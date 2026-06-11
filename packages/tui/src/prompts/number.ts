@@ -2,6 +2,9 @@ import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { readTypedValue } from '#tui/typed-value';
 import type { NumberPromptOptions } from '#tui/types';
 
+const integerPattern = /^[+-]?\d+$/u;
+const numberPattern = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/iu;
+
 export function number(options: NumberPromptOptions): Promise<number>;
 export function number(
   label: string,
@@ -39,11 +42,14 @@ export async function number(
       return options.default;
     }
 
-    const parsed = options.integer ? Number.parseInt(answer, 10) : Number.parseFloat(answer);
+    const normalized = answer.trim();
+    const valid = options.integer ? integerPattern.test(normalized) : numberPattern.test(normalized);
 
-    if (Number.isNaN(parsed)) {
+    if (!valid) {
       throw new PromptValidationError('Please enter a valid number.');
     }
+
+    const parsed = options.integer ? Number.parseInt(normalized, 10) : Number(normalized);
 
     if (options.min !== undefined && parsed < options.min) {
       throw new PromptValidationError(`Please enter a value greater than or equal to ${options.min}.`);
