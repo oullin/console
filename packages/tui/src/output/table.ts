@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { parseTableOptions } from '#tui/output/validators/table';
+import { renderGrid } from '#tui/output/grid';
 import { renderTable } from '#tui/theme';
 import type { TableOptions } from '#tui/types';
 
@@ -22,15 +23,13 @@ export const table = (headersOrOptions: TableOptions | string[] = [], rows: Tabl
 };
 
 export const grid = (items: Array<string | number | boolean> = [], maxWidth?: number): void => {
-	const width = Math.max(1, Math.trunc(maxWidth ?? 4));
-	const rows: string[][] = [];
+	const rendered = renderGrid(items, maxWidth);
 
-	for (let index = 0; index < items.length; index += width) {
-		rows.push(items.slice(index, index + width).map(String));
+	if (rendered === '') {
+		return;
 	}
 
-	promptEnvironment().output.write(rows.map((row) => row.join('  ')).join('\n'));
-	promptEnvironment().output.write(items.length > 0 ? '\n' : '');
+	promptEnvironment().output.write(`${rendered}\n`);
 };
 
 export const dataTable = table;
