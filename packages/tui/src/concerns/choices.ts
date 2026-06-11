@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { parseChoice } from '#tui/concerns/validators/choice';
+import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
 import type { Choice, ChoiceInput } from '#tui/types';
 
 export const normalizeChoices = <T>(options: Array<ChoiceInput<T>>): Array<Choice<T>> => {
@@ -63,14 +64,16 @@ export const nextEnabledIndex = <T>(choices: Array<Choice<T>>, current: number, 
 };
 
 const choiceWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
-	if (scroll === undefined || scroll <= 0 || scroll >= total) {
+	const size = parseOptionalScrollSize(scroll);
+
+	if (size === undefined || size >= total) {
 		return { end: total, start: 0 };
 	}
 
-	const before = Math.floor((scroll - 1) / 2);
-	const start = Math.max(0, Math.min(selected - before, total - scroll));
+	const before = Math.floor((size - 1) / 2);
+	const start = Math.max(0, Math.min(selected - before, total - size));
 
-	return { end: start + scroll, start };
+	return { end: start + size, start };
 };
 
 export const renderInteractiveChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number> = new Set(), scroll?: number): void => {

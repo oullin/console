@@ -1,4 +1,5 @@
 import { Key } from '#tui/key';
+import { parseScrollSize } from '#tui/concerns/validators/scroll';
 import type { Choice } from '#tui/types';
 
 export const parseChoiceIndex = (key: string): number => (/^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN);
@@ -22,7 +23,7 @@ export const lastEnabledChoiceIndex = <T>(choices: Array<Choice<T>>): number => 
 };
 
 export const pageSize = (scroll?: number): number => {
-	return Math.max(1, scroll ?? 10);
+	return parseScrollSize(scroll, 10);
 };
 
 export const pageIndex = (total: number, current: number, direction: 1 | -1, scroll?: number): number => {

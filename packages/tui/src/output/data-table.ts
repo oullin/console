@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
+import { parseOptionalScrollSize, parseScrollSize } from '#tui/concerns/validators/scroll';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderTable } from '#tui/theme';
 import { isDataObjectRow } from '#tui/output/validators/data-table';
@@ -73,14 +74,16 @@ const clampSelected = <T>(selected: number, rows: Array<VisibleRow<T>>): number 
 };
 
 const rowWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
-	if (scroll === undefined || scroll <= 0 || scroll >= total) {
+	const size = parseOptionalScrollSize(scroll);
+
+	if (size === undefined || size >= total) {
 		return { end: total, start: 0 };
 	}
 
-	const before = Math.floor((scroll - 1) / 2);
-	const start = Math.max(0, Math.min(selected - before, total - scroll));
+	const before = Math.floor((size - 1) / 2);
+	const start = Math.max(0, Math.min(selected - before, total - size));
 
-	return { end: start + scroll, start };
+	return { end: start + size, start };
 };
 
 const isPrintable = (key: string): boolean => {
@@ -194,13 +197,13 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 			}
 
 			if (key === Key.pageDown) {
-				selected = rows.length === 0 ? 0 : Math.min(rows.length - 1, selected + (options.scroll ?? 10));
+				selected = rows.length === 0 ? 0 : Math.min(rows.length - 1, selected + parseScrollSize(options.scroll, 10));
 				render();
 				continue;
 			}
 
 			if (key === Key.pageUp) {
-				selected = Math.max(0, selected - (options.scroll ?? 10));
+				selected = Math.max(0, selected - parseScrollSize(options.scroll, 10));
 				render();
 				continue;
 			}

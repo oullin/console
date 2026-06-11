@@ -184,6 +184,28 @@ describe('choice prompts', () => {
 		expect(result).toBe('third');
 	});
 
+	it('normalizes fractional scroll sizes for select page navigation', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.pageDown, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second', 'third', 'fourth'], scroll: 2.9 }),
+		);
+
+		const latestFrame = output.text().split('Pick one\n').at(-1) ?? '';
+
+		expect(result).toBe('third');
+		expect(latestFrame).not.toContain('first');
+		expect(latestFrame).not.toContain('second');
+		expect(latestFrame).toContain('third');
+		expect(latestFrame).toContain('fourth');
+	});
+
 	it('renders select info for the highlighted option', async () => {
 		const output = createMemoryOutput();
 
