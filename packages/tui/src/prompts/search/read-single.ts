@@ -20,7 +20,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 	let highlighted: number | null = null;
 
-	renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+	renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -41,13 +41,13 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			highlighted = moveSearchHighlight(choices, highlighted, action, { attempt, retryFirst: true, scroll: options.scroll });
-			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
 		if (clearsSearchHighlight(key) && highlighted !== null) {
 			highlighted = null;
-			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
@@ -66,7 +66,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			highlighted = null;
-			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
@@ -83,6 +83,6 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 		choices = await resolveSearchChoices(options.options, state.value);
 
-		renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+		renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 	}
 };

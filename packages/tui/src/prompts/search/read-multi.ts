@@ -28,7 +28,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const currentChoices = displayedChoices();
 		const marked = markedSearchChoiceIndexes(currentChoices, selected);
 
-		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info, true);
+		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info, true, options.placeholder);
 	};
 
 	render();

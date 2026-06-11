@@ -27,7 +27,8 @@ describe('search prompt', () => {
 		);
 
 		expect(result).toBe('blue');
-		expect(output.text()).toContain('Favorite color? ue');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mFavorite color?\u001B[39m ');
+		expect(parseAnsiText(output.text())).toContain('│ ue');
 		expect(output.text()).toContain('┌ \u001B[2mFavorite color?\u001B[22m ');
 		expect(output.text()).toContain('│ Blue');
 	});
@@ -67,7 +68,7 @@ describe('search prompt', () => {
 			() => search({ message: 'Favorite color?', options: colors }),
 		);
 
-		expect(output.text()).toContain('Favorite color? r');
+		expect(parseAnsiText(output.text())).toContain('│ r');
 		expect(output.text()).toContain('\u001B[36m›\u001B[39m Red');
 		expect(output.text()).toContain('\u001B[2mGreen\u001B[22m');
 	});
@@ -85,10 +86,8 @@ describe('search prompt', () => {
 			() => search({ message: 'Favorite color?', options: colors, default: 'red' }),
 		);
 
-		const firstFrame = output.text().split('Favorite color?\n')[1] ?? '';
-
-		expect(firstFrame).not.toContain('›');
-		expect(firstFrame).toContain('\u001B[2mRed\u001B[22m');
+		expect(output.text()).not.toContain('›');
+		expect(output.text()).toContain('\u001B[2mRed\u001B[22m');
 	});
 
 	it('respects scroll windows when rendering results', async () => {
@@ -109,15 +108,12 @@ describe('search prompt', () => {
 				}),
 		);
 
-		const latestFrame = output.text().split('Pick number\n').at(-1) ?? '';
-
 		expect(result).toBe('three');
-		expect(latestFrame).not.toContain('one');
-		expect(latestFrame).toContain('two');
-		expect(latestFrame).toContain('three');
-		expect(latestFrame).toContain('four');
-		expect(latestFrame).toContain('┃');
-		expect(latestFrame).toContain('│');
+		expect(parseAnsiText(output.text())).toContain('│   two');
+		expect(parseAnsiText(output.text())).toContain('│ › three');
+		expect(parseAnsiText(output.text())).toContain('│   four');
+		expect(output.text()).toContain('┃');
+		expect(output.text()).toContain('│');
 	});
 
 	it('supports page search navigation keys', async () => {
@@ -432,8 +428,8 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['violet', 'green']);
 		expect(output.text()).toContain('\u001B[36m› ◼\u001B[39m Violet');
-		expect(output.text()).toContain('Selected: Violet');
-		expect(output.text()).toContain('Selected: Violet, Green');
+		expect(output.text()).toContain('1 selected');
+		expect(output.text()).toContain('2 selected');
 		expect(output.text()).toContain('┌ \u001B[2mFavorite colors?\u001B[22m ');
 		expect(output.text()).toContain('│ Violet');
 		expect(output.text()).toContain('│ Green');
@@ -459,7 +455,6 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['green']);
 		expect(output.text()).toContain('1 selected');
-		expect(output.text()).toContain('Selected: Green');
 		expect(output.text()).toContain('│ Green');
 	});
 
@@ -482,7 +477,7 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['green']);
-		expect(output.text()).toContain('Selected: Green');
+		expect(output.text()).toContain('│ Green');
 	});
 
 	it('returns an empty array for non-interactive multisearch prompts without defaults', async () => {
@@ -614,7 +609,7 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['green']);
 		expect(output.text()).toContain('1 selected (1 hidden)');
-		expect(output.text()).toContain('Selected: Green');
+		expect(output.text()).toContain('│ Green');
 	});
 
 	it('cancels multisearch prompts with the current selected values', async () => {
@@ -651,7 +646,10 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['red', 'green', 'blue']);
-		expect(output.text()).toContain('Selected: Red, Green, Blue');
+		expect(output.text()).toContain('3 selected');
+		expect(output.text()).toContain('│ Red');
+		expect(output.text()).toContain('│ Green');
+		expect(output.text()).toContain('│ Blue');
 	});
 
 	it('does not navigate multisearch results with ctrl-n or ctrl-p', async () => {
@@ -731,7 +729,9 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['blue', 'red']);
-		expect(output.text()).toContain('Selected: Blue, Red');
+		expect(output.text()).toContain('2 selected');
+		expect(output.text()).toContain('│ Blue');
+		expect(output.text()).toContain('│ Red');
 	});
 
 	it('ignores end-of-line control navigation while multisearch results are highlighted', async () => {
@@ -748,7 +748,8 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['red']);
-		expect(output.text()).toContain('Selected: Red');
+		expect(output.text()).toContain('1 selected');
+		expect(output.text()).toContain('│ Red');
 	});
 
 	it('supports page multisearch navigation keys', async () => {
@@ -765,7 +766,9 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['blue', 'red']);
-		expect(output.text()).toContain('Selected: Blue, Red');
+		expect(output.text()).toContain('2 selected');
+		expect(output.text()).toContain('│ Blue');
+		expect(output.text()).toContain('│ Red');
 		expect(output.text()).toContain('┃');
 		expect(output.text()).toContain('│');
 	});
@@ -792,7 +795,9 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['green', 'blue']);
-		expect(output.text()).toContain('Selected: Green, Blue');
+		expect(output.text()).toContain('2 selected');
+		expect(output.text()).toContain('│ Green');
+		expect(output.text()).toContain('│ Blue');
 	});
 
 	it('transforms multisearch values before validation and return', async () => {

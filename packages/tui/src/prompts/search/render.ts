@@ -2,7 +2,6 @@ import { promptEnvironment } from '#tui/environment';
 import { choiceWindow } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
-import { searchMessage } from '#tui/prompts/search/choices';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
@@ -17,24 +16,15 @@ export const renderSearchChoices = <T>(
 	scroll?: number,
 	info?: SearchPromptOptions<T>['info'] | MultiSearchPromptOptions<T>['info'],
 	showSelectedSummary = false,
+	placeholder = '',
 ): void => {
-	renderSearchRows(searchMessage(message, query), choices, highlighted, marked, scroll, showSelectedSummary);
-
-	if (query.length > 0 && choices.length === 0) {
-		promptEnvironment().output.write(`${dim('  No results.')}\n`);
-	}
-
 	const text = resolveInfo(info, highlighted === null ? null : (choices[highlighted]?.value ?? null));
 	const summary = showSelectedSummary ? selectedSummary(selectedLabels.length, selectedLabels.length - marked.size) : '';
 	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
 
-	if (details.length > 0) {
-		promptEnvironment().output.write(`${details}\n`);
-	}
-
-	if (selectedLabels.length > 0) {
-		promptEnvironment().output.write(`Selected: ${selectedLabels.join(', ')}\n`);
-	}
+	promptEnvironment().output.write(
+		`${renderBox({ body: renderSearchBody(query, placeholder, choices, highlighted, marked, scroll, showSelectedSummary), borderStyle: cyan, info: details, title: cyan(message) })}\n`,
+	);
 };
 
 export const renderSubmittedSearchChoice = (message: string, label: string): void => {
@@ -54,11 +44,19 @@ export const renderCancelledSearch = (message: string, query: string, placeholde
 	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
 };
 
-const renderSearchRows = <T>(message: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): void => {
-	const environment = promptEnvironment();
-	const window = choiceWindow(choices.length, highlighted ?? 0, scroll);
+const renderSearchBody = <T>(query: string, placeholder: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): string => {
+	const value = query.length > 0 ? query : dim(placeholder);
+	const rows = renderSearchRows(choices, highlighted, marked, scroll, multiple);
 
-	environment.output.write(`${message}\n`);
+	if (query.length > 0 && choices.length === 0) {
+		return [value, dim('  No results.')].join('\n');
+	}
+
+	return rows.length > 0 ? [value, rows].join('\n') : value;
+};
+
+const renderSearchRows = <T>(choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): string => {
+	const window = choiceWindow(choices.length, highlighted ?? 0, scroll);
 
 	const rows = choices.slice(window.start, window.end).map((choice, offset) => {
 		const index = window.start + offset;
@@ -69,9 +67,7 @@ const renderSearchRows = <T>(message: string, choices: Array<Choice<T>>, highlig
 		return multiple ? multiSearchRow(label, active, selected) : searchRow(label, active);
 	});
 
-	for (const row of renderScrollbarRows(rows, window.start, window.end - window.start, choices.length)) {
-		environment.output.write(`${row}\n`);
-	}
+	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');
 };
 
 const choiceLabel = <T>(choice: Choice<T>): string => {

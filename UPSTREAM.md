@@ -32,10 +32,12 @@ TypeScript and OpenTUI internals.
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
+| Search active boxed layout and row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
@@ -72,9 +74,7 @@ The following reference areas still need full line-by-line behavioral mapping in
 later phases:
 
 - Form builder remaining method-surface and validation parity
-- Multi-search active boxed layout parity
 - Prompt lifecycle
-- Search active boxed layout parity
 - Textarea wrapping and cursor parity
 - Default theme
 - Feature parity tests
