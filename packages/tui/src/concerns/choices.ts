@@ -1,9 +1,20 @@
 import { promptEnvironment } from '#tui/environment';
-import { parseChoice } from '#tui/concerns/validators/choice';
+import { parseChoice, parseChoiceRecord } from '#tui/concerns/validators/choice';
 import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
-import type { Choice, ChoiceInput } from '#tui/types';
+import type { Choice, ChoiceOptions } from '#tui/types';
 
-export const normalizeChoices = <T>(options: Array<ChoiceInput<T>>): Array<Choice<T>> => {
+const normalizeChoiceRecordKey = (key: string): string | number => (/^-?\d+$/u.test(key) ? Number.parseInt(key, 10) : key);
+
+export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => {
+	if (!Array.isArray(options)) {
+		const parsed = parseChoiceRecord(options);
+
+		return Object.entries(parsed ?? {}).map(([value, label]) => ({
+			label,
+			value: normalizeChoiceRecordKey(value) as T,
+		}));
+	}
+
 	return options.map((choice) => {
 		const parsed = parseChoice<T>(choice);
 
@@ -18,16 +29,7 @@ export const normalizeChoices = <T>(options: Array<ChoiceInput<T>>): Array<Choic
 	});
 };
 
-export const normalizeSearchChoices = <T>(options: Array<ChoiceInput<T>> | Record<string, string>): Array<Choice<T>> => {
-	if (Array.isArray(options)) {
-		return normalizeChoices(options);
-	}
-
-	return Object.entries(options).map(([value, label]) => ({
-		label,
-		value: value as T,
-	}));
-};
+export const normalizeSearchChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => normalizeChoices(options);
 
 export const findChoice = <T>(choices: Array<Choice<T>>, answer: string): Choice<T> | undefined => {
 	const normalizedAnswer = answer.trim();

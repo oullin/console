@@ -39,6 +39,8 @@ export type Choice<T = string> = {
 
 export type ChoiceInput<T = string> = Choice<T> | T;
 
+export type ChoiceOptions<T = string> = Array<ChoiceInput<T>> | Record<string, string>;
+
 export type PromptInfo<T> = string | ((value: T | null) => string | null | undefined);
 
 export type TextPromptOptions = BasePromptOptions<string> & {
@@ -71,7 +73,7 @@ export type ConfirmPromptOptions = BasePromptOptions<boolean> & {
 
 export type SelectPromptOptions<T> = BasePromptOptions<T> & {
 	label?: string;
-	options: Array<ChoiceInput<T>>;
+	options: ChoiceOptions<T>;
 	scroll?: number;
 	info?: PromptInfo<T>;
 	transform?: (value: T) => MaybePromise<T>;
@@ -79,7 +81,7 @@ export type SelectPromptOptions<T> = BasePromptOptions<T> & {
 
 export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
 	label?: string;
-	options: Array<ChoiceInput<T>>;
+	options: ChoiceOptions<T>;
 	scroll?: number;
 	info?: PromptInfo<T>;
 	transform?: (value: T[]) => MaybePromise<T[]>;
@@ -87,7 +89,7 @@ export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
 
 export type SearchPromptOptions<T> = Omit<BasePromptOptions<T>, 'required'> & {
 	label?: string;
-	options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
+	options: ChoiceOptions<T> | ((query: string) => MaybePromise<ChoiceOptions<T>>);
 	placeholder?: string;
 	required?: true | string;
 	scroll?: number;
@@ -97,7 +99,7 @@ export type SearchPromptOptions<T> = Omit<BasePromptOptions<T>, 'required'> & {
 
 export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
 	label?: string;
-	options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
+	options: ChoiceOptions<T> | ((query: string) => MaybePromise<ChoiceOptions<T>>);
 	placeholder?: string;
 	scroll?: number;
 	info?: PromptInfo<T>;

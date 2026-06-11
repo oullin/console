@@ -97,6 +97,38 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Pick one');
 	});
 
+	it('returns keys from keyed select options', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: { first: 'First', second: 'Second' } }),
+		);
+
+		expect(result).toBe('second');
+	});
+
+	it('returns numeric keys from numeric keyed select options', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select<number>({ message: 'Pick one', options: { 1: 'First', 2: 'Second' } }),
+		);
+
+		expect(result).toBe(2);
+	});
+
 	it('starts select prompts on the default value', async () => {
 		const output = createMemoryOutput();
 
@@ -298,6 +330,22 @@ describe('choice prompts', () => {
 		expect(result).toEqual(['first', 'second']);
 		expect(output.text()).toContain('Selected: first');
 		expect(output.text()).toContain('Selected: first, second');
+	});
+
+	it('returns keys from keyed multiselect options', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.space, Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: { first: 'First', second: 'Second', third: 'Third' } }),
+		);
+
+		expect(result).toEqual(['second', 'third']);
 	});
 
 	it('starts multiselect prompts with default selected values', async () => {

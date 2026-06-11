@@ -10,8 +10,16 @@ const choiceSchema = z
 	})
 	.passthrough();
 
+const choiceRecordSchema = z.record(z.string(), z.string());
+
 export const parseChoice = <T>(value: unknown): Choice<T> | null => {
 	const parsed = choiceSchema.safeParse(value);
 
 	return parsed.success ? (parsed.data as Choice<T>) : null;
+};
+
+export const parseChoiceRecord = (value: unknown): Record<string, string> | null => {
+	const parsed = choiceRecordSchema.safeParse(value);
+
+	return parsed.success ? parsed.data : null;
 };

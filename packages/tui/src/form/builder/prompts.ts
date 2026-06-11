@@ -2,7 +2,7 @@ import { autocomplete, confirm, multiselect, multisearch, pause, search, select,
 import { number, password, text, textarea } from '#tui/prompts/basic';
 import { previousArray, previousNumber, previousString } from '#tui/form/builder/previous';
 import type { FormBuilder } from '#tui/form/builder/index';
-import type { ChoiceInput, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TextPromptOptions } from '#tui/types';
+import type { ChoiceOptions, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TextPromptOptions } from '#tui/types';
 import type { SuggestOptions } from '#tui/prompts/choices';
 
 export type PromptBuilderMethods = {
@@ -33,7 +33,7 @@ export type PromptBuilderMethods = {
 	multiselect<T>(
 		this: FormBuilder,
 		label: string,
-		options: Array<ChoiceInput<T>>,
+		options: ChoiceOptions<T>,
 		defaultValue?: T[],
 		scroll?: number,
 		required?: boolean | string,
@@ -70,7 +70,7 @@ export type PromptBuilderMethods = {
 	select<T>(
 		this: FormBuilder,
 		label: string,
-		options: Array<ChoiceInput<T>>,
+		options: ChoiceOptions<T>,
 		defaultValue?: T,
 		scroll?: number,
 		validate?: (value: T) => MaybePromise<string | null | undefined>,
@@ -128,7 +128,7 @@ export const promptBuilderMethods: PromptBuilderMethods & ThisType<FormBuilder> 
 	},
 	multiselect<T>(
 		label: string,
-		options: Array<ChoiceInput<T>>,
+		options: ChoiceOptions<T>,
 		defaultValue: T[] = [],
 		scroll = 5,
 		required: boolean | string = false,
@@ -151,7 +151,7 @@ export const promptBuilderMethods: PromptBuilderMethods & ThisType<FormBuilder> 
 	search<T>(options: SearchPromptOptions<T>, name?: string) {
 		return this.add(() => search(options), name);
 	},
-	select<T>(label: string, options: Array<ChoiceInput<T>>, defaultValue?: T, scroll = 5, validate = undefined, hint = '', required: boolean | string = true, name?: string, transform = undefined) {
+	select<T>(label: string, options: ChoiceOptions<T>, defaultValue?: T, scroll = 5, validate = undefined, hint = '', required: boolean | string = true, name?: string, transform = undefined) {
 		return this.add((_, previous) => select({ message: label, options, default: previous === undefined ? defaultValue : (previous as T), scroll, validate, hint, required, transform }), name);
 	},
 	suggest(label, options, defaultValue = '', scroll = 5, required = false, validate = undefined, hint = '', name, transform = undefined) {
