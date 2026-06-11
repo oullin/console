@@ -80,4 +80,21 @@ describe('typed value editing', () => {
 			value: 'abc\nde\nfghi',
 		});
 	});
+
+	it('moves to textarea line boundaries', () => {
+		expect(applyMultilineState('abc\nde\nfghi', 5, [Key.home[0]])).toEqual({
+			cursor: 4,
+			value: 'abc\nde\nfghi',
+		});
+
+		expect(applyMultilineState('abc\nde\nfghi', 5, [Key.end[0]])).toEqual({
+			cursor: 6,
+			value: 'abc\nde\nfghi',
+		});
+
+		expect(applyMultilineState('abc\nde\nfghi', 9, [Key.ctrlA, 'X', Key.ctrlE, 'Y'])).toEqual({
+			cursor: 13,
+			value: 'abc\nde\nXfghiY',
+		});
+	});
 });

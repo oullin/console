@@ -99,6 +99,17 @@ const moveLine = (value: string[], cursor: number, direction: 1 | -1): number =>
 	return target.start + targetColumn;
 };
 
+const moveToLineBoundary = (value: string[], cursor: number, boundary: 'start' | 'end'): number => {
+	const ranges = lineRanges(value);
+	const range = ranges[currentLine(ranges, cursor)];
+
+	if (!range) {
+		return cursor;
+	}
+
+	return boundary === 'start' ? range.start : range.end;
+};
+
 export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false): TypedValueState & { submitted: boolean; cancelled: boolean } => {
 	const value = characters(state.value);
 
@@ -140,11 +151,15 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 	}
 
 	if (oneOf([Key.home, Key.ctrlA], key)) {
-		return { cursor: 0, value: fromCharacters(value), submitted: false, cancelled: false };
+		const nextCursor = allowNewLine ? moveToLineBoundary(value, cursor, 'start') : 0;
+
+		return { cursor: nextCursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (oneOf([Key.end, Key.ctrlE], key)) {
-		return { cursor: value.length, value: fromCharacters(value), submitted: false, cancelled: false };
+		const nextCursor = allowNewLine ? moveToLineBoundary(value, cursor, 'end') : value.length;
+
+		return { cursor: nextCursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (key === Key.delete) {
