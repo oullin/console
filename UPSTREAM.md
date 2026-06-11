@@ -15,7 +15,10 @@ TypeScript and OpenTUI internals.
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts` |
 | Key constants | `packages/tui/src/key.ts` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
-| Text, textarea, number, password | `packages/tui/src/prompts/basic.ts`, `packages/tui/src/typed-value.ts` |
+| Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
+| Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
+| Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
+| Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search.ts` |
