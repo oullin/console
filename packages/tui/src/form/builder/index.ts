@@ -1,6 +1,8 @@
 import { outputBuilderMethods } from '#tui/form/builder/output';
 import { promptBuilderMethods } from '#tui/form/builder/prompts';
+import { FormRevertedError, runWithFormRevert } from '#tui/form/builder/revert';
 import { statusBuilderMethods } from '#tui/form/builder/status';
+import { shouldIgnoreStepWhenReverting, shouldRunStep } from '#tui/form/builder/conditions';
 import type { FormResponses, FormStep } from '#tui/form/types';
 import type { MaybePromise } from '#tui/types';
 
@@ -61,16 +63,42 @@ export class FormBuilder {
 	}
 
 	async submit(): Promise<FormResponses> {
-		for (const [index, step] of this.#steps.entries()) {
-			const key = step.name ?? index;
-			const shouldRun = typeof step.condition === 'function' ? step.condition(this.#responses) : step.condition;
+		let index = 0;
+		let wasReverted = false;
 
-			if (!shouldRun) {
-				this.#responses[key] = null;
+		while (index < this.#steps.length) {
+			const step = this.#steps[index];
+
+			if (step === undefined) {
+				break;
+			}
+
+			if (wasReverted && index > 0 && shouldIgnoreStepWhenReverting(step, this.#responses)) {
+				index -= 1;
 				continue;
 			}
 
-			this.#responses[key] = await step.run(this.#responses, this.#responses[key], step.name);
+			wasReverted = false;
+
+			const key = step.name ?? index;
+
+			if (!shouldRunStep(step, this.#responses)) {
+				this.#responses[key] = null;
+				index += 1;
+				continue;
+			}
+
+			try {
+				this.#responses[key] = await runWithFormRevert(index > 0, () => step.run(this.#responses, this.#responses[key], step.name));
+			} catch (error) {
+				if (!(error instanceof FormRevertedError)) {
+					throw error;
+				}
+
+				wasReverted = true;
+			}
+
+			index += wasReverted ? -1 : 1;
 		}
 
 		return this.#responses;

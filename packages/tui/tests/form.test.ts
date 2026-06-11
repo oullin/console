@@ -64,6 +64,40 @@ describe('form builder', () => {
 		expect(responses.details).toBeNull();
 	});
 
+	it('reverts to the previous form step and reuses the prior response', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.enter, 'B', Key.ctrlU, Key.backspace, 'C', Key.enter, 'D', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().text('First').text('Second').submit(),
+		);
+
+		expect(responses[0]).toBe('C');
+		expect(responses[1]).toBe('D');
+	});
+
+	it('does not revert the first form step', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlU, 'A', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().text('First').submit(),
+		);
+
+		expect(responses[0]).toBe('A');
+		expect(output.text()).toContain('This cannot be reverted.');
+	});
+
 	it('runs suggest, search, and multisearch form steps', async () => {
 		const output = createMemoryOutput();
 
