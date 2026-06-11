@@ -6,7 +6,7 @@ export { confirm, select, multiselect, suggest, search, multisearch, autocomplet
 export { number, password, text, textarea } from '#tui/prompts/basic';
 export { alert, clear, dataTable, datatable, error, grid, info, intro, note, notify, outro, table, title, warning } from '#tui/output';
 export { PromptValidationError } from '#tui/prompt';
-export { Progress, progress, spin, stream, task } from '#tui/status';
+export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
 export { clearTerminal, cursorToStart, eraseLine, setTerminalTitle, terminalSize } from '#tui/terminal';
 export { applyTypedKey, readTypedValue } from '#tui/typed-value';
 export { parseAnsiText, truncate, visibleWidth, wrap } from '#tui/strings';
@@ -16,6 +16,7 @@ export type {
   ChoiceInput,
   ConfirmPromptOptions,
   MaybePromise,
+  MultiSearchPromptOptions,
   MultiSelectPromptOptions,
   NumberPromptOptions,
   PromptEnvironment,

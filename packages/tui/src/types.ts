@@ -83,6 +83,14 @@ export type SearchPromptOptions<T> = BasePromptOptions<T> & {
   info?: string | ((value: T) => string);
 };
 
+export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
+  label?: string;
+  options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
+  placeholder?: string;
+  scroll?: number;
+  info?: string | ((value: T[]) => string);
+};
+
 export type TableOptions = {
   headers?: string[];
   rows: Array<Array<string | number | boolean | null | undefined> | Record<string, string | number | boolean | null | undefined>>;

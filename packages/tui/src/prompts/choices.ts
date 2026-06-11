@@ -3,89 +3,17 @@ import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
 import { renderChoices } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
+import { findChoice, firstEnabledIndex, nextEnabledIndex, normalizeChoices, normalizeSearchChoices, renderInteractiveChoices } from '#tui/concerns/choices';
 import type {
   Choice,
-  ChoiceInput,
   ConfirmPromptOptions,
   MaybePromise,
+  MultiSearchPromptOptions,
   MultiSelectPromptOptions,
   SearchPromptOptions,
   SelectPromptOptions,
   TextPromptOptions
 } from '#tui/types';
-
-export const normalizeChoices = <T>(options: Array<ChoiceInput<T>>): Array<Choice<T>> => {
-  return options.map((choice) => {
-    if (typeof choice === 'object' && choice !== null && 'value' in choice && 'label' in choice) {
-      return choice;
-    }
-
-    return {
-      label: String(choice),
-      value: choice as T
-    };
-  });
-};
-
-const normalizeSearchChoices = <T>(options: Array<ChoiceInput<T>> | Record<string, string>): Array<Choice<T>> => {
-  if (Array.isArray(options)) {
-    return normalizeChoices(options);
-  }
-
-  return Object.entries(options).map(([value, label]) => ({
-    label,
-    value: value as T
-  }));
-};
-
-const findChoice = <T>(choices: Array<Choice<T>>, answer: string): Choice<T> | undefined => {
-  const index = Number.parseInt(answer, 10);
-
-  if (!Number.isNaN(index)) {
-    return choices[index - 1];
-  }
-
-  return choices.find((choice) => choice.label === answer || String(choice.value) === answer);
-};
-
-const firstEnabledIndex = <T>(choices: Array<Choice<T>>): number => {
-  const index = choices.findIndex((choice) => !choice.disabled);
-
-  return index === -1 ? 0 : index;
-};
-
-const nextEnabledIndex = <T>(choices: Array<Choice<T>>, current: number, direction: 1 | -1): number => {
-  if (choices.length === 0) {
-    return 0;
-  }
-
-  let index = current;
-
-  for (let attempts = 0; attempts < choices.length; attempts += 1) {
-    index = (index + direction + choices.length) % choices.length;
-
-    if (!choices[index]?.disabled) {
-      return index;
-    }
-  }
-
-  return current;
-};
-
-const renderInteractiveChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number> = new Set()): void => {
-  const environment = promptEnvironment();
-
-  environment.output.write(`${message}\n`);
-
-  for (const [index, choice] of choices.entries()) {
-    const pointer = index === selected ? '›' : ' ';
-    const checked = marked.size > 0 ? (marked.has(index) ? '[x]' : '[ ]') : '  ';
-    const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
-    const hint = choice.hint ? ` ${choice.hint}` : '';
-
-    environment.output.write(`${pointer} ${checked} ${choice.label}${hint}${disabled}\n`);
-  }
-};
 
 const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, hint?: string): Promise<T> => {
   const environment = promptEnvironment();
@@ -112,7 +40,7 @@ const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>,
       throw new PromptValidationError('Please select a valid option.');
     }
 
-    const numeric = Number.parseInt(key, 10);
+    const numeric = /^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN;
 
     if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
       return choices[numeric - 1].value;
@@ -173,14 +101,19 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
     }
 
     if (key.includes(',')) {
-      return key
+      const selectedChoices = key
         .split(',')
         .map((part) => findChoice(choices, part.trim()))
-        .filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled)
-        .map((choice) => choice.value);
+        .filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
+
+      if (selectedChoices.length !== key.split(',').length) {
+        throw new PromptValidationError('Please select valid options.');
+      }
+
+      return selectedChoices.map((choice) => choice.value);
     }
 
-    const numeric = Number.parseInt(key, 10);
+    const numeric = /^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN;
 
     if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
       const index = numeric - 1;
@@ -444,7 +377,7 @@ export const search = async <T>(options: SearchPromptOptions<T>): Promise<T> => 
   });
 };
 
-export const multisearch = async <T>(options: SearchPromptOptions<T[]>): Promise<T[]> => {
+export const multisearch = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
   return promptUntilValid(options, async () => {
     return readMultiSearchChoices(options);
   });
@@ -528,7 +461,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
   }
 };
 
-const readMultiSearchChoices = async <T>(options: SearchPromptOptions<T[]>): Promise<T[]> => {
+const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
   const environment = promptEnvironment();
 
   if (!environment.input.readKey) {
@@ -539,11 +472,16 @@ const readMultiSearchChoices = async <T>(options: SearchPromptOptions<T[]>): Pro
       return options.default;
     }
 
-    return query
+    const selectedChoices = query
       .split(',')
       .map((part) => findChoice(choices, part.trim()))
-      .filter((choice): choice is Choice<T[]> => choice !== undefined && !choice.disabled)
-      .flatMap((choice) => choice.value);
+      .filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
+
+    if (selectedChoices.length !== query.split(',').length) {
+      throw new PromptValidationError('Please select valid options.');
+    }
+
+    return selectedChoices.map((choice) => choice.value);
   }
 
   let state = { cursor: 0, value: '' };
