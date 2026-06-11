@@ -48,6 +48,7 @@ export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: P
 			return value;
 		}
 
+		options.default = value;
 		environment.error.write(renderError(validation));
 		attempt += 1;
 	}

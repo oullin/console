@@ -15,9 +15,11 @@ TypeScript and OpenTUI internals.
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts`, `packages/tui/src/environment/*` |
 | Prompt cancellation callback lifecycle | `packages/tui/src/prompt/cancel.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt revert rejection lifecycle | `packages/tui/src/prompt/revert.ts`, `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/form.test.ts` |
+| Prompt validation retry default lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/text.test.ts` |
 | Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
+| Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/text.test.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
 | Textarea control-key line navigation and empty-line movement | `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea boxed renderer and placeholder styling | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
