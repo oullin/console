@@ -195,6 +195,36 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('Selected: Red, Green, Blue');
 	});
 
+	it('keeps selected multisearch values visible after clearing the query', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['V', Key.down, Key.space, Key.backspace, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: (value) => {
+						if (value === '') {
+							return { green: 'Green' };
+						}
+
+						return { violet: 'Violet' };
+					},
+				}),
+		);
+
+		const latestFrame = output.text().split('Favorite colors?\n').at(-1) ?? '';
+
+		expect(result).toEqual(['violet']);
+		expect(latestFrame).toContain('Violet');
+		expect(latestFrame).toContain('Green');
+	});
+
 	it('supports home and end multisearch navigation keys', async () => {
 		const output = createMemoryOutput();
 

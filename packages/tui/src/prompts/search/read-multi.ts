@@ -40,12 +40,24 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 	let highlighted: number | null = null;
 
 	const selected = new Map<T, string>();
-	const selectableChoices = (): Array<Choice<T>> => choices.filter((choice) => !choice.disabled);
+
+	const displayedChoices = (): Array<Choice<T>> => {
+		if (state.value.trim() !== '') {
+			return choices;
+		}
+
+		const selectedChoices = [...selected.entries()].filter(([value]) => !choices.some((choice) => Object.is(choice.value, value))).map(([value, label]) => ({ label, value }));
+
+		return [...selectedChoices, ...choices];
+	};
+
+	const selectableChoices = (): Array<Choice<T>> => displayedChoices().filter((choice) => !choice.disabled);
 
 	const render = (): void => {
-		const marked = new Set(choices.flatMap((choice, index) => (selected.has(choice.value) ? [index] : [])));
+		const currentChoices = displayedChoices();
+		const marked = new Set(currentChoices.flatMap((choice, index) => (selected.has(choice.value) ? [index] : [])));
 
-		renderSearchChoices(options.message, state.value, choices, highlighted, marked, [...selected.values()], options.scroll, options.info);
+		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info);
 	};
 
 	render();
@@ -60,7 +72,9 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : highlighted === null ? firstEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, 1);
+			const currentChoices = displayedChoices();
+
+			highlighted = currentChoices.length === 0 ? null : highlighted === null ? firstEnabledIndex(currentChoices) : nextEnabledIndex(currentChoices, highlighted, 1);
 			render();
 			continue;
 		}
@@ -68,19 +82,21 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, -1);
+			const currentChoices = displayedChoices();
+
+			highlighted = currentChoices.length === 0 ? null : highlighted === null ? lastEnabledIndex(currentChoices) : nextEnabledIndex(currentChoices, highlighted, -1);
 			render();
 			continue;
 		}
 
 		if (oneOf([Key.home], key) && highlighted !== null) {
-			highlighted = firstEnabledIndex(choices);
+			highlighted = firstEnabledIndex(displayedChoices());
 			render();
 			continue;
 		}
 
 		if (oneOf([Key.end], key) && highlighted !== null) {
-			highlighted = lastEnabledIndex(choices);
+			highlighted = lastEnabledIndex(displayedChoices());
 			render();
 			continue;
 		}
@@ -109,7 +125,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		}
 
 		if (key === Key.space && highlighted !== null) {
-			const choice = choices[highlighted];
+			const choice = displayedChoices()[highlighted];
 
 			if (choice && !choice.disabled) {
 				if (selected.has(choice.value as T)) {
