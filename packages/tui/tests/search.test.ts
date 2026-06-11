@@ -454,6 +454,29 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('1 selected (1 hidden)');
 	});
 
+	it('keeps default multisearch labels while filtered out', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['B', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: colors,
+					default: ['green'],
+				}),
+		);
+
+		expect(result).toEqual(['green']);
+		expect(output.text()).toContain('1 selected (1 hidden)');
+		expect(output.text()).toContain('Selected: Green');
+	});
+
 	it('cancels multisearch prompts with the current selected values', async () => {
 		const output = createMemoryOutput();
 

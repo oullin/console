@@ -6,7 +6,8 @@ import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { resolveLineMultiSearchChoices } from '#tui/prompts/search/line-mode';
 import { firstSearchHighlight, lastSearchHighlight, nextSearchHighlight, pageSearchHighlight } from '#tui/prompts/search/navigation';
 import { renderSearchChoices } from '#tui/prompts/search/render';
-import type { Choice, MultiSearchPromptOptions } from '#tui/types';
+import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoice, toggleSearchChoices } from '#tui/prompts/search/selection';
+import type { MultiSearchPromptOptions } from '#tui/types';
 
 export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
 	const environment = promptEnvironment();
@@ -23,23 +24,12 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 
 	let highlighted: number | null = null;
 
-	const selected = initialSelectedValues(choices, options.default);
-
-	const displayedChoices = (): Array<Choice<T>> => {
-		if (state.value.trim() !== '') {
-			return choices;
-		}
-
-		const selectedChoices = [...selected.entries()].filter(([value]) => !choices.some((choice) => Object.is(choice.value, value))).map(([value, label]) => ({ label, value }));
-
-		return [...selectedChoices, ...choices];
-	};
-
-	const selectableChoices = (): Array<Choice<T>> => displayedChoices().filter((choice) => !choice.disabled);
+	const selected = createInitialSearchSelection(choices, options.default);
+	const displayedChoices = () => displayedSearchChoices(choices, selected, state.value);
 
 	const render = (): void => {
 		const currentChoices = displayedChoices();
-		const marked = new Set(currentChoices.flatMap((choice, index) => (selected.has(choice.value) ? [index] : [])));
+		const marked = markedSearchChoiceIndexes(currentChoices, selected);
 
 		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info, true);
 	};
@@ -116,18 +106,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		}
 
 		if (key === Key.ctrlA && highlighted !== null) {
-			const currentChoices = selectableChoices();
-			const allCurrentChoicesSelected = currentChoices.every((choice) => selected.has(choice.value));
-
-			if (allCurrentChoicesSelected) {
-				for (const choice of currentChoices) {
-					selected.delete(choice.value);
-				}
-			} else {
-				for (const choice of currentChoices) {
-					selected.set(choice.value, choice.label);
-				}
-			}
+			toggleSearchChoices(selected, displayedChoices());
 
 			render();
 			continue;
@@ -137,11 +116,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 			const choice = displayedChoices()[highlighted];
 
 			if (choice && !choice.disabled) {
-				if (selected.has(choice.value as T)) {
-					selected.delete(choice.value as T);
-				} else {
-					selected.set(choice.value as T, choice.label);
-				}
+				toggleSearchChoice(selected, choice);
 			}
 
 			render();
@@ -163,16 +138,4 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		highlighted = null;
 		render();
 	}
-};
-
-const initialSelectedValues = <T>(choices: Array<Choice<T>>, defaults: T[] = []): Map<T, string> => {
-	const selected = new Map<T, string>();
-
-	for (const value of defaults) {
-		const choice = choices.find((candidate) => Object.is(candidate.value, value));
-
-		selected.set(value, choice?.label ?? String(value));
-	}
-
-	return selected;
 };
