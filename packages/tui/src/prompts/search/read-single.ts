@@ -20,9 +20,15 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			return options.default;
 		}
 
-		const choice = findChoice(choices, query) ?? choices.find((candidate) => !candidate.disabled);
+		const matched = findChoice(choices, query);
 
-		return choice?.value ?? choices[0]?.value;
+		if (matched?.disabled) {
+			return undefined;
+		}
+
+		const choice = matched ?? choices.find((candidate) => !candidate.disabled);
+
+		return choice?.value;
 	}
 
 	let state = { cursor: 0, value: '' };

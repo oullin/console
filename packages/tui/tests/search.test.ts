@@ -244,6 +244,35 @@ describe('search prompt', () => {
 
 		expect(result).toBe('green');
 	});
+
+	it('rejects disabled exact line-mode matches and retries', async () => {
+		const output = createMemoryOutput();
+		const answers = ['Red', 'Green'];
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return answers.shift() ?? '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: [
+						{ label: 'Red', value: 'red', disabled: true },
+						{ label: 'Green', value: 'green' },
+					],
+				}),
+		);
+
+		expect(result).toBe('green');
+		expect(output.text()).toContain('Please select a valid option.');
+	});
 });
 
 describe('multisearch prompt', () => {
