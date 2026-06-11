@@ -107,13 +107,14 @@ describe('prompt helpers', () => {
 			const bar = progress(2, 'Files');
 
 			bar.advance();
+			bar.advance();
 			bar.finish();
 
 			await stream(['a', 'b']);
 		});
 
 		expect(output.text()).toContain('Working');
-		expect(output.text()).toContain('Files:');
+		expect(output.text()).toContain('┌ Files ');
 		expect(output.text()).toContain('2 / 2');
 		expect(output.text()).toContain('ab');
 	});

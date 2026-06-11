@@ -30,6 +30,7 @@ TypeScript and OpenTUI internals.
 | Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table.ts` |
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
+| Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
@@ -44,7 +45,7 @@ later phases:
 - Multi-search full rendering and selected-result summary parity
 - Multi-select
 - Notifications
-- Progress exact box drawing and signal handling parity
+- Progress signal handling and terminal cleanup parity
 - Prompt lifecycle
 - Search full rendering and highlighted result label parity
 - Spinner

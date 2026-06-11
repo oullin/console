@@ -2,6 +2,7 @@ import type { MaybePromise } from '#tui/types';
 
 type ProgressRunner = {
 	advance(): void;
+	fail(): void;
 	finish(): void;
 	start(): void;
 };
@@ -15,10 +16,16 @@ export const runProgressSteps = async <T, R, TProgress extends ProgressRunner>(
 
 	progress.start();
 
-	for (const value of values) {
-		results.push(await callback(value, progress));
+	try {
+		for (const value of values) {
+			results.push(await callback(value, progress));
 
-		progress.advance();
+			progress.advance();
+		}
+	} catch (error) {
+		progress.fail();
+
+		throw error;
 	}
 
 	progress.finish();

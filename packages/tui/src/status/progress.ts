@@ -3,12 +3,14 @@ import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/pr
 import { renderProgressFrame } from '#tui/status/progress/render';
 import { runProgressSteps } from '#tui/status/progress/run';
 import { progressValues } from '#tui/status/progress/steps';
+import type { ProgressFrameState } from '#tui/status/progress/render';
 import type { MaybePromise } from '#tui/types';
 
 export class Progress {
 	#current = 0;
 	#label: string;
 	#hint: string;
+	#state: ProgressFrameState = 'active';
 	readonly total: number;
 
 	constructor(total: number, message = 'Progress', hint = '') {
@@ -18,16 +20,23 @@ export class Progress {
 	}
 
 	start(): void {
+		this.#state = 'active';
 		this.render();
 	}
 
 	advance(step = 1): void {
+		this.#state = 'active';
 		this.#current = Math.max(0, Math.min(this.total, this.#current + parseProgressStep(step)));
 		this.render();
 	}
 
 	finish(): void {
-		this.#current = this.total;
+		this.#state = 'submit';
+		this.render();
+	}
+
+	fail(): void {
+		this.#state = 'error';
 		this.render();
 	}
 
@@ -56,7 +65,7 @@ export class Progress {
 	}
 
 	render(): void {
-		promptEnvironment().output.write(renderProgressFrame({ current: this.#current, hint: this.#hint, label: this.#label, total: this.total }));
+		promptEnvironment().output.write(renderProgressFrame({ current: this.#current, hint: this.#hint, label: this.#label, state: this.#state, total: this.total }));
 	}
 }
 

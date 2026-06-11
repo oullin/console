@@ -55,16 +55,19 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('1 / 100');
 	});
 
-	it('renders a fully filled progress bar at completion', async () => {
+	it('renders a boxed progress bar with formatted fractions', async () => {
 		const output = createMemoryOutput();
 
 		await withPromptEnvironment({ output, error: output }, async () => {
-			const bar = progress('Adding States', 2);
+			const bar = progress('Adding States', 1000);
 
+			bar.start();
 			bar.finish();
 		});
 
-		expect(output.text()).toContain('████████████████████ 2 / 2');
+		expect(output.text()).toContain(' ┌ Adding States ');
+		expect(output.text()).toContain(' │                                                              │');
+		expect(output.text()).toContain('└─────────────────────────────────────────────────── 0 / 1,000 ┘');
 	});
 
 	it('returns a completion value separately from the current count', async () => {
@@ -117,5 +120,20 @@ describe('progress helper', () => {
 	it('rejects invalid numeric progress step counts before rendering', () => {
 		expect(() => progress('Adding States', -1)).toThrow('Progress bar must have at least one item.');
 		expect(() => progress('Adding States', Number.POSITIVE_INFINITY)).toThrow('Progress bar must have at least one item.');
+	});
+
+	it('renders an error frame before rethrowing callback failures', async () => {
+		const output = createMemoryOutput();
+
+		await expect(async () => {
+			await withPromptEnvironment({ output, error: output }, async () => {
+				await progress('Adding States', ['Alabama'], () => {
+					throw new Error('failed');
+				});
+			});
+		}).rejects.toThrow('failed');
+
+		expect(output.text()).toContain('Adding States');
+		expect(output.text()).toContain('0 / 1');
 	});
 });
