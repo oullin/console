@@ -40,10 +40,10 @@ format-all: ## Format every non-ignored TS file in the repo via oxfmt/oxlint
 fresh: ## Clean generated state, reinstall dependencies, then run local gates
 	$(call step,Removing generated dependency/cache/build state)
 	@test -n "$(ROOT_PATH)" && test "$(ROOT_PATH)" != "/" || { echo "Refusing to clean unsafe ROOT_PATH='$(ROOT_PATH)'"; exit 1; }
-	rm -rf "$(ROOT_PATH)/node_modules" "$(ROOT_PATH)"/packages/*/node_modules "$(ROOT_PATH)/.turbo" "$(ROOT_PATH)/packages/artefacts/.cache" "$(ROOT_PATH)/packages/artefacts/.logs" "$(ROOT_PATH)/packages/artefacts/dist"
+	rm -rf "$(ROOT_PATH)/node_modules" "$(ROOT_PATH)"/packages/*/node_modules "$(ROOT_PATH)/.turbo" "$(ROOT_PATH)/packages/artefacts/.cache" "$(ROOT_PATH)/packages/artefacts/.logs" "$(ROOT_PATH)/packages/artefacts/dist" "$(ROOT_PATH)/packages/tui/dist"
 	$(call step,Removing TypeScript build info files)
 	find "$(ROOT_PATH)" -name '*.tsbuildinfo' -type f -delete
 	$(call step,Installing dependencies)
 	cd "$(ROOT_PATH)" && pnpm install
 	$(call step,Running local gates)
-	cd "$(ROOT_PATH)" && pnpm typecheck && pnpm test
+	cd "$(ROOT_PATH)" && pnpm build && pnpm typecheck && pnpm test
