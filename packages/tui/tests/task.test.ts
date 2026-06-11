@@ -58,6 +58,18 @@ describe('task helper', () => {
 		expect(output.text()).toContain('beforeafter');
 	});
 
+	it('strips carriage returns from task log lines', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.log('before\rafter');
+			});
+		});
+
+		expect(output.text()).toContain('beforeafter');
+	});
+
 	it('trims trailing whitespace from completed log lines', async () => {
 		const output = createMemoryOutput();
 
