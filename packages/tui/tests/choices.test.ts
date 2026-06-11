@@ -245,6 +245,23 @@ describe('choice prompts', () => {
 		expect(result).toBe('FIRST');
 	});
 
+	it('cancels select prompts with the current highlighted option', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'] }),
+		);
+
+		expect(result).toBe('second');
+		expect(output.text()).toContain('Cancelled.');
+	});
+
 	it('toggles multiselect choices with the space bar', async () => {
 		const output = createMemoryOutput();
 
@@ -400,5 +417,22 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual(['second', 'first']);
+	});
+
+	it('cancels multiselect prompts with the current marked options', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.space, Key.down, Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second'] }),
+		);
+
+		expect(result).toEqual(['first']);
+		expect(output.text()).toContain('Cancelled.');
 	});
 });

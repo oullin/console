@@ -45,6 +45,18 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 			throw new PromptValidationError('Please select a valid option.');
 		}
 
+		if (key === Key.ctrlC) {
+			environment.error.write('Cancelled.\n');
+
+			const choice = choices[selected];
+
+			if (!choice || choice.disabled) {
+				throw new PromptValidationError('Please select a valid option.');
+			}
+
+			return choice.value;
+		}
+
 		const numeric = parseChoiceIndex(key);
 
 		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {

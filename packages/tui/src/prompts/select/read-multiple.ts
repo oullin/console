@@ -54,6 +54,12 @@ export const readMultipleChoices = async <T>(
 			return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
 		}
 
+		if (key === Key.ctrlC) {
+			environment.error.write('Cancelled.\n');
+
+			return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
+		}
+
 		if (key.includes(',')) {
 			return choicesFromCommaSeparated(choices, key);
 		}
