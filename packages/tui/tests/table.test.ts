@@ -467,6 +467,43 @@ describe('data table prompt', () => {
 		expect(result).toBe(1);
 	});
 
+	it('supports control-line data table navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const endResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlE, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third']],
+				}),
+		);
+
+		const homeResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlE, Key.ctrlA, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third']],
+				}),
+		);
+
+		expect(endResult).toBe(2);
+		expect(homeResult).toBe(0);
+	});
+
 	it('wraps data table navigation from the first row to the last row', async () => {
 		const output = createMemoryOutput();
 

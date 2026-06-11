@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
-import { firstDataTableSelection, lastDataTableSelection, nextDataTableSelection, pageDataTableSelection, previousDataTableSelection } from '#tui/output/data-table/navigation';
+import { moveDataTableSelection } from '#tui/output/data-table/navigation';
 import { dataTableRowValue, deriveDataTableHeaders, visibleDataTableRows } from '#tui/output/data-table/rows';
 import { renderDataTableFrame } from '#tui/output/data-table/render';
 import type { DataTablePromptOptions } from '#tui/types';
@@ -119,28 +119,4 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 			}
 		}
 	});
-};
-
-const moveDataTableSelection = (action: NonNullable<ReturnType<typeof dataTableNavigationAction>>, selected: number, total: number, scroll?: number): number => {
-	if (action === 'next') {
-		return nextDataTableSelection(selected, total);
-	}
-
-	if (action === 'previous') {
-		return previousDataTableSelection(selected, total);
-	}
-
-	if (action === 'page-next') {
-		return pageDataTableSelection(selected, total, 1, scroll);
-	}
-
-	if (action === 'page-previous') {
-		return pageDataTableSelection(selected, total, -1, scroll);
-	}
-
-	if (action === 'first') {
-		return firstDataTableSelection();
-	}
-
-	return lastDataTableSelection(total);
 };
