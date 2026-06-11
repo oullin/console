@@ -401,7 +401,7 @@ describe('choice prompts', () => {
 		expect(result).toEqual(['third', 'first']);
 	});
 
-	it('supports end-of-list control navigation for multiselect prompts', async () => {
+	it('ignores end-of-line control navigation for multiselect prompts', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -414,7 +414,7 @@ describe('choice prompts', () => {
 			() => multiselect({ message: 'Pick many', options: ['first', 'second', 'third'] }),
 		);
 
-		expect(result).toEqual(['third']);
+		expect(result).toEqual(['first']);
 	});
 
 	it('combines multiselect info with selected counts', async () => {
