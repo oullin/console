@@ -46,6 +46,18 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			return options.default;
 		}
 
+		if (key === Key.ctrlC) {
+			environment.error.write('Cancelled.\n');
+
+			if (highlighted !== null) {
+				const choice = choices[highlighted];
+
+				return choice?.disabled ? options.default : (choice?.value ?? options.default);
+			}
+
+			return options.default;
+		}
+
 		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 

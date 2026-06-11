@@ -188,6 +188,23 @@ describe('search prompt', () => {
 		expect(result).toBe('red');
 	});
 
+	it('cancels search prompts with the current highlighted result', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors }),
+		);
+
+		expect(result).toBe('red');
+		expect(output.text()).toContain('Cancelled.');
+	});
+
 	it('rejects optional single search prompts', async () => {
 		const options = {
 			message: 'Favorite color?',
