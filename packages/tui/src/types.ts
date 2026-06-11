@@ -1,132 +1,16 @@
-export type MaybePromise<T> = T | Promise<T>;
-
-export type ValidationResult = string | null | undefined;
-
-export type Validator<T> = (value: T) => MaybePromise<ValidationResult>;
-
-export type PromptValue = string | number | boolean | string[] | number[];
-
-export type PromptOutput = {
-	write(content: string): void;
-};
-
-export type PromptInput = {
-	readKey?(): Promise<string | null>;
-	readLine?(message: string): Promise<string>;
-};
-
-export type PromptEnvironment = {
-	input: PromptInput;
-	output: PromptOutput;
-	error: PromptOutput;
-	interactive: boolean;
-};
-
-export type BasePromptOptions<T> = {
-	message: string;
-	default?: T;
-	required?: boolean | string;
-	hint?: string;
-	validate?: Validator<T>;
-};
-
-export type Choice<T = string> = {
-	label: string;
-	value: T;
-	hint?: string;
-	disabled?: boolean | string;
-};
-
-export type ChoiceInput<T = string> = Choice<T> | T;
-
-export type ChoiceOptions<T = string> = Array<ChoiceInput<T>> | Record<string, string>;
-
-export type PromptInfo<T> = string | ((value: T | null) => string | null | undefined);
-
-export type TextPromptOptions = BasePromptOptions<string> & {
-	label?: string;
-	options?: string[] | ((query: string) => MaybePromise<string[]>);
-	placeholder?: string;
-	transform?: (value: string) => MaybePromise<string>;
-};
-
-export type TextareaPromptOptions = TextPromptOptions & {
-	rows?: number;
-};
-
-export type NumberPromptOptions = BasePromptOptions<number | string> & {
-	label?: string;
-	placeholder?: string;
-	min?: number;
-	max?: number;
-	integer?: boolean;
-	step?: number;
-	transform?: (value: number | string) => MaybePromise<number | string>;
-};
-
-export type ConfirmPromptOptions = BasePromptOptions<boolean> & {
-	label?: string;
-	yes?: string;
-	no?: string;
-	transform?: (value: boolean) => MaybePromise<boolean>;
-};
-
-export type SelectPromptOptions<T> = BasePromptOptions<T> & {
-	label?: string;
-	options: ChoiceOptions<T>;
-	scroll?: number;
-	info?: PromptInfo<T>;
-	transform?: (value: T) => MaybePromise<T>;
-};
-
-export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
-	label?: string;
-	options: ChoiceOptions<T>;
-	scroll?: number;
-	info?: PromptInfo<T>;
-	transform?: (value: T[]) => MaybePromise<T[]>;
-};
-
-export type SearchPromptOptions<T> = Omit<BasePromptOptions<T>, 'required'> & {
-	label?: string;
-	options: ChoiceOptions<T> | ((query: string) => MaybePromise<ChoiceOptions<T>>);
-	placeholder?: string;
-	required?: true | string;
-	scroll?: number;
-	info?: PromptInfo<T>;
-	transform?: (value: T) => MaybePromise<T>;
-};
-
-export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
-	label?: string;
-	options: ChoiceOptions<T> | ((query: string) => MaybePromise<ChoiceOptions<T>>);
-	placeholder?: string;
-	scroll?: number;
-	info?: PromptInfo<T>;
-	transform?: (value: T[]) => MaybePromise<T[]>;
-};
-
-export type TableCell = string | number | boolean | null | undefined;
-
-export type TableOptions = {
-	headers?: string[];
-	rows: Array<Array<TableCell> | Record<string, TableCell>>;
-};
-
-export type DataTablePromptOptions<T = unknown> = BasePromptOptions<T | number> & {
-	filter?: (query: string, row: DataTableRow<T>) => boolean;
-	headers?: string[];
-	rows: Array<DataTableRow<T>>;
-	scroll?: number;
-};
-
-export type DataTableObjectRow<T = unknown> = {
-	cells: Record<string, TableCell>;
-	value?: T;
-};
-
-export type DataTableRow<T = unknown> = Array<TableCell> | Record<string, TableCell> | DataTableObjectRow<T>;
-
-export type StatusOptions = {
-	message: string;
-};
+export type { MaybePromise, PromptValue, ValidationResult, Validator } from '#tui/contracts/base';
+export type { PromptEnvironment, PromptInput, PromptOutput } from '#tui/contracts/environment';
+export type { BasePromptOptions } from '#tui/contracts/options';
+export type { Choice, ChoiceInput, ChoiceOptions, PromptInfo } from '#tui/contracts/choices';
+export type {
+	ConfirmPromptOptions,
+	MultiSearchPromptOptions,
+	MultiSelectPromptOptions,
+	NumberPromptOptions,
+	SearchPromptOptions,
+	SelectPromptOptions,
+	TextareaPromptOptions,
+	TextPromptOptions,
+} from '#tui/contracts/prompts';
+export type { DataTableObjectRow, DataTablePromptOptions, DataTableRow, TableCell, TableOptions } from '#tui/contracts/output';
+export type { StatusOptions } from '#tui/contracts/status';

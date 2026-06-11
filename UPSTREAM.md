@@ -32,6 +32,7 @@ TypeScript and OpenTUI internals.
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
+| Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
 
 ## Remaining Exact-Parity Work
 
