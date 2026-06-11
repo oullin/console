@@ -18,12 +18,21 @@ type StableMessage = {
 };
 
 export class Logger {
+	labelValue: string;
 	readonly lines: string[] = [];
 	readonly stableMessages: StableMessage[] = [];
+	subLabelValue: string;
 	#partialBuffer = '';
 	#partialStartIndex: number | null = null;
 
-	constructor(private readonly limit: number) {}
+	constructor(
+		private readonly limit: number,
+		label: string,
+		subLabel = '',
+	) {
+		this.labelValue = label;
+		this.subLabelValue = subLabel;
+	}
 
 	line(message: string): void {
 		for (const line of message.split(/\r?\n/u).filter((value) => value.length > 0)) {
@@ -37,6 +46,14 @@ export class Logger {
 
 	log(message: string): void {
 		this.line(message);
+	}
+
+	label(message: string): void {
+		this.labelValue = message;
+	}
+
+	subLabel(message: string): void {
+		this.subLabelValue = message;
 	}
 
 	partial(chunk: string): void {
@@ -87,7 +104,7 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 		throw new Error('A task callback is required.');
 	}
 
-	const logger = new Logger(typeof definitionOrLabel === 'string' ? limit : (definitionOrLabel.limit ?? limit));
+	const logger = new Logger(typeof definitionOrLabel === 'string' ? limit : (definitionOrLabel.limit ?? limit), title, subtitle ?? '');
 
 	promptEnvironment().output.write(`${title}${subtitle ? ` ${subtitle}` : ''}\n`);
 
@@ -103,7 +120,7 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 		}
 	}
 
-	promptEnvironment().output.write(`Done: ${title}\n`);
+	promptEnvironment().output.write(`Done: ${logger.labelValue}${logger.subLabelValue ? ` ${logger.subLabelValue}` : ''}\n`);
 
 	return result;
 }

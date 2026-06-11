@@ -106,4 +106,39 @@ describe('task helper', () => {
 		expect(output.text()).toContain('one');
 		expect(output.text()).toContain('two');
 	});
+
+	it('updates task labels through the logger', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.label('Building');
+				logger.subLabel('assets');
+			});
+		});
+
+		expect(output.text()).toContain('Running...');
+		expect(output.text()).toContain('Done: Building assets');
+	});
+
+	it('clears task sub-labels through the logger', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task(
+				'Running...',
+				(logger) => {
+					logger.label('Building');
+					logger.subLabel('');
+				},
+				10,
+				false,
+				'assets',
+			);
+		});
+
+		expect(output.text()).toContain('Running... assets');
+		expect(output.text()).toContain('Done: Building');
+		expect(output.text()).not.toContain('Done: Building assets');
+	});
 });
