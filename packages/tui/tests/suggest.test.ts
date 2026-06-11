@@ -183,6 +183,38 @@ describe('autocomplete prompt', () => {
 		expect(result).toBe('Black');
 	});
 
+	it('cycles autocomplete matches with control navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.ctrlN, Key.ctrlN, Key.ctrlP, Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue', 'Black', 'Blurple']),
+		);
+
+		expect(result).toBe('Black');
+	});
+
+	it('cycles autocomplete matches backwards with shift tab', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.shiftTab, Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue', 'Black', 'Blurple']),
+		);
+
+		expect(result).toBe('Blurple');
+	});
+
 	it('supports page autocomplete navigation before accepting completion', async () => {
 		const output = createMemoryOutput();
 

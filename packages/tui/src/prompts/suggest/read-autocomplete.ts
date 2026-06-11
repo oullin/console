@@ -33,7 +33,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			return state.value;
 		}
 
-		if (key === Key.up || key === Key.upArrow) {
+		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted - 1 + matches.length) % matches.length;
@@ -41,7 +41,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			continue;
 		}
 
-		if (key === Key.down || key === Key.downArrow) {
+		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted + 1) % matches.length;
