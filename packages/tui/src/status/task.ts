@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { Logger } from '#tui/status/task/logger';
+import { captureTaskProcessOutput } from '#tui/status/task/process-output';
 import { renderTaskFrame } from '#tui/status/task/render';
 import { hideCursor, showCursor } from '#tui/terminal';
 import type { MaybePromise } from '#tui/types';
@@ -45,9 +46,12 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 	output.write(frame);
 
+	const processOutput = captureTaskProcessOutput(logger);
+
 	try {
 		const result = await run(logger);
 
+		processOutput.stop();
 		eraseRenderedFrame(frame);
 		frame = renderTaskFrame({
 			finished: true,
@@ -62,6 +66,7 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 		return result;
 	} catch (error) {
+		processOutput.stop();
 		eraseRenderedFrame(frame);
 		frame = renderTaskFrame({
 			label: logger.labelValue,

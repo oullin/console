@@ -192,6 +192,35 @@ describe('task helper', () => {
 		expect(output.text()).toContain('two');
 	});
 
+	it('captures process output while task callbacks run', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', () => {
+				process.stdout.write('stdout line\n');
+				process.stderr.write('stderr partial');
+			});
+		});
+
+		expect(output.text()).toContain('stdout line');
+		expect(output.text()).toContain('stderr partial');
+	});
+
+	it('restores process output writers after task callbacks finish', async () => {
+		const output = createMemoryOutput();
+		const stdoutWrite = process.stdout.write;
+		const stderrWrite = process.stderr.write;
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', () => {
+				process.stdout.write('inside\n');
+			});
+		});
+
+		expect(process.stdout.write).toBe(stdoutWrite);
+		expect(process.stderr.write).toBe(stderrWrite);
+	});
+
 	it('updates task labels through the logger', async () => {
 		const output = createMemoryOutput();
 

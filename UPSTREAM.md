@@ -40,6 +40,7 @@ TypeScript and OpenTUI internals.
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
 | Spinner static and deterministic animated frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | Task static and deterministic animated frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/*` |
+| Task process output capture | `packages/tui/src/status/task/process-output.ts`, `packages/tui/tests/task.test.ts` |
 | Stream frame rendering, wrapping, fade styles, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/*` |
 | Status cursor visibility cleanup | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
 | Status rendered-frame cleanup | `packages/tui/src/status/frame.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/task.ts` |
@@ -60,7 +61,6 @@ later phases:
 - Progress signal handling parity
 - Prompt lifecycle
 - Search boxed layout, scrollbar, and submit/cancel frame parity
-- Task process-log parity
 - Terminal interactive read parity
 - Textarea wrapping, cursor, and scrollbar parity
 - Default theme
