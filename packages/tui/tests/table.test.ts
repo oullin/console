@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, datatable, form, Key, table, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, datatable, form, Key, table, visibleWidth, withPromptEnvironment } from '#tui/index';
 
 describe('table output', () => {
 	it('renders static table rows', async () => {
@@ -432,6 +432,66 @@ describe('data table prompt', () => {
 		expect(result).toBe(0);
 		expect(tableLines).toHaveLength(7);
 		expect(tableLines.slice(2)).toHaveLength(5);
+	});
+
+	it('uses comfortable data table width for compact rows', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['A', 'B'],
+					rows: [['Hi', 'Lo']],
+					scroll: 5,
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+		const widestLine = Math.max(...activeFrame.split('\n').map(visibleWidth));
+
+		expect(result).toBe(0);
+		expect(widestLine).toBeLessThan(70);
+	});
+
+	it('truncates outlier data table columns before they stretch the table', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.end[0], Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name', 'Value'],
+					rows: [
+						['Alice', 'Short'],
+						['Bob', 'Short'],
+						['Charlie', 'Short'],
+						['Diana', 'Short'],
+						['Ethan', 'Short'],
+						['An extremely long value that should be treated as an outlier and truncated', 'Short'],
+					],
+					scroll: 5,
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+		const widestLine = Math.max(...activeFrame.split('\n').map(visibleWidth));
+
+		expect(result).toBe(5);
+		expect(widestLine).toBeLessThan(76);
+		expect(activeFrame).toContain('...');
 	});
 
 	it('renders data table rows without headers', async () => {

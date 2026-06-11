@@ -5,10 +5,13 @@ import { dataTableRowCells } from '#tui/output/data-table/rows';
 import { renderScrollableDataTable } from '#tui/output/data-table/scrollbar';
 import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
 import { fixedVisualDataTableRows } from '#tui/output/data-table/visual-window';
+import { fitDataTableColumns } from '#tui/output/data-table/widths';
 import { dim, red, strikethrough } from '#tui/theme/styles';
+import type { DataTableRow } from '#tui/types';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
 type RenderDataTableFrameOptions<T> = {
+	allRows: Array<DataTableRow<T>>;
 	headers: string[];
 	message: string;
 	mode: 'browse' | 'search';
@@ -34,15 +37,19 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 		return selected;
 	}
 
-	const renderedRows = options.rows.slice(window.start, window.end).map(({ row }, offset) => {
+	const visibleCells = options.rows.slice(window.start, window.end).map(({ row }) => dataTableRowCells(options.headers, row));
+	const allCells = options.allRows.map((row) => dataTableRowCells(options.headers, row));
+	const fitted = fitDataTableColumns({ allRows: allCells, headers: options.headers, rows: visibleCells });
+
+	const renderedRows = fitted.rows.map((row, offset) => {
 		const index = window.start + offset;
 
-		return [index === selected ? '›' : ' ', ...dataTableRowCells(options.headers, row)];
+		return [index === selected ? '›' : ' ', ...row];
 	});
 
 	const visualRows = fixedVisualDataTableRows(expandMultilineDataTableRows(renderedRows), options.scroll);
 
-	environment.output.write(`${renderScrollableDataTable(renderHeaders(options.headers), visualRows, window.start, window.end - window.start, options.rows.length)}\n`);
+	environment.output.write(`${renderScrollableDataTable(renderHeaders(fitted.headers), visualRows, window.start, window.end - window.start, options.rows.length)}\n`);
 
 	if (window.end - window.start < options.rows.length) {
 		const suffix = options.query.length > 0 ? ' results' : '';

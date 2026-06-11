@@ -32,6 +32,7 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 
 	const render = (): void => {
 		selected = renderDataTableFrame({
+			allRows: options.rows,
 			headers,
 			message: options.message,
 			mode: search.mode,
