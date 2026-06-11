@@ -2,10 +2,10 @@ import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
-import { findChoice, firstEnabledIndex, nextEnabledIndex } from '#tui/concerns/choices';
-import { lastEnabledIndex, resolveSearchChoices } from '#tui/prompts/search/choices';
+import { resolveSearchChoices } from '#tui/prompts/search/choices';
+import { resolveLineSearchChoice } from '#tui/prompts/search/line-mode';
+import { firstSearchHighlight, lastSearchHighlight, nextRetriedSearchHighlight, nextSearchHighlight, pageSearchHighlight } from '#tui/prompts/search/navigation';
 import { renderSearchChoices } from '#tui/prompts/search/render';
-import { pageEnabledChoiceIndex } from '#tui/prompts/select/navigation';
 import type { SearchPromptOptions } from '#tui/types';
 
 export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0): Promise<T | undefined> => {
@@ -14,21 +14,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 	if (!environment.input.readKey) {
 		const query = (await ask(options.message, options.hint)).trim();
 
-		const choices = await resolveSearchChoices(options.options, query);
-
-		if (query === '' && options.default !== undefined) {
-			return options.default;
-		}
-
-		const matched = findChoice(choices, query);
-
-		if (matched?.disabled) {
-			return undefined;
-		}
-
-		const choice = matched ?? choices.find((candidate) => !candidate.disabled);
-
-		return choice?.value;
+		return resolveLineSearchChoice(options, query);
 	}
 
 	let state = { cursor: 0, value: '' };
@@ -61,14 +47,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted =
-				choices.length === 0
-					? null
-					: highlighted === null
-						? attempt > 0
-							? nextEnabledIndex(choices, firstEnabledIndex(choices), 1)
-							: firstEnabledIndex(choices)
-						: nextEnabledIndex(choices, highlighted, 1);
+			highlighted = nextRetriedSearchHighlight(choices, highlighted, attempt);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
@@ -76,7 +55,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, -1);
+			highlighted = nextSearchHighlight(choices, highlighted, -1);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
@@ -84,7 +63,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		if (key === Key.pageDown) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : highlighted === null ? firstEnabledIndex(choices) : pageEnabledChoiceIndex(choices, highlighted, 1, options.scroll);
+			highlighted = pageSearchHighlight(choices, highlighted, 1, options.scroll);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
@@ -92,19 +71,19 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		if (key === Key.pageUp) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : pageEnabledChoiceIndex(choices, highlighted, -1, options.scroll);
+			highlighted = pageSearchHighlight(choices, highlighted, -1, options.scroll);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
 
 		if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
-			highlighted = firstEnabledIndex(choices);
+			highlighted = firstSearchHighlight(choices);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
 
 		if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
-			highlighted = lastEnabledIndex(choices);
+			highlighted = lastSearchHighlight(choices);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}

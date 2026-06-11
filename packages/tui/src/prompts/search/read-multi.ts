@@ -1,11 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
-import { ask, PromptValidationError } from '#tui/prompt';
+import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
-import { findChoice, firstEnabledIndex, nextEnabledIndex } from '#tui/concerns/choices';
-import { lastEnabledIndex, resolveSearchChoices } from '#tui/prompts/search/choices';
+import { resolveSearchChoices } from '#tui/prompts/search/choices';
+import { resolveLineMultiSearchChoices } from '#tui/prompts/search/line-mode';
+import { firstSearchHighlight, lastSearchHighlight, nextSearchHighlight, pageSearchHighlight } from '#tui/prompts/search/navigation';
 import { renderSearchChoices } from '#tui/prompts/search/render';
-import { pageEnabledChoiceIndex } from '#tui/prompts/select/navigation';
 import type { Choice, MultiSearchPromptOptions } from '#tui/types';
 
 export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
@@ -14,24 +14,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 	if (!environment.input.readKey) {
 		const query = (await ask(options.message, options.hint)).trim();
 
-		const choices = await resolveSearchChoices(options.options, query);
-
-		if (query === '' && options.default !== undefined) {
-			return options.default;
-		}
-
-		const parts = query
-			.split(',')
-			.map((part) => part.trim())
-			.filter((part) => part.length > 0);
-
-		const selectedChoices = parts.map((part) => findChoice(choices, part)).filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
-
-		if (selectedChoices.length !== parts.length) {
-			throw new PromptValidationError('Please select valid options.');
-		}
-
-		return selectedChoices.map((choice) => choice.value);
+		return resolveLineMultiSearchChoices(options, query);
 	}
 
 	let state = { cursor: 0, value: '' };
@@ -81,7 +64,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 
 			const currentChoices = displayedChoices();
 
-			highlighted = currentChoices.length === 0 ? null : highlighted === null ? firstEnabledIndex(currentChoices) : nextEnabledIndex(currentChoices, highlighted, 1);
+			highlighted = nextSearchHighlight(currentChoices, highlighted, 1);
 			render();
 			continue;
 		}
@@ -91,7 +74,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 
 			const currentChoices = displayedChoices();
 
-			highlighted = currentChoices.length === 0 ? null : highlighted === null ? lastEnabledIndex(currentChoices) : nextEnabledIndex(currentChoices, highlighted, -1);
+			highlighted = nextSearchHighlight(currentChoices, highlighted, -1);
 			render();
 			continue;
 		}
@@ -101,7 +84,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 
 			const currentChoices = displayedChoices();
 
-			highlighted = currentChoices.length === 0 ? null : highlighted === null ? firstEnabledIndex(currentChoices) : pageEnabledChoiceIndex(currentChoices, highlighted, 1, options.scroll);
+			highlighted = pageSearchHighlight(currentChoices, highlighted, 1, options.scroll);
 			render();
 			continue;
 		}
@@ -111,19 +94,19 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 
 			const currentChoices = displayedChoices();
 
-			highlighted = currentChoices.length === 0 ? null : highlighted === null ? lastEnabledIndex(currentChoices) : pageEnabledChoiceIndex(currentChoices, highlighted, -1, options.scroll);
+			highlighted = pageSearchHighlight(currentChoices, highlighted, -1, options.scroll);
 			render();
 			continue;
 		}
 
 		if (oneOf([Key.home], key) && highlighted !== null) {
-			highlighted = firstEnabledIndex(displayedChoices());
+			highlighted = firstSearchHighlight(displayedChoices());
 			render();
 			continue;
 		}
 
 		if (oneOf([Key.end], key) && highlighted !== null) {
-			highlighted = lastEnabledIndex(displayedChoices());
+			highlighted = lastSearchHighlight(displayedChoices());
 			render();
 			continue;
 		}

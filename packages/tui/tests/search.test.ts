@@ -377,6 +377,35 @@ describe('multisearch prompt', () => {
 		expect(result).toEqual([]);
 	});
 
+	it('rejects disabled line-mode multisearch choices and retries', async () => {
+		const output = createMemoryOutput();
+		const answers = ['Red', 'Green'];
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return answers.shift() ?? '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: [
+						{ label: 'Red', value: 'red', disabled: true },
+						{ label: 'Green', value: 'green' },
+					],
+				}),
+		);
+
+		expect(result).toEqual(['green']);
+		expect(output.text()).toContain('Please select valid options.');
+	});
+
 	it('rejects required non-interactive multisearch prompts without defaults', async () => {
 		const output = createMemoryOutput();
 
