@@ -1,4 +1,3 @@
-import { promptEnvironment } from '#tui/environment';
 import { ask } from '#tui/prompt';
 import { resolveLineSearchChoice } from '#tui/prompts/search/line-mode';
 import type { Choice, SearchPromptOptions } from '#tui/types';
@@ -20,7 +19,5 @@ export const selectedSearchValue = <T>(choices: Array<Choice<T>>, highlighted: n
 };
 
 export const cancelledSearchValue = <T>(choices: Array<Choice<T>>, highlighted: number | null, fallback?: T): T | undefined => {
-	promptEnvironment().error.write('Cancelled.\n');
-
 	return selectedSearchValue(choices, highlighted) ?? fallback;
 };

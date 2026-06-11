@@ -6,7 +6,7 @@ import { firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { choicesFromCommaSeparated, markedChoiceIndexes, markedChoiceValues, toggleAllEnabledChoices, toggleMarkedChoice } from '#tui/prompts/select/multiple';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { renderMultipleChoices, renderSubmittedChoices } from '#tui/prompts/select/render';
+import { renderCancelledChoices, renderMultipleChoices, renderSubmittedChoices } from '#tui/prompts/select/render';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
 const markedChoiceLabels = <T>(choices: Array<Choice<T>>, marked: Set<number>): string[] => {
@@ -50,7 +50,7 @@ export const readMultipleChoices = async <T>(
 		}
 
 		if (key === Key.ctrlC) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledChoices(message, choices, selected, marked, scroll);
 
 			return markedChoiceValues(choices, marked);
 		}

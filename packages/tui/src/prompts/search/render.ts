@@ -4,7 +4,7 @@ import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { searchMessage } from '#tui/prompts/search/choices';
 import { renderBox } from '#tui/theme/box';
-import { cyan, dim } from '#tui/theme/styles';
+import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
 export const renderSearchChoices = <T>(
@@ -45,6 +45,13 @@ export const renderSubmittedSearchChoices = (message: string, labels: string[]):
 	const body = labels.length === 0 ? dim('None') : labels.join('\n');
 
 	promptEnvironment().output.write(`${renderBox({ body, title: dim(message) })}\n`);
+};
+
+export const renderCancelledSearch = (message: string, query: string, placeholder = ''): void => {
+	const body = strikethrough(dim(query.length > 0 ? query : placeholder));
+
+	promptEnvironment().output.write(`${renderBox({ body, borderStyle: red, title: dim(message) })}\n`);
+	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
 };
 
 const renderSearchRows = <T>(message: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): void => {

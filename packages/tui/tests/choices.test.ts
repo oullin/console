@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confirm, createMemoryOutput, createScriptedInput, Key, multiselect, PromptValidationError, select, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, Key, multiselect, parseAnsiText, PromptValidationError, select, withPromptEnvironment } from '#tui/index';
 
 describe('choice prompts', () => {
 	it('confirms with direct y and n keys', async () => {
@@ -393,6 +393,9 @@ describe('choice prompts', () => {
 
 		expect(result).toBe('second');
 		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Pick one ');
+		expect(output.text()).toContain('\u001B[2m› ● \u001B[9msecond\u001B[29m');
+		expect(parseAnsiText(output.text())).toContain('│ › ● second');
 	});
 
 	it('toggles multiselect choices with the space bar', async () => {
@@ -717,5 +720,9 @@ describe('choice prompts', () => {
 
 		expect(result).toEqual(['first']);
 		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Pick many ');
+		expect(output.text()).toContain('\u001B[2m  ◼ \u001B[9mfirst\u001B[29m');
+		expect(output.text()).toContain('\u001B[2m› ◻ \u001B[9msecond\u001B[29m');
+		expect(parseAnsiText(output.text())).toContain('│ › ◻ second');
 	});
 });

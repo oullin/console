@@ -24,16 +24,20 @@ TypeScript and OpenTUI internals.
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
+| Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select checklist markers | `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active and selected row styling | `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
+| Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/search/render.ts` |
@@ -57,6 +61,7 @@ TypeScript and OpenTUI internals.
 | Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
 | Terminal raw key alias normalization | `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | Terminal split escape-sequence buffering | `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
+| Red, strikethrough, and border-styled frames | `packages/tui/src/theme/styles.ts`, `packages/tui/src/theme/box.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
@@ -67,10 +72,10 @@ The following reference areas still need full line-by-line behavioral mapping in
 later phases:
 
 - Form builder remaining method-surface and validation parity
-- Multi-search boxed layout and cancel frame parity
-- Multi-select boxed layout and cancel frame parity
+- Multi-search active boxed layout parity
+- Multi-select active boxed layout parity
 - Prompt lifecycle
-- Search boxed layout and cancel frame parity
+- Search active boxed layout parity
 - Textarea wrapping and cursor parity
 - Default theme
 - Feature parity tests

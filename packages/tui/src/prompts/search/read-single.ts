@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderSearchChoices, renderSubmittedSearchChoice } from '#tui/prompts/search/render';
+import { renderCancelledSearch, renderSearchChoices, renderSubmittedSearchChoice } from '#tui/prompts/search/render';
 import { cancelledSearchValue, lineSearchValue, selectedSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchPromptOptions } from '#tui/types';
 
@@ -30,6 +30,8 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		}
 
 		if (key === Key.ctrlC) {
+			renderCancelledSearch(options.message, state.value, options.placeholder);
+
 			return cancelledSearchValue(choices, highlighted, options.default);
 		}
 
@@ -71,7 +73,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		const next = applyTypedKey(state, key);
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledSearch(options.message, state.value, options.placeholder);
 
 			return options.default;
 		}

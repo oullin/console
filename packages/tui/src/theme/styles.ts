@@ -12,6 +12,10 @@ export const cyan = (value: string): string => ansi(36, 39, value);
 
 export const inverse = (value: string): string => ansi(7, 27, value);
 
+export const red = (value: string): string => ansi(31, 39, value);
+
+export const strikethrough = (value: string): string => ansi(9, 29, value);
+
 export const foregroundRgb = (value: string, red: number, green: number, blue: number): string => {
 	if (value.length === 0) {
 		return '';

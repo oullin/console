@@ -19,7 +19,7 @@ export const scrollbarPosition = (firstVisible: number, height: number, total: n
 	return Math.round((firstVisible / maxPosition) * (height - 3)) + 1;
 };
 
-export const renderScrollbarRows = (rows: string[], firstVisible: number, height: number, total: number): string[] => {
+export const renderScrollbarRows = (rows: string[], firstVisible: number, height: number, total: number, style = cyan): string[] => {
 	if (height >= total || rows.length === 0) {
 		return rows;
 	}
@@ -28,7 +28,7 @@ export const renderScrollbarRows = (rows: string[], firstVisible: number, height
 	const width = Math.max(...rows.map((row) => visibleWidth(row)));
 
 	return rows.map((row, index) => {
-		const bar = index === position ? cyan('┃') : dim('│');
+		const bar = index === position ? style('┃') : dim('│');
 
 		return `${padVisible(row, width)} ${bar}`;
 	});

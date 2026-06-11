@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderSearchChoices, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
+import { renderCancelledSearch, renderSearchChoices, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
 import { lineMultiSearchValues, selectedSearchValues, toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
 import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
 import type { MultiSearchPromptOptions } from '#tui/types';
@@ -43,7 +43,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		}
 
 		if (key === Key.ctrlC) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledSearch(options.message, state.value, options.placeholder);
 
 			return selectedSearchValues(selected);
 		}
@@ -81,7 +81,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const next = applyTypedKey(state, key);
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledSearch(options.message, state.value, options.placeholder);
 
 			return options.default ?? [];
 		}

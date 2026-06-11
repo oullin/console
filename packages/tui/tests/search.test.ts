@@ -272,6 +272,8 @@ describe('search prompt', () => {
 
 		expect(result).toBe('red');
 		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m \u001B[2mFavorite color?\u001B[22m ');
+		expect(parseAnsiText(output.text())).toContain('⚠ Cancelled.');
 	});
 
 	it('uses the default when cancelling a disabled highlighted search result', async () => {
@@ -630,6 +632,9 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['red']);
 		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m \u001B[2mFavorite colors?\u001B[22m ');
+		expect(output.text()).toContain('\u001B[9m\u001B[2mB\u001B[22m\u001B[29m');
+		expect(parseAnsiText(output.text())).toContain('│ B');
 	});
 
 	it('toggles all current multisearch results with ctrl-a', async () => {

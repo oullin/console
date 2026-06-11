@@ -4,6 +4,7 @@ const DEFAULT_BOX_WIDTH = 60;
 
 type BoxOptions = {
 	body: string;
+	borderStyle?: (value: string) => string;
 	info?: string;
 	title?: string;
 	width?: number;
@@ -11,7 +12,7 @@ type BoxOptions = {
 
 const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
 
-export const renderBox = ({ body, info = '', title = '', width = DEFAULT_BOX_WIDTH }: BoxOptions): string => {
+export const renderBox = ({ body, borderStyle = (value) => value, info = '', title = '', width = DEFAULT_BOX_WIDTH }: BoxOptions): string => {
 	const bodyLines = body.split('\n');
 	const contentWidth = Math.max(width, visibleWidth(title), ...bodyLines.map(visibleWidth));
 	const titleWidth = visibleWidth(title);
@@ -20,5 +21,9 @@ export const renderBox = ({ body, info = '', title = '', width = DEFAULT_BOX_WID
 	const renderedInfo = info ? truncate(info, contentWidth - 1) : '';
 	const bottomBorder = '─'.repeat(renderedInfo ? contentWidth - visibleWidth(renderedInfo) : contentWidth + 2);
 
-	return [` ┌${titleLabel}${topBorder}┐`, ...bodyLines.map((line) => ` │ ${padVisible(line, contentWidth)} │`), ` └${bottomBorder}${renderedInfo ? ` ${renderedInfo} ` : ''}┘`].join('\n');
+	return [
+		`${borderStyle(' ┌')}${titleLabel}${borderStyle(`${topBorder}┐`)}`,
+		...bodyLines.map((line) => `${borderStyle(' │')} ${padVisible(line, contentWidth)} ${borderStyle('│')}`),
+		borderStyle(` └${bottomBorder}${renderedInfo ? ` ${renderedInfo} ` : ''}┘`),
+	].join('\n');
 };

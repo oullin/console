@@ -5,7 +5,7 @@ import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { renderSelectedChoice, renderSubmittedChoice } from '#tui/prompts/select/render';
+import { renderCancelledChoice, renderSelectedChoice, renderSubmittedChoice } from '#tui/prompts/select/render';
 import type { Choice, SelectPromptOptions } from '#tui/types';
 
 const defaultChoiceIndex = <T>(choices: Array<Choice<T>>, defaultValue: T | undefined): number => {
@@ -47,7 +47,7 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 		}
 
 		if (key === Key.ctrlC) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledChoice(message, choices, selected, scroll);
 
 			const choice = choices[selected];
 
