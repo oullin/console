@@ -1,0 +1,33 @@
+{
+  "name": "@ollin/tui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "imports": {
+    "#tui/*": "./src/*.ts",
+    "#tui/prompts/*": "./src/prompts/*.ts"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.4.0",
+    "string-width": "^7.2.0",
+    "strip-ansi": "^7.1.2"
+  },
+  "devDependencies": {
+    "@ollin/artefacts": "workspace:*",
+    "@ollin/tsconfig": "workspace:*",
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  }
+}

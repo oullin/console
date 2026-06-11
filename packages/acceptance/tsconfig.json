@@ -1,0 +1,7 @@
+{
+  "extends": ["@ollin/tsconfig/base.json", "@ollin/artefacts/tsconfig/acceptance.json"],
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": ["tests/**/*.ts", "vitest.config.ts"]
+}

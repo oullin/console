@@ -1,0 +1,21 @@
+{
+  "name": "@ollin/artefacts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./tsconfig/*.json": "./tsconfig/*.json"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@ollin/tsconfig": "workspace:*",
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+.turbo/
+.DS_Store
+coverage/
+packages/artefacts/.cache/
+packages/artefacts/.logs/
+packages/artefacts/dist/
