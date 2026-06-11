@@ -1,5 +1,6 @@
 import { textOptions } from '#tui/concerns/text-options';
-import { text } from '#tui/prompts/text';
+import { promptUntilValid } from '#tui/prompt';
+import { readPasswordValue } from '#tui/prompts/password/input';
 import type { TextPromptOptions } from '#tui/types';
 
 export function password(options: TextPromptOptions): Promise<string>;
@@ -23,5 +24,12 @@ export async function password(
 ): Promise<string> {
 	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, required, validate, hint, transform }) : textOptions(message);
 
-	return text(options);
+	return promptUntilValid(options, async () => {
+		const value = await readPasswordValue(options.message, {
+			hint: options.hint,
+			placeholder: options.placeholder,
+		});
+
+		return options.transform ? options.transform(value) : value;
+	});
 }
