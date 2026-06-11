@@ -81,6 +81,40 @@ describe('form builder', () => {
 		expect(responses[1]).toBe('D');
 	});
 
+	it('reuses numeric previous responses when reverting prompt builder steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['4', Key.enter, Key.ctrlU, '5', Key.enter, 'D', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().number('Count').text('Done').submit(),
+		);
+
+		expect(responses[0]).toBe(45);
+		expect(responses[1]).toBe('D');
+	});
+
+	it('reuses array previous responses when reverting prompt builder steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.space, Key.enter, Key.ctrlU, Key.enter, 'D', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().multiselect('Flags', ['alpha', 'beta']).text('Done').submit(),
+		);
+
+		expect(responses[0]).toEqual(['alpha']);
+		expect(responses[1]).toBe('D');
+	});
+
 	it('does not revert the first form step', async () => {
 		const output = createMemoryOutput();
 

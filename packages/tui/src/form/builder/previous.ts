@@ -1,11 +1,13 @@
+import { parsePreviousArray, parsePreviousNumber, parsePreviousString } from '#tui/form/builder/validators/previous';
+
 export const previousString = (previous: unknown, defaultValue: string): string => {
-	return previous === undefined || previous === null ? defaultValue : String(previous);
+	return parsePreviousString(previous, defaultValue);
 };
 
 export const previousNumber = (previous: unknown, defaultValue: number | string): number | string => {
-	return typeof previous === 'number' || typeof previous === 'string' ? previous : defaultValue;
+	return parsePreviousNumber(previous, defaultValue);
 };
 
 export const previousArray = <T>(previous: unknown, defaultValue: T[]): T[] => {
-	return Array.isArray(previous) ? (previous as T[]) : defaultValue;
+	return parsePreviousArray(previous, defaultValue);
 };
