@@ -109,7 +109,7 @@ export const readMultipleChoices = async <T>(
 			continue;
 		}
 
-		if (oneOf([Key.end], key)) {
+		if (oneOf([Key.end, Key.ctrlE], key)) {
 			selected = lastEnabledChoiceIndex(choices);
 			renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;

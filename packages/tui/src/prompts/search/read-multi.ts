@@ -129,6 +129,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		}
 
 		if (key === Key.ctrlE && highlighted !== null) {
+			highlighted = lastEnabledIndex(displayedChoices());
 			render();
 			continue;
 		}

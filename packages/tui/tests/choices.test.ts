@@ -401,6 +401,22 @@ describe('choice prompts', () => {
 		expect(result).toEqual(['third', 'first']);
 	});
 
+	it('supports end-of-list control navigation for multiselect prompts', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlE, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second', 'third'] }),
+		);
+
+		expect(result).toEqual(['third']);
+	});
+
 	it('combines multiselect info with selected counts', async () => {
 		const output = createMemoryOutput();
 
