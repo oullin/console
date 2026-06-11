@@ -49,8 +49,12 @@ export class Progress {
 		return this.#current / this.total;
 	}
 
-	value(): number {
+	current(): number {
 		return this.#current;
+	}
+
+	value(): boolean {
+		return true;
 	}
 
 	render(): void {

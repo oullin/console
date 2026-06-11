@@ -44,4 +44,18 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('█');
 		expect(output.text()).toContain('1 / 100');
 	});
+
+	it('returns a completion value separately from the current count', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const bar = progress('Adding States', 2);
+
+			bar.start();
+			bar.advance();
+
+			expect(bar.current()).toBe(1);
+			expect(bar.value()).toBe(true);
+		});
+	});
 });
