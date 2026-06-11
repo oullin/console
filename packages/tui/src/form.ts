@@ -10,23 +10,23 @@ import type {
 
 export class FormBuilder {
   async text(message: string | TextPromptOptions): Promise<string> {
-    return text(message);
+    return typeof message === 'string' ? text(message) : text(message);
   }
 
   async textarea(message: string | TextPromptOptions): Promise<string> {
-    return textarea(message);
+    return typeof message === 'string' ? textarea(message) : textarea(message);
   }
 
   async password(message: string | TextPromptOptions): Promise<string> {
-    return password(message);
+    return typeof message === 'string' ? password(message) : password(message);
   }
 
   async number(message: string | NumberPromptOptions): Promise<number> {
-    return number(message);
+    return typeof message === 'string' ? number(message) : number(message);
   }
 
   async confirm(message: string | ConfirmPromptOptions): Promise<boolean> {
-    return confirm(message);
+    return typeof message === 'string' ? confirm(message) : confirm(message);
   }
 
   async select<T>(options: SelectPromptOptions<T>): Promise<T> {

@@ -9,6 +9,33 @@ const outputFromStream = (stream: NodeJS.WritableStream): PromptOutput => ({
 });
 
 const defaultInput: PromptInput = {
+  async readKey(): Promise<string | null> {
+    return new Promise((resolve) => {
+      const input = defaultStdin;
+      const wasRaw = input.isRaw;
+
+      const cleanup = (): void => {
+        input.off('data', onData);
+
+        if (input.isTTY) {
+          input.setRawMode(wasRaw);
+          input.pause();
+        }
+      };
+
+      const onData = (chunk: Buffer): void => {
+        cleanup();
+        resolve(chunk.toString('utf8'));
+      };
+
+      input.once('data', onData);
+
+      if (input.isTTY) {
+        input.setRawMode(true);
+        input.resume();
+      }
+    });
+  },
   async readLine(message: string): Promise<string> {
     const readline = createInterface({
       input: defaultStdin,
@@ -70,6 +97,9 @@ export const createScriptedInput = (lines: string[]): PromptInput => {
   const queued = [...lines];
 
   return {
+    async readKey(): Promise<string | null> {
+      return queued.shift() ?? null;
+    },
     async readLine(): Promise<string> {
       return queued.shift() ?? '';
     }

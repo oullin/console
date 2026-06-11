@@ -1,19 +1,41 @@
 export const Key = {
-  backspace: 'backspace',
-  delete: 'delete',
-  down: 'down',
-  end: 'end',
-  enter: 'enter',
-  escape: 'escape',
-  home: 'home',
-  left: 'left',
-  right: 'right',
-  space: 'space',
-  tab: 'tab',
-  up: 'up'
+  up: '\u001B[A',
+  shiftUp: '\u001B[1;2A',
+  pageUp: '\u001B[5~',
+  down: '\u001B[B',
+  shiftDown: '\u001B[1;2B',
+  pageDown: '\u001B[6~',
+  right: '\u001B[C',
+  left: '\u001B[D',
+  upArrow: '\u001BOA',
+  downArrow: '\u001BOB',
+  rightArrow: '\u001BOC',
+  leftArrow: '\u001BOD',
+  escape: '\u001B',
+  delete: '\u001B[3~',
+  backspace: '\u007F',
+  enter: '\n',
+  space: ' ',
+  tab: '\t',
+  shiftTab: '\u001B[Z',
+  home: ['\u001B[1~', '\u001BOH', '\u001B[H', '\u001B[7~'],
+  end: ['\u001B[4~', '\u001BOF', '\u001B[F', '\u001B[8~'],
+  ctrlC: '\u0003',
+  ctrlP: '\u0010',
+  ctrlN: '\u000E',
+  ctrlF: '\u0006',
+  ctrlB: '\u0002',
+  ctrlH: '\u0008',
+  ctrlA: '\u0001',
+  ctrlD: '\u0004',
+  ctrlE: '\u0005',
+  ctrlU: '\u0015',
+  optionBackspace: '\u001B\u007F'
 } as const;
 
-export type KeyName = (typeof Key)[keyof typeof Key];
+export type KeyValue = string | readonly string[];
+
+export type KeyName = Extract<(typeof Key)[keyof typeof Key], string>;
 
 export type KeyboardEventLike = {
   name?: string;
@@ -25,7 +47,9 @@ export type KeyboardEventLike = {
 
 export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
   if (event.name && event.name in Key) {
-    return Key[event.name as keyof typeof Key];
+    const key = Key[event.name as keyof typeof Key];
+
+    return typeof key === 'string' ? key : key[0];
   }
 
   if (event.sequence === ' ') {
@@ -37,4 +61,20 @@ export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
   }
 
   return event.name ?? event.sequence ?? '';
+};
+
+export const oneOf = (keys: KeyValue[], match: string): string | undefined => {
+  for (const key of keys) {
+    if (Array.isArray(key)) {
+      const nested = oneOf([...key], match);
+
+      if (nested !== undefined) {
+        return nested;
+      }
+    } else if (key === match) {
+      return match;
+    }
+  }
+
+  return undefined;
 };

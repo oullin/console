@@ -6,6 +6,10 @@ import {
   form,
   multiselect,
   note,
+  error,
+  info,
+  intro,
+  outro,
   number,
   progress,
   select,
@@ -34,8 +38,8 @@ const scripted = async <T>(lines: string[], callback: () => Promise<T>): Promise
 
 describe('Laravel-style helpers', () => {
   it('reads text and number prompts', async () => {
-    await expect(scripted(['Taylor'], () => text('Name'))).resolves.toMatchObject({ result: 'Taylor' });
-    await expect(scripted(['42'], () => number({ message: 'Age', integer: true }))).resolves.toMatchObject({ result: 42 });
+    await expect(scripted(['Tay', 'lor', '\n'], () => text('Name'))).resolves.toMatchObject({ result: 'Taylor' });
+    await expect(scripted(['4', '2', '\n'], () => number({ message: 'Age', integer: true }))).resolves.toMatchObject({ result: 42 });
   });
 
   it('reads confirm and choice prompts', async () => {
@@ -61,7 +65,7 @@ describe('Laravel-style helpers', () => {
   });
 
   it('runs form builders', async () => {
-    const response = await scripted(['Ada', 'y'], () =>
+    const response = await scripted(['A', 'd', 'a', '\n', 'y'], () =>
       form(async (builder) => ({
         name: await builder.text('Name'),
         active: await builder.confirm('Active')
@@ -75,12 +79,20 @@ describe('Laravel-style helpers', () => {
     const output = createMemoryOutput();
 
     await withPromptEnvironment({ output, error: output }, async () => {
-      note('Hello', 'Greeting');
+      note('Hello');
+      error('Nope');
+      info('Facts');
+      intro('Start');
+      outro('Done');
       table({ headers: ['Name'], rows: [['Laravel']] });
       title('Demo');
     });
 
-    expect(output.text()).toContain('Greeting');
+    expect(output.text()).toContain('Hello');
+    expect(output.text()).toContain('Nope');
+    expect(output.text()).toContain('Facts');
+    expect(output.text()).toContain('Start');
+    expect(output.text()).toContain('Done');
     expect(output.text()).toContain('| Name');
     expect(output.text()).toContain('\u001B]0;Demo\u0007');
   });

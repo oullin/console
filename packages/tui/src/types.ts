@@ -11,7 +11,8 @@ export type PromptOutput = {
 };
 
 export type PromptInput = {
-  readLine(message: string): Promise<string>;
+  readKey?(): Promise<string | null>;
+  readLine?(message: string): Promise<string>;
 };
 
 export type PromptEnvironment = {
@@ -39,30 +40,46 @@ export type Choice<T = string> = {
 export type ChoiceInput<T = string> = Choice<T> | T;
 
 export type TextPromptOptions = BasePromptOptions<string> & {
+  label?: string;
   placeholder?: string;
+  transform?: (value: string) => MaybePromise<string>;
 };
 
 export type NumberPromptOptions = BasePromptOptions<number> & {
+  label?: string;
   min?: number;
   max?: number;
   integer?: boolean;
+  step?: number;
+  transform?: (value: number) => MaybePromise<number>;
 };
 
 export type ConfirmPromptOptions = BasePromptOptions<boolean> & {
+  label?: string;
   yes?: string;
   no?: string;
 };
 
 export type SelectPromptOptions<T> = BasePromptOptions<T> & {
+  label?: string;
   options: Array<ChoiceInput<T>>;
+  scroll?: number;
+  info?: string | ((value: T) => string);
 };
 
 export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
+  label?: string;
   options: Array<ChoiceInput<T>>;
+  scroll?: number;
+  info?: string | ((value: T[]) => string);
 };
 
 export type SearchPromptOptions<T> = BasePromptOptions<T> & {
+  label?: string;
   options: Array<ChoiceInput<T>> | ((query: string) => MaybePromise<Array<ChoiceInput<T>>>);
+  placeholder?: string;
+  scroll?: number;
+  info?: string | ((value: T) => string);
 };
 
 export type TableOptions = {

@@ -15,13 +15,13 @@ idiomatic TypeScript and OpenTUI internals.
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts` |
 | Key constants | `packages/tui/src/key.ts` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
-| Text, textarea, number, password | `packages/tui/src/prompts/basic.ts` |
+| Text, textarea, number, password | `packages/tui/src/prompts/basic.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect, suggest, search, multisearch, autocomplete | `packages/tui/src/prompts/choices.ts` |
 | Form builder | `packages/tui/src/form.ts` |
 | Note, notify, table, grid, title, clear | `packages/tui/src/output.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
-| OpenTUI testing adapter | `packages/tui/src/opentui.ts` |
+| OpenTUI adapter | `packages/tui/src/opentui.ts` |
 
 ## Remaining Exact-Parity Work
 

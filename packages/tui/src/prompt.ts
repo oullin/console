@@ -39,12 +39,36 @@ export const promptUntilValid = async <T>(
 ): Promise<T> => {
   const environment = promptEnvironment();
 
-  if (!environment.interactive && options.default !== undefined) {
-    return options.default;
+  if (!environment.interactive) {
+    const value = options.default as T;
+    const required = ensureRequired(value, options.required);
+    const validation = required ?? (await validationMessage(value, options.validate));
+
+    if (validation) {
+      throw new PromptValidationError(validation);
+    }
+
+    return value;
   }
 
   while (true) {
-    const value = await read();
+    let value: T;
+
+    try {
+      value = await read();
+    } catch (error) {
+      if (error instanceof PromptValidationError) {
+        if (!environment.interactive) {
+          throw error;
+        }
+
+        environment.error.write(renderError(error.message));
+        continue;
+      }
+
+      throw error;
+    }
+
     const required = ensureRequired(value, options.required);
     const validation = required ?? (await validationMessage(value, options.validate));
 
@@ -62,6 +86,10 @@ export const promptUntilValid = async <T>(
 
 export const ask = async (message: string, hint?: string): Promise<string> => {
   const environment = promptEnvironment();
+
+  if (!environment.input.readLine) {
+    throw new PromptValidationError('The configured prompt input cannot read lines.');
+  }
 
   return environment.input.readLine(renderQuestion(message, hint));
 };

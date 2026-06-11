@@ -1,13 +1,14 @@
 export { configurePrompts, createMemoryOutput, createScriptedInput, promptEnvironment, withPromptEnvironment } from '#tui/environment';
 export { FormBuilder, form } from '#tui/form';
-export { Key, keyFromEvent } from '#tui/key';
-export { createOpenTuiTextFrame } from '#tui/opentui';
+export { Key, keyFromEvent, oneOf } from '#tui/key';
+export { renderOpenTuiTextFrame } from '#tui/opentui';
 export { confirm, select, multiselect, suggest, search, multisearch, autocomplete, pause } from '#tui/prompts/choices';
 export { number, password, text, textarea } from '#tui/prompts/basic';
-export { clear, dataTable, grid, note, notify, table, title } from '#tui/output';
+export { alert, clear, dataTable, datatable, error, grid, info, intro, note, notify, outro, table, title, warning } from '#tui/output';
 export { PromptValidationError } from '#tui/prompt';
 export { Progress, progress, spin, stream, task } from '#tui/status';
 export { clearTerminal, cursorToStart, eraseLine, setTerminalTitle, terminalSize } from '#tui/terminal';
+export { applyTypedKey, readTypedValue } from '#tui/typed-value';
 export { parseAnsiText, truncate, visibleWidth, wrap } from '#tui/strings';
 export type {
   BasePromptOptions,

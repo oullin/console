@@ -7,9 +7,10 @@ using TypeScript-first modules and package boundaries.
 
 ## Status
 
-Phase 1 contains the monorepo scaffold, public helper surface, shared prompt
-environment, terminal utilities, baseline theme rendering, and local parity
-tests. Full upstream feature-test parity is tracked in `UPSTREAM.md`.
+The port is being delivered phase by phase on one draft PR. Current code includes
+working key-driven text and choice prompts, output helpers, terminal utilities,
+OpenTUI adapter wiring, and local parity tests. Full upstream feature-test parity
+is tracked in `UPSTREAM.md`.
 
 ## Development
 
