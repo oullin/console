@@ -17,7 +17,7 @@ describe('stream helper', () => {
 			expect(outputStream.closed()).toBe(true);
 		});
 
-		expect(output.text()).toBe('hello world');
+		expect(output.text()).toContain(' hello world');
 	});
 
 	it('pipes iterable content through a stateful stream', async () => {
@@ -27,7 +27,8 @@ describe('stream helper', () => {
 			await stream(['one', '\n', 'two']);
 		});
 
-		expect(output.text()).toBe('one\ntwo');
+		expect(output.text()).toContain(' one');
+		expect(output.text()).toContain(' two');
 	});
 
 	it('closes piped streams after the source is exhausted', async () => {
@@ -57,7 +58,7 @@ describe('stream helper', () => {
 			expect(outputStream.value()).toBe('finished');
 		});
 
-		expect(output.text()).toBe('finished');
+		expect(output.text()).toContain(' finished');
 	});
 
 	it('cannot be prompted for input', async () => {
@@ -68,5 +69,38 @@ describe('stream helper', () => {
 
 			expect(() => outputStream.prompt()).toThrow('Stream cannot be prompted');
 		});
+	});
+
+	it('wraps rendered stream lines with a leading gutter', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const outputStream = stream();
+
+			outputStream.write('a '.repeat(40).trimEnd());
+
+			expect(outputStream.lines().length).toBeGreaterThan(1);
+		});
+
+		expect(output.text()).toContain('\n ');
+	});
+
+	it('flushes pending stream chunks before closing', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const outputStream = stream();
+
+			for (let index = 0; index < 12; index += 1) {
+				outputStream.append(String(index));
+			}
+
+			outputStream.close();
+
+			expect(outputStream.value()).toBe('01234567891011');
+			expect(outputStream.closed()).toBe(true);
+		});
+
+		expect(output.text()).toContain(' 01234567891011');
 	});
 });

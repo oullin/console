@@ -1,25 +1,31 @@
 import { promptEnvironment } from '#tui/environment';
+import { StreamBuffer } from '#tui/status/stream/buffer';
+import { renderStreamFrame, streamLines } from '#tui/status/stream/render';
 
 export class Stream {
 	#closed = false;
-	#value = '';
+	readonly #buffer = new StreamBuffer(10);
 
 	write(content: string): this {
+		return this.append(content);
+	}
+
+	append(content: string): this {
 		if (this.#closed) {
 			throw new Error('Stream is closed.');
 		}
 
-		this.#value += content;
-		promptEnvironment().output.write(content);
+		this.#buffer.append(content);
+		this.render();
 
 		return this;
 	}
 
-	append(content: string): this {
-		return this.write(content);
-	}
-
 	close(): void {
+		while (this.#buffer.flushNext()) {
+			this.render();
+		}
+
 		this.#closed = true;
 	}
 
@@ -28,7 +34,7 @@ export class Stream {
 	}
 
 	lines(): string[] {
-		return this.#value.split(/\r?\n/u);
+		return streamLines({ value: this.value() });
 	}
 
 	async pipe(source: AsyncIterable<string> | Iterable<string>): Promise<void> {
@@ -46,7 +52,11 @@ export class Stream {
 	}
 
 	value(): string {
-		return this.#value;
+		return this.#buffer.value();
+	}
+
+	private render(): void {
+		promptEnvironment().output.write(renderStreamFrame({ value: this.value() }));
 	}
 }
 
