@@ -364,6 +364,30 @@ describe('data table prompt', () => {
 		expect(result).toBe(1);
 	});
 
+	it('uses the first visible row without keyboard input support', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: {},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [
+						{ Name: 'First', value: 'first' },
+						{ Name: 'Second', value: 'second' },
+					],
+				}),
+		);
+
+		expect(result).toBe('first');
+	});
+
 	it('renders a scrolling data table window around the selected row', async () => {
 		const output = createMemoryOutput();
 
