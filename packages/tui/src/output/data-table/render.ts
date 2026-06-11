@@ -2,6 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { renderTable } from '#tui/theme';
 import { dataTableRowCells } from '#tui/output/data-table/rows';
 import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
+import { dim, red, strikethrough } from '#tui/theme/styles';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
 type RenderDataTableFrameOptions<T> = {
@@ -43,4 +44,29 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 	}
 
 	return selected;
+};
+
+export const renderSubmittedDataTableFrame = <T>(message: string, headers: string[], rows: Array<VisibleDataTableRow<T>>, selected: number): void => {
+	const row = rows[selected];
+
+	if (!row) {
+		return;
+	}
+
+	const display = dataTableRowCells(headers, row.row).join(', ');
+
+	promptEnvironment().output.write(`${message}\n${display}\n`);
+};
+
+export const renderCancelledDataTableFrame = <T>(message: string, headers: string[], rows: Array<VisibleDataTableRow<T>>, selected: number): void => {
+	const outputRows = rows.map(({ row }, index) => {
+		return [index === selected ? '›' : ' ', ...dataTableRowCells(headers, row).map((cell) => dim(strikethrough(cell)))];
+	});
+
+	const environment = promptEnvironment();
+
+	environment.output.write(`${message}\n`);
+	environment.output.write(`${dim('/ Search')}\n`);
+	environment.output.write(`${renderTable(['', ...headers], outputRows)}\n`);
+	environment.error.write(`${red('Cancelled.')}\n`);
 };

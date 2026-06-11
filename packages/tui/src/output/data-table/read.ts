@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
-import { renderDataTableFrame } from '#tui/output/data-table/render';
+import { renderCancelledDataTableFrame, renderDataTableFrame, renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
 import { dataTableRowValue, visibleDataTableRows } from '#tui/output/data-table/rows';
 import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTableSearchState } from '#tui/output/data-table/search';
@@ -58,7 +58,7 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		const rows = visibleRows();
 
 		if (key === Key.ctrlC) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledDataTableFrame(options.message, headers, rows, selected);
 
 			return cancelPrompt(selectedDataTableValue(rows, selected));
 		}
@@ -88,6 +88,8 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		}
 
 		if (key === Key.enter) {
+			renderSubmittedDataTableFrame(options.message, headers, rows, selected);
+
 			return selectedDataTableValue(rows, selected);
 		}
 	}

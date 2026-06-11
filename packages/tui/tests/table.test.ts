@@ -240,7 +240,7 @@ describe('data table prompt', () => {
 
 		expect(result).toBe('beta');
 
-		const latestFrame = output.text().split('Pick project\n').at(-1) ?? '';
+		const latestFrame = output.text().split('Pick project\n').at(-2) ?? '';
 
 		expect(latestFrame).not.toContain('Pick project B');
 		expect(latestFrame).toContain('Alpha');
@@ -295,6 +295,7 @@ describe('data table prompt', () => {
 
 		expect(result).toBe('beta');
 		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('/ Search');
 	});
 
 	it('cancels data table search with the current filtered row', async () => {
@@ -319,6 +320,31 @@ describe('data table prompt', () => {
 
 		expect(result).toBe('beta');
 		expect(output.text()).toContain('Cancelled.');
+	});
+
+	it('renders a submitted data table row summary', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					headers: ['Name', 'Role'],
+					rows: [
+						['Alice', 'Designer'],
+						['Bob', 'Developer'],
+					],
+				}),
+		);
+
+		expect(result).toBe(1);
+		expect(output.text()).toContain('Bob, Developer');
 	});
 
 	it('edits Unicode data table search queries without corrupting input', async () => {
@@ -433,7 +459,7 @@ describe('data table prompt', () => {
 				}),
 		);
 
-		const latestFrame = output.text().split('Pick row\n').at(-1) ?? '';
+		const latestFrame = output.text().split('Pick row\n').at(-2) ?? '';
 
 		expect(result).toBe(2);
 		expect(latestFrame).not.toContain('First');
@@ -645,7 +671,7 @@ describe('data table prompt', () => {
 				}),
 		);
 
-		const latestFrame = output.text().split('Pick row\n').at(-1) ?? '';
+		const latestFrame = output.text().split('Pick row\n').at(-2) ?? '';
 
 		expect(result).toBe(2);
 		expect(latestFrame).not.toContain('First');
