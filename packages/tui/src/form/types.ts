@@ -6,5 +6,5 @@ export type FormStep = {
 	condition: boolean | ((responses: FormResponses) => boolean);
 	ignoreWhenReverting: boolean;
 	name?: string;
-	run: (responses: FormResponses, previous: unknown) => MaybePromise<unknown>;
+	run: (responses: FormResponses, previous: unknown, name?: string) => MaybePromise<unknown>;
 };

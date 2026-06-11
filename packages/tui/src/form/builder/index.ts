@@ -33,7 +33,7 @@ export class FormBuilder {
 	readonly textarea = promptBuilderMethods.textarea;
 	readonly warning = outputBuilderMethods.warning;
 
-	add(step: (responses: FormResponses, previous: unknown) => MaybePromise<unknown>, name?: string, ignoreWhenReverting = false): this {
+	add(step: (responses: FormResponses, previous: unknown, name?: string) => MaybePromise<unknown>, name?: string, ignoreWhenReverting = false): this {
 		this.#steps.push({
 			condition: true,
 			ignoreWhenReverting,
@@ -46,7 +46,7 @@ export class FormBuilder {
 
 	addIf(
 		condition: boolean | ((responses: FormResponses) => boolean),
-		step: (responses: FormResponses, previous: unknown) => MaybePromise<unknown>,
+		step: (responses: FormResponses, previous: unknown, name?: string) => MaybePromise<unknown>,
 		name?: string,
 		ignoreWhenReverting = false,
 	): this {
@@ -70,7 +70,7 @@ export class FormBuilder {
 				continue;
 			}
 
-			this.#responses[key] = await step.run(this.#responses, this.#responses[key]);
+			this.#responses[key] = await step.run(this.#responses, this.#responses[key], step.name);
 		}
 
 		return this.#responses;

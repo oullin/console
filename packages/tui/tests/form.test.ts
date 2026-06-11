@@ -20,7 +20,7 @@ describe('form builder', () => {
 		expect(responses[2]).toBe(true);
 	});
 
-	it('keys named responses and passes prior responses to custom steps', async () => {
+	it('keys named responses and passes prior responses and names to custom steps', async () => {
 		const output = createMemoryOutput();
 
 		const responses = await withPromptEnvironment(
@@ -33,12 +33,12 @@ describe('form builder', () => {
 			() =>
 				form()
 					.text('Name', '', '', false, undefined, '', 'name')
-					.add((values) => `Hello ${values.name}`, 'greeting')
+					.add((values, previous, name) => `${name ?? 'missing'}:${previous ?? 'new'}:Hello ${values.name}`, 'greeting')
 					.submit(),
 		);
 
 		expect(responses.name).toBe('Ada');
-		expect(responses.greeting).toBe('Hello Ada');
+		expect(responses.greeting).toBe('greeting:new:Hello Ada');
 	});
 
 	it('stores null for skipped conditional steps', async () => {
