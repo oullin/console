@@ -39,6 +39,8 @@ export type Choice<T = string> = {
 
 export type ChoiceInput<T = string> = Choice<T> | T;
 
+export type PromptInfo<T> = string | ((value: T | null) => string | null | undefined);
+
 export type TextPromptOptions = BasePromptOptions<string> & {
   label?: string;
   options?: string[] | ((query: string) => MaybePromise<string[]>);
@@ -65,14 +67,14 @@ export type SelectPromptOptions<T> = BasePromptOptions<T> & {
   label?: string;
   options: Array<ChoiceInput<T>>;
   scroll?: number;
-  info?: string | ((value: T) => string);
+  info?: PromptInfo<T>;
 };
 
 export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
   label?: string;
   options: Array<ChoiceInput<T>>;
   scroll?: number;
-  info?: string | ((value: T[]) => string);
+  info?: PromptInfo<T>;
 };
 
 export type SearchPromptOptions<T> = BasePromptOptions<T> & {
@@ -80,7 +82,7 @@ export type SearchPromptOptions<T> = BasePromptOptions<T> & {
   options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
   placeholder?: string;
   scroll?: number;
-  info?: string | ((value: T) => string);
+  info?: PromptInfo<T>;
 };
 
 export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
@@ -88,7 +90,7 @@ export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
   options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
   placeholder?: string;
   scroll?: number;
-  info?: string | ((value: T[]) => string);
+  info?: PromptInfo<T>;
 };
 
 export type TableCell = string | number | boolean | null | undefined;

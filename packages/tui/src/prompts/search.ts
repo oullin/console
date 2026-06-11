@@ -3,6 +3,7 @@ import { Key, oneOf } from '#tui/key';
 import { ask, promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { findChoice, normalizeSearchChoices, renderInteractiveChoices } from '#tui/concerns/choices';
+import { resolveInfo } from '#tui/concerns/info';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
 const resolveSearchChoices = async <T>(source: SearchPromptOptions<T>['options'], query: string): Promise<Array<Choice<T>>> => {
@@ -22,9 +23,16 @@ const renderSearchChoices = <T>(
   highlighted: number | null,
   marked: Set<number> = new Set(),
   selectedLabels: string[] = [],
-  scroll?: number
+  scroll?: number,
+  info?: SearchPromptOptions<T>['info'] | MultiSearchPromptOptions<T>['info']
 ): void => {
   renderInteractiveChoices(searchMessage(message, query), choices, highlighted ?? 0, marked, scroll);
+
+  const text = resolveInfo(info, highlighted === null ? null : choices[highlighted]?.value ?? null);
+
+  if (text.length > 0) {
+    promptEnvironment().output.write(`${text}\n`);
+  }
 
   if (selectedLabels.length > 0) {
     promptEnvironment().output.write(`Selected: ${selectedLabels.join(', ')}\n`);
@@ -46,7 +54,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
   let choices = await resolveSearchChoices(options.options, state.value);
   let highlighted: number | null = null;
 
-  renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+  renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 
   while (true) {
     const key = await environment.input.readKey();
@@ -58,26 +66,26 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
     if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
       choices = await resolveSearchChoices(options.options, state.value);
       highlighted = choices.length === 0 ? null : ((highlighted ?? (attempt > 0 ? 0 : -1)) + 1) % choices.length;
-      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
       continue;
     }
 
     if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
       choices = await resolveSearchChoices(options.options, state.value);
       highlighted = choices.length === 0 ? null : ((highlighted ?? choices.length) - 1 + choices.length) % choices.length;
-      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
       continue;
     }
 
     if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
       highlighted = 0;
-      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
       continue;
     }
 
     if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
       highlighted = Math.max(0, choices.length - 1);
-      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
       continue;
     }
 
@@ -88,7 +96,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
 
       choices = await resolveSearchChoices(options.options, state.value);
       highlighted = choices.length > 0 ? 0 : null;
-      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
       continue;
     }
 
@@ -103,7 +111,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
     state = { cursor: next.cursor, value: next.value };
     highlighted = null;
     choices = await resolveSearchChoices(options.options, state.value);
-    renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
+    renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
   }
 };
 
@@ -150,7 +158,7 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
   const render = (): void => {
     const marked = new Set(choices.flatMap((choice, index) => selected.has(choice.value) ? [index] : []));
 
-    renderSearchChoices(options.message, state.value, choices, highlighted, marked, [...selected.values()], options.scroll);
+    renderSearchChoices(options.message, state.value, choices, highlighted, marked, [...selected.values()], options.scroll, options.info);
   };
 
   render();

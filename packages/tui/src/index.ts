@@ -23,6 +23,7 @@ export type {
   MultiSelectPromptOptions,
   NumberPromptOptions,
   PromptEnvironment,
+  PromptInfo,
   PromptInput,
   PromptOutput,
   PromptValue,

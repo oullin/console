@@ -89,6 +89,21 @@ describe('search prompt', () => {
     expect(latestFrame).toContain('three');
     expect(latestFrame).toContain('four');
   });
+
+  it('renders search info for the highlighted result', async () => {
+    const output = createMemoryOutput();
+    await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => search({ message: 'Favorite color?', options: colors, info: (value) => `About ${value ?? 'none'}` })
+    );
+
+    expect(output.text()).toContain('About red');
+  });
 });
 
 describe('multisearch prompt', () => {
@@ -115,5 +130,20 @@ describe('multisearch prompt', () => {
     expect(result).toEqual(['violet', 'green']);
     expect(output.text()).toContain('Selected: Violet');
     expect(output.text()).toContain('Selected: Violet, Green');
+  });
+
+  it('renders multisearch info for the highlighted result', async () => {
+    const output = createMemoryOutput();
+    await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => multisearch({ message: 'Favorite colors?', options: colors, info: (value) => `About ${value ?? 'none'}` })
+    );
+
+    expect(output.text()).toContain('About red');
   });
 });

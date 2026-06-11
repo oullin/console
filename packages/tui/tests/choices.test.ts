@@ -68,6 +68,22 @@ describe('choice prompts', () => {
     expect(result).toBe('first');
   });
 
+  it('renders select info for the highlighted option', async () => {
+    const output = createMemoryOutput();
+    await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => select({ message: 'Pick one', options: ['first', 'second'], info: (value) => `About ${value ?? 'none'}` })
+    );
+
+    expect(output.text()).toContain('About first');
+    expect(output.text()).toContain('About second');
+  });
+
   it('toggles multiselect choices with the space bar', async () => {
     const output = createMemoryOutput();
     const result = await withPromptEnvironment(
@@ -115,5 +131,21 @@ describe('choice prompts', () => {
 
     expect(result).toEqual(['first', 'second', 'third']);
     expect(output.text()).toContain('Selected: first, second, third');
+  });
+
+  it('renders multiselect info for the highlighted option', async () => {
+    const output = createMemoryOutput();
+    await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => multiselect({ message: 'Pick many', options: ['first', 'second'], info: (value) => `About ${value ?? 'none'}` })
+    );
+
+    expect(output.text()).toContain('About first');
+    expect(output.text()).toContain('About second');
   });
 });

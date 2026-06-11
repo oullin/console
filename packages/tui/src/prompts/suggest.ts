@@ -3,12 +3,13 @@ import { Key, oneOf } from '#tui/key';
 import { ask, promptUntilValid } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { renderInteractiveChoices } from '#tui/concerns/choices';
+import { resolveInfo } from '#tui/concerns/info';
 import type { MaybePromise, TextPromptOptions } from '#tui/types';
 
 export type SuggestOptions = TextPromptOptions & {
   options: string[] | ((query: string) => MaybePromise<string[]>);
   scroll?: number;
-  info?: string | ((value: string) => string);
+  info?: string | ((value: string | null) => string | null | undefined);
 };
 
 const suggestOptions = (
@@ -39,7 +40,7 @@ const resolveSuggestions = async (source: SuggestOptions['options'], query: stri
   return options.filter((option: string) => option.toLowerCase().startsWith(query.toLowerCase()));
 };
 
-const renderSuggestions = (message: string, value: string, matches: string[], highlighted: number | null, scroll?: number): void => {
+const renderSuggestions = (message: string, value: string, matches: string[], highlighted: number | null, scroll?: number, info?: SuggestOptions['info']): void => {
   renderInteractiveChoices(
     value.length > 0 ? `${message} ${value}` : message,
     matches.map((match) => ({ label: match, value: match })),
@@ -47,6 +48,12 @@ const renderSuggestions = (message: string, value: string, matches: string[], hi
     new Set(),
     scroll
   );
+
+  const text = resolveInfo(info, highlighted === null ? null : matches[highlighted] ?? null);
+
+  if (text.length > 0) {
+    promptEnvironment().output.write(`${text}\n`);
+  }
 };
 
 const readSuggestionValue = async (options: SuggestOptions): Promise<string> => {
@@ -63,7 +70,7 @@ const readSuggestionValue = async (options: SuggestOptions): Promise<string> => 
   let highlighted: number | null = null;
   let matches: string[] = await resolveSuggestions(options.options, state.value);
 
-  renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+  renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 
   while (true) {
     const key = await environment.input.readKey();
@@ -82,33 +89,33 @@ const readSuggestionValue = async (options: SuggestOptions): Promise<string> => 
 
       matches = await resolveSuggestions(options.options, state.value);
       highlighted = null;
-      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
       continue;
     }
 
     if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.shiftTab) {
       matches = await resolveSuggestions(options.options, state.value);
       highlighted = matches.length === 0 ? null : ((highlighted ?? -1) + 1) % matches.length;
-      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
       continue;
     }
 
     if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
       matches = await resolveSuggestions(options.options, state.value);
       highlighted = matches.length === 0 ? null : ((highlighted ?? matches.length) - 1 + matches.length) % matches.length;
-      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
       continue;
     }
 
     if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
       highlighted = 0;
-      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
       continue;
     }
 
     if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
       highlighted = Math.max(0, matches.length - 1);
-      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+      renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
       continue;
     }
 
@@ -135,7 +142,7 @@ const readSuggestionValue = async (options: SuggestOptions): Promise<string> => 
     state = { cursor: next.cursor, value: next.value };
     highlighted = null;
     matches = await resolveSuggestions(options.options, state.value);
-    renderSuggestions(options.message, state.value, matches, highlighted, options.scroll);
+    renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
   }
 };
 

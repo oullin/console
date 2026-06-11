@@ -67,4 +67,20 @@ describe('suggest prompt', () => {
 
     expect(output).toContain('Favorite color? Blue');
   });
+
+  it('renders suggest info for the highlighted result', async () => {
+    const output = createMemoryOutput();
+
+    await withPromptEnvironment(
+      {
+        input: createScriptedInput(['b', Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => suggest({ message: 'Favorite color?', options: ['Red', 'Green', 'Blue'], info: (value) => `About ${value ?? 'none'}` })
+    );
+
+    expect(output.text()).toContain('About Blue');
+  });
 });

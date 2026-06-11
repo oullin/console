@@ -3,6 +3,7 @@ import { Key, oneOf } from '#tui/key';
 import { ask, promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex, nextEnabledIndex, normalizeChoices, renderInteractiveChoices } from '#tui/concerns/choices';
+import { resolveInfo } from '#tui/concerns/info';
 import type { Choice, ConfirmPromptOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 const parseChoiceIndex = (key: string): number => (/^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN);
@@ -31,7 +32,17 @@ const nextChoiceKeys = (key: string): boolean => {
     || key === 'l';
 };
 
-const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, hint?: string, scroll?: number): Promise<T> => {
+const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll: number | undefined, info: SelectPromptOptions<T>['info']): void => {
+  renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+
+  const text = resolveInfo(info, choices[selected]?.value ?? null);
+
+  if (text.length > 0) {
+    promptEnvironment().output.write(`${text}\n`);
+  }
+};
+
+const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, hint?: string, scroll?: number, info?: SelectPromptOptions<T>['info']): Promise<T> => {
   const environment = promptEnvironment();
 
   if (!environment.input.readKey) {
@@ -47,7 +58,7 @@ const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>,
   }
 
   let selected = firstEnabledIndex(choices);
-  renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+  renderSelectedChoice(message, choices, selected, scroll, info);
 
   while (true) {
     const key = await environment.input.readKey();
@@ -64,19 +75,19 @@ const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>,
 
     if (nextChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, 1);
-      renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+      renderSelectedChoice(message, choices, selected, scroll, info);
       continue;
     }
 
     if (previousChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, -1);
-      renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+      renderSelectedChoice(message, choices, selected, scroll, info);
       continue;
     }
 
     if (oneOf([Key.home, Key.ctrlA], key)) {
       selected = firstEnabledIndex(choices);
-      renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+      renderSelectedChoice(message, choices, selected, scroll, info);
       continue;
     }
 
@@ -87,7 +98,7 @@ const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>,
         selected -= 1;
       }
 
-      renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+      renderSelectedChoice(message, choices, selected, scroll, info);
       continue;
     }
 
@@ -116,8 +127,14 @@ const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: string)
   return selected.map((choice) => choice.value);
 };
 
-const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number): void => {
+const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): void => {
   renderInteractiveChoices(message, choices, selected, marked, scroll);
+
+  const text = resolveInfo(info, choices[selected]?.value ?? null);
+
+  if (text.length > 0) {
+    promptEnvironment().output.write(`${text}\n`);
+  }
 
   const labels = [...marked]
     .sort((left, right) => left - right)
@@ -129,7 +146,7 @@ const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, se
   }
 };
 
-const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>, defaults: T[] = [], hint?: string, scroll?: number): Promise<T[]> => {
+const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>, defaults: T[] = [], hint?: string, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): Promise<T[]> => {
   const environment = promptEnvironment();
   const selectedValues = new Set(defaults);
 
@@ -142,7 +159,7 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
 
   let selected = firstEnabledIndex(choices);
   const marked = new Set(choices.flatMap((choice, index) => selectedValues.has(choice.value) ? [index] : []));
-  renderMultipleChoices(message, choices, selected, marked, scroll);
+  renderMultipleChoices(message, choices, selected, marked, scroll, info);
 
   while (true) {
     const key = await environment.input.readKey();
@@ -166,25 +183,25 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
         marked.add(index);
       }
 
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
     if (nextChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, 1);
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
     if (previousChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, -1);
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
     if (oneOf([Key.home], key)) {
       selected = firstEnabledIndex(choices);
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
@@ -195,7 +212,7 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
         selected -= 1;
       }
 
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
@@ -212,7 +229,7 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
         }
       }
 
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
@@ -223,7 +240,7 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
         marked.add(selected);
       }
 
-      renderMultipleChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll, info);
       continue;
     }
 
@@ -272,7 +289,7 @@ export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => 
   const choices = normalizeChoices(options.options);
 
   return promptUntilValid(options, async () => {
-    return readSelectedChoice(options.message, choices, options.hint, options.scroll).catch((error: unknown) => {
+    return readSelectedChoice(options.message, choices, options.hint, options.scroll, options.info).catch((error: unknown) => {
       if (options.default !== undefined && error instanceof PromptValidationError) {
         return options.default;
       }
@@ -285,5 +302,5 @@ export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => 
 export const multiselect = async <T>(options: MultiSelectPromptOptions<T>): Promise<T[]> => {
   const choices = normalizeChoices(options.options);
 
-  return promptUntilValid(options, async () => readMultipleChoices(options.message, choices, options.default, options.hint, options.scroll));
+  return promptUntilValid(options, async () => readMultipleChoices(options.message, choices, options.default, options.hint, options.scroll, options.info));
 };
