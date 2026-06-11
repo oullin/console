@@ -32,6 +32,7 @@ TypeScript and OpenTUI internals.
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
 | Spinner static frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
+| Task static frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/*` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
@@ -51,7 +52,7 @@ later phases:
 - Search full rendering and highlighted result label parity
 - Spinner animated frame and terminal cleanup parity
 - Stream
-- Task
+- Task animated frame, terminal cleanup, and process-log parity
 - Terminal
 - Textarea
 - Default theme

@@ -43,7 +43,7 @@ describe('task helper', () => {
 		expect(output.text()).toContain('Running...');
 		expect(output.text()).not.toContain('line one');
 		expect(output.text()).not.toContain('line two');
-		expect(output.text()).toContain('Done: Running...');
+		expect(output.text()).toContain(' ⠶ Running...');
 	});
 
 	it('strips cursor reset control sequences from log lines', async () => {
@@ -100,10 +100,11 @@ describe('task helper', () => {
 			);
 		});
 
-		expect(output.text()).toContain('line one');
-		expect(output.text()).toContain('success: created');
-		expect(output.text()).toContain('warning: check this');
-		expect(output.text()).toContain('error: failed optional step');
+		expect(output.text()).not.toContain('line one');
+		expect(output.text()).toContain(' • Running...');
+		expect(output.text()).toContain('✔ created');
+		expect(output.text()).toContain('⚠ check this');
+		expect(output.text()).toContain('✘ failed optional step');
 	});
 
 	it('bounds stable task summaries with the task log limit', async () => {
@@ -123,8 +124,8 @@ describe('task helper', () => {
 		});
 
 		expect(output.text()).not.toContain('success: first');
-		expect(output.text()).toContain('warning: second');
-		expect(output.text()).toContain('error: third');
+		expect(output.text()).toContain('⚠ second');
+		expect(output.text()).toContain('✘ third');
 	});
 
 	it('omits stable task summaries by default', async () => {
@@ -137,7 +138,8 @@ describe('task helper', () => {
 		});
 
 		expect(output.text()).not.toContain('success: created');
-		expect(output.text()).toContain('Done: Running...');
+		expect(output.text()).not.toContain('✔ created');
+		expect(output.text()).toContain(' ⠶ Running...');
 	});
 
 	it('accumulates partial task output until committed', async () => {
@@ -196,7 +198,8 @@ describe('task helper', () => {
 		});
 
 		expect(output.text()).toContain('Running...');
-		expect(output.text()).toContain('Done: Building assets');
+		expect(output.text()).toContain(' ⠶ Building');
+		expect(output.text()).toContain('assets');
 	});
 
 	it('clears task sub-labels through the logger', async () => {
@@ -215,8 +218,8 @@ describe('task helper', () => {
 			);
 		});
 
-		expect(output.text()).toContain('Running... assets');
-		expect(output.text()).toContain('Done: Building');
-		expect(output.text()).not.toContain('Done: Building assets');
+		expect(output.text()).toContain(' ⠶ Running...\n   assets');
+		expect(output.text()).toContain(' ⠶ Building');
+		expect(output.text()).not.toContain(' ⠶ Building\n   assets');
 	});
 });

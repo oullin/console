@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Logger } from '#tui/status/task/logger';
+import { renderTaskFrame } from '#tui/status/task/render';
 import type { MaybePromise } from '#tui/types';
 
 export type TaskDefinition<T> = {
@@ -28,21 +29,45 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 	const logger = new Logger(typeof definitionOrLabel === 'string' ? limit : (definitionOrLabel.limit ?? limit), title, subtitle ?? '');
 
-	promptEnvironment().output.write(`${title}${subtitle ? ` ${subtitle}` : ''}\n`);
+	const output = promptEnvironment().output;
 
-	const result = await run(logger);
+	output.write(
+		renderTaskFrame({
+			label: logger.labelValue,
+			limit: logger.limitValue,
+			lines: logger.lines,
+			stableMessages: logger.stableMessages,
+			subLabel: logger.subLabelValue,
+		}),
+	);
 
-	for (const line of logger.lines) {
-		promptEnvironment().output.write(`${line}\n`);
+	try {
+		const result = await run(logger);
+
+		output.write(
+			renderTaskFrame({
+				finished: true,
+				keepSummary: summary,
+				label: logger.labelValue,
+				limit: logger.limitValue,
+				lines: logger.lines,
+				stableMessages: summary ? logger.stableMessages : [],
+				subLabel: logger.subLabelValue,
+			}),
+		);
+
+		return result;
+	} catch (error) {
+		output.write(
+			renderTaskFrame({
+				label: logger.labelValue,
+				limit: logger.limitValue,
+				lines: logger.lines,
+				stableMessages: logger.stableMessages,
+				subLabel: logger.subLabelValue,
+			}),
+		);
+
+		throw error;
 	}
-
-	if (summary) {
-		for (const message of logger.stableMessages) {
-			promptEnvironment().output.write(`${message.type}: ${message.message}\n`);
-		}
-	}
-
-	promptEnvironment().output.write(`Done: ${logger.labelValue}${logger.subLabelValue ? ` ${logger.subLabelValue}` : ''}\n`);
-
-	return result;
 }

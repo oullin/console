@@ -19,6 +19,10 @@ export class Logger {
 		this.subLabelValue = subLabel;
 	}
 
+	get limitValue(): number {
+		return this.limit;
+	}
+
 	line(message: string): void {
 		this.writeLines(message.trimEnd());
 	}
@@ -70,6 +74,9 @@ export class Logger {
 
 	private stable(type: StableTaskMessage['type'], message: string): void {
 		this.stableMessages.push({ message, type });
+		this.lines.splice(0);
+		this.#partialBuffer = '';
+		this.#partialStartIndex = null;
 
 		while (this.stableMessages.length > this.stableLimit) {
 			this.stableMessages.shift();
