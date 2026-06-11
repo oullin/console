@@ -154,4 +154,38 @@ describe('multisearch prompt', () => {
 
 		expect(output.text()).toContain('About red');
 	});
+
+	it('toggles all current multisearch results with ctrl-a', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlA, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual(['red', 'green', 'blue']);
+		expect(output.text()).toContain('Selected: Red, Green, Blue');
+	});
+
+	it('supports home and end multisearch navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.end[0], Key.space, Key.home[0], Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual(['blue', 'red']);
+		expect(output.text()).toContain('Selected: Blue, Red');
+	});
 });

@@ -169,6 +169,7 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
 	let highlighted: number | null = null;
 
 	const selected = new Map<T, string>();
+	const selectableChoices = (): Array<Choice<T>> => choices.filter((choice) => !choice.disabled);
 
 	const render = (): void => {
 		const marked = new Set(choices.flatMap((choice, index) => (selected.has(choice.value) ? [index] : [])));
@@ -197,6 +198,41 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			highlighted = choices.length === 0 ? null : ((highlighted ?? choices.length) - 1 + choices.length) % choices.length;
+			render();
+			continue;
+		}
+
+		if (oneOf([Key.home], key) && highlighted !== null) {
+			highlighted = 0;
+			render();
+			continue;
+		}
+
+		if (oneOf([Key.end], key) && highlighted !== null) {
+			highlighted = Math.max(0, choices.length - 1);
+			render();
+			continue;
+		}
+
+		if (key === Key.ctrlE && highlighted !== null) {
+			render();
+			continue;
+		}
+
+		if (key === Key.ctrlA && highlighted !== null) {
+			const currentChoices = selectableChoices();
+			const allCurrentChoicesSelected = currentChoices.every((choice) => selected.has(choice.value));
+
+			if (allCurrentChoicesSelected) {
+				for (const choice of currentChoices) {
+					selected.delete(choice.value);
+				}
+			} else {
+				for (const choice of currentChoices) {
+					selected.set(choice.value, choice.label);
+				}
+			}
+
 			render();
 			continue;
 		}
