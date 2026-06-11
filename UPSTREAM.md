@@ -19,12 +19,12 @@ TypeScript and OpenTUI internals.
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
-| Confirm, select, multiselect | `packages/tui/src/prompts/select.ts` |
-| Suggest, autocomplete | `packages/tui/src/prompts/suggest.ts` |
-| Search, multisearch | `packages/tui/src/prompts/search.ts` |
+| Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
+| Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
+| Search, multisearch | `packages/tui/src/prompts/search/*` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
-| Form builder | `packages/tui/src/form/*`, `packages/tui/src/form.ts` |
+| Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
 | Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table.ts` |
