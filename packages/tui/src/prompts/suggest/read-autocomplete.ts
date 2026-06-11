@@ -4,9 +4,9 @@ import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
+import { characterLength } from '#tui/typed-value/characters';
+import { nextAutocompleteHighlight } from '#tui/prompts/suggest/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
-
-const characterLength = (value: string): number => [...value].length;
 
 export const readAutocompleteValue = async (options: SuggestOptions): Promise<string> => {
 	const environment = promptEnvironment();
@@ -35,7 +35,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 		if (key === Key.up || key === Key.upArrow) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? 0 : (highlighted - 1 + matches.length) % matches.length;
+			highlighted = nextAutocompleteHighlight(matches, highlighted, -1);
 			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
@@ -43,7 +43,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 		if (key === Key.down || key === Key.downArrow) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? 0 : (highlighted + 1) % matches.length;
+			highlighted = nextAutocompleteHighlight(matches, highlighted, 1);
 			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}

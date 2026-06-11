@@ -60,6 +60,10 @@ describe('suggest prompt', () => {
 		await expectSuggestion(['b', Key.down, Key.pageDown, Key.pageUp, Key.pageDown, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Blurple');
 	});
 
+	it('supports home and end suggestion navigation keys', async () => {
+		await expectSuggestion(['b', Key.down, Key.end[0], Key.home[0], Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Blue');
+	});
+
 	it('supports callback options', async () => {
 		await expectSuggestion(['e', 'e', Key.down, Key.enter], (value) => ['Red', 'Green', 'Blue'].filter((option) => option.toLowerCase().includes(value.toLowerCase())), 'Green');
 	});

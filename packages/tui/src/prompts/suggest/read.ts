@@ -4,10 +4,9 @@ import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { renderSuggestions } from '#tui/prompts/suggest/render';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
-import { pageIndex } from '#tui/prompts/select/navigation';
+import { characterLength } from '#tui/typed-value/characters';
+import { firstSuggestionHighlight, lastSuggestionHighlight, nextSuggestionHighlight, pageSuggestionHighlight } from '#tui/prompts/suggest/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
-
-const characterLength = (value: string): number => [...value].length;
 
 export const readSuggestionValue = async (options: SuggestOptions): Promise<string> => {
 	const environment = promptEnvironment();
@@ -36,7 +35,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (key === Key.tab) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? null : ((highlighted ?? -1) + 1) % matches.length;
+			highlighted = nextSuggestionHighlight(matches, highlighted, 1);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
@@ -44,7 +43,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? null : ((highlighted ?? -1) + 1) % matches.length;
+			highlighted = nextSuggestionHighlight(matches, highlighted, 1);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
@@ -52,7 +51,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? null : ((highlighted ?? matches.length) - 1 + matches.length) % matches.length;
+			highlighted = nextSuggestionHighlight(matches, highlighted, -1);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
@@ -60,7 +59,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (key === Key.pageDown) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? null : highlighted === null ? 0 : pageIndex(matches.length, highlighted, 1, options.scroll);
+			highlighted = pageSuggestionHighlight(matches, highlighted, 1, options.scroll);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
@@ -68,19 +67,19 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (key === Key.pageUp) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = matches.length === 0 ? null : highlighted === null ? Math.max(0, matches.length - 1) : pageIndex(matches.length, highlighted, -1, options.scroll);
+			highlighted = pageSuggestionHighlight(matches, highlighted, -1, options.scroll);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
 
 		if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
-			highlighted = 0;
+			highlighted = firstSuggestionHighlight(matches);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
 
 		if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
-			highlighted = Math.max(0, matches.length - 1);
+			highlighted = lastSuggestionHighlight(matches);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
