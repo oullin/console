@@ -69,7 +69,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 			return [...selected.keys()];
 		}
 
-		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
+		if (key === Key.down || key === Key.downArrow || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			const currentChoices = displayedChoices();
@@ -79,7 +79,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 			continue;
 		}
 
-		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
+		if (key === Key.up || key === Key.upArrow || key === Key.shiftTab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			const currentChoices = displayedChoices();

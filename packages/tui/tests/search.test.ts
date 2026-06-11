@@ -278,6 +278,23 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('Selected: Red, Green, Blue');
 	});
 
+	it('does not navigate multisearch results with ctrl-n or ctrl-p', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlN, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual([]);
+		expect(output.text()).not.toContain('Selected: Green');
+	});
+
 	it('keeps selected multisearch values visible after clearing the query', async () => {
 		const output = createMemoryOutput();
 
