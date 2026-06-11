@@ -2,6 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { parseChoiceAnswerIndex, parseChoiceRecordKey } from '#tui/concerns/validators/choice-answer';
 import { parseChoice, parseChoiceRecord } from '#tui/concerns/validators/choice';
 import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
+import { cyan, dim } from '#tui/theme/styles';
 import type { Choice, ChoiceOptions } from '#tui/types';
 
 export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => {
@@ -109,7 +110,23 @@ export const renderInteractiveChecklist = <T>(message: string, choices: Array<Ch
 		const marker = checked ? '◼' : '◻';
 		const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
 		const hint = choice.hint ? ` ${choice.hint}` : '';
+		const label = `${choice.label}${hint}${disabled}`;
 
-		environment.output.write(`${pointer} ${marker} ${choice.label}${hint}${disabled}\n`);
+		if (active && checked) {
+			environment.output.write(`${cyan(`${pointer} ${marker}`)} ${label}\n`);
+			continue;
+		}
+
+		if (active) {
+			environment.output.write(`${cyan(pointer)} ${marker} ${label}\n`);
+			continue;
+		}
+
+		if (checked) {
+			environment.output.write(`  ${cyan(marker)} ${dim(label)}\n`);
+			continue;
+		}
+
+		environment.output.write(`  ${dim(marker)} ${dim(label)}\n`);
 	}
 };

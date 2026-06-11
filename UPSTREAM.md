@@ -23,6 +23,7 @@ TypeScript and OpenTUI internals.
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Multi-select checklist markers | `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select active and selected row styling | `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
@@ -57,7 +58,7 @@ later phases:
 
 - Form builder
 - Multi-search full rendering and selected-result summary parity
-- Multi-select
+- Multi-select boxed layout and submit/cancel frame parity
 - Progress signal handling parity
 - Prompt lifecycle
 - Search boxed layout, scrollbar, and submit/cancel frame parity

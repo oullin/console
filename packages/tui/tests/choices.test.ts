@@ -421,9 +421,9 @@ describe('choice prompts', () => {
 			() => multiselect({ message: 'Pick many', options: ['first', 'second'] }),
 		);
 
-		expect(output.text()).toContain('› ◻ first');
-		expect(output.text()).toContain('  ◻ second');
-		expect(output.text()).toContain('› ◼ first');
+		expect(output.text()).toContain('\u001B[36m›\u001B[39m ◻ first');
+		expect(output.text()).toContain('  \u001B[2m◻\u001B[22m \u001B[2msecond\u001B[22m');
+		expect(output.text()).toContain('\u001B[36m› ◼\u001B[39m first');
 	});
 
 	it('returns keys from keyed multiselect options', async () => {
