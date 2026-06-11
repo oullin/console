@@ -41,6 +41,7 @@ export type ChoiceInput<T = string> = Choice<T> | T;
 
 export type TextPromptOptions = BasePromptOptions<string> & {
   label?: string;
+  options?: string[] | ((query: string) => MaybePromise<string[]>);
   placeholder?: string;
   transform?: (value: string) => MaybePromise<string>;
 };

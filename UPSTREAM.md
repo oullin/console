@@ -28,7 +28,7 @@ idiomatic TypeScript and OpenTUI internals.
 The following upstream files still need full line-by-line behavioral mapping in
 later phases:
 
-- `src/AutoCompletePrompt.php`
+- `src/AutoCompletePrompt.php` advanced ghost-text rendering
 - `src/DataTablePrompt.php`
 - `src/FormBuilder.php`
 - `src/MultiSearchPrompt.php`
@@ -36,7 +36,7 @@ later phases:
 - `src/NotifyPrompt.php`
 - `src/Progress.php`
 - `src/Prompt.php`
-- `src/SearchPrompt.php`
+- `src/SearchPrompt.php` full search lifecycle and highlighted result labels
 - `src/Spinner.php`
 - `src/Stream.php`
 - `src/Task.php`
