@@ -19,7 +19,7 @@ const normalizeTableOptions = (headersOrOptions: TableOptions | string[] = [], r
 	};
 };
 
-export const table = (headersOrOptions: TableOptions | string[] = [], rows: TableOptions['rows'] | null = null): void => {
+export const table = (headersOrOptions: TableOptions | string[] = [], rows: TableOptions['rows'] | null = null): boolean => {
 	const options = normalizeTableOptions(headersOrOptions, rows);
 
 	const normalizedRows = options.rows.map((row) => {
@@ -31,9 +31,11 @@ export const table = (headersOrOptions: TableOptions | string[] = [], rows: Tabl
 	});
 
 	promptEnvironment().output.write(`${renderTable(options.headers, normalizedRows)}\n`);
+
+	return true;
 };
 
-export const grid = (items: Array<string | number | boolean> = [], maxWidth?: number): void => {
+export const grid = (items: Array<string | number | boolean> = [], maxWidth?: number): boolean => {
 	const width = maxWidth ?? 4;
 	const rows: string[][] = [];
 
@@ -43,6 +45,8 @@ export const grid = (items: Array<string | number | boolean> = [], maxWidth?: nu
 
 	promptEnvironment().output.write(rows.map((row) => row.join('  ')).join('\n'));
 	promptEnvironment().output.write(items.length > 0 ? '\n' : '');
+
+	return true;
 };
 
 export const dataTable = table;

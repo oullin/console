@@ -142,4 +142,23 @@ describe('form builder', () => {
 		expect(output.text()).toContain('Build');
 		expect(output.text()).toContain('line one');
 	});
+
+	it('stores output helper success responses', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+			},
+			() =>
+				form()
+					.note('Saved', null, 'note')
+					.table(['Name'], [['Ollin']], 'table')
+					.submit(),
+		);
+
+		expect(responses.note).toBe(true);
+		expect(responses.table).toBe(true);
+	});
 });
