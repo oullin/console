@@ -68,6 +68,7 @@ TypeScript and OpenTUI internals.
 | Display-only output helper return values and form responses | `packages/tui/src/output/notes.ts`, `packages/tui/src/output/table.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/output.test.ts`, `packages/tui/tests/form.test.ts` |
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
 | Spinner static and deterministic animated frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
+| Spinner empty default message | `packages/tui/src/status/spinner.ts`, `packages/tui/src/form/builder/status.ts`, `packages/tui/tests/spinner.test.ts`, `packages/tui/tests/form.test.ts` |
 | Task static and deterministic animated frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/*` |
 | Task process output capture | `packages/tui/src/status/task/process-output.ts`, `packages/tui/tests/task.test.ts` |
 | Stream frame rendering, wrapping, fade styles, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/*` |

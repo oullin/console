@@ -8,7 +8,7 @@ export function spin<T>(callback: () => MaybePromise<T>, options?: StatusOptions
 
 export function spin<T>(message: string, callback: () => MaybePromise<T>): Promise<T>;
 
-export async function spin<T>(callbackOrMessage: (() => MaybePromise<T>) | string, optionsOrCallback: StatusOptions | (() => MaybePromise<T>) = { message: 'Loading' }): Promise<T> {
+export async function spin<T>(callbackOrMessage: (() => MaybePromise<T>) | string, optionsOrCallback: StatusOptions | (() => MaybePromise<T>) = { message: '' }): Promise<T> {
 	const callback = typeof callbackOrMessage === 'string' ? optionsOrCallback : callbackOrMessage;
 	const options = typeof callbackOrMessage === 'string' ? { message: callbackOrMessage } : optionsOrCallback;
 
@@ -16,7 +16,7 @@ export async function spin<T>(callbackOrMessage: (() => MaybePromise<T>) | strin
 		throw new Error('A spinner callback is required.');
 	}
 
-	const message = typeof options === 'function' ? 'Loading' : options.message;
+	const message = typeof options === 'function' ? '' : options.message;
 	const output = promptEnvironment().output;
 	const frame = renderSpinnerFrame(message);
 

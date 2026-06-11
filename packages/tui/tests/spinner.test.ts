@@ -18,6 +18,18 @@ describe('spinner helper', () => {
 		expect(output.text()).not.toContain('Done: Working');
 	});
 
+	it('runs callback-first spinner callbacks without a default message', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment({ output, error: output }, async () => {
+			return spin(async () => 'done');
+		});
+
+		expect(result).toBe('done');
+		expect(output.text()).toContain(' ⠶ ');
+		expect(output.text()).not.toContain('Loading');
+	});
+
 	it('runs label-first spinner callbacks', async () => {
 		const output = createMemoryOutput();
 

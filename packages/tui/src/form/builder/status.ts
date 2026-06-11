@@ -15,7 +15,7 @@ export const statusBuilderMethods: StatusBuilderMethods & ThisType<FormBuilder> 
 	progress<T, R>(label: string, steps: Iterable<T> | number, callback?: (step: T | number, bar: Progress) => MaybePromise<R>, hint = '', name?: string) {
 		return this.add(() => progress(label, steps, callback, hint), name, true);
 	},
-	spin<T>(callback: () => MaybePromise<T>, message = 'Loading', name?: string) {
+	spin<T>(callback: () => MaybePromise<T>, message = '', name?: string) {
 		return this.add(() => spin(callback, { message }), name, true);
 	},
 	stream(source: AsyncIterable<string> | Iterable<string>, name?: string) {
