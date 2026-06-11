@@ -496,6 +496,7 @@ describe('data table prompt', () => {
 		expect(latestFrame).toContain('Third');
 		expect(latestFrame).toContain('Fourth');
 		expect(latestFrame).toContain('Viewing 2-4 of 4');
+		expect(latestFrame).toContain('┃');
 	});
 
 	it('does not render data table viewing info when all rows are visible', async () => {
@@ -518,6 +519,7 @@ describe('data table prompt', () => {
 		);
 
 		expect(output.text()).not.toContain('Viewing');
+		expect(output.text()).not.toContain('┃');
 	});
 
 	it('renders data table viewing info for filtered result windows', async () => {

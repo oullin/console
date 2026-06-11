@@ -55,6 +55,7 @@ TypeScript and OpenTUI internals.
 | Data table viewing-info rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table submitted and cancelled final frames | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/tests/table.test.ts` |
 | Data table multiline cell rendering | `packages/tui/src/output/data-table/multiline.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
+| Data table scrollbar rendering | `packages/tui/src/output/data-table/scrollbar.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Boxed balanced grid rendering | `packages/tui/src/output/grid.ts`, `packages/tui/tests/output.test.ts` |
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |

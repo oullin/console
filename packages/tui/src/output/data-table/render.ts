@@ -2,6 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { renderTable } from '#tui/theme';
 import { expandMultilineDataTableRows } from '#tui/output/data-table/multiline';
 import { dataTableRowCells } from '#tui/output/data-table/rows';
+import { renderScrollableDataTable } from '#tui/output/data-table/scrollbar';
 import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
 import { dim, red, strikethrough } from '#tui/theme/styles';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
@@ -36,7 +37,7 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 		return [index === selected ? '›' : ' ', ...dataTableRowCells(options.headers, row)];
 	});
 
-	environment.output.write(`${renderTable(['', ...options.headers], expandMultilineDataTableRows(renderedRows))}\n`);
+	environment.output.write(`${renderScrollableDataTable(['', ...options.headers], expandMultilineDataTableRows(renderedRows), window.start, window.end - window.start, options.rows.length)}\n`);
 
 	if (window.end - window.start < options.rows.length) {
 		const suffix = options.query.length > 0 ? ' results' : '';
