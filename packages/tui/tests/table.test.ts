@@ -87,6 +87,34 @@ describe('data table prompt', () => {
 		expect(result).toBe(1);
 	});
 
+	it('renders a scrolling data table window around the selected row', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third'], ['Fourth']],
+					scroll: 3,
+				}),
+		);
+
+		const latestFrame = output.text().split('Pick row\n').at(-1) ?? '';
+
+		expect(result).toBe(2);
+		expect(latestFrame).not.toContain('First');
+		expect(latestFrame).toContain('Second');
+		expect(latestFrame).toContain('Third');
+		expect(latestFrame).toContain('Fourth');
+	});
+
 	it('works from form builders', async () => {
 		const output = createMemoryOutput();
 

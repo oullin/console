@@ -44,6 +44,10 @@ const derivedHeaders = <T>(rows: Array<DataTableRow<T>>): string[] => {
 };
 
 const rowCells = <T>(headers: string[], row: DataTableRow<T>): string[] => {
+	if (Array.isArray(row)) {
+		return headers.length > 0 ? headers.map((_, index) => stringify(row[index])) : row.map(stringify);
+	}
+
 	const fields = rowFields(row);
 
 	return headers.map((header) => stringify(fields[header]));
@@ -71,6 +75,17 @@ const clampSelected = <T>(selected: number, rows: Array<VisibleRow<T>>): number 
 	return Math.min(selected, rows.length - 1);
 };
 
+const rowWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
+	if (scroll === undefined || scroll <= 0 || scroll >= total) {
+		return { end: total, start: 0 };
+	}
+
+	const before = Math.floor((scroll - 1) / 2);
+	const start = Math.max(0, Math.min(selected - before, total - scroll));
+
+	return { end: start + scroll, start };
+};
+
 const isPrintable = (key: string): boolean => {
 	return [...key].every((character) => (character.codePointAt(0) ?? 0) >= 32);
 };
@@ -93,7 +108,11 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 
 			selected = clampSelected(selected, rows);
 
-			const renderedRows = rows.map(({ row }, index) => {
+			const window = rowWindow(rows.length, selected, options.scroll);
+
+			const renderedRows = rows.slice(window.start, window.end).map(({ row }, offset) => {
+				const index = window.start + offset;
+
 				return [index === selected ? '›' : ' ', ...rowCells(headers, row)];
 			});
 
