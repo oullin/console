@@ -2,10 +2,10 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
+import { acceptAutocompleteMatch, autocompleteNavigationDirection, canAcceptAutocomplete, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
 import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import { characterLength } from '#tui/typed-value/characters';
-import { nextAutocompleteHighlight } from '#tui/prompts/suggest/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const readAutocompleteValue = async (options: SuggestOptions): Promise<string> => {
@@ -32,29 +32,23 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			return state.value;
 		}
 
-		if (key === Key.up || key === Key.upArrow) {
+		const direction = autocompleteNavigationDirection(key);
+
+		if (direction !== null) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = nextAutocompleteHighlight(matches, highlighted, -1);
+			highlighted = moveAutocompleteHighlight(matches, highlighted, direction);
 			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
-		if (key === Key.down || key === Key.downArrow) {
+		if (key === Key.tab && canAcceptAutocomplete(state)) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = nextAutocompleteHighlight(matches, highlighted, 1);
-			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
-			continue;
-		}
+			const next = acceptAutocompleteMatch(state, matches[highlighted], true);
 
-		if (key === Key.tab && state.cursor >= characterLength(state.value)) {
-			matches = await resolveSuggestions(options.options, state.value);
-
-			const match = matches[highlighted];
-
-			if (match !== undefined && match.length > state.value.length) {
-				state = { cursor: match.length, value: match };
+			if (next !== null) {
+				state = next;
 
 				matches = await resolveSuggestions(options.options, state.value);
 			} else {
@@ -65,14 +59,10 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			continue;
 		}
 
-		if ((key === Key.right || key === Key.rightArrow) && state.cursor >= characterLength(state.value)) {
+		if ((key === Key.right || key === Key.rightArrow) && canAcceptAutocomplete(state)) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			const match = matches[highlighted];
-
-			if (match !== undefined) {
-				state = { cursor: match.length, value: match };
-			}
+			state = acceptAutocompleteMatch(state, matches[highlighted], false) ?? state;
 
 			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;

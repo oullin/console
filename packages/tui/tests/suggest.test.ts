@@ -161,6 +161,22 @@ describe('autocomplete prompt', () => {
 		expect(output.text()).toContain('Favorite color? Blue');
 	});
 
+	it('does not accept tab completion before the cursor reaches the end', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.left, Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue']),
+		);
+
+		expect(result).toBe('b');
+	});
+
 	it('accepts same-length autocomplete matches with right arrow', async () => {
 		const output = createMemoryOutput();
 
