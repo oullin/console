@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderError, renderQuestion } from '#tui/theme';
 import { requiredMessage } from '#tui/validators/required';
+import { parseValidationResult } from '#tui/validators/result';
 import type { BasePromptOptions, Validator } from '#tui/types';
 
 export class PromptValidationError extends Error {
@@ -11,14 +12,10 @@ export class PromptValidationError extends Error {
 }
 
 export const validationMessage = async <T>(value: T, validator?: Validator<T>): Promise<string | undefined> => {
-	const result = await validator?.(value);
+	const result = parseValidationResult(await validator?.(value));
 
-	if (typeof result === 'string') {
+	if (result !== undefined && result !== null && result.length > 0) {
 		return result;
-	}
-
-	if (result === false) {
-		return 'The given value is invalid.';
 	}
 
 	return undefined;
