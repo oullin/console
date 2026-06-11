@@ -75,4 +75,25 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('2 / 2');
 		expect(output.text()).toContain('0 / 2');
 	});
+
+	it('normalizes fractional totals and ignores non-finite advance values', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const bar = progress(2.9, 'Adding States');
+
+			expect(bar.total).toBe(2);
+
+			bar.advance(Number.NaN);
+
+			expect(bar.current()).toBe(0);
+		});
+
+		expect(output.text()).toContain('0 / 2');
+	});
+
+	it('rejects invalid numeric progress step counts before rendering', () => {
+		expect(() => progress('Adding States', -1)).toThrow('Progress bar must have at least one item.');
+		expect(() => progress('Adding States', Number.POSITIVE_INFINITY)).toThrow('Progress bar must have at least one item.');
+	});
 });

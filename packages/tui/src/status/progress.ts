@@ -1,20 +1,15 @@
 import { promptEnvironment } from '#tui/environment';
+import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/progress';
 import type { MaybePromise } from '#tui/types';
 
 export class Progress {
 	#current = 0;
 	#label: string;
 	#hint: string;
+	readonly total: number;
 
-	constructor(
-		readonly total: number,
-		message = 'Progress',
-		hint = '',
-	) {
-		if (total <= 0) {
-			throw new Error('Progress bar must have at least one item.');
-		}
-
+	constructor(total: number, message = 'Progress', hint = '') {
+		this.total = parseProgressTotal(total);
 		this.#label = message;
 		this.#hint = hint;
 	}
@@ -24,7 +19,7 @@ export class Progress {
 	}
 
 	advance(step = 1): void {
-		this.#current = Math.max(0, Math.min(this.total, this.#current + step));
+		this.#current = Math.max(0, Math.min(this.total, this.#current + parseProgressStep(step)));
 		this.render();
 	}
 
@@ -87,7 +82,7 @@ export function progress<T, R>(
 		throw new Error('Progress steps must be an iterable or a number.');
 	}
 
-	const values = typeof steps === 'number' ? Array.from({ length: steps }, (_, index) => index) : Array.from(steps);
+	const values = typeof steps === 'number' ? Array.from({ length: parseProgressTotal(steps) }, (_, index) => index) : Array.from(steps);
 	const bar = new Progress(values.length, labelOrTotal, hint);
 
 	if (!callback) {
