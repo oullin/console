@@ -11,12 +11,61 @@ export type TypedValueState = {
 const characters = (value: string): string[] => [...value];
 const fromCharacters = (value: string[]): string => value.join('');
 
+type LineRange = {
+	end: number;
+	start: number;
+};
+
 const isPrintable = (key: string): boolean => {
 	return [...key].every((character) => {
 		const code = character.codePointAt(0) ?? 0;
 
 		return code >= 32 && code !== 127;
 	});
+};
+
+const lineRanges = (value: string[]): LineRange[] => {
+	const ranges: LineRange[] = [];
+
+	let start = 0;
+
+	for (const [index, character] of value.entries()) {
+		if (character === '\n') {
+			ranges.push({ end: index, start });
+			start = index + 1;
+		}
+	}
+
+	ranges.push({ end: value.length, start });
+
+	return ranges;
+};
+
+const currentLine = (ranges: LineRange[], cursor: number): number => {
+	const index = ranges.findIndex((range) => cursor <= range.end);
+
+	return index === -1 ? ranges.length - 1 : index;
+};
+
+const moveLine = (value: string[], cursor: number, direction: 1 | -1): number => {
+	const ranges = lineRanges(value);
+	const index = currentLine(ranges, cursor);
+	const range = ranges[index];
+
+	if (!range) {
+		return cursor;
+	}
+
+	const target = ranges[index + direction];
+
+	if (!target) {
+		return direction === -1 ? 0 : value.length;
+	}
+
+	const column = Math.min(cursor - range.start, range.end - range.start);
+	const targetColumn = Math.min(column, target.end - target.start);
+
+	return target.start + targetColumn;
 };
 
 export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false): TypedValueState & { submitted: boolean; cancelled: boolean } => {
@@ -49,6 +98,14 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 
 	if (key === Key.right || key === Key.rightArrow || key === Key.ctrlF) {
 		return { cursor: Math.min(value.length, cursor + 1), value: fromCharacters(value), submitted: false, cancelled: false };
+	}
+
+	if (allowNewLine && (key === Key.up || key === Key.upArrow || key === Key.ctrlP)) {
+		return { cursor: moveLine(value, cursor, -1), value: fromCharacters(value), submitted: false, cancelled: false };
+	}
+
+	if (allowNewLine && (key === Key.down || key === Key.downArrow || key === Key.ctrlN)) {
+		return { cursor: moveLine(value, cursor, 1), value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (oneOf([Key.home, Key.ctrlA], key)) {

@@ -27,6 +27,18 @@ const applyMultiline = (keys: string[]): { submitted: boolean; value: string } =
 	return { submitted, value: state.value };
 };
 
+const applyMultilineState = (value: string, cursor: number, keys: string[]): { cursor: number; value: string } => {
+	let state = { cursor, value };
+
+	for (const key of keys) {
+		const next = applyTypedKey(state, key, true);
+
+		state = { cursor: next.cursor, value: next.value };
+	}
+
+	return state;
+};
+
 describe('typed value editing', () => {
 	it('inserts buffered characters', () => {
 		expect(apply(['Je', 'ss'])).toBe('Jess');
@@ -49,6 +61,23 @@ describe('typed value editing', () => {
 		expect(applyMultiline(['A', Key.enter, 'B', Key.ctrlD])).toEqual({
 			submitted: true,
 			value: 'A\nB',
+		});
+	});
+
+	it('moves the cursor between textarea lines', () => {
+		expect(applyMultilineState('abc\nde\nfghi', 6, [Key.up])).toEqual({
+			cursor: 2,
+			value: 'abc\nde\nfghi',
+		});
+
+		expect(applyMultilineState('abc\nde\nfghi', 2, [Key.down])).toEqual({
+			cursor: 6,
+			value: 'abc\nde\nfghi',
+		});
+
+		expect(applyMultilineState('abc\nde\nfghi', 6, [Key.down])).toEqual({
+			cursor: 9,
+			value: 'abc\nde\nfghi',
 		});
 	});
 });
