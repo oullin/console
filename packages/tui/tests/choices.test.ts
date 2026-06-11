@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confirm, createMemoryOutput, createScriptedInput, Key, multiselect, select, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, Key, multiselect, PromptValidationError, select, withPromptEnvironment } from '#tui/index';
 
 describe('choice prompts', () => {
 	it('confirms with direct y and n keys', async () => {
@@ -363,6 +363,36 @@ describe('choice prompts', () => {
 
 		expect(result).toEqual(['second']);
 		expect(output.text()).toContain('Selected: second');
+	});
+
+	it('returns an empty array for non-interactive multiselect prompts without defaults', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second'] }),
+		);
+
+		expect(result).toEqual([]);
+	});
+
+	it('rejects required non-interactive multiselect prompts without defaults', async () => {
+		const output = createMemoryOutput();
+
+		await expect(
+			withPromptEnvironment(
+				{
+					output,
+					error: output,
+					interactive: false,
+				},
+				() => multiselect({ message: 'Pick many', options: ['first', 'second'], required: true }),
+			),
+		).rejects.toThrow(PromptValidationError);
 	});
 
 	it('requires multiselect choices when configured', async () => {

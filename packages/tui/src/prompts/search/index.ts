@@ -19,9 +19,11 @@ export const search = async <T>(options: SearchPromptOptions<T>): Promise<T> => 
 };
 
 export const multisearch = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
-	return promptUntilValid(options, async () => {
-		const selected = await readMultiSearchChoices(options);
+	const promptOptions = { ...options, default: options.default ?? [] };
 
-		return options.transform ? options.transform(selected) : selected;
+	return promptUntilValid(promptOptions, async () => {
+		const selected = await readMultiSearchChoices(promptOptions);
+
+		return promptOptions.transform ? promptOptions.transform(selected) : selected;
 	});
 };

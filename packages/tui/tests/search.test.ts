@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, multisearch, search, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, multisearch, PromptValidationError, search, withPromptEnvironment } from '#tui/index';
 import type { SearchPromptOptions } from '#tui/index';
 
 const colors = (value: string): Record<string, string> => {
@@ -360,6 +360,36 @@ describe('multisearch prompt', () => {
 		expect(result).toEqual(['green']);
 		expect(output.text()).toContain('1 selected');
 		expect(output.text()).toContain('Selected: Green');
+	});
+
+	it('returns an empty array for non-interactive multisearch prompts without defaults', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual([]);
+	});
+
+	it('rejects required non-interactive multisearch prompts without defaults', async () => {
+		const output = createMemoryOutput();
+
+		await expect(
+			withPromptEnvironment(
+				{
+					output,
+					error: output,
+					interactive: false,
+				},
+				() => multisearch({ message: 'Favorite colors?', options: colors, required: true }),
+			),
+		).rejects.toThrow(PromptValidationError);
 	});
 
 	it('renders multisearch info for the highlighted result', async () => {

@@ -23,11 +23,12 @@ export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => 
 };
 
 export const multiselect = async <T>(options: MultiSelectPromptOptions<T>): Promise<T[]> => {
+	const promptOptions = { ...options, default: options.default ?? [] };
 	const choices = normalizeChoices(options.options);
 
-	return promptUntilValid(options, async () => {
-		const selected = await readMultipleChoices(options.message, choices, options.default, options.hint, options.scroll, options.info);
+	return promptUntilValid(promptOptions, async () => {
+		const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 
-		return options.transform ? options.transform(selected) : selected;
+		return promptOptions.transform ? promptOptions.transform(selected) : selected;
 	});
 };
