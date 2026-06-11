@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, notificationCommand, notifyForPlatform, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, notificationCommand, notifyForPlatform, withPromptEnvironment } from '#tui/index';
 
 describe('notify helper', () => {
 	it('builds macOS notification commands', () => {

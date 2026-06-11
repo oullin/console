@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, form, Key, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, form, Key, withPromptEnvironment } from '#tui/index';
 
 describe('form builder', () => {
 	it('runs chained steps and returns positional responses', async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, number, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, Key, number, withPromptEnvironment } from '#tui/index';
 
 describe('number prompt', () => {
 	it('rejects partial decimal input and accepts a retry', async () => {

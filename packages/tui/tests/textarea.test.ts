@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, textarea, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, Key, textarea, withPromptEnvironment } from '#tui/index';
 
 describe('textarea prompt', () => {
 	it('accepts multiline input and submits with ctrl-d', async () => {

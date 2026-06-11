@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clear, clearTerminal, createMemoryOutput, cursorToStart, eraseLine, setTerminalTitle, title, withPromptEnvironment } from '../src/index';
+import { clear, clearTerminal, createMemoryOutput, cursorToStart, eraseLine, setTerminalTitle, title, withPromptEnvironment } from '#tui/index';
 
 describe('terminal helpers', () => {
 	it('writes clear terminal control sequences', async () => {

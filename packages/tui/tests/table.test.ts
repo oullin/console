@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, datatable, form, Key, table, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, datatable, form, Key, table, withPromptEnvironment } from '#tui/index';
 
 describe('table output', () => {
 	it('renders static table rows', async () => {

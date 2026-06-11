@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, suggest, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, Key, suggest, withPromptEnvironment } from '#tui/index';
 
 const runSuggest = async (keys: string[], options: string[] | ((query: string) => string[])): Promise<{ output: string; result: string }> => {
 	const output = createMemoryOutput();

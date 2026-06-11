@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyTypedKey, Key } from '../src/index';
+import { applyTypedKey, Key } from '#tui/index';
 
 const apply = (keys: string[]): string => {
 	let state = { cursor: 0, value: '' };

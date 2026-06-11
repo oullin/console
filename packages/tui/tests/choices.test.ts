@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, multiselect, select, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, Key, multiselect, select, withPromptEnvironment } from '#tui/index';
 
 describe('choice prompts', () => {
 	it('selects with arrow keys and enter', async () => {

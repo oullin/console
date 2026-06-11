@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, multisearch, search, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, Key, multisearch, search, withPromptEnvironment } from '#tui/index';
 
 const colors = (value: string): Record<string, string> => {
 	const options = {

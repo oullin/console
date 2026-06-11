@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, task, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, task, withPromptEnvironment } from '#tui/index';
 
 describe('task helper', () => {
 	it('passes a bounded logger to the callback and returns the callback value', async () => {

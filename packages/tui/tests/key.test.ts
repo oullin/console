@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Key, keyFromEvent } from '../src/index';
+import { Key, keyFromEvent } from '#tui/index';
 
 describe('keyboard mapping', () => {
 	it('maps named keys', () => {

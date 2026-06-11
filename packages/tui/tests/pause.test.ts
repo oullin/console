@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, pause, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, createScriptedInput, Key, pause, withPromptEnvironment } from '#tui/index';
 
 describe('pause prompt', () => {
 	it('waits for enter from key-driven input', async () => {

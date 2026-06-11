@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, progress, withPromptEnvironment } from '../src/index';
+import { createMemoryOutput, progress, withPromptEnvironment } from '#tui/index';
 
 describe('progress helper', () => {
 	it('maps iterable steps and returns callback results', async () => {

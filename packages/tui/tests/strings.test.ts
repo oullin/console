@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseAnsiText, truncate, visibleWidth, wrap } from '../src/index';
+import { parseAnsiText, truncate, visibleWidth, wrap } from '#tui/index';
 
 describe('string utilities', () => {
 	it('measures visible width without ANSI control sequences', () => {
