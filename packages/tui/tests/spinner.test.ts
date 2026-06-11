@@ -10,8 +10,8 @@ describe('spinner helper', () => {
 		});
 
 		expect(result).toBe('done');
-		expect(output.text()).toContain('Working...');
-		expect(output.text()).toContain('Done: Working');
+		expect(output.text()).toContain(' ⠶ Working');
+		expect(output.text()).not.toContain('Done: Working');
 	});
 
 	it('runs label-first spinner callbacks', async () => {
@@ -22,11 +22,11 @@ describe('spinner helper', () => {
 		});
 
 		expect(result).toBe('done');
-		expect(output.text()).toContain('Working...');
-		expect(output.text()).toContain('Done: Working');
+		expect(output.text()).toContain(' ⠶ Working');
+		expect(output.text()).not.toContain('Done: Working');
 	});
 
-	it('writes failure output before rethrowing spinner errors', async () => {
+	it('rethrows spinner errors without synthetic failure output', async () => {
 		const output = createMemoryOutput();
 		const failure = new Error('failed');
 
@@ -38,8 +38,8 @@ describe('spinner helper', () => {
 			}),
 		).rejects.toBe(failure);
 
-		expect(output.text()).toContain('Working...');
-		expect(output.text()).toContain('Failed: Working');
+		expect(output.text()).toContain(' ⠶ Working');
+		expect(output.text()).not.toContain('Failed: Working');
 		expect(output.text()).not.toContain('Done: Working');
 	});
 });

@@ -1,4 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
+import { renderSpinnerFrame } from '#tui/status/spinner/render';
 import type { MaybePromise, StatusOptions } from '#tui/types';
 
 export function spin<T>(callback: () => MaybePromise<T>, options?: StatusOptions): Promise<T>;
@@ -15,16 +16,7 @@ export async function spin<T>(callbackOrMessage: (() => MaybePromise<T>) | strin
 
 	const message = typeof options === 'function' ? 'Loading' : options.message;
 
-	promptEnvironment().output.write(`${message}...\n`);
+	promptEnvironment().output.write(renderSpinnerFrame(message));
 
-	try {
-		const result = await callback();
-
-		promptEnvironment().output.write(`Done: ${message}\n`);
-
-		return result;
-	} catch (error) {
-		promptEnvironment().error.write(`Failed: ${message}\n`);
-		throw error;
-	}
+	return callback();
 }

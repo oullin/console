@@ -263,8 +263,8 @@ describe('form builder', () => {
 
 		expect(responses.spin).toBe('spun');
 		expect(responses.progress).toEqual([2, 4]);
-		expect(output.text()).toContain('Loading...');
-		expect(output.text()).toContain('Done: Loading');
+		expect(output.text()).toContain(' ⠶ Loading');
+		expect(output.text()).not.toContain('Done: Loading');
 		expect(output.text()).toContain('Files');
 		expect(output.text()).toContain('2 / 2');
 	});

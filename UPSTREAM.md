@@ -31,6 +31,7 @@ TypeScript and OpenTUI internals.
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
+| Spinner static frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
@@ -48,7 +49,7 @@ later phases:
 - Progress signal handling and terminal cleanup parity
 - Prompt lifecycle
 - Search full rendering and highlighted result label parity
-- Spinner
+- Spinner animated frame and terminal cleanup parity
 - Stream
 - Task
 - Terminal
