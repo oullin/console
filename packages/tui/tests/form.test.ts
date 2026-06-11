@@ -115,6 +115,24 @@ describe('form builder', () => {
 		expect(responses[1]).toBe('D');
 	});
 
+	it('reverts past ignored side-effect steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.enter, 'B', Key.ctrlU, Key.backspace, 'C', Key.enter, 'D', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().text('First').note('Skipping back over this', null, 'note').text('Second').submit(),
+		);
+
+		expect(responses[0]).toBe('C');
+		expect(responses.note).toBe(true);
+		expect(responses[2]).toBe('D');
+	});
+
 	it('does not revert the first form step', async () => {
 		const output = createMemoryOutput();
 
