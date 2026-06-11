@@ -138,6 +138,54 @@ describe('data table prompt', () => {
 		expect(result).toBe('beta');
 	});
 
+	it('edits Unicode data table search queries without corrupting input', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', '😀', Key.backspace, 'B', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Pick project B');
+	});
+
+	it('supports cursor edits inside data table search queries', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'B', 't', Key.left, 'e', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Pick project Bet');
+	});
+
 	it('falls back to row indexes when rows have no explicit value', async () => {
 		const output = createMemoryOutput();
 

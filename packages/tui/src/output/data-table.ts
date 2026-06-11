@@ -3,6 +3,7 @@ import { Key, oneOf } from '#tui/key';
 import { parseOptionalScrollSize, parseScrollSize } from '#tui/concerns/validators/scroll';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderTable } from '#tui/theme';
+import { applyTypedKey } from '#tui/typed-value';
 import { isDataObjectRow } from '#tui/output/validators/data-table';
 import type { DataTablePromptOptions, DataTableRow, TableCell } from '#tui/types';
 
@@ -86,10 +87,6 @@ const rowWindow = (total: number, selected: number, scroll?: number): { end: num
 	return { end: start + size, start };
 };
 
-const isPrintable = (key: string): boolean => {
-	return [...key].every((character) => (character.codePointAt(0) ?? 0) >= 32);
-};
-
 export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number> => {
 	const headers = options.headers ?? derivedHeaders(options.rows);
 
@@ -98,10 +95,12 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 
 		let selected = 0;
 		let mode: 'browse' | 'search' = 'browse';
-		let query = '';
+		let query = { cursor: 0, value: '' };
 
 		const visibleRows = (): Array<VisibleRow<T>> => {
-			return options.rows.map((row, index) => ({ index, row })).filter(({ row }) => options.filter?.(query, row) ?? rowLabel(headers, row).toLowerCase().includes(query.toLowerCase()));
+			return options.rows
+				.map((row, index) => ({ index, row }))
+				.filter(({ row }) => options.filter?.(query.value, row) ?? rowLabel(headers, row).toLowerCase().includes(query.value.toLowerCase()));
 		};
 
 		const render = (): void => {
@@ -117,7 +116,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				return [index === selected ? '›' : ' ', ...rowCells(headers, row)];
 			});
 
-			const querySuffix = mode === 'search' || query.length > 0 ? ` ${query}` : '';
+			const querySuffix = mode === 'search' || query.value.length > 0 ? ` ${query.value}` : '';
 
 			environment.output.write(`${options.message}${querySuffix}\n`);
 			environment.output.write(`${renderTable(['', ...headers], renderedRows)}\n`);
@@ -155,21 +154,16 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 
 				if (key === Key.escape) {
 					mode = 'browse';
-					query = '';
+					query = { cursor: 0, value: '' };
 					selected = 0;
 					render();
 					continue;
 				}
 
-				if (key === Key.backspace || key === Key.ctrlH) {
-					query = query.slice(0, -1);
-					selected = 0;
-					render();
-					continue;
-				}
+				const next = applyTypedKey(query, key);
 
-				if (isPrintable(key)) {
-					query += key;
+				if (next.value !== query.value || next.cursor !== query.cursor) {
+					query = { cursor: next.cursor, value: next.value };
 					selected = 0;
 					render();
 					continue;
@@ -178,7 +172,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 
 			if (key === '/') {
 				mode = 'search';
-				query = '';
+				query = { cursor: 0, value: '' };
 				selected = 0;
 				render();
 				continue;
