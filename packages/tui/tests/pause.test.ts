@@ -5,7 +5,7 @@ describe('pause prompt', () => {
 	it('waits for enter from key-driven input', async () => {
 		const output = createMemoryOutput();
 
-		await withPromptEnvironment(
+		const result = await withPromptEnvironment(
 			{
 				input: createScriptedInput(['x', Key.enter]),
 				output,
@@ -15,6 +15,7 @@ describe('pause prompt', () => {
 			() => pause('Continue'),
 		);
 
+		expect(result).toBe(true);
 		expect(output.text()).toContain('Continue');
 		expect(output.text().endsWith('\n')).toBe(true);
 	});
@@ -24,7 +25,7 @@ describe('pause prompt', () => {
 
 		let asked = '';
 
-		await withPromptEnvironment(
+		const result = await withPromptEnvironment(
 			{
 				input: {
 					async readLine(message: string): Promise<string> {
@@ -40,6 +41,21 @@ describe('pause prompt', () => {
 			() => pause('Continue'),
 		);
 
+		expect(result).toBe(true);
 		expect(asked).toContain('Continue');
+	});
+
+	it('returns false when the configured environment is non-interactive', async () => {
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output: createMemoryOutput(),
+				error: createMemoryOutput(),
+				interactive: false,
+			},
+			() => pause('Continue'),
+		);
+
+		expect(result).toBe(false);
 	});
 });

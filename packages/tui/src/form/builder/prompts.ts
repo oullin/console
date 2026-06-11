@@ -1,7 +1,6 @@
 import { autocomplete, confirm, multiselect, multisearch, pause, search, select, suggest } from '#tui/prompts/choices';
 import { number, password, text, textarea } from '#tui/prompts/basic';
 import { previousArray, previousNumber, previousString } from '#tui/form/builder/previous';
-import { sideEffectStep } from '#tui/form/builder/step';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ChoiceInput, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TextPromptOptions } from '#tui/types';
 import type { SuggestOptions } from '#tui/prompts/choices';
@@ -142,12 +141,8 @@ export const promptBuilderMethods: PromptBuilderMethods & ThisType<FormBuilder> 
 	password(label, placeholder = '', required = false, validate = undefined, hint = '', name, transform = undefined) {
 		return this.add(() => password(label, placeholder, required, validate, hint, transform), name);
 	},
-	pause(message = 'Press enter to continue', name?: string) {
-		return this.add(
-			sideEffectStep(() => pause(message)),
-			name,
-			true,
-		);
+	pause(message = 'Press enter to continue...', name?: string) {
+		return this.add(() => pause(message), name);
 	},
 	search<T>(options: SearchPromptOptions<T>, name?: string) {
 		return this.add(() => search(options), name);

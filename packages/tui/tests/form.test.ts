@@ -137,6 +137,7 @@ describe('form builder', () => {
 		);
 
 		expect(responses.task).toBe(1);
+		expect(responses[1]).toBe(true);
 		expect(responses.streamed).toBeNull();
 		expect(output.text()).toContain('Build');
 		expect(output.text()).toContain('line one');

@@ -3,13 +3,13 @@ import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 
-export const pause = async (message = 'Press enter to continue'): Promise<void> => {
+export const pause = async (message = 'Press enter to continue...'): Promise<boolean> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
 		await ask(message);
 
-		return;
+		return environment.interactive;
 	}
 
 	environment.output.write(renderQuestion(message));
@@ -20,7 +20,7 @@ export const pause = async (message = 'Press enter to continue'): Promise<void> 
 		if (key === null || key === Key.enter) {
 			environment.output.write('\n');
 
-			return;
+			return environment.interactive;
 		}
 	}
 };
