@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, number, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, number, PromptValidationError, withPromptEnvironment } from '#tui/index';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
 
 describe('number prompt', () => {
@@ -226,6 +226,36 @@ describe('number prompt', () => {
 
 		expect(result).toBe(7);
 		expect(output.text()).toContain('? Count 7');
+	});
+
+	it('returns an empty string for non-interactive number prompts without defaults', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() => number({ message: 'Count' }),
+		);
+
+		expect(result).toBe('');
+	});
+
+	it('rejects required non-interactive number prompts without defaults', async () => {
+		const output = createMemoryOutput();
+
+		await expect(
+			withPromptEnvironment(
+				{
+					output,
+					error: output,
+					interactive: false,
+				},
+				() => number({ message: 'Count', required: true }),
+			),
+		).rejects.toThrow(PromptValidationError);
 	});
 
 	it('clamps arrow key changes to min and max', async () => {
