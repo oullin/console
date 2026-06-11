@@ -16,7 +16,10 @@ TypeScript and OpenTUI internals.
 | Key constants | `packages/tui/src/key.ts` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text, textarea, number, password | `packages/tui/src/prompts/basic.ts`, `packages/tui/src/typed-value.ts` |
-| Confirm, select, multiselect, suggest, search, multisearch, autocomplete | `packages/tui/src/prompts/choices.ts` |
+| Confirm, select, multiselect | `packages/tui/src/prompts/select.ts` |
+| Suggest, autocomplete | `packages/tui/src/prompts/suggest.ts` |
+| Search, multisearch | `packages/tui/src/prompts/search.ts` |
+| Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Form builder | `packages/tui/src/form.ts` |
 | Note, notify, table, grid, title, clear | `packages/tui/src/output.ts` |

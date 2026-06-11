@@ -1,0 +1,201 @@
+import { promptEnvironment } from '#tui/environment';
+import { Key } from '#tui/key';
+import { ask, promptUntilValid, PromptValidationError } from '#tui/prompt';
+import { renderChoices } from '#tui/theme';
+import { findChoice, firstEnabledIndex, nextEnabledIndex, normalizeChoices, renderInteractiveChoices } from '#tui/concerns/choices';
+import type { Choice, ConfirmPromptOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
+
+const parseChoiceIndex = (key: string): number => (/^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN);
+
+const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, hint?: string): Promise<T> => {
+  const environment = promptEnvironment();
+
+  if (!environment.input.readKey) {
+    const rendered = renderChoices(choices);
+    const answer = await ask(`${message}\n${rendered}\n`, hint);
+    const choice = findChoice(choices, answer);
+
+    if (!choice || choice.disabled) {
+      throw new PromptValidationError('Please select a valid option.');
+    }
+
+    return choice.value;
+  }
+
+  let selected = firstEnabledIndex(choices);
+  renderInteractiveChoices(message, choices, selected);
+
+  while (true) {
+    const key = await environment.input.readKey();
+
+    if (key === null) {
+      throw new PromptValidationError('Please select a valid option.');
+    }
+
+    const numeric = parseChoiceIndex(key);
+
+    if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
+      return choices[numeric - 1].value;
+    }
+
+    if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
+      selected = nextEnabledIndex(choices, selected, 1);
+      renderInteractiveChoices(message, choices, selected);
+      continue;
+    }
+
+    if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+      selected = nextEnabledIndex(choices, selected, -1);
+      renderInteractiveChoices(message, choices, selected);
+      continue;
+    }
+
+    if (key === Key.enter) {
+      const choice = choices[selected];
+
+      if (!choice || choice.disabled) {
+        throw new PromptValidationError('Please select a valid option.');
+      }
+
+      return choice.value;
+    }
+  }
+};
+
+const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: string): T[] => {
+  const parts = answer.split(',').map((part) => part.trim()).filter((part) => part.length > 0);
+  const selected = parts
+    .map((part) => findChoice(choices, part))
+    .filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
+
+  if (selected.length !== parts.length) {
+    throw new PromptValidationError('Please select valid options.');
+  }
+
+  return selected.map((choice) => choice.value);
+};
+
+const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>, defaults: T[] = [], hint?: string): Promise<T[]> => {
+  const environment = promptEnvironment();
+  const selectedValues = new Set(defaults);
+
+  if (!environment.input.readKey) {
+    const rendered = renderChoices(choices);
+    const answer = await ask(`${message}\n${rendered}\n`, hint);
+
+    return answer.trim() === '' ? defaults : choicesFromCommaSeparated(choices, answer);
+  }
+
+  let selected = firstEnabledIndex(choices);
+  const marked = new Set(choices.flatMap((choice, index) => selectedValues.has(choice.value) ? [index] : []));
+  renderInteractiveChoices(message, choices, selected, marked);
+
+  while (true) {
+    const key = await environment.input.readKey();
+
+    if (key === null) {
+      return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
+    }
+
+    if (key.includes(',')) {
+      return choicesFromCommaSeparated(choices, key);
+    }
+
+    const numeric = parseChoiceIndex(key);
+
+    if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
+      const index = numeric - 1;
+
+      if (marked.has(index)) {
+        marked.delete(index);
+      } else {
+        marked.add(index);
+      }
+
+      renderInteractiveChoices(message, choices, selected, marked);
+      continue;
+    }
+
+    if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
+      selected = nextEnabledIndex(choices, selected, 1);
+      renderInteractiveChoices(message, choices, selected, marked);
+      continue;
+    }
+
+    if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+      selected = nextEnabledIndex(choices, selected, -1);
+      renderInteractiveChoices(message, choices, selected, marked);
+      continue;
+    }
+
+    if (key === Key.space) {
+      if (marked.has(selected)) {
+        marked.delete(selected);
+      } else if (!choices[selected]?.disabled) {
+        marked.add(selected);
+      }
+
+      renderInteractiveChoices(message, choices, selected, marked);
+      continue;
+    }
+
+    if (key === Key.enter) {
+      return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
+    }
+  }
+};
+
+export function confirm(options: ConfirmPromptOptions): Promise<boolean>;
+export function confirm(
+  label: string,
+  defaultValue?: boolean,
+  yes?: string,
+  no?: string,
+  required?: boolean | string,
+  validate?: ConfirmPromptOptions['validate'],
+  hint?: string
+): Promise<boolean>;
+export async function confirm(
+  message: string | ConfirmPromptOptions,
+  defaultValue = true,
+  yes = 'Yes',
+  no = 'No',
+  required: boolean | string = false,
+  validate: ConfirmPromptOptions['validate'] = undefined,
+  hint = ''
+): Promise<boolean> {
+  const options: ConfirmPromptOptions = typeof message === 'string'
+    ? { message, label: message, default: defaultValue, yes, no, required, validate, hint }
+    : { ...message, default: message.default ?? true };
+
+  return promptUntilValid(options, async () => {
+    const suffix = options.default === false ? ' [y/N]' : ' [Y/n]';
+    const answer = (await ask(`${options.message}${suffix}`, options.hint)).trim().toLowerCase();
+
+    if (answer === '' && options.default !== undefined) {
+      return options.default;
+    }
+
+    return ['y', 'yes', options.yes?.toLowerCase()].includes(answer);
+  });
+}
+
+export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => {
+  const choices = normalizeChoices(options.options);
+
+  return promptUntilValid(options, async () => {
+    return readSelectedChoice(options.message, choices, options.hint).catch((error: unknown) => {
+      if (options.default !== undefined && error instanceof PromptValidationError) {
+        return options.default;
+      }
+
+      throw error;
+    });
+  });
+};
+
+export const multiselect = async <T>(options: MultiSelectPromptOptions<T>): Promise<T[]> => {
+  const choices = normalizeChoices(options.options);
+
+  return promptUntilValid(options, async () => readMultipleChoices(options.message, choices, options.default, options.hint));
+};
