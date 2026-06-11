@@ -58,6 +58,12 @@ const ctrlKeyMap: Record<string, KeyName> = {
 	u: Key.ctrlU,
 };
 
+const namedKeyMap: Record<string, KeyName> = {
+	pagedown: Key.pageDown,
+	pageup: Key.pageUp,
+	return: Key.enter,
+};
+
 export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
 	if (event.ctrl && event.name) {
 		const key = ctrlKeyMap[event.name.toLowerCase()];
@@ -69,6 +75,14 @@ export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
 
 	if (event.meta && event.name === 'backspace') {
 		return Key.optionBackspace;
+	}
+
+	if (event.name) {
+		const key = namedKeyMap[event.name.toLowerCase()];
+
+		if (key !== undefined) {
+			return key;
+		}
 	}
 
 	if (event.name && event.name in Key) {
