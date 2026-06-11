@@ -46,7 +46,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			continue;
 		}
 
-		if ((key === Key.tab || key === Key.right || key === Key.rightArrow) && state.cursor >= [...state.value].length) {
+		if (key === Key.tab && state.cursor >= [...state.value].length) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			const match = matches[highlighted];
@@ -57,6 +57,19 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 				matches = await resolveSuggestions(options.options, state.value);
 			} else {
 				highlighted = 0;
+			}
+
+			renderAutocomplete(options.message, state.value, matches, highlighted);
+			continue;
+		}
+
+		if ((key === Key.right || key === Key.rightArrow) && state.cursor >= [...state.value].length) {
+			matches = await resolveSuggestions(options.options, state.value);
+
+			const match = matches[highlighted];
+
+			if (match !== undefined) {
+				state = { cursor: match.length, value: match };
 			}
 
 			renderAutocomplete(options.message, state.value, matches, highlighted);

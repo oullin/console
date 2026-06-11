@@ -127,6 +127,22 @@ describe('autocomplete prompt', () => {
 		expect(output.text()).toContain('Favorite color? Blue');
 	});
 
+	it('accepts same-length autocomplete matches with right arrow', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', 'l', 'u', 'e', Key.right, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue']),
+		);
+
+		expect(result).toBe('Blue');
+	});
+
 	it('cycles autocomplete matches before accepting completion', async () => {
 		const output = createMemoryOutput();
 
