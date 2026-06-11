@@ -48,13 +48,13 @@ export type TextPromptOptions = BasePromptOptions<string> & {
 	transform?: (value: string) => MaybePromise<string>;
 };
 
-export type NumberPromptOptions = BasePromptOptions<number> & {
+export type NumberPromptOptions = BasePromptOptions<number | string> & {
 	label?: string;
 	min?: number;
 	max?: number;
 	integer?: boolean;
 	step?: number;
-	transform?: (value: number) => MaybePromise<number>;
+	transform?: (value: number | string) => MaybePromise<number | string>;
 };
 
 export type ConfirmPromptOptions = BasePromptOptions<boolean> & {

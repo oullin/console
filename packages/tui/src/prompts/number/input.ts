@@ -5,7 +5,7 @@ import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
 
 type NumberInputOptions = {
-	default?: number;
+	default?: number | string;
 	hint?: string;
 	max?: number;
 	min?: number;

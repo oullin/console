@@ -16,7 +16,7 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(42);
-		expect(output.text()).toContain('Please enter a valid number.');
+		expect(output.text()).toContain('Must be a number');
 	});
 
 	it('rejects decimal values for integer prompts', async () => {
@@ -33,7 +33,57 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(2);
-		expect(output.text()).toContain('Please enter a valid number.');
+		expect(output.text()).toContain('Must be a number');
+	});
+
+	it('returns an empty string for optional empty input', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count' }),
+		);
+
+		expect(result).toBe('');
+	});
+
+	it('coerces decimal input to an integer value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['1', '.', '9', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count' }),
+		);
+
+		expect(result).toBe(1);
+	});
+
+	it('validates typed values against min and max bounds', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['1', Key.enter, '5', Key.enter, '3', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count', min: 2, max: 4 }),
+		);
+
+		expect(result).toBe(3);
+		expect(output.text()).toContain('Must be at least 2');
+		expect(output.text()).toContain('Must be less than 4');
 	});
 
 	it('increments and decrements with arrow keys', async () => {

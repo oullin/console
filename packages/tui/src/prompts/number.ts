@@ -1,35 +1,33 @@
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { readNumberValue } from '#tui/prompts/number/input';
+import { parseNumberInput } from '#tui/prompts/number/validators/value';
 import type { NumberPromptOptions } from '#tui/types';
 
-const integerPattern = /^[+-]?\d+$/u;
-const numberPattern = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/iu;
-
-export function number(options: NumberPromptOptions): Promise<number>;
+export function number(options: NumberPromptOptions): Promise<number | string>;
 
 export function number(
 	label: string,
 	placeholder?: string,
-	defaultValue?: number,
+	defaultValue?: number | string,
 	required?: boolean | string,
 	validate?: NumberPromptOptions['validate'],
 	hint?: string,
 	min?: number,
 	max?: number,
 	step?: number,
-): Promise<number>;
+): Promise<number | string>;
 
 export async function number(
 	message: string | NumberPromptOptions,
 	_placeholder = '',
-	defaultValue: number | undefined = undefined,
+	defaultValue: number | string | undefined = undefined,
 	required: boolean | string = false,
 	validate: NumberPromptOptions['validate'] = undefined,
 	hint = '',
 	min: number | undefined = undefined,
 	max: number | undefined = undefined,
 	step: number | undefined = undefined,
-): Promise<number> {
+): Promise<number | string> {
 	const options: NumberPromptOptions = typeof message === 'string' ? { message, label: message, default: defaultValue, required, validate, hint, min, max, step } : { ...message };
 
 	return promptUntilValid(options, async () => {
@@ -45,23 +43,12 @@ export async function number(
 			return options.default;
 		}
 
-		const normalized = answer.trim();
-		const valid = options.integer ? integerPattern.test(normalized) : numberPattern.test(normalized);
+		const result = parseNumberInput(answer, options);
 
-		if (!valid) {
-			throw new PromptValidationError('Please enter a valid number.');
+		if (result.error !== undefined) {
+			throw new PromptValidationError(result.error);
 		}
 
-		const parsed = options.integer ? Number.parseInt(normalized, 10) : Number(normalized);
-
-		if (options.min !== undefined && parsed < options.min) {
-			throw new PromptValidationError(`Please enter a value greater than or equal to ${options.min}.`);
-		}
-
-		if (options.max !== undefined && parsed > options.max) {
-			throw new PromptValidationError(`Please enter a value less than or equal to ${options.max}.`);
-		}
-
-		return options.transform ? options.transform(parsed) : parsed;
+		return options.transform ? options.transform(result.value ?? '') : (result.value ?? '');
 	});
 }
