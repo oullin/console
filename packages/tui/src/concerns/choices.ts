@@ -1,9 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
+import { parseChoiceAnswerIndex, parseChoiceRecordKey } from '#tui/concerns/validators/choice-answer';
 import { parseChoice, parseChoiceRecord } from '#tui/concerns/validators/choice';
 import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
 import type { Choice, ChoiceOptions } from '#tui/types';
-
-const normalizeChoiceRecordKey = (key: string): string | number => (/^-?\d+$/u.test(key) ? Number.parseInt(key, 10) : key);
 
 export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => {
 	if (!Array.isArray(options)) {
@@ -11,7 +10,7 @@ export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>>
 
 		return Object.entries(parsed ?? {}).map(([value, label]) => ({
 			label,
-			value: normalizeChoiceRecordKey(value) as T,
+			value: parseChoiceRecordKey(value) as T,
 		}));
 	}
 
@@ -33,10 +32,9 @@ export const normalizeSearchChoices = <T>(options: ChoiceOptions<T>): Array<Choi
 
 export const findChoice = <T>(choices: Array<Choice<T>>, answer: string): Choice<T> | undefined => {
 	const normalizedAnswer = answer.trim();
+	const index = parseChoiceAnswerIndex(normalizedAnswer);
 
-	if (/^\d+$/u.test(normalizedAnswer)) {
-		const index = Number.parseInt(normalizedAnswer, 10);
-
+	if (!Number.isNaN(index)) {
 		return choices[index - 1];
 	}
 

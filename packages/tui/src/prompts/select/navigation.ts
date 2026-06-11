@@ -1,8 +1,9 @@
+import { parseChoiceAnswerIndex } from '#tui/concerns/validators/choice-answer';
 import { Key } from '#tui/key';
 import { parseScrollSize } from '#tui/concerns/validators/scroll';
 import type { Choice } from '#tui/types';
 
-export const parseChoiceIndex = (key: string): number => (/^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN);
+export const parseChoiceIndex = (key: string): number => parseChoiceAnswerIndex(key);
 
 export const previousChoiceKeys = (key: string): boolean => {
 	return key === Key.up || key === Key.upArrow || key === Key.left || key === Key.leftArrow || key === Key.shiftTab || key === Key.ctrlP || key === Key.ctrlB || key === 'k' || key === 'h';

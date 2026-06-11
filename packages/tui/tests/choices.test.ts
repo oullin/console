@@ -324,6 +324,28 @@ describe('choice prompts', () => {
 		expect(result).toBe('second');
 	});
 
+	it('rejects partial numeric line-mode select answers and retries', async () => {
+		const output = createMemoryOutput();
+		const answers = ['1abc', '2'];
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return answers.shift() ?? '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'] }),
+		);
+
+		expect(result).toBe('second');
+		expect(output.text()).toContain('Please select a valid option.');
+	});
+
 	it('cancels select prompts with the current highlighted option', async () => {
 		const output = createMemoryOutput();
 
@@ -405,6 +427,28 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual([]);
+	});
+
+	it('rejects invalid comma-separated line-mode multiselect answers and retries', async () => {
+		const output = createMemoryOutput();
+		const answers = ['1,missing', '1,2'];
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return answers.shift() ?? '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second'] }),
+		);
+
+		expect(result).toEqual(['first', 'second']);
+		expect(output.text()).toContain('Please select valid options.');
 	});
 
 	it('rejects required non-interactive multiselect prompts without defaults', async () => {
