@@ -177,6 +177,29 @@ describe('form builder', () => {
 		expect(output.text()).toContain('line one');
 	});
 
+	it('runs spin and progress form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+			},
+			() =>
+				form()
+					.spin(async () => 'spun', undefined, 'spin')
+					.progress('Files', [1, 2], (step) => Number(step) * 2, '', 'progress')
+					.submit(),
+		);
+
+		expect(responses.spin).toBe('spun');
+		expect(responses.progress).toEqual([2, 4]);
+		expect(output.text()).toContain('Loading...');
+		expect(output.text()).toContain('Done: Loading');
+		expect(output.text()).toContain('Files');
+		expect(output.text()).toContain('2 / 2');
+	});
+
 	it('stores output helper success responses', async () => {
 		const output = createMemoryOutput();
 
