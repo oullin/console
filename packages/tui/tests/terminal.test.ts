@@ -7,7 +7,7 @@ describe('terminal helpers', () => {
 
 		await withPromptEnvironment({ output, error: output }, async () => {
 			clearTerminal();
-			clear();
+			expect(clear()).toBe(true);
 		});
 
 		expect(output.text()).toBe('\u001Bc\u001Bc');
@@ -18,7 +18,7 @@ describe('terminal helpers', () => {
 
 		await withPromptEnvironment({ output, error: output }, async () => {
 			setTerminalTitle('Demo');
-			title('Prompt');
+			expect(title('Prompt')).toBe(true);
 		});
 
 		expect(output.text()).toBe('\u001B]0;Demo\u0007\u001B]0;Prompt\u0007');
