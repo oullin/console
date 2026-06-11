@@ -64,6 +64,23 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Pick one');
 	});
 
+	it('starts select prompts on the default value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second', 'third'], default: 'third' }),
+		);
+
+		expect(result).toBe('third');
+		expect(output.text()).toContain('›    third');
+	});
+
 	it('renders a scrolling select window around the highlighted choice', async () => {
 		const output = createMemoryOutput();
 

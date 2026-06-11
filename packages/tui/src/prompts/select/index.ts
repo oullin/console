@@ -10,7 +10,7 @@ export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => 
 	const choices = normalizeChoices(options.options);
 
 	return promptUntilValid(options, async () => {
-		return readSelectedChoice(options.message, choices, options.hint, options.scroll, options.info).catch((error: unknown) => {
+		return readSelectedChoice(options.message, choices, options.default, options.hint, options.scroll, options.info).catch((error: unknown) => {
 			if (options.default !== undefined && error instanceof PromptValidationError) {
 				return options.default;
 			}

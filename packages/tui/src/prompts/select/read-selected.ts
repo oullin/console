@@ -7,7 +7,17 @@ import { lastEnabledChoiceIndex, nextChoiceKeys, parseChoiceIndex, previousChoic
 import { renderSelectedChoice } from '#tui/prompts/select/render';
 import type { Choice, SelectPromptOptions } from '#tui/types';
 
-export const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, hint?: string, scroll?: number, info?: SelectPromptOptions<T>['info']): Promise<T> => {
+const defaultChoiceIndex = <T>(choices: Array<Choice<T>>, defaultValue: T | undefined): number => {
+	if (defaultValue === undefined) {
+		return firstEnabledIndex(choices);
+	}
+
+	const index = choices.findIndex((choice) => !choice.disabled && Object.is(choice.value, defaultValue));
+
+	return index === -1 ? firstEnabledIndex(choices) : index;
+};
+
+export const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, defaultValue?: T, hint?: string, scroll?: number, info?: SelectPromptOptions<T>['info']): Promise<T> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -24,7 +34,7 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 		return choice.value;
 	}
 
-	let selected = firstEnabledIndex(choices);
+	let selected = defaultChoiceIndex(choices, defaultValue);
 
 	renderSelectedChoice(message, choices, selected, scroll, info);
 
