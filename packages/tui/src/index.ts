@@ -8,7 +8,7 @@ export { alert, clear, dataTable, datatable, error, grid, info, intro, note, not
 export type { NotificationCommand } from '#tui/output';
 export { PromptValidationError } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
-export { clearTerminal, cursorToStart, eraseLine, setTerminalTitle, terminalSize } from '#tui/terminal';
+export { backgroundColor, clearTerminal, cursorToStart, eraseLine, foregroundColor, setTerminalTitle, supportsTrueColor, terminalSize } from '#tui/terminal';
 export { applyTypedKey, readTypedValue } from '#tui/typed-value';
 export { parseAnsiText, truncate, visibleWidth, wrap } from '#tui/strings';
 export type {

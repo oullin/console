@@ -34,6 +34,7 @@ TypeScript and OpenTUI internals.
 | Spinner static frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | Task static frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/*` |
 | Stream frame rendering, wrapping, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/*` |
+| Terminal clear/title, true-color detection, and default colors | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
@@ -54,7 +55,7 @@ later phases:
 - Spinner animated frame and terminal cleanup parity
 - Stream true-color fade and terminal cleanup parity
 - Task animated frame, terminal cleanup, and process-log parity
-- Terminal
+- Terminal raw TTY restoration and interactive read parity
 - Textarea
 - Default theme
 - Feature parity tests

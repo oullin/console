@@ -1,4 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
+import { defaultBackgroundColor, defaultForegroundColor, parseTerminalColor, terminalSupportsTrueColor } from '#tui/terminal/capabilities';
+import type { TerminalColor } from '#tui/terminal/capabilities';
 
 export type TerminalSize = {
 	columns: number;
@@ -24,4 +26,16 @@ export const eraseLine = (): void => {
 
 export const cursorToStart = (): void => {
 	promptEnvironment().output.write('\r');
+};
+
+export const supportsTrueColor = (value?: string): boolean => {
+	return terminalSupportsTrueColor(value);
+};
+
+export const foregroundColor = (value?: unknown): TerminalColor => {
+	return parseTerminalColor(value, defaultForegroundColor());
+};
+
+export const backgroundColor = (value?: unknown): TerminalColor => {
+	return parseTerminalColor(value, defaultBackgroundColor());
 };

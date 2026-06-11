@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { clear, clearTerminal, createMemoryOutput, cursorToStart, eraseLine, setTerminalTitle, title, withPromptEnvironment } from '#tui/index';
+
+import { backgroundColor, clear, clearTerminal, createMemoryOutput, cursorToStart, eraseLine, foregroundColor, setTerminalTitle, supportsTrueColor, title, withPromptEnvironment } from '#tui/index';
 
 describe('terminal helpers', () => {
 	it('writes clear terminal control sequences', async () => {
@@ -33,5 +34,19 @@ describe('terminal helpers', () => {
 		});
 
 		expect(output.text()).toBe('\r\u001B[2K');
+	});
+
+	it('detects true color terminal modes', () => {
+		expect(supportsTrueColor('truecolor')).toBe(true);
+		expect(supportsTrueColor('24bit')).toBe(true);
+		expect(supportsTrueColor('256color')).toBe(false);
+		expect(supportsTrueColor(undefined)).toBe(supportsTrueColor(process.env.COLORTERM));
+	});
+
+	it('parses terminal colors with default fallbacks', () => {
+		expect(foregroundColor([1, 2, 3])).toEqual([1, 2, 3]);
+		expect(backgroundColor([4, 5, 6])).toEqual([4, 5, 6]);
+		expect(foregroundColor(['1', 2, 3])).toEqual([204, 204, 204]);
+		expect(backgroundColor([0, 0, 300])).toEqual([0, 0, 0]);
 	});
 });
