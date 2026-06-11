@@ -3,43 +3,9 @@ import { Key } from '#tui/key';
 import { PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
-
-type NumberInputOptions = {
-	default?: number | string;
-	hint?: string;
-	max?: number;
-	min?: number;
-	placeholder?: string;
-	step?: number;
-};
-
-const numeric = (value: string): boolean => value.trim() !== '' && Number.isFinite(Number(value));
-
-const clamp = (value: number, min?: number, max?: number): number => {
-	const clampedMin = min === undefined ? value : Math.max(min, value);
-
-	return max === undefined ? clampedMin : Math.min(max, clampedMin);
-};
-
-const steppedValue = (value: string, direction: 1 | -1, options: NumberInputOptions): string => {
-	const step = options.step !== undefined && options.step > 0 ? Math.max(1, Math.trunc(options.step)) : 1;
-
-	if (value === '') {
-		return String(direction === 1 ? (options.min ?? 1) : (options.max ?? 0));
-	}
-
-	if (!numeric(value)) {
-		return value;
-	}
-
-	return String(clamp(Math.trunc(Number(value)) + step * direction, options.min, options.max));
-};
-
-const renderNumberValue = (message: string, value: string, options: NumberInputOptions): void => {
-	const displayValue = value.length > 0 ? value : (options.placeholder ?? '');
-
-	promptEnvironment().output.write(`${renderQuestion(message, options.hint)}${displayValue}\n`);
-};
+import { renderNumberValue } from '#tui/prompts/number/render';
+import { steppedNumberValue } from '#tui/prompts/number/step';
+import type { NumberInputOptions } from '#tui/prompts/number/types';
 
 export const readNumberValue = async (message: string, options: NumberInputOptions = {}): Promise<string> => {
 	const environment = promptEnvironment();
@@ -69,14 +35,14 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		}
 
 		if (key === Key.up || key === Key.upArrow) {
-			state.value = steppedValue(state.value, 1, options);
+			state.value = steppedNumberValue(state.value, 1, options);
 			state.cursor = state.value.length;
 			renderNumberValue(message, state.value, options);
 			continue;
 		}
 
 		if (key === Key.down || key === Key.downArrow) {
-			state.value = steppedValue(state.value, -1, options);
+			state.value = steppedNumberValue(state.value, -1, options);
 			state.cursor = state.value.length;
 			renderNumberValue(message, state.value, options);
 			continue;

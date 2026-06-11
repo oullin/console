@@ -160,6 +160,23 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('? Count 1');
 	});
 
+	it('uses the max value when decrementing from an empty number input', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count', max: 9 }),
+		);
+
+		expect(result).toBe(9);
+		expect(output.text()).toContain('? Count 9');
+	});
+
 	it('does not increment or decrement with control navigation keys', async () => {
 		const output = createMemoryOutput();
 
