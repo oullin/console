@@ -183,12 +183,12 @@ describe('autocomplete prompt', () => {
 		expect(result).toBe('Black');
 	});
 
-	it('cycles autocomplete matches with control navigation keys', async () => {
+	it('does not cycle autocomplete matches with control navigation keys', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
 			{
-				input: createScriptedInput(['b', Key.ctrlN, Key.ctrlN, Key.ctrlP, Key.tab, Key.enter]),
+				input: createScriptedInput(['b', Key.ctrlN, Key.tab, Key.enter]),
 				output,
 				error: output,
 				interactive: true,
@@ -196,10 +196,10 @@ describe('autocomplete prompt', () => {
 			() => autocomplete('Favorite color?', ['Blue', 'Black', 'Blurple']),
 		);
 
-		expect(result).toBe('Black');
+		expect(result).toBe('Blue');
 	});
 
-	it('cycles autocomplete matches backwards with shift tab', async () => {
+	it('does not cycle autocomplete matches with shift tab', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -212,10 +212,10 @@ describe('autocomplete prompt', () => {
 			() => autocomplete('Favorite color?', ['Blue', 'Black', 'Blurple']),
 		);
 
-		expect(result).toBe('Blurple');
+		expect(result).toBe('Blue');
 	});
 
-	it('supports page autocomplete navigation before accepting completion', async () => {
+	it('does not cycle autocomplete matches with page navigation keys', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -228,7 +228,7 @@ describe('autocomplete prompt', () => {
 			() => autocomplete({ message: 'Favorite color?', options: ['Blue', 'Black', 'Blurple'], scroll: 2 }),
 		);
 
-		expect(result).toBe('Blurple');
-		expect(output.text()).toContain('Favorite color? Blurple');
+		expect(result).toBe('Blue');
+		expect(output.text()).toContain('Favorite color? Blue');
 	});
 });
