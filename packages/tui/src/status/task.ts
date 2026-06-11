@@ -36,13 +36,7 @@ export class Logger {
 	}
 
 	line(message: string): void {
-		for (const line of message.split(/\r?\n/u).filter((value) => value.length > 0)) {
-			this.lines.push(line.replaceAll(cursorReset, '').replaceAll(eraseLine, ''));
-		}
-
-		while (this.lines.length > this.limit) {
-			this.lines.shift();
-		}
+		this.writeLines(message.trimEnd());
 	}
 
 	log(message: string): void {
@@ -65,7 +59,7 @@ export class Logger {
 		}
 
 		this.lines.splice(this.#partialStartIndex);
-		this.line(this.#partialBuffer);
+		this.writeLines(this.#partialBuffer);
 		this.#partialStartIndex = Math.min(this.#partialStartIndex, this.lines.length);
 	}
 
@@ -95,6 +89,16 @@ export class Logger {
 
 		while (this.stableMessages.length > this.stableLimit) {
 			this.stableMessages.shift();
+		}
+	}
+
+	private writeLines(message: string): void {
+		for (const line of message.split(/\r?\n/u).filter((value) => value.length > 0)) {
+			this.lines.push(line.replaceAll(cursorReset, '').replaceAll(eraseLine, ''));
+		}
+
+		while (this.lines.length > this.limit) {
+			this.lines.shift();
 		}
 	}
 }

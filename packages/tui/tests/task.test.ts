@@ -58,6 +58,19 @@ describe('task helper', () => {
 		expect(output.text()).toContain('beforeafter');
 	});
 
+	it('trims trailing whitespace from completed log lines', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.line('trailing   ');
+			});
+		});
+
+		expect(output.text()).toContain('trailing\n');
+		expect(output.text()).not.toContain('trailing   \n');
+	});
+
 	it('keeps stable task summaries when requested', async () => {
 		const output = createMemoryOutput();
 
@@ -130,6 +143,18 @@ describe('task helper', () => {
 		expect(output.text()).toContain('Downloading states');
 		expect(output.text()).toContain('Done');
 		expect(output.text()).not.toContain('Downloading \n');
+	});
+
+	it('preserves trailing spaces while partial output is still accumulating', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.partial('Downloading ');
+			});
+		});
+
+		expect(output.text()).toContain('Downloading \n');
 	});
 
 	it('starts a new partial line after committing the previous partial', async () => {
