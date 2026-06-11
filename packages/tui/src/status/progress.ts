@@ -55,7 +55,7 @@ export class Progress {
 
 	render(): void {
 		const width = 20;
-		const filled = Math.round(width * this.percentage());
+		const filled = Math.ceil(width * this.percentage());
 		const bar = `${'█'.repeat(filled)}${' '.repeat(width - filled)}`;
 		const hint = this.#hint ? ` ${this.#hint}` : '';
 

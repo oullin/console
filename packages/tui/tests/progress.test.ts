@@ -30,4 +30,18 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('ALABAMA');
 		expect(output.text()).toContain('alaska');
 	});
+
+	it('renders visible progress for small non-zero percentages', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const bar = progress('Adding States', 100);
+
+			bar.start();
+			bar.advance();
+		});
+
+		expect(output.text()).toContain('█');
+		expect(output.text()).toContain('1 / 100');
+	});
 });
