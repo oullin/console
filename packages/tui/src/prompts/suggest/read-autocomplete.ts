@@ -7,6 +7,8 @@ import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import { pageIndex } from '#tui/prompts/select/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
+const characterLength = (value: string): number => [...value].length;
+
 export const readAutocompleteValue = async (options: SuggestOptions): Promise<string> => {
 	const environment = promptEnvironment();
 
@@ -15,7 +17,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 	}
 
 	let state = {
-		cursor: options.default?.length ?? 0,
+		cursor: characterLength(options.default ?? ''),
 		value: options.default ?? '',
 	};
 	let highlighted = 0;
@@ -63,7 +65,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			continue;
 		}
 
-		if (key === Key.tab && state.cursor >= [...state.value].length) {
+		if (key === Key.tab && state.cursor >= characterLength(state.value)) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			const match = matches[highlighted];
@@ -80,7 +82,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			continue;
 		}
 
-		if ((key === Key.right || key === Key.rightArrow) && state.cursor >= [...state.value].length) {
+		if ((key === Key.right || key === Key.rightArrow) && state.cursor >= characterLength(state.value)) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			const match = matches[highlighted];

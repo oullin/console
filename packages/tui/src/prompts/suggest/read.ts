@@ -7,6 +7,8 @@ import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import { pageIndex } from '#tui/prompts/select/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
+const characterLength = (value: string): number => [...value].length;
+
 export const readSuggestionValue = async (options: SuggestOptions): Promise<string> => {
 	const environment = promptEnvironment();
 
@@ -15,7 +17,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 	}
 
 	let state = {
-		cursor: options.default?.length ?? 0,
+		cursor: characterLength(options.default ?? ''),
 		value: options.default ?? '',
 	};
 	let highlighted: number | null = null;

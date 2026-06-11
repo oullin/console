@@ -57,6 +57,20 @@ describe('typed value editing', () => {
 		expect(apply(['J', 'z', 'e', Key.ctrlB, Key.ctrlH, Key.ctrlF, 's', 's'])).toBe('Jess');
 	});
 
+	it('clamps UTF-16 cursor offsets to character positions before editing', () => {
+		expect(applyMultilineState('😀', '😀'.length, ['!'])).toEqual({
+			cursor: 2,
+			value: '😀!',
+		});
+	});
+
+	it('deletes the previous word after non-BMP characters', () => {
+		expect(applyMultilineState('😀 hello', [...'😀 hello'].length, [Key.optionBackspace])).toEqual({
+			cursor: 2,
+			value: '😀 ',
+		});
+	});
+
 	it('moves to the start and end of a line', () => {
 		expect(apply(['A', 'r', Key.home[0], 'J', Key.end[0], 'c', 'h', 'e', 'r'])).toBe('JArcher');
 	});

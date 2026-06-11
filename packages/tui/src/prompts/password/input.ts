@@ -10,6 +10,7 @@ type PasswordInputOptions = {
 };
 
 const mask = (value: string): string => '•'.repeat([...value].length);
+const characterLength = (value: string): number => [...value].length;
 
 const renderPasswordValue = (message: string, stateValue: string, options: PasswordInputOptions): void => {
 	const value = stateValue.length > 0 ? mask(stateValue) : (options.placeholder ?? '');
@@ -31,7 +32,7 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 	}
 
 	let state = {
-		cursor: options.default?.length ?? 0,
+		cursor: characterLength(options.default ?? ''),
 		value: options.default ?? '',
 	};
 

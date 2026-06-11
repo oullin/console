@@ -18,6 +18,8 @@ type TypedValueOptions = {
 
 const characters = (value: string): string[] => [...value];
 const fromCharacters = (value: string[]): string => value.join('');
+const characterLength = (value: string): number => characters(value).length;
+const stringIndexToCharacterIndex = (value: string, index: number): number => characterLength(value.slice(0, index));
 
 type LineRange = {
 	end: number;
@@ -113,7 +115,7 @@ const moveToLineBoundary = (value: string[], cursor: number, boundary: 'start' |
 export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false): TypedValueState & { submitted: boolean; cancelled: boolean } => {
 	const value = characters(state.value);
 
-	let cursor = state.cursor;
+	let cursor = Math.max(0, Math.min(value.length, state.cursor));
 
 	if (key === Key.ctrlC) {
 		return { cursor, value: fromCharacters(value), submitted: false, cancelled: true };
@@ -189,7 +191,7 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 	if (key === Key.optionBackspace) {
 		const before = fromCharacters(value.slice(0, cursor));
 		const match = before.match(/(?:[\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}\s]+)\s*$/u);
-		const start = match?.index ?? 0;
+		const start = match?.index === undefined ? 0 : stringIndexToCharacterIndex(before, match.index);
 
 		value.splice(start, cursor - start);
 
@@ -220,7 +222,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 	}
 
 	let state: TypedValueState = {
-		cursor: options.default?.length ?? 0,
+		cursor: characterLength(options.default ?? ''),
 		value: options.default ?? '',
 	};
 
