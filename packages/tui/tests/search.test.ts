@@ -117,6 +117,33 @@ describe('search prompt', () => {
 		expect(result).toBe('three');
 	});
 
+	it('supports control-key search navigation', async () => {
+		const output = createMemoryOutput();
+
+		const forwardResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlN, Key.ctrlN, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors }),
+		);
+
+		const backwardResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlP, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors }),
+		);
+
+		expect(forwardResult).toBe('green');
+		expect(backwardResult).toBe('blue');
+	});
+
 	it('renders search info for the highlighted result', async () => {
 		const output = createMemoryOutput();
 
