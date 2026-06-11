@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, stream, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, parseAnsiText, stream, withPromptEnvironment } from '#tui/index';
+import { streamFadeStyles } from '#tui/status/stream/fade';
+import { renderStreamFrame } from '#tui/status/stream/render';
 
 describe('stream helper', () => {
 	it('appends streamed content and returns the accumulated value', async () => {
@@ -17,7 +19,7 @@ describe('stream helper', () => {
 			expect(outputStream.closed()).toBe(true);
 		});
 
-		expect(output.text()).toContain(' hello world');
+		expect(parseAnsiText(output.text())).toContain(' hello world');
 	});
 
 	it('pipes iterable content through a stateful stream', async () => {
@@ -27,8 +29,8 @@ describe('stream helper', () => {
 			await stream(['one', '\n', 'two']);
 		});
 
-		expect(output.text()).toContain(' one');
-		expect(output.text()).toContain(' two');
+		expect(parseAnsiText(output.text())).toContain(' one');
+		expect(parseAnsiText(output.text())).toContain(' two');
 	});
 
 	it('closes piped streams after the source is exhausted', async () => {
@@ -58,7 +60,7 @@ describe('stream helper', () => {
 			expect(outputStream.value()).toBe('finished');
 		});
 
-		expect(output.text()).toContain(' finished');
+		expect(parseAnsiText(output.text())).toContain(' finished');
 	});
 
 	it('cannot be prompted for input', async () => {
@@ -101,6 +103,33 @@ describe('stream helper', () => {
 			expect(outputStream.closed()).toBe(true);
 		});
 
-		expect(output.text()).toContain(' 01234567891011');
+		expect(parseAnsiText(output.text())).toContain(' 01234567891011');
+	});
+
+	it('renders pending stream chunks with fallback fade styles', () => {
+		const frame = renderStreamFrame({
+			fading: ['fresh', ' fading'],
+			fadeStyles: streamFadeStyles({ trueColor: false }),
+			value: 'stable ',
+		});
+
+		expect(parseAnsiText(frame)).toBe(' stable fresh fading\n');
+		expect(frame).toContain('stable fresh\u001B[2m fading\u001B[22m');
+	});
+
+	it('renders true-color stream fade styles', () => {
+		const frame = renderStreamFrame({
+			fading: ['fresh', ' fading'],
+			fadeStyles: streamFadeStyles({
+				background: [0, 0, 0],
+				foreground: [100, 50, 0],
+				steps: 2,
+				trueColor: true,
+			}),
+			value: '',
+		});
+
+		expect(frame).toContain('\u001B[38;2;100;50;0mfresh\u001B[0m');
+		expect(frame).toContain('\u001B[38;2;50;25;0m fading\u001B[0m');
 	});
 });

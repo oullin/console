@@ -1,10 +1,12 @@
 import { promptEnvironment } from '#tui/environment';
 import { StreamBuffer } from '#tui/status/stream/buffer';
+import { streamFadeStyles } from '#tui/status/stream/fade';
 import { renderStreamFrame, streamLines } from '#tui/status/stream/render';
 
 export class Stream {
 	#closed = false;
 	readonly #buffer = new StreamBuffer(10);
+	readonly #fadeStyles = streamFadeStyles();
 
 	write(content: string): this {
 		return this.append(content);
@@ -56,7 +58,13 @@ export class Stream {
 	}
 
 	private render(): void {
-		promptEnvironment().output.write(renderStreamFrame({ value: this.value() }));
+		promptEnvironment().output.write(
+			renderStreamFrame({
+				fading: this.#buffer.fading,
+				fadeStyles: this.#fadeStyles,
+				value: this.#buffer.stableValue(),
+			}),
+		);
 	}
 }
 

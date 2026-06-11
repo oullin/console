@@ -27,4 +27,8 @@ export class StreamBuffer {
 	value(): string {
 		return `${this.#message}${this.fading.join('')}`;
 	}
+
+	stableValue(): string {
+		return this.#message;
+	}
 }
