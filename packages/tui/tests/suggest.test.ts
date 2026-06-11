@@ -64,6 +64,12 @@ describe('suggest prompt', () => {
 		await expectSuggestion(['b', Key.down, Key.end[0], Key.home[0], Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Blue');
 	});
 
+	it('supports control-line suggestion navigation keys', async () => {
+		await expectSuggestion(['b', Key.down, Key.ctrlE, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Blurple');
+
+		await expectSuggestion(['b', Key.down, Key.ctrlE, Key.ctrlA, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Blue');
+	});
+
 	it('supports callback options', async () => {
 		await expectSuggestion(['e', 'e', Key.down, Key.enter], (value) => ['Red', 'Green', 'Blue'].filter((option) => option.toLowerCase().includes(value.toLowerCase())), 'Green');
 	});

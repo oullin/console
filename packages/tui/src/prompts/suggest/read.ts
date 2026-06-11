@@ -1,11 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key, oneOf } from '#tui/key';
+import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
+import { clearsSuggestionHighlight, moveSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
 import { renderSuggestions } from '#tui/prompts/suggest/render';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import { characterLength } from '#tui/typed-value/characters';
-import { firstSuggestionHighlight, lastSuggestionHighlight, nextSuggestionHighlight, pageSuggestionHighlight } from '#tui/prompts/suggest/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const readSuggestionValue = async (options: SuggestOptions): Promise<string> => {
@@ -32,59 +32,17 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 			return state.value;
 		}
 
-		if (key === Key.tab) {
+		const action = suggestNavigationAction(key);
+
+		if (action !== null && (action !== 'first' || highlighted !== null) && (action !== 'last' || highlighted !== null)) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			highlighted = nextSuggestionHighlight(matches, highlighted, 1);
+			highlighted = moveSuggestionHighlight(matches, highlighted, action, options.scroll);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}
 
-		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
-			matches = await resolveSuggestions(options.options, state.value);
-
-			highlighted = nextSuggestionHighlight(matches, highlighted, 1);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
-			continue;
-		}
-
-		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
-			matches = await resolveSuggestions(options.options, state.value);
-
-			highlighted = nextSuggestionHighlight(matches, highlighted, -1);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
-			continue;
-		}
-
-		if (key === Key.pageDown) {
-			matches = await resolveSuggestions(options.options, state.value);
-
-			highlighted = pageSuggestionHighlight(matches, highlighted, 1, options.scroll);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
-			continue;
-		}
-
-		if (key === Key.pageUp) {
-			matches = await resolveSuggestions(options.options, state.value);
-
-			highlighted = pageSuggestionHighlight(matches, highlighted, -1, options.scroll);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
-			continue;
-		}
-
-		if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
-			highlighted = firstSuggestionHighlight(matches);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
-			continue;
-		}
-
-		if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
-			highlighted = lastSuggestionHighlight(matches);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
-			continue;
-		}
-
-		if (oneOf([Key.left, Key.leftArrow, Key.right, Key.rightArrow, Key.ctrlB, Key.ctrlF], key) && highlighted !== null) {
+		if (clearsSuggestionHighlight(key) && highlighted !== null) {
 			highlighted = null;
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
