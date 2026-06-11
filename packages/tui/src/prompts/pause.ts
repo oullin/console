@@ -6,10 +6,14 @@ import { renderQuestion } from '#tui/theme';
 export const pause = async (message = 'Press enter to continue...'): Promise<boolean> => {
 	const environment = promptEnvironment();
 
+	if (!environment.interactive) {
+		return false;
+	}
+
 	if (!environment.input.readKey) {
 		await ask(message);
 
-		return environment.interactive;
+		return true;
 	}
 
 	environment.output.write(renderQuestion(message));
@@ -20,7 +24,7 @@ export const pause = async (message = 'Press enter to continue...'): Promise<boo
 		if (key === null || key === Key.enter) {
 			environment.output.write('\n');
 
-			return environment.interactive;
+			return true;
 		}
 	}
 };

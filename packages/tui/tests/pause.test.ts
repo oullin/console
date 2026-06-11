@@ -46,16 +46,19 @@ describe('pause prompt', () => {
 	});
 
 	it('returns false when the configured environment is non-interactive', async () => {
+		const output = createMemoryOutput();
+
 		const result = await withPromptEnvironment(
 			{
 				input: createScriptedInput([Key.enter]),
-				output: createMemoryOutput(),
-				error: createMemoryOutput(),
+				output,
+				error: output,
 				interactive: false,
 			},
-			() => pause('Continue'),
+			() => pause('This should not be rendered'),
 		);
 
 		expect(result).toBe(false);
+		expect(output.text()).not.toContain('This should not be rendered');
 	});
 });

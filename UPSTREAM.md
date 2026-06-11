@@ -50,6 +50,7 @@ TypeScript and OpenTUI internals.
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
+| Pause non-interactive no-render behavior | `packages/tui/src/prompts/pause.ts`, `packages/tui/tests/pause.test.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
