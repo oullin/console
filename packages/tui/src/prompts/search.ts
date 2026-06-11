@@ -2,7 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
 import { ask, promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
-import { findChoice, normalizeSearchChoices, renderInteractiveChoices } from '#tui/concerns/choices';
+import { findChoice, firstEnabledIndex, nextEnabledIndex, normalizeSearchChoices, renderInteractiveChoices } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
@@ -14,6 +14,16 @@ const resolveSearchChoices = async <T>(source: SearchPromptOptions<T>['options']
 
 const searchMessage = (message: string, query: string): string => {
 	return query.length > 0 ? `${message} ${query}` : message;
+};
+
+const lastEnabledIndex = <T>(choices: Array<Choice<T>>): number => {
+	for (let index = choices.length - 1; index >= 0; index -= 1) {
+		if (!choices[index]?.disabled) {
+			return index;
+		}
+	}
+
+	return 0;
 };
 
 const renderSearchChoices = <T>(
@@ -70,7 +80,14 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
 		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : ((highlighted ?? (attempt > 0 ? 0 : -1)) + 1) % choices.length;
+			highlighted =
+				choices.length === 0
+					? null
+					: highlighted === null
+						? attempt > 0
+							? nextEnabledIndex(choices, firstEnabledIndex(choices), 1)
+							: firstEnabledIndex(choices)
+						: nextEnabledIndex(choices, highlighted, 1);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
@@ -78,31 +95,33 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
 		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : ((highlighted ?? choices.length) - 1 + choices.length) % choices.length;
+			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, -1);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
 
 		if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
-			highlighted = 0;
+			highlighted = firstEnabledIndex(choices);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
 
 		if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
-			highlighted = Math.max(0, choices.length - 1);
+			highlighted = lastEnabledIndex(choices);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
 
 		if (key === Key.enter) {
 			if (highlighted !== null) {
-				return choices[highlighted]?.value;
+				const choice = choices[highlighted];
+
+				return choice?.disabled ? undefined : choice?.value;
 			}
 
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length > 0 ? 0 : null;
+			highlighted = choices.length > 0 ? firstEnabledIndex(choices) : null;
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
@@ -189,7 +208,7 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
 		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : ((highlighted ?? -1) + 1) % choices.length;
+			highlighted = choices.length === 0 ? null : highlighted === null ? firstEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, 1);
 			render();
 			continue;
 		}
@@ -197,19 +216,19 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
 		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length === 0 ? null : ((highlighted ?? choices.length) - 1 + choices.length) % choices.length;
+			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, -1);
 			render();
 			continue;
 		}
 
 		if (oneOf([Key.home], key) && highlighted !== null) {
-			highlighted = 0;
+			highlighted = firstEnabledIndex(choices);
 			render();
 			continue;
 		}
 
 		if (oneOf([Key.end], key) && highlighted !== null) {
-			highlighted = Math.max(0, choices.length - 1);
+			highlighted = lastEnabledIndex(choices);
 			render();
 			continue;
 		}
@@ -240,7 +259,7 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
 		if (key === Key.space && highlighted !== null) {
 			const choice = choices[highlighted];
 
-			if (choice) {
+			if (choice && !choice.disabled) {
 				if (selected.has(choice.value as T)) {
 					selected.delete(choice.value as T);
 				} else {

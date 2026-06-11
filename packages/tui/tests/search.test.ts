@@ -110,6 +110,29 @@ describe('search prompt', () => {
 
 		expect(output.text()).toContain('About red');
 	});
+
+	it('skips disabled search results while navigating', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: [
+						{ label: 'Red', value: 'red', disabled: true },
+						{ label: 'Green', value: 'green' },
+					],
+				}),
+		);
+
+		expect(result).toBe('green');
+	});
 });
 
 describe('multisearch prompt', () => {
@@ -187,5 +210,30 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['blue', 'red']);
 		expect(output.text()).toContain('Selected: Blue, Red');
+	});
+
+	it('skips disabled multisearch results while navigating and toggling all', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlA, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: [
+						{ label: 'Red', value: 'red', disabled: true },
+						{ label: 'Green', value: 'green' },
+						{ label: 'Blue', value: 'blue' },
+					],
+				}),
+		);
+
+		expect(result).toEqual(['green', 'blue']);
+		expect(output.text()).toContain('Selected: Green, Blue');
 	});
 });
