@@ -1,5 +1,6 @@
 import { Key, oneOf } from '#tui/key';
-import { characterLength, characters, fromCharacters, isPrintable, stringIndexToCharacterIndex } from '#tui/typed-value/characters';
+import { characterLength, characters, fromCharacters, isPrintable } from '#tui/typed-value/characters';
+import { deleteNextCharacter, deletePreviousCharacter, deletePreviousWord, deleteToLineStart } from '#tui/typed-value/delete';
 import { moveLine, moveToLineBoundary } from '#tui/typed-value/lines';
 import type { AppliedTypedKey, TypedValueState } from '#tui/typed-value/types';
 
@@ -56,37 +57,27 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 	}
 
 	if (key === Key.delete) {
-		value.splice(cursor, 1);
+		cursor = deleteNextCharacter(value, cursor);
 
 		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (key === Key.ctrlU) {
-		const start = allowNewLine ? moveToLineBoundary(value, cursor, 'start') : 0;
+		cursor = deleteToLineStart(value, cursor, allowNewLine);
 
-		value.splice(start, cursor - start);
-
-		return { cursor: start, value: fromCharacters(value), submitted: false, cancelled: false };
+		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (key === Key.backspace || key === Key.ctrlH) {
-		if (cursor === 0) {
-			return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
-		}
+		cursor = deletePreviousCharacter(value, cursor);
 
-		value.splice(cursor - 1, 1);
-
-		return { cursor: cursor - 1, value: fromCharacters(value), submitted: false, cancelled: false };
+		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (key === Key.optionBackspace) {
-		const before = fromCharacters(value.slice(0, cursor));
-		const match = before.match(/(?:[\p{L}\p{M}\p{N}]+|[^\p{L}\p{M}\p{N}\s]+)\s*$/u);
-		const start = match?.index === undefined ? 0 : stringIndexToCharacterIndex(before, match.index);
+		cursor = deletePreviousWord(value, cursor);
 
-		value.splice(start, cursor - start);
-
-		return { cursor: start, value: fromCharacters(value), submitted: false, cancelled: false };
+		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
 	if (isPrintable(key)) {

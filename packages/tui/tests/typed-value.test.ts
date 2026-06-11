@@ -49,6 +49,10 @@ describe('typed value editing', () => {
 		expect(apply(['J', 'e', 'z', Key.left, Key.delete, 's', 's'])).toBe('Jess');
 	});
 
+	it('keeps delete at the end of input unchanged', () => {
+		expect(apply(['J', 'e', 's', 's', Key.delete])).toBe('Jess');
+	});
+
 	it('deletes typed input back to the line start', () => {
 		expect(apply(['J', 'a', 'n', 'e', Key.left, Key.left, Key.ctrlU, 'D', 'o'])).toBe('Done');
 	});
