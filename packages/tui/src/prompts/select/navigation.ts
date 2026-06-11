@@ -20,3 +20,33 @@ export const lastEnabledChoiceIndex = <T>(choices: Array<Choice<T>>): number => 
 
 	return selected;
 };
+
+export const pageSize = (scroll?: number): number => {
+	return Math.max(1, scroll ?? 10);
+};
+
+export const pageIndex = (total: number, current: number, direction: 1 | -1, scroll?: number): number => {
+	if (total <= 0) {
+		return 0;
+	}
+
+	return Math.max(0, Math.min(total - 1, current + pageSize(scroll) * direction));
+};
+
+export const pageEnabledChoiceIndex = <T>(choices: Array<Choice<T>>, current: number, direction: 1 | -1, scroll?: number): number => {
+	const target = pageIndex(choices.length, current, direction, scroll);
+
+	for (let index = target; index >= 0 && index < choices.length; index += direction) {
+		if (!choices[index]?.disabled) {
+			return index;
+		}
+	}
+
+	for (let index = target; index >= 0 && index < choices.length; index -= direction) {
+		if (!choices[index]?.disabled) {
+			return index;
+		}
+	}
+
+	return current;
+};

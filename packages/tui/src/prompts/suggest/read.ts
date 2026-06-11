@@ -4,6 +4,7 @@ import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { renderSuggestions } from '#tui/prompts/suggest/render';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
+import { pageIndex } from '#tui/prompts/select/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const readSuggestionValue = async (options: SuggestOptions): Promise<string> => {
@@ -50,6 +51,22 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? null : ((highlighted ?? matches.length) - 1 + matches.length) % matches.length;
+			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+			continue;
+		}
+
+		if (key === Key.pageDown) {
+			matches = await resolveSuggestions(options.options, state.value);
+
+			highlighted = matches.length === 0 ? null : highlighted === null ? 0 : pageIndex(matches.length, highlighted, 1, options.scroll);
+			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+			continue;
+		}
+
+		if (key === Key.pageUp) {
+			matches = await resolveSuggestions(options.options, state.value);
+
+			highlighted = matches.length === 0 ? null : highlighted === null ? Math.max(0, matches.length - 1) : pageIndex(matches.length, highlighted, -1, options.scroll);
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}

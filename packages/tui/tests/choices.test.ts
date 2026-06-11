@@ -168,6 +168,22 @@ describe('choice prompts', () => {
 		expect(result).toBe('first');
 	});
 
+	it('supports page select navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.pageDown, Key.pageUp, Key.pageDown, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second', 'third', 'fourth'], scroll: 2 }),
+		);
+
+		expect(result).toBe('third');
+	});
+
 	it('renders select info for the highlighted option', async () => {
 		const output = createMemoryOutput();
 
@@ -308,6 +324,22 @@ describe('choice prompts', () => {
 
 		expect(output.text()).toContain('0 selected');
 		expect(output.text()).toContain('1 selected');
+	});
+
+	it('supports page multiselect navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.pageDown, Key.space, Key.pageUp, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second', 'third', 'fourth'], scroll: 2 }),
+		);
+
+		expect(result).toEqual(['third', 'first']);
 	});
 
 	it('combines multiselect info with selected counts', async () => {

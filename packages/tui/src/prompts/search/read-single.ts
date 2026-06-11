@@ -5,6 +5,7 @@ import { applyTypedKey } from '#tui/typed-value';
 import { findChoice, firstEnabledIndex, nextEnabledIndex } from '#tui/concerns/choices';
 import { lastEnabledIndex, resolveSearchChoices } from '#tui/prompts/search/choices';
 import { renderSearchChoices } from '#tui/prompts/search/render';
+import { pageEnabledChoiceIndex } from '#tui/prompts/select/navigation';
 import type { SearchPromptOptions } from '#tui/types';
 
 export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0): Promise<T | undefined> => {
@@ -54,6 +55,22 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : nextEnabledIndex(choices, highlighted, -1);
+			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+			continue;
+		}
+
+		if (key === Key.pageDown) {
+			choices = await resolveSearchChoices(options.options, state.value);
+
+			highlighted = choices.length === 0 ? null : highlighted === null ? firstEnabledIndex(choices) : pageEnabledChoiceIndex(choices, highlighted, 1, options.scroll);
+			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+			continue;
+		}
+
+		if (key === Key.pageUp) {
+			choices = await resolveSearchChoices(options.options, state.value);
+
+			highlighted = choices.length === 0 ? null : highlighted === null ? lastEnabledIndex(choices) : pageEnabledChoiceIndex(choices, highlighted, -1, options.scroll);
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}

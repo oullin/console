@@ -3,7 +3,7 @@ import { Key, oneOf } from '#tui/key';
 import { ask, PromptValidationError } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex, nextEnabledIndex } from '#tui/concerns/choices';
-import { lastEnabledChoiceIndex, nextChoiceKeys, parseChoiceIndex, previousChoiceKeys } from '#tui/prompts/select/navigation';
+import { lastEnabledChoiceIndex, nextChoiceKeys, pageEnabledChoiceIndex, parseChoiceIndex, previousChoiceKeys } from '#tui/prompts/select/navigation';
 import { renderMultipleChoices } from '#tui/prompts/select/render';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
@@ -81,6 +81,18 @@ export const readMultipleChoices = async <T>(
 
 		if (previousChoiceKeys(key)) {
 			selected = nextEnabledIndex(choices, selected, -1);
+			renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			continue;
+		}
+
+		if (key === Key.pageDown) {
+			selected = pageEnabledChoiceIndex(choices, selected, 1, scroll);
+			renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			continue;
+		}
+
+		if (key === Key.pageUp) {
+			selected = pageEnabledChoiceIndex(choices, selected, -1, scroll);
 			renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;
 		}

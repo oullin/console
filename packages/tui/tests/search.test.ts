@@ -96,6 +96,27 @@ describe('search prompt', () => {
 		expect(latestFrame).toContain('four');
 	});
 
+	it('supports page search navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.pageDown, Key.pageUp, Key.pageDown, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Pick number',
+					options: ['one', 'two', 'three', 'four'],
+					scroll: 2,
+				}),
+		);
+
+		expect(result).toBe('three');
+	});
+
 	it('renders search info for the highlighted result', async () => {
 		const output = createMemoryOutput();
 
@@ -358,6 +379,23 @@ describe('multisearch prompt', () => {
 				interactive: true,
 			},
 			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual(['blue', 'red']);
+		expect(output.text()).toContain('Selected: Blue, Red');
+	});
+
+	it('supports page multisearch navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.pageDown, Key.space, Key.pageUp, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors, scroll: 2 }),
 		);
 
 		expect(result).toEqual(['blue', 'red']);
