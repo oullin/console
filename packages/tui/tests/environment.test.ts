@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { EventEmitter } from 'node:events';
 import { configurePrompts, createMemoryOutput, createScriptedInput, promptEnvironment, withPromptEnvironment } from '#tui/environment';
 import { readRawKey } from '#tui/environment/raw-key';
+import { Key } from '#tui/key';
 
 class FakeRawInput extends EventEmitter {
 	isRaw = false;
@@ -110,6 +111,22 @@ describe('prompt environment', () => {
 		expect(input.listenerCount('data')).toBe(0);
 		expect(input.listenerCount('end')).toBe(0);
 		expect(input.listenerCount('error')).toBe(0);
+	});
+
+	it('normalizes raw terminal key aliases', async () => {
+		const input = new FakeRawInput();
+		const enter = readRawKey(input);
+
+		input.emit('data', Buffer.from('\r'));
+
+		await expect(enter).resolves.toBe(Key.enter);
+
+		const backspaceInput = new FakeRawInput();
+		const backspace = readRawKey(backspaceInput);
+
+		backspaceInput.emit('data', Buffer.from('\u0008'));
+
+		await expect(backspace).resolves.toBe(Key.backspace);
 	});
 
 	it('restores raw input mode when key input ends', async () => {

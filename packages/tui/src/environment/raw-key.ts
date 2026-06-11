@@ -1,4 +1,5 @@
 import type { EventEmitter } from 'node:events';
+import { normalizeRawKey } from '#tui/environment/raw-key/normalize';
 
 export type RawKeyInput = Pick<EventEmitter, 'off' | 'once'> & {
 	isRaw?: boolean;
@@ -33,7 +34,7 @@ export const readRawKey = async (input: RawKeyInput): Promise<null | string> =>
 
 		const onData = (chunk: Buffer | string): void => {
 			cleanup();
-			resolve(Buffer.isBuffer(chunk) ? chunk.toString('utf8') : chunk);
+			resolve(normalizeRawKey(Buffer.isBuffer(chunk) ? chunk.toString('utf8') : chunk));
 		};
 
 		const onEnd = (): void => {

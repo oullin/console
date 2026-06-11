@@ -48,6 +48,7 @@ TypeScript and OpenTUI internals.
 | Status rendered-frame cleanup | `packages/tui/src/status/frame.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/task.ts` |
 | Progress cursor visibility and rendered-frame redraw cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/frame.ts` |
 | Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
+| Terminal raw key alias normalization | `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
@@ -63,7 +64,7 @@ later phases:
 - Progress signal handling parity
 - Prompt lifecycle
 - Search boxed layout, scrollbar, and submit/cancel frame parity
-- Terminal interactive read parity
+- Terminal interactive escape-sequence read parity
 - Textarea wrapping, cursor, and scrollbar parity
 - Default theme
 - Feature parity tests
