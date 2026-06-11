@@ -1,9 +1,14 @@
 import { promptEnvironment } from '#tui/environment';
 
 export class Stream {
+	#closed = false;
 	#value = '';
 
 	write(content: string): this {
+		if (this.#closed) {
+			throw new Error('Stream is closed.');
+		}
+
 		this.#value += content;
 		promptEnvironment().output.write(content);
 
@@ -15,7 +20,11 @@ export class Stream {
 	}
 
 	close(): void {
-		//
+		this.#closed = true;
+	}
+
+	closed(): boolean {
+		return this.#closed;
 	}
 
 	lines(): string[] {
@@ -23,8 +32,12 @@ export class Stream {
 	}
 
 	async pipe(source: AsyncIterable<string> | Iterable<string>): Promise<void> {
-		for await (const chunk of source) {
-			this.write(chunk);
+		try {
+			for await (const chunk of source) {
+				this.write(chunk);
+			}
+		} finally {
+			this.close();
 		}
 	}
 
