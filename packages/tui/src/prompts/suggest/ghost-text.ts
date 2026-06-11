@@ -1,3 +1,4 @@
+import { dim, inverse } from '#tui/theme/styles';
 import { characterLength, characters, fromCharacters } from '#tui/typed-value/characters';
 import type { TypedValueState } from '#tui/typed-value/types';
 
@@ -20,5 +21,8 @@ export const autocompleteDisplayValue = (state: TypedValueState, match: string |
 		return state.value;
 	}
 
-	return `${state.value}${autocompleteGhostText(state.value, match)}`;
+	const ghostText = autocompleteGhostText(state.value, match);
+	const [cursorCharacter = '', ...remainingGhost] = characters(ghostText);
+
+	return `${state.value}${inverse(cursorCharacter)}${dim(fromCharacters(remainingGhost))}`;
 };

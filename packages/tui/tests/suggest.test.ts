@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { autocomplete, createMemoryOutput, createScriptedInput, Key, suggest, withPromptEnvironment } from '#tui/index';
+import { autocomplete, createMemoryOutput, createScriptedInput, Key, parseAnsiText, suggest, withPromptEnvironment } from '#tui/index';
 
 const runSuggest = async (keys: string[], options: string[] | ((query: string) => string[])): Promise<{ output: string; result: string }> => {
 	const output = createMemoryOutput();
@@ -140,7 +140,8 @@ describe('autocomplete prompt', () => {
 			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue']),
 		);
 
-		expect(output.text()).toContain('Favorite color? blue');
+		expect(parseAnsiText(output.text())).toContain('Favorite color? blue');
+		expect(output.text()).toContain('b\u001B[7ml\u001B[27m\u001B[2mue\u001B[22m');
 		expect(output.text()).not.toContain('›');
 	});
 
