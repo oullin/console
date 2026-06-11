@@ -347,6 +347,35 @@ describe('data table prompt', () => {
 		expect(output.text()).toContain('Bob, Developer');
 	});
 
+	it('renders multiline data table cells as visual table rows', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name', 'Role'],
+					rows: [
+						['Alice', 'Lead\nDeveloper'],
+						['Bob', 'Designer'],
+					],
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+
+		expect(result).toBe(0);
+		expect(activeFrame).toContain('| › | Alice | Lead      |');
+		expect(activeFrame).toContain('|   |       | Developer |');
+		expect(activeFrame).toContain('|   | Bob   | Designer  |');
+	});
+
 	it('edits Unicode data table search queries without corrupting input', async () => {
 		const output = createMemoryOutput();
 

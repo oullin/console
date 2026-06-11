@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderTable } from '#tui/theme';
+import { expandMultilineDataTableRows } from '#tui/output/data-table/multiline';
 import { dataTableRowCells } from '#tui/output/data-table/rows';
 import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
 import { dim, red, strikethrough } from '#tui/theme/styles';
@@ -35,7 +36,7 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 		return [index === selected ? '›' : ' ', ...dataTableRowCells(options.headers, row)];
 	});
 
-	environment.output.write(`${renderTable(['', ...options.headers], renderedRows)}\n`);
+	environment.output.write(`${renderTable(['', ...options.headers], expandMultilineDataTableRows(renderedRows))}\n`);
 
 	if (window.end - window.start < options.rows.length) {
 		const suffix = options.query.length > 0 ? ' results' : '';
@@ -59,8 +60,18 @@ export const renderSubmittedDataTableFrame = <T>(message: string, headers: strin
 };
 
 export const renderCancelledDataTableFrame = <T>(message: string, headers: string[], rows: Array<VisibleDataTableRow<T>>, selected: number): void => {
-	const outputRows = rows.map(({ row }, index) => {
-		return [index === selected ? '›' : ' ', ...dataTableRowCells(headers, row).map((cell) => dim(strikethrough(cell)))];
+	const outputRows = rows.flatMap(({ row }, index) => {
+		const expandedRows = expandMultilineDataTableRows([[index === selected ? '›' : ' ', ...dataTableRowCells(headers, row)]]);
+
+		return expandedRows.map((expandedRow) => {
+			return expandedRow.map((cell, columnIndex) => {
+				if (columnIndex === 0) {
+					return cell;
+				}
+
+				return cell.length > 0 ? dim(strikethrough(cell)) : '';
+			});
+		});
 	});
 
 	const environment = promptEnvironment();
