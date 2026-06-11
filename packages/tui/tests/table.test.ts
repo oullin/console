@@ -138,6 +138,54 @@ describe('data table prompt', () => {
 		expect(result).toBe('beta');
 	});
 
+	it('cancels data table prompts with the current selected row', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Cancelled.');
+	});
+
+	it('cancels data table search with the current filtered row', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'B', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Cancelled.');
+	});
+
 	it('edits Unicode data table search queries without corrupting input', async () => {
 		const output = createMemoryOutput();
 

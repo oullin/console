@@ -144,6 +144,18 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 
 			const rows = visibleRows();
 
+			if (key === Key.ctrlC) {
+				const selectedRow = rows[selected];
+
+				environment.error.write('Cancelled.\n');
+
+				if (!selectedRow) {
+					throw new PromptValidationError('Please select a valid row.');
+				}
+
+				return rowValue(selectedRow.row, selectedRow.index);
+			}
+
 			if (mode === 'search') {
 				if (key === Key.enter) {
 					mode = 'browse';
