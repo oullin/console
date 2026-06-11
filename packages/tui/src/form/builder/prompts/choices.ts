@@ -1,10 +1,10 @@
 import { autocomplete, confirm, multiselect, multisearch, pause, search, select, suggest } from '#tui/prompts/choices';
 import { previousArray, previousString } from '#tui/form/builder/previous';
 import type { FormBuilder } from '#tui/form/builder/index';
-import type { PromptBuilderMethods } from '#tui/form/builder/prompts/types';
+import type { ChoicePromptBuilderMethods } from '#tui/form/builder/prompts/types';
 import type { ChoiceOptions, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
-export const choicePromptBuilderMethods: Omit<PromptBuilderMethods, 'number' | 'password' | 'text' | 'textarea'> & ThisType<FormBuilder> = {
+export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<FormBuilder> = {
 	autocomplete(label, options, defaultValue = '', required = false, validate = undefined, hint = '', name, transform = undefined) {
 		return this.add((_, previous) => autocomplete({ message: label, label, options, default: previousString(previous, defaultValue), required, validate, hint, transform }), name);
 	},
