@@ -161,6 +161,45 @@ describe('data table prompt', () => {
 		expect(latestFrame).toContain('Fourth');
 	});
 
+	it('supports page, home, and end data table navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const pageDownResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.pageDown, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third'], ['Fourth']],
+					scroll: 2,
+				}),
+		);
+
+		const endHomeResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.end[0], Key.home[0], Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third'], ['Fourth']],
+					scroll: 2,
+				}),
+		);
+
+		expect(pageDownResult).toBe(2);
+		expect(endHomeResult).toBe(0);
+	});
+
 	it('works from form builders', async () => {
 		const output = createMemoryOutput();
 
