@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { backgroundColor, clear, clearTerminal, createMemoryOutput, cursorToStart, eraseLine, foregroundColor, setTerminalTitle, supportsTrueColor, title, withPromptEnvironment } from '#tui/index';
+import {
+	backgroundColor,
+	clear,
+	clearTerminal,
+	createMemoryOutput,
+	cursorToStart,
+	eraseLine,
+	foregroundColor,
+	hideCursor,
+	setTerminalTitle,
+	showCursor,
+	supportsTrueColor,
+	title,
+	withPromptEnvironment,
+} from '#tui/index';
 
 describe('terminal helpers', () => {
 	it('writes clear terminal control sequences', async () => {
@@ -31,9 +45,11 @@ describe('terminal helpers', () => {
 		await withPromptEnvironment({ output, error: output }, async () => {
 			cursorToStart();
 			eraseLine();
+			hideCursor();
+			showCursor();
 		});
 
-		expect(output.text()).toBe('\r\u001B[2K');
+		expect(output.text()).toBe('\r\u001B[2K\u001B[?25l\u001B[?25h');
 	});
 
 	it('detects true color terminal modes', () => {

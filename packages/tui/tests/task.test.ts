@@ -21,6 +21,8 @@ describe('task helper', () => {
 		});
 
 		expect(result).toBe('done');
+		expect(output.text()).toContain('\u001B[?25l');
+		expect(output.text()).toContain('\u001B[?25h');
 		expect(output.text()).toContain('Running...');
 		expect(output.text()).not.toContain('line one');
 		expect(output.text()).toContain('line two');
@@ -243,5 +245,20 @@ describe('task helper', () => {
 				stableMessages: [],
 			}),
 		).toContain(' ⠶ Running...');
+	});
+
+	it('restores the cursor when task callbacks fail', async () => {
+		const output = createMemoryOutput();
+		const failure = new Error('failed');
+
+		await expect(
+			withPromptEnvironment({ output, error: output }, async () => {
+				await task('Running...', () => {
+					throw failure;
+				});
+			}),
+		).rejects.toBe(failure);
+
+		expect(output.text()).toContain('\u001B[?25h');
 	});
 });

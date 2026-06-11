@@ -19,6 +19,8 @@ describe('stream helper', () => {
 			expect(outputStream.closed()).toBe(true);
 		});
 
+		expect(output.text()).toContain('\u001B[?25l');
+		expect(output.text()).toContain('\u001B[?25h');
 		expect(parseAnsiText(output.text())).toContain(' hello world');
 	});
 
@@ -45,6 +47,8 @@ describe('stream helper', () => {
 			expect(outputStream.value()).toBe('done');
 			expect(() => outputStream.write(' again')).toThrow('Stream is closed.');
 		});
+
+		expect(output.text()).toContain('\u001B[?25h');
 	});
 
 	it('rejects writes after close without losing buffered content', async () => {

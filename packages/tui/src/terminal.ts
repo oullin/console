@@ -28,6 +28,14 @@ export const cursorToStart = (): void => {
 	promptEnvironment().output.write('\r');
 };
 
+export const hideCursor = (): void => {
+	promptEnvironment().output.write('\u001B[?25l');
+};
+
+export const showCursor = (): void => {
+	promptEnvironment().output.write('\u001B[?25h');
+};
+
 export const supportsTrueColor = (value?: string): boolean => {
 	return terminalSupportsTrueColor(value);
 };

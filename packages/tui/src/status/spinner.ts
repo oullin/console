@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderSpinnerFrame } from '#tui/status/spinner/render';
+import { hideCursor, showCursor } from '#tui/terminal';
 import type { MaybePromise, StatusOptions } from '#tui/types';
 
 export function spin<T>(callback: () => MaybePromise<T>, options?: StatusOptions): Promise<T>;
@@ -16,7 +17,12 @@ export async function spin<T>(callbackOrMessage: (() => MaybePromise<T>) | strin
 
 	const message = typeof options === 'function' ? 'Loading' : options.message;
 
+	hideCursor();
 	promptEnvironment().output.write(renderSpinnerFrame(message));
 
-	return callback();
+	try {
+		return await callback();
+	} finally {
+		showCursor();
+	}
 }

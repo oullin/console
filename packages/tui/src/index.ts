@@ -28,7 +28,7 @@ export {
 export type { NotificationCommand, NotificationRuntime } from '#tui/output';
 export { PromptValidationError } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
-export { backgroundColor, clearTerminal, cursorToStart, eraseLine, foregroundColor, setTerminalTitle, supportsTrueColor, terminalSize } from '#tui/terminal';
+export { backgroundColor, clearTerminal, cursorToStart, eraseLine, foregroundColor, hideCursor, setTerminalTitle, showCursor, supportsTrueColor, terminalSize } from '#tui/terminal';
 export { applyTypedKey, readTypedValue } from '#tui/typed-value';
 export { parseAnsiText, truncate, visibleWidth, wrap } from '#tui/strings';
 export type {

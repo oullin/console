@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Logger } from '#tui/status/task/logger';
 import { renderTaskFrame } from '#tui/status/task/render';
+import { hideCursor, showCursor } from '#tui/terminal';
 import type { MaybePromise } from '#tui/types';
 
 export type TaskDefinition<T> = {
@@ -31,6 +32,7 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 	const output = promptEnvironment().output;
 
+	hideCursor();
 	output.write(
 		renderTaskFrame({
 			label: logger.labelValue,
@@ -69,5 +71,7 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 		);
 
 		throw error;
+	} finally {
+		showCursor();
 	}
 }

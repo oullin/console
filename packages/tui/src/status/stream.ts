@@ -2,11 +2,16 @@ import { promptEnvironment } from '#tui/environment';
 import { StreamBuffer } from '#tui/status/stream/buffer';
 import { streamFadeStyles } from '#tui/status/stream/fade';
 import { renderStreamFrame, streamLines } from '#tui/status/stream/render';
+import { hideCursor, showCursor } from '#tui/terminal';
 
 export class Stream {
 	#closed = false;
 	readonly #buffer = new StreamBuffer(10);
 	readonly #fadeStyles = streamFadeStyles();
+
+	constructor() {
+		hideCursor();
+	}
 
 	write(content: string): this {
 		return this.append(content);
@@ -24,11 +29,16 @@ export class Stream {
 	}
 
 	close(): void {
+		if (this.#closed) {
+			return;
+		}
+
 		while (this.#buffer.flushNext()) {
 			this.render();
 		}
 
 		this.#closed = true;
+		showCursor();
 	}
 
 	closed(): boolean {
