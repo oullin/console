@@ -1,10 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key, oneOf } from '#tui/key';
+import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
-import { firstEnabledIndex, nextEnabledIndex } from '#tui/concerns/choices';
+import { firstEnabledIndex } from '#tui/concerns/choices';
+import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { choicesFromCommaSeparated, markedChoiceIndexes, markedChoiceValues, toggleAllEnabledChoices, toggleMarkedChoice } from '#tui/prompts/select/multiple';
-import { lastEnabledChoiceIndex, nextChoiceKeys, pageEnabledChoiceIndex, parseChoiceIndex, previousChoiceKeys } from '#tui/prompts/select/navigation';
+import { parseChoiceIndex } from '#tui/prompts/select/navigation';
 import { renderMultipleChoices } from '#tui/prompts/select/render';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
@@ -64,38 +65,10 @@ export const readMultipleChoices = async <T>(
 			continue;
 		}
 
-		if (nextChoiceKeys(key)) {
-			selected = nextEnabledIndex(choices, selected, 1);
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
-			continue;
-		}
+		const action = selectNavigationAction(key);
 
-		if (previousChoiceKeys(key)) {
-			selected = nextEnabledIndex(choices, selected, -1);
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
-			continue;
-		}
-
-		if (key === Key.pageDown) {
-			selected = pageEnabledChoiceIndex(choices, selected, 1, scroll);
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
-			continue;
-		}
-
-		if (key === Key.pageUp) {
-			selected = pageEnabledChoiceIndex(choices, selected, -1, scroll);
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
-			continue;
-		}
-
-		if (oneOf([Key.home], key)) {
-			selected = firstEnabledIndex(choices);
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
-			continue;
-		}
-
-		if (oneOf([Key.end], key)) {
-			selected = lastEnabledChoiceIndex(choices);
+		if (action !== null) {
+			selected = moveSelectHighlight(choices, selected, action, scroll);
 			renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;
 		}

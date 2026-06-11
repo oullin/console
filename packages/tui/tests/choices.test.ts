@@ -576,6 +576,22 @@ describe('choice prompts', () => {
 		expect(result).toEqual(['third', 'first']);
 	});
 
+	it('supports control-key multiselect navigation', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlN, Key.ctrlN, Key.ctrlP, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second', 'third'] }),
+		);
+
+		expect(result).toEqual(['second']);
+	});
+
 	it('ignores end-of-line control navigation for multiselect prompts', async () => {
 		const output = createMemoryOutput();
 
