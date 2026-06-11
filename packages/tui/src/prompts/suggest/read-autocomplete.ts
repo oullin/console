@@ -2,7 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
-import { renderSuggestions } from '#tui/prompts/suggest/render';
+import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
@@ -21,7 +21,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	renderSuggestions(options.message, state.value, matches, matches.length > 0 ? highlighted : null, options.scroll, options.info);
+	renderAutocomplete(options.message, state.value, matches, highlighted);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -34,7 +34,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted - 1 + matches.length) % matches.length;
-			renderSuggestions(options.message, state.value, matches, matches.length > 0 ? highlighted : null, options.scroll, options.info);
+			renderAutocomplete(options.message, state.value, matches, highlighted);
 			continue;
 		}
 
@@ -42,7 +42,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted + 1) % matches.length;
-			renderSuggestions(options.message, state.value, matches, matches.length > 0 ? highlighted : null, options.scroll, options.info);
+			renderAutocomplete(options.message, state.value, matches, highlighted);
 			continue;
 		}
 
@@ -59,7 +59,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 				highlighted = 0;
 			}
 
-			renderSuggestions(options.message, state.value, matches, matches.length > 0 ? highlighted : null, options.scroll, options.info);
+			renderAutocomplete(options.message, state.value, matches, highlighted);
 			continue;
 		}
 
@@ -80,6 +80,6 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderSuggestions(options.message, state.value, matches, matches.length > 0 ? highlighted : null, options.scroll, options.info);
+		renderAutocomplete(options.message, state.value, matches, highlighted);
 	}
 };

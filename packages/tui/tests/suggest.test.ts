@@ -93,6 +93,23 @@ describe('suggest prompt', () => {
 });
 
 describe('autocomplete prompt', () => {
+	it('renders autocomplete ghost text without a suggestion list', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue']),
+		);
+
+		expect(output.text()).toContain('Favorite color? blue');
+		expect(output.text()).not.toContain('›');
+	});
+
 	it('accepts ghost completion with tab', async () => {
 		const output = createMemoryOutput();
 
