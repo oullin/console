@@ -1,11 +1,11 @@
 # Upstream Parity Map
 
-Target upstream: `laravel/prompts@v0.3.18`
+Target upstream release: `v0.3.18`
 
 Tree: `a19af51bb144bf87f08397921fa619f85c7d4e72`
 
-This port keeps Laravel Prompts behavior as the source of truth while using
-idiomatic TypeScript and OpenTUI internals.
+This port keeps upstream behavior as the source of truth while using idiomatic
+TypeScript and OpenTUI internals.
 
 ## Implemented In Phase 1
 

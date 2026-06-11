@@ -3,15 +3,15 @@ import { parseAnsiText, truncate, visibleWidth, wrap } from '../src/index';
 
 describe('string utilities', () => {
   it('measures visible width without ANSI control sequences', () => {
-    expect(visibleWidth('\u001B[31mLaravel\u001B[39m')).toBe(7);
+    expect(visibleWidth('\u001B[31mPrompts\u001B[39m')).toBe(7);
   });
 
   it('truncates by visible width', () => {
-    expect(truncate('Laravel Prompts', 10)).toBe('Laravel...');
+    expect(truncate('Ollin Prompts', 10)).toBe('Ollin P...');
   });
 
   it('wraps words to the requested width', () => {
-    expect(wrap('Laravel Prompts', 7)).toEqual(['Laravel', 'Prompts']);
+    expect(wrap('Ollin Prompts', 7)).toEqual(['Ollin', 'Prompts']);
   });
 
   it('strips ANSI text', () => {

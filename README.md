@@ -1,9 +1,9 @@
 # `@ollin/tui`
 
-An idiomatic TypeScript/OpenTUI port of `laravel/prompts`.
+An idiomatic TypeScript/OpenTUI prompt toolkit.
 
-This repository targets behavioral parity with `laravel/prompts@v0.3.18` while
-using TypeScript-first modules and package boundaries.
+This repository targets behavioral parity with the upstream prompt toolkit
+release `v0.3.18` while using TypeScript-first modules and package boundaries.
 
 ## Status
 

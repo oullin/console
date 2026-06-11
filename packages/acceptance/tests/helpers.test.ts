@@ -36,7 +36,7 @@ const scripted = async <T>(lines: string[], callback: () => Promise<T>): Promise
   return { output: output.text(), result };
 };
 
-describe('Laravel-style helpers', () => {
+describe('prompt helpers', () => {
   it('reads text and number prompts', async () => {
     await expect(scripted(['Tay', 'lor', '\n'], () => text('Name'))).resolves.toMatchObject({ result: 'Taylor' });
     await expect(scripted(['4', '2', '\n'], () => number({ message: 'Age', integer: true }))).resolves.toMatchObject({ result: 42 });
@@ -49,7 +49,7 @@ describe('Laravel-style helpers', () => {
       scripted(['2'], () =>
         select({
           message: 'Framework',
-          options: ['Laravel', 'Vue']
+          options: ['Ollin', 'Vue']
         })
       )
     ).resolves.toMatchObject({ result: 'Vue' });
@@ -84,7 +84,7 @@ describe('Laravel-style helpers', () => {
       info('Facts');
       intro('Start');
       outro('Done');
-      table({ headers: ['Name'], rows: [['Laravel']] });
+      table({ headers: ['Name'], rows: [['Ollin']] });
       title('Demo');
     });
 

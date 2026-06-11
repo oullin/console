@@ -2,7 +2,7 @@ MIT License
 
 Copyright (c) 2026 Oullin
 
-Portions of this package are derived from Laravel Prompts, Copyright (c) Taylor Otwell.
+Portions of this package are derived from upstream MIT-licensed prompt toolkit code, Copyright (c) Taylor Otwell.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
