@@ -356,6 +356,27 @@ describe('data table prompt', () => {
 		expect(endHomeResult).toBe(0);
 	});
 
+	it('supports tab and reverse-tab data table navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.tab, Key.tab, Key.shiftTab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third']],
+				}),
+		);
+
+		expect(result).toBe(1);
+	});
+
 	it('normalizes fractional scroll sizes for data table page navigation', async () => {
 		const output = createMemoryOutput();
 

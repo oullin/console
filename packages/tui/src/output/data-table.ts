@@ -190,13 +190,13 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				continue;
 			}
 
-			if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
+			if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
 				selected = rows.length === 0 ? 0 : (selected + 1) % rows.length;
 				render();
 				continue;
 			}
 
-			if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+			if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 				selected = rows.length === 0 ? 0 : (selected - 1 + rows.length) % rows.length;
 				render();
 				continue;
