@@ -1,39 +1,33 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { platform } from 'node:process';
 import { note } from '#tui/output/notes';
+import { notificationCommands } from '#tui/output/notify/commands';
+import type { NotificationCommand } from '#tui/output/notify/commands';
 
-export type NotificationCommand = {
-	args: string[];
-	bin: string;
+export type { NotificationCommand };
+export { notificationCommands };
+
+const commandExists = (bin: string): boolean => {
+	const result = spawnSync('command', ['-v', bin], { shell: true, stdio: 'ignore' });
+
+	return result.status === 0;
+};
+
+const availableNotificationCommand = (targetPlatform: NodeJS.Platform, commands: NotificationCommand[]): NotificationCommand | null => {
+	if (targetPlatform !== 'linux') {
+		return commands.at(0) ?? null;
+	}
+
+	return commands.find((command) => commandExists(command.bin)) ?? null;
 };
 
 export const notificationCommand = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = ''): NotificationCommand | null => {
-	if (targetPlatform === 'darwin') {
-		const script = [
-			'display notification',
-			JSON.stringify(body),
-			'with title',
-			JSON.stringify(title),
-			subtitle ? `subtitle ${JSON.stringify(subtitle)}` : '',
-			sound ? `sound name ${JSON.stringify(sound)}` : '',
-		]
-			.filter(Boolean)
-			.join(' ');
-
-		return { args: ['-e', script], bin: 'osascript' };
-	}
-
-	if (targetPlatform === 'linux') {
-		const args = icon ? ['--icon', icon, title, body] : [title, body];
-
-		return { args, bin: 'notify-send' };
-	}
-
-	return null;
+	return notificationCommands(targetPlatform, { body, icon, sound, subtitle, title }).at(0) ?? null;
 };
 
 export const notifyForPlatform = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
-	const command = notificationCommand(targetPlatform, title, body, subtitle, sound, icon);
+	const commands = notificationCommands(targetPlatform, { body, icon, sound, subtitle, title });
+	const command = availableNotificationCommand(targetPlatform, commands);
 
 	if (command) {
 		spawn(command.bin, command.args, { detached: true, stdio: 'ignore' }).unref();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, notificationCommand, notifyForPlatform, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, notificationCommand, notificationCommands, notifyForPlatform, withPromptEnvironment } from '#tui/index';
 
 describe('notify helper', () => {
 	it('builds macOS notification commands', () => {
@@ -19,10 +19,28 @@ describe('notify helper', () => {
 			bin: 'notify-send',
 		});
 
+		expect(notificationCommand('linux', 'Deploy')).toEqual({
+			args: ['Deploy'],
+			bin: 'notify-send',
+		});
+
 		expect(notificationCommand('linux', 'Deploy', 'Done', '', '', '/tmp/icon.png')).toEqual({
 			args: ['--icon', '/tmp/icon.png', 'Deploy', 'Done'],
 			bin: 'notify-send',
 		});
+	});
+
+	it('builds Linux fallback notification commands in availability order', () => {
+		expect(notificationCommands('linux', { title: 'Deploy', body: 'Done' })).toEqual([
+			{
+				args: ['Deploy', 'Done'],
+				bin: 'notify-send',
+			},
+			{
+				args: ['--passivepopup', 'Deploy: Done', '5', '--title', 'Deploy'],
+				bin: 'kdialog',
+			},
+		]);
 	});
 
 	it('falls back to note output on unsupported platforms', async () => {
