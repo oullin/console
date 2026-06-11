@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/progress';
 import { renderProgressFrame } from '#tui/status/progress/render';
+import { runProgressSteps } from '#tui/status/progress/run';
 import { progressValues } from '#tui/status/progress/steps';
 import type { MaybePromise } from '#tui/types';
 
@@ -86,19 +87,5 @@ export function progress<T, R>(
 		return bar;
 	}
 
-	return (async () => {
-		const results: R[] = [];
-
-		bar.start();
-
-		for (const value of values) {
-			results.push(await callback(value, bar));
-
-			bar.advance();
-		}
-
-		bar.finish();
-
-		return results;
-	})();
+	return runProgressSteps(bar, values, callback);
 }

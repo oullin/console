@@ -14,6 +14,16 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('2 / 2');
 	});
 
+	it('passes the current count to progress callbacks before advancing', async () => {
+		const output = createMemoryOutput();
+
+		const counts = await withPromptEnvironment({ output, error: output }, async () => {
+			return progress('Adding States', ['Alabama', 'Alaska'], (_state, bar) => bar.current());
+		});
+
+		expect(counts).toEqual([0, 1]);
+	});
+
 	it('supports manual progress updates with label and hint changes', async () => {
 		const output = createMemoryOutput();
 
