@@ -144,11 +144,11 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 		return { cursor: Math.min(value.length, cursor + 1), value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
-	if (allowNewLine && (key === Key.up || key === Key.upArrow || key === Key.ctrlP)) {
+	if (allowNewLine && (key === Key.up || key === Key.upArrow)) {
 		return { cursor: moveLine(value, cursor, -1), value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
-	if (allowNewLine && (key === Key.down || key === Key.downArrow || key === Key.ctrlN)) {
+	if (allowNewLine && (key === Key.down || key === Key.downArrow)) {
 		return { cursor: moveLine(value, cursor, 1), value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
