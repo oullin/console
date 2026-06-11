@@ -28,11 +28,11 @@ const applyMultiline = (keys: string[]): { submitted: boolean; value: string } =
 	return { submitted, value: state.value };
 };
 
-const applyMultilineState = (value: string, cursor: number, keys: string[]): { cursor: number; value: string } => {
+const applyMultilineState = (value: string, cursor: number, keys: string[], wrapWidth?: number): { cursor: number; value: string } => {
 	let state = { cursor, value };
 
 	for (const key of keys) {
-		const next = applyTypedKey(state, key, true);
+		const next = applyTypedKey(state, key, true, wrapWidth);
 
 		state = { cursor: next.cursor, value: next.value };
 	}
@@ -129,6 +129,23 @@ describe('typed value editing', () => {
 		expect(applyMultilineState('abc\nde\nfghi', 2, [Key.ctrlN])).toEqual({
 			cursor: 6,
 			value: 'abc\nde\nfghi',
+		});
+	});
+
+	it('moves the textarea cursor between wrapped rows', () => {
+		expect(applyMultilineState('abcdefghijkl', 7, [Key.up], 5)).toEqual({
+			cursor: 2,
+			value: 'abcdefghijkl',
+		});
+
+		expect(applyMultilineState('abcdefghijkl', 2, [Key.down], 5)).toEqual({
+			cursor: 7,
+			value: 'abcdefghijkl',
+		});
+
+		expect(applyMultilineState('abcdefghijkl', 11, [Key.up], 5)).toEqual({
+			cursor: 6,
+			value: 'abcdefghijkl',
 		});
 	});
 

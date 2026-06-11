@@ -103,6 +103,22 @@ describe('textarea prompt', () => {
 		expect(latestFrame).not.toContain(`│ ${longLine}`);
 	});
 
+	it('moves the textarea cursor across wrapped rows before editing', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', Key.up, '!', Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description', '', '', false, undefined, '', 2),
+		);
+
+		expect(result).toBe('ab!cdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+	});
+
 	it('uses control navigation keys to move between textarea lines', async () => {
 		const output = createMemoryOutput();
 

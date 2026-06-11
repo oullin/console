@@ -89,8 +89,8 @@ export const visibleLineWindow = (value: string, cursor: number, rows: number | 
 	};
 };
 
-export const moveLine = (value: string[], cursor: number, direction: 1 | -1): number => {
-	const ranges = lineRanges(value);
+export const moveLine = (value: string[], cursor: number, direction: 1 | -1, width?: number): number => {
+	const ranges = lineRanges(value, width);
 	const index = currentLine(ranges, cursor);
 	const range = ranges[index];
 

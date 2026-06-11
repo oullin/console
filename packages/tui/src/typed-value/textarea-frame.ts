@@ -2,9 +2,8 @@ import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { renderBox } from '#tui/theme/box';
 import { dim } from '#tui/theme/styles';
 import { visibleLineWindow } from '#tui/typed-value/lines';
+import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
-
-const TEXTAREA_CONTENT_WIDTH = 60;
 
 export const renderTextareaFrame = (message: string, state: TypedValueState, options: TypedValueOptions): string => {
 	return renderBox({ body: textareaBody(state, options), title: message });

@@ -6,7 +6,7 @@ import { moveTypedValueCursor } from '#tui/typed-value/edit/navigation';
 import { typedKeyResult } from '#tui/typed-value/edit/result';
 import type { AppliedTypedKey, TypedValueState } from '#tui/typed-value/types';
 
-export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false): AppliedTypedKey => {
+export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false, wrapWidth?: number): AppliedTypedKey => {
 	const value = characters(state.value);
 
 	let cursor = Math.max(0, Math.min(value.length, state.cursor));
@@ -30,7 +30,7 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 		return typedKeyResult(value, cursor);
 	}
 
-	const moved = moveTypedValueCursor(value, cursor, key, allowNewLine);
+	const moved = moveTypedValueCursor(value, cursor, key, allowNewLine, wrapWidth);
 
 	if (moved !== undefined) {
 		return typedKeyResult(value, moved);

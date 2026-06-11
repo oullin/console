@@ -3,6 +3,7 @@ import { PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey, initialTypedValueState } from '#tui/typed-value/edit';
 import { renderTypedValue } from '#tui/typed-value/render';
+import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
 export { applyTypedKey };
@@ -32,7 +33,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 			return state.value;
 		}
 
-		const next = applyTypedKey(state, key, options.allowNewLine);
+		const next = applyTypedKey(state, key, options.allowNewLine, options.allowNewLine ? TEXTAREA_CONTENT_WIDTH : undefined);
 
 		if (next.cancelled) {
 			environment.error.write('Cancelled.\n');
