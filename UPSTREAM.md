@@ -20,6 +20,7 @@ TypeScript and OpenTUI internals.
 | Textarea control-key line navigation and empty-line movement | `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea boxed renderer and placeholder styling | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea scrollbar rendering | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts` |
+| Textarea wrapped frame line windows | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts`, `packages/tui/tests/typed-value.test.ts` |
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
@@ -75,7 +76,7 @@ later phases:
 
 - Form builder remaining method-surface and validation parity
 - Prompt lifecycle
-- Textarea wrapping and cursor parity
+- Textarea wrapped-line cursor parity
 - Default theme
 - Feature parity tests
 

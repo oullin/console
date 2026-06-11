@@ -4,6 +4,8 @@ import { dim } from '#tui/theme/styles';
 import { visibleLineWindow } from '#tui/typed-value/lines';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
+const TEXTAREA_CONTENT_WIDTH = 60;
+
 export const renderTextareaFrame = (message: string, state: TypedValueState, options: TypedValueOptions): string => {
 	return renderBox({ body: textareaBody(state, options), title: message });
 };
@@ -15,7 +17,7 @@ const textareaBody = (state: TypedValueState, options: TypedValueOptions): strin
 		return placeholderBody(options, rows);
 	}
 
-	const window = visibleLineWindow(state.value, state.cursor, rows);
+	const window = visibleLineWindow(state.value, state.cursor, rows, TEXTAREA_CONTENT_WIDTH);
 
 	if (rows === undefined) {
 		return window.lines.join('\n');

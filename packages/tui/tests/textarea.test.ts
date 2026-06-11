@@ -81,6 +81,28 @@ describe('textarea prompt', () => {
 		expect(output.text()).toContain('\u001B[2mUse full sentences.\u001B[22m');
 	});
 
+	it('wraps long textarea lines inside the frame', async () => {
+		const output = createMemoryOutput();
+		const longLine = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		const firstWrappedLine = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567';
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([longLine, Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description', '', '', false, undefined, '', 2),
+		);
+
+		const latestFrame = output.text().split('┌ Description ').at(-1) ?? '';
+
+		expect(latestFrame).toContain(`│ ${firstWrappedLine}`);
+		expect(latestFrame).toContain('│ 89');
+		expect(latestFrame).not.toContain(`│ ${longLine}`);
+	});
+
 	it('uses control navigation keys to move between textarea lines', async () => {
 		const output = createMemoryOutput();
 

@@ -163,4 +163,12 @@ describe('typed value editing', () => {
 			total: 3,
 		});
 	});
+
+	it('reports wrapped textarea line windows', () => {
+		expect(visibleLineWindow('abcdefghijkl', 12, 2, 5)).toEqual({
+			lines: ['fghij', 'kl'],
+			start: 1,
+			total: 3,
+		});
+	});
 });
