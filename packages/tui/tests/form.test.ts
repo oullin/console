@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confirm, createMemoryOutput, createScriptedInput, form, Key, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, text, withPromptEnvironment } from '#tui/index';
 
 describe('form builder', () => {
 	it('runs chained steps and returns positional responses', async () => {
@@ -167,6 +167,77 @@ describe('form builder', () => {
 		expect(responses[0]).toBe('C');
 		expect(responses.note).toBeNull();
 		expect(responses[2]).toBe('D');
+	});
+
+	it('will not skip over the first step when reverting', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlU, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().info('This should not be skipped').confirm('Are you sure?').submit(),
+		);
+
+		expect(responses[0]).toBeNull();
+		expect(responses[1]).toBe(true);
+	});
+
+	it('stops custom step execution at the moment of reverting', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['2', '7', Key.enter, Key.down, Key.ctrlU, Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.text('Age')
+					.add(async () => {
+						const confirmed = await confirm('Are you sure?');
+
+						if (!confirmed) {
+							outro('This should not appear!');
+						}
+					})
+					.submit(),
+		);
+
+		expect(output.text()).not.toContain('This should not appear!');
+	});
+
+	it('re-evaluates conditional steps after reverting prior responses', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', 'd', 'a', Key.enter, Key.down, Key.enter, Key.ctrlU, Key.up, Key.enter, '1', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.text('Name')
+					.select('Runtime', ['TS', 'JS'])
+					.addIf(
+						(values) => values[1] === 'TS',
+						() => text('Version'),
+					)
+					.confirm('Are you sure?')
+					.submit(),
+		);
+
+		expect(responses[0]).toBe('Ada');
+		expect(responses[1]).toBe('TS');
+		expect(responses[2]).toBe('1');
+		expect(responses[3]).toBe(true);
 	});
 
 	it('does not revert the first form step', async () => {

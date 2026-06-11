@@ -50,6 +50,8 @@ TypeScript and OpenTUI internals.
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
+| Form builder nested prompt revert short-circuiting | `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder first-step and conditional revert feature coverage | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
 | Notification command construction, executable discovery, and process result reporting | `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*` |
