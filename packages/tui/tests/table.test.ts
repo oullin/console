@@ -376,6 +376,64 @@ describe('data table prompt', () => {
 		expect(activeFrame).toContain('|   | Bob   | Designer  |');
 	});
 
+	it('keeps highlighted multiline data table rows fully visible', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name', 'Role'],
+					rows: [
+						['Alice', 'Designer'],
+						['Bob', 'CEO\nCTO\nDeveloper'],
+						['Charlie', 'Designer'],
+					],
+					scroll: 5,
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+
+		expect(result).toBe(1);
+		expect(activeFrame).toContain('CEO');
+		expect(activeFrame).toContain('CTO');
+		expect(activeFrame).toContain('Developer');
+	});
+
+	it('maintains fixed data table visual height', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['Alice'], ['Bob']],
+					scroll: 5,
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+		const tableLines = activeFrame.split('\n').filter((line) => line.startsWith('|'));
+
+		expect(result).toBe(0);
+		expect(tableLines).toHaveLength(7);
+		expect(tableLines.slice(2)).toHaveLength(5);
+	});
+
 	it('renders data table rows without headers', async () => {
 		const output = createMemoryOutput();
 

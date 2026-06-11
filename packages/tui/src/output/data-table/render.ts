@@ -4,6 +4,7 @@ import { expandMultilineDataTableRows } from '#tui/output/data-table/multiline';
 import { dataTableRowCells } from '#tui/output/data-table/rows';
 import { renderScrollableDataTable } from '#tui/output/data-table/scrollbar';
 import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
+import { fixedVisualDataTableRows } from '#tui/output/data-table/visual-window';
 import { dim, red, strikethrough } from '#tui/theme/styles';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
@@ -39,9 +40,9 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 		return [index === selected ? '›' : ' ', ...dataTableRowCells(options.headers, row)];
 	});
 
-	environment.output.write(
-		`${renderScrollableDataTable(renderHeaders(options.headers), expandMultilineDataTableRows(renderedRows), window.start, window.end - window.start, options.rows.length)}\n`,
-	);
+	const visualRows = fixedVisualDataTableRows(expandMultilineDataTableRows(renderedRows), options.scroll);
+
+	environment.output.write(`${renderScrollableDataTable(renderHeaders(options.headers), visualRows, window.start, window.end - window.start, options.rows.length)}\n`);
 
 	if (window.end - window.start < options.rows.length) {
 		const suffix = options.query.length > 0 ? ' results' : '';
