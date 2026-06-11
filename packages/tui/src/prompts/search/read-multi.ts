@@ -1,10 +1,10 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key, oneOf } from '#tui/key';
+import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
+import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
 import { resolveLineMultiSearchChoices } from '#tui/prompts/search/line-mode';
-import { firstSearchHighlight, lastSearchHighlight, nextSearchHighlight, pageSearchHighlight } from '#tui/prompts/search/navigation';
 import { renderSearchChoices } from '#tui/prompts/search/render';
 import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoice, toggleSearchChoices } from '#tui/prompts/search/selection';
 import type { MultiSearchPromptOptions } from '#tui/types';
@@ -49,54 +49,14 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 			return [...selected.keys()];
 		}
 
-		if (key === Key.down || key === Key.downArrow || key === Key.tab) {
+		const action = searchNavigationAction(key);
+
+		if (action !== null && (action !== 'first' || highlighted !== null) && (action !== 'last' || highlighted !== null)) {
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			const currentChoices = displayedChoices();
 
-			highlighted = nextSearchHighlight(currentChoices, highlighted, 1);
-			render();
-			continue;
-		}
-
-		if (key === Key.up || key === Key.upArrow || key === Key.shiftTab) {
-			choices = await resolveSearchChoices(options.options, state.value);
-
-			const currentChoices = displayedChoices();
-
-			highlighted = nextSearchHighlight(currentChoices, highlighted, -1);
-			render();
-			continue;
-		}
-
-		if (key === Key.pageDown) {
-			choices = await resolveSearchChoices(options.options, state.value);
-
-			const currentChoices = displayedChoices();
-
-			highlighted = pageSearchHighlight(currentChoices, highlighted, 1, options.scroll);
-			render();
-			continue;
-		}
-
-		if (key === Key.pageUp) {
-			choices = await resolveSearchChoices(options.options, state.value);
-
-			const currentChoices = displayedChoices();
-
-			highlighted = pageSearchHighlight(currentChoices, highlighted, -1, options.scroll);
-			render();
-			continue;
-		}
-
-		if (oneOf([Key.home], key) && highlighted !== null) {
-			highlighted = firstSearchHighlight(displayedChoices());
-			render();
-			continue;
-		}
-
-		if (oneOf([Key.end], key) && highlighted !== null) {
-			highlighted = lastSearchHighlight(displayedChoices());
+			highlighted = moveSearchHighlight(currentChoices, highlighted, action, { scroll: options.scroll });
 			render();
 			continue;
 		}

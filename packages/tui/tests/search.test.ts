@@ -555,6 +555,22 @@ describe('multisearch prompt', () => {
 		expect(output.text()).not.toContain('Selected: Green');
 	});
 
+	it('supports tab and reverse-tab multisearch navigation', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.tab, Key.tab, Key.shiftTab, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual(['red']);
+	});
+
 	it('keeps selected multisearch values visible after clearing the query', async () => {
 		const output = createMemoryOutput();
 
