@@ -13,16 +13,25 @@ export const renderSearchChoices = <T>(
 	selectedLabels: string[] = [],
 	scroll?: number,
 	info?: SearchPromptOptions<T>['info'] | MultiSearchPromptOptions<T>['info'],
+	showSelectedSummary = false,
 ): void => {
 	renderInteractiveChoices(searchMessage(message, query), choices, highlighted ?? 0, marked, scroll);
 
 	const text = resolveInfo(info, highlighted === null ? null : (choices[highlighted]?.value ?? null));
+	const summary = showSelectedSummary ? selectedSummary(selectedLabels.length, selectedLabels.length - marked.size) : '';
+	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
 
-	if (text.length > 0) {
-		promptEnvironment().output.write(`${text}\n`);
+	if (details.length > 0) {
+		promptEnvironment().output.write(`${details}\n`);
 	}
 
 	if (selectedLabels.length > 0) {
 		promptEnvironment().output.write(`Selected: ${selectedLabels.join(', ')}\n`);
 	}
+};
+
+const selectedSummary = (selectedCount: number, hiddenCount: number): string => {
+	const hidden = hiddenCount > 0 ? ` (${hiddenCount} hidden)` : '';
+
+	return `${selectedCount} selected${hidden}`;
 };

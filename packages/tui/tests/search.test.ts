@@ -162,6 +162,29 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('Selected: Violet, Green');
 	});
 
+	it('starts multisearch prompts with default selected values', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: colors,
+					default: ['green'],
+				}),
+		);
+
+		expect(result).toEqual(['green']);
+		expect(output.text()).toContain('1 selected');
+		expect(output.text()).toContain('Selected: Green');
+	});
+
 	it('renders multisearch info for the highlighted result', async () => {
 		const output = createMemoryOutput();
 
@@ -176,6 +199,23 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(output.text()).toContain('About red');
+		expect(output.text()).toContain('0 selected');
+	});
+
+	it('renders hidden selected counts when multisearch results are filtered', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.space, 'B', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(output.text()).toContain('1 selected (1 hidden)');
 	});
 
 	it('toggles all current multisearch results with ctrl-a', async () => {

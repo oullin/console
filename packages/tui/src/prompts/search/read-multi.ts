@@ -39,7 +39,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 
 	let highlighted: number | null = null;
 
-	const selected = new Map<T, string>();
+	const selected = initialSelectedValues(choices, options.default);
 
 	const displayedChoices = (): Array<Choice<T>> => {
 		if (state.value.trim() !== '') {
@@ -57,7 +57,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const currentChoices = displayedChoices();
 		const marked = new Set(currentChoices.flatMap((choice, index) => (selected.has(choice.value) ? [index] : [])));
 
-		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info);
+		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info, true);
 	};
 
 	render();
@@ -154,4 +154,16 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		highlighted = null;
 		render();
 	}
+};
+
+const initialSelectedValues = <T>(choices: Array<Choice<T>>, defaults: T[] = []): Map<T, string> => {
+	const selected = new Map<T, string>();
+
+	for (const value of defaults) {
+		const choice = choices.find((candidate) => Object.is(candidate.value, value));
+
+		selected.set(value, choice?.label ?? String(value));
+	}
+
+	return selected;
 };
