@@ -38,6 +38,36 @@ describe('choice prompts', () => {
     expect(latestFrame).toContain('fourth');
   });
 
+  it('supports alternate select navigation keys', async () => {
+    const output = createMemoryOutput();
+    const result = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.tab, 'l', Key.right, 'h', Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => select({ message: 'Pick one', options: ['first', 'second', 'third'] })
+    );
+
+    expect(result).toBe('third');
+  });
+
+  it('supports home and end select navigation keys', async () => {
+    const output = createMemoryOutput();
+    const result = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.end[0], Key.home[0], Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => select({ message: 'Pick one', options: ['first', 'second', 'third'] })
+    );
+
+    expect(result).toBe('first');
+  });
+
   it('toggles multiselect choices with the space bar', async () => {
     const output = createMemoryOutput();
     const result = await withPromptEnvironment(
@@ -69,5 +99,21 @@ describe('choice prompts', () => {
 
     expect(result).toEqual(['first']);
     expect(output.text()).toContain('A value is required.');
+  });
+
+  it('toggles all multiselect choices with ctrl-a', async () => {
+    const output = createMemoryOutput();
+    const result = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.ctrlA, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => multiselect({ message: 'Pick many', options: ['first', 'second', 'third'] })
+    );
+
+    expect(result).toEqual(['first', 'second', 'third']);
+    expect(output.text()).toContain('Selected: first, second, third');
   });
 });

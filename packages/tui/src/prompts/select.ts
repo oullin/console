@@ -1,11 +1,35 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key } from '#tui/key';
+import { Key, oneOf } from '#tui/key';
 import { ask, promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex, nextEnabledIndex, normalizeChoices, renderInteractiveChoices } from '#tui/concerns/choices';
 import type { Choice, ConfirmPromptOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 const parseChoiceIndex = (key: string): number => (/^\d+$/u.test(key) ? Number.parseInt(key, 10) : Number.NaN);
+
+const previousChoiceKeys = (key: string): boolean => {
+  return key === Key.up
+    || key === Key.upArrow
+    || key === Key.left
+    || key === Key.leftArrow
+    || key === Key.shiftTab
+    || key === Key.ctrlP
+    || key === Key.ctrlB
+    || key === 'k'
+    || key === 'h';
+};
+
+const nextChoiceKeys = (key: string): boolean => {
+  return key === Key.down
+    || key === Key.downArrow
+    || key === Key.right
+    || key === Key.rightArrow
+    || key === Key.tab
+    || key === Key.ctrlN
+    || key === Key.ctrlF
+    || key === 'j'
+    || key === 'l';
+};
 
 const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>, hint?: string, scroll?: number): Promise<T> => {
   const environment = promptEnvironment();
@@ -38,14 +62,31 @@ const readSelectedChoice = async <T>(message: string, choices: Array<Choice<T>>,
       return choices[numeric - 1].value;
     }
 
-    if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
+    if (nextChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, 1);
       renderInteractiveChoices(message, choices, selected, new Set(), scroll);
       continue;
     }
 
-    if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+    if (previousChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, -1);
+      renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+      continue;
+    }
+
+    if (oneOf([Key.home, Key.ctrlA], key)) {
+      selected = firstEnabledIndex(choices);
+      renderInteractiveChoices(message, choices, selected, new Set(), scroll);
+      continue;
+    }
+
+    if (oneOf([Key.end, Key.ctrlE], key)) {
+      selected = choices.length - 1;
+
+      while (choices[selected]?.disabled && selected > 0) {
+        selected -= 1;
+      }
+
       renderInteractiveChoices(message, choices, selected, new Set(), scroll);
       continue;
     }
@@ -129,14 +170,48 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
       continue;
     }
 
-    if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
+    if (nextChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, 1);
       renderMultipleChoices(message, choices, selected, marked, scroll);
       continue;
     }
 
-    if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+    if (previousChoiceKeys(key)) {
       selected = nextEnabledIndex(choices, selected, -1);
+      renderMultipleChoices(message, choices, selected, marked, scroll);
+      continue;
+    }
+
+    if (oneOf([Key.home], key)) {
+      selected = firstEnabledIndex(choices);
+      renderMultipleChoices(message, choices, selected, marked, scroll);
+      continue;
+    }
+
+    if (oneOf([Key.end], key)) {
+      selected = choices.length - 1;
+
+      while (choices[selected]?.disabled && selected > 0) {
+        selected -= 1;
+      }
+
+      renderMultipleChoices(message, choices, selected, marked, scroll);
+      continue;
+    }
+
+    if (key === Key.ctrlA) {
+      if (marked.size === choices.filter((choice) => !choice.disabled).length) {
+        marked.clear();
+      } else {
+        marked.clear();
+
+        for (const [index, choice] of choices.entries()) {
+          if (!choice.disabled) {
+            marked.add(index);
+          }
+        }
+      }
+
       renderMultipleChoices(message, choices, selected, marked, scroll);
       continue;
     }
