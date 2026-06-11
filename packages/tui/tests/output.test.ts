@@ -30,4 +30,16 @@ describe('output helpers', () => {
 		expect(output.text()).toContain('| Name');
 		expect(output.text()).toContain('A  B');
 	});
+
+	it('keeps grid rendering finite for invalid widths', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			expect(grid(['A', 'B'], 0)).toBe(true);
+			expect(grid(['C', 'D'], -2)).toBe(true);
+		});
+
+		expect(output.text()).toContain('A\nB');
+		expect(output.text()).toContain('C\nD');
+	});
 });

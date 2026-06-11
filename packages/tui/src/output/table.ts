@@ -36,7 +36,7 @@ export const table = (headersOrOptions: TableOptions | string[] = [], rows: Tabl
 };
 
 export const grid = (items: Array<string | number | boolean> = [], maxWidth?: number): boolean => {
-	const width = maxWidth ?? 4;
+	const width = Math.max(1, maxWidth ?? 4);
 	const rows: string[][] = [];
 
 	for (let index = 0; index < items.length; index += width) {
