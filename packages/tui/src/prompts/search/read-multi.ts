@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderSearchChoices } from '#tui/prompts/search/render';
+import { renderSearchChoices, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
 import { lineMultiSearchValues, selectedSearchValues, toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
 import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
 import type { MultiSearchPromptOptions } from '#tui/types';
@@ -37,6 +37,8 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const key = await environment.input.readKey();
 
 		if (key === null || key === Key.enter) {
+			renderSubmittedSearchChoices(options.message, [...selected.values()]);
+
 			return selectedSearchValues(selected);
 		}
 

@@ -432,6 +432,9 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('\u001B[36m› ◼\u001B[39m Violet');
 		expect(output.text()).toContain('Selected: Violet');
 		expect(output.text()).toContain('Selected: Violet, Green');
+		expect(output.text()).toContain('┌ \u001B[2mFavorite colors?\u001B[22m ');
+		expect(output.text()).toContain('│ Violet');
+		expect(output.text()).toContain('│ Green');
 	});
 
 	it('starts multisearch prompts with default selected values', async () => {
@@ -455,6 +458,7 @@ describe('multisearch prompt', () => {
 		expect(result).toEqual(['green']);
 		expect(output.text()).toContain('1 selected');
 		expect(output.text()).toContain('Selected: Green');
+		expect(output.text()).toContain('│ Green');
 	});
 
 	it('returns selected defaults when multisearch input is exhausted', async () => {

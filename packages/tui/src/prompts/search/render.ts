@@ -41,6 +41,12 @@ export const renderSubmittedSearchChoice = (message: string, label: string): voi
 	promptEnvironment().output.write(`${renderBox({ body: label, title: dim(message) })}\n`);
 };
 
+export const renderSubmittedSearchChoices = (message: string, labels: string[]): void => {
+	const body = labels.length === 0 ? dim('None') : labels.join('\n');
+
+	promptEnvironment().output.write(`${renderBox({ body, title: dim(message) })}\n`);
+};
+
 const renderSearchRows = <T>(message: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): void => {
 	const environment = promptEnvironment();
 	const window = choiceWindow(choices.length, highlighted ?? 0, scroll);

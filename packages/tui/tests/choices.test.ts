@@ -411,6 +411,9 @@ describe('choice prompts', () => {
 		expect(result).toEqual(['first', 'second']);
 		expect(output.text()).toContain('Selected: first');
 		expect(output.text()).toContain('Selected: first, second');
+		expect(output.text()).toContain('┌ \u001B[2mPick many\u001B[22m ');
+		expect(output.text()).toContain('│ first');
+		expect(output.text()).toContain('│ second');
 	});
 
 	it('renders multiselect options as a checklist', async () => {
@@ -462,6 +465,7 @@ describe('choice prompts', () => {
 
 		expect(result).toEqual(['second']);
 		expect(output.text()).toContain('Selected: second');
+		expect(output.text()).toContain('│ second');
 	});
 
 	it('returns an empty array for non-interactive multiselect prompts without defaults', async () => {

@@ -26,12 +26,14 @@ TypeScript and OpenTUI internals.
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select checklist markers | `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active and selected row styling | `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/search/render.ts` |
@@ -65,8 +67,8 @@ The following reference areas still need full line-by-line behavioral mapping in
 later phases:
 
 - Form builder remaining method-surface and validation parity
-- Multi-search full rendering and selected-result summary parity
-- Multi-select boxed layout and submit/cancel frame parity
+- Multi-search boxed layout and cancel frame parity
+- Multi-select boxed layout and cancel frame parity
 - Prompt lifecycle
 - Search boxed layout and cancel frame parity
 - Textarea wrapping and cursor parity

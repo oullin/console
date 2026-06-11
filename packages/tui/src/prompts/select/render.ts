@@ -19,6 +19,12 @@ export const renderSubmittedChoice = (message: string, label: string): void => {
 	promptEnvironment().output.write(`${renderBox({ body: label, title: dim(message) })}\n`);
 };
 
+export const renderSubmittedChoices = (message: string, labels: string[]): void => {
+	const body = labels.length === 0 ? dim('None') : labels.join('\n');
+
+	promptEnvironment().output.write(`${renderBox({ body, title: dim(message) })}\n`);
+};
+
 export const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): void => {
 	renderInteractiveChecklist(message, choices, selected, marked, scroll);
 

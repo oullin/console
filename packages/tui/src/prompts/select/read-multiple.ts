@@ -6,8 +6,15 @@ import { firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { choicesFromCommaSeparated, markedChoiceIndexes, markedChoiceValues, toggleAllEnabledChoices, toggleMarkedChoice } from '#tui/prompts/select/multiple';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { renderMultipleChoices } from '#tui/prompts/select/render';
+import { renderMultipleChoices, renderSubmittedChoices } from '#tui/prompts/select/render';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
+
+const markedChoiceLabels = <T>(choices: Array<Choice<T>>, marked: Set<number>): string[] => {
+	return [...marked]
+		.sort((left, right) => left - right)
+		.map((index) => choices[index]?.label)
+		.filter((label): label is string => label !== undefined);
+};
 
 export const readMultipleChoices = async <T>(
 	message: string,
@@ -37,6 +44,8 @@ export const readMultipleChoices = async <T>(
 		const key = await environment.input.readKey();
 
 		if (key === null) {
+			renderSubmittedChoices(message, markedChoiceLabels(choices, marked));
+
 			return markedChoiceValues(choices, marked);
 		}
 
@@ -88,6 +97,8 @@ export const readMultipleChoices = async <T>(
 		}
 
 		if (key === Key.enter) {
+			renderSubmittedChoices(message, markedChoiceLabels(choices, marked));
+
 			return markedChoiceValues(choices, marked);
 		}
 	}
