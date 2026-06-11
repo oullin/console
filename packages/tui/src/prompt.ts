@@ -3,97 +3,96 @@ import { renderError, renderQuestion } from '#tui/theme';
 import type { BasePromptOptions, Validator } from '#tui/types';
 
 export class PromptValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'PromptValidationError';
-  }
+	constructor(message: string) {
+		super(message);
+		this.name = 'PromptValidationError';
+	}
 }
 
 export const validationMessage = async <T>(value: T, validator?: Validator<T>): Promise<string | undefined> => {
-  const result = await validator?.(value);
+	const result = await validator?.(value);
 
-  if (typeof result === 'string') {
-    return result;
-  }
+	if (typeof result === 'string') {
+		return result;
+	}
 
-  if (result === false) {
-    return 'The given value is invalid.';
-  }
+	if (result === false) {
+		return 'The given value is invalid.';
+	}
 
-  return undefined;
+	return undefined;
 };
 
 export const ensureRequired = <T>(value: T, required?: boolean | string): string | undefined => {
-  const empty = value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
+	const empty = value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
 
-  if (!empty || !required) {
-    return undefined;
-  }
+	if (!empty || !required) {
+		return undefined;
+	}
 
-  return typeof required === 'string' ? required : 'A value is required.';
+	return typeof required === 'string' ? required : 'A value is required.';
 };
 
-export const promptUntilValid = async <T>(
-  options: BasePromptOptions<T>,
-  read: (attempt: number) => Promise<T>
-): Promise<T> => {
-  const environment = promptEnvironment();
+export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: (attempt: number) => Promise<T>): Promise<T> => {
+	const environment = promptEnvironment();
 
-  if (!environment.interactive) {
-    const value = options.default as T;
-    const required = ensureRequired(value, options.required);
-    const validation = required ?? (await validationMessage(value, options.validate));
+	if (!environment.interactive) {
+		const value = options.default as T;
+		const required = ensureRequired(value, options.required);
 
-    if (validation) {
-      throw new PromptValidationError(validation);
-    }
+		const validation = required ?? (await validationMessage(value, options.validate));
 
-    return value;
-  }
+		if (validation) {
+			throw new PromptValidationError(validation);
+		}
 
-  let attempt = 0;
+		return value;
+	}
 
-  while (true) {
-    let value: T;
+	let attempt = 0;
 
-    try {
-      value = await read(attempt);
-    } catch (error) {
-      if (error instanceof PromptValidationError) {
-        if (!environment.interactive) {
-          throw error;
-        }
+	while (true) {
+		let value: T;
 
-        environment.error.write(renderError(error.message));
-        attempt += 1;
-        continue;
-      }
+		try {
+			value = await read(attempt);
+		} catch (error) {
+			if (error instanceof PromptValidationError) {
+				if (!environment.interactive) {
+					throw error;
+				}
 
-      throw error;
-    }
+				environment.error.write(renderError(error.message));
+				attempt += 1;
+				continue;
+			}
 
-    const required = ensureRequired(value, options.required);
-    const validation = required ?? (await validationMessage(value, options.validate));
+			throw error;
+		}
 
-    if (!validation) {
-      return value;
-    }
+		const required = ensureRequired(value, options.required);
 
-    if (!environment.interactive) {
-      throw new PromptValidationError(validation);
-    }
+		const validation = required ?? (await validationMessage(value, options.validate));
 
-    environment.error.write(renderError(validation));
-    attempt += 1;
-  }
+		if (!validation) {
+			return value;
+		}
+
+		if (!environment.interactive) {
+			throw new PromptValidationError(validation);
+		}
+
+		environment.error.write(renderError(validation));
+		attempt += 1;
+	}
 };
 
 export const ask = async (message: string, hint?: string): Promise<string> => {
-  const environment = promptEnvironment();
+	const environment = promptEnvironment();
 
-  if (!environment.input.readLine) {
-    throw new PromptValidationError('The configured prompt input cannot read lines.');
-  }
+	if (!environment.input.readLine) {
+		throw new PromptValidationError('The configured prompt input cannot read lines.');
+	}
 
-  return environment.input.readLine(renderQuestion(message, hint));
+	return environment.input.readLine(renderQuestion(message, hint));
 };

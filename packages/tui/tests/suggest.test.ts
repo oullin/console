@@ -2,85 +2,87 @@ import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, createScriptedInput, Key, suggest, withPromptEnvironment } from '../src/index';
 
 const runSuggest = async (keys: string[], options: string[] | ((query: string) => string[])): Promise<{ output: string; result: string }> => {
-  const output = createMemoryOutput();
-  const result = await withPromptEnvironment(
-    {
-      input: createScriptedInput(keys),
-      output,
-      error: output,
-      interactive: true
-    },
-    () => suggest('Favorite color?', options)
-  );
+	const output = createMemoryOutput();
 
-  return { output: output.text(), result };
+	const result = await withPromptEnvironment(
+		{
+			input: createScriptedInput(keys),
+			output,
+			error: output,
+			interactive: true,
+		},
+		() => suggest('Favorite color?', options),
+	);
+
+	return { output: output.text(), result };
 };
 
 const expectSuggestion = async (keys: string[], options: string[] | ((query: string) => string[]), result: string): Promise<void> => {
-  await expect(runSuggest(keys, options)).resolves.toMatchObject({ result });
+	await expect(runSuggest(keys, options)).resolves.toMatchObject({ result });
 };
 
 const outputFor = async (keys: string[], options: string[] | ((query: string) => string[])): Promise<string> => {
-  const output = createMemoryOutput();
+	const output = createMemoryOutput();
 
-  await withPromptEnvironment(
-    {
-      input: createScriptedInput(keys),
-      output,
-      error: output,
-      interactive: true
-    },
-    () => suggest('Favorite color?', options)
-  );
+	await withPromptEnvironment(
+		{
+			input: createScriptedInput(keys),
+			output,
+			error: output,
+			interactive: true,
+		},
+		() => suggest('Favorite color?', options),
+	);
 
-  return output.text();
+	return output.text();
 };
 
 describe('suggest prompt', () => {
-  it('accepts arbitrary typed input', async () => {
-    await expectSuggestion(['B', 'l', 'a', 'c', 'k', Key.enter], ['Red', 'Green', 'Blue'], 'Black');
-  });
+	it('accepts arbitrary typed input', async () => {
+		await expectSuggestion(['B', 'l', 'a', 'c', 'k', Key.enter], ['Red', 'Green', 'Blue'], 'Black');
+	});
 
-  it('completes input using tab', async () => {
-    await expectSuggestion(['b', Key.tab, Key.enter], ['Red', 'Green', 'Blue'], 'Blue');
-  });
+	it('completes input using tab', async () => {
+		await expectSuggestion(['b', Key.tab, Key.enter], ['Red', 'Green', 'Blue'], 'Blue');
+	});
 
-  it('navigates matches using arrow and emacs keys', async () => {
-    await expectSuggestion(['b', Key.down, Key.down, Key.down, Key.up, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Black');
-    await expectSuggestion(['b', Key.ctrlN, Key.ctrlN, Key.ctrlN, Key.ctrlP, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Black');
-  });
+	it('navigates matches using arrow and emacs keys', async () => {
+		await expectSuggestion(['b', Key.down, Key.down, Key.down, Key.up, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Black');
 
-  it('supports callback options', async () => {
-    await expectSuggestion(['e', 'e', Key.down, Key.enter], (value) => ['Red', 'Green', 'Blue'].filter((option) => option.toLowerCase().includes(value.toLowerCase())), 'Green');
-  });
+		await expectSuggestion(['b', Key.ctrlN, Key.ctrlN, Key.ctrlN, Key.ctrlP, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Black');
+	});
 
-  it('renders typed queries and suggestion matches', async () => {
-    const output = await outputFor(['b', Key.down, Key.enter], ['Red', 'Green', 'Blue']);
+	it('supports callback options', async () => {
+		await expectSuggestion(['e', 'e', Key.down, Key.enter], (value) => ['Red', 'Green', 'Blue'].filter((option) => option.toLowerCase().includes(value.toLowerCase())), 'Green');
+	});
 
-    expect(output).toContain('Favorite color? b');
-    expect(output).toContain('›');
-    expect(output).toContain('Blue');
-  });
+	it('renders typed queries and suggestion matches', async () => {
+		const output = await outputFor(['b', Key.down, Key.enter], ['Red', 'Green', 'Blue']);
 
-  it('renders completed values after tab completion', async () => {
-    const output = await outputFor(['b', Key.tab, Key.enter], ['Red', 'Green', 'Blue']);
+		expect(output).toContain('Favorite color? b');
+		expect(output).toContain('›');
+		expect(output).toContain('Blue');
+	});
 
-    expect(output).toContain('Favorite color? Blue');
-  });
+	it('renders completed values after tab completion', async () => {
+		const output = await outputFor(['b', Key.tab, Key.enter], ['Red', 'Green', 'Blue']);
 
-  it('renders suggest info for the highlighted result', async () => {
-    const output = createMemoryOutput();
+		expect(output).toContain('Favorite color? Blue');
+	});
 
-    await withPromptEnvironment(
-      {
-        input: createScriptedInput(['b', Key.down, Key.enter]),
-        output,
-        error: output,
-        interactive: true
-      },
-      () => suggest({ message: 'Favorite color?', options: ['Red', 'Green', 'Blue'], info: (value) => `About ${value ?? 'none'}` })
-    );
+	it('renders suggest info for the highlighted result', async () => {
+		const output = createMemoryOutput();
 
-    expect(output.text()).toContain('About Blue');
-  });
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => suggest({ message: 'Favorite color?', options: ['Red', 'Green', 'Blue'], info: (value) => `About ${value ?? 'none'}` }),
+		);
+
+		expect(output.text()).toContain('About Blue');
+	});
 });

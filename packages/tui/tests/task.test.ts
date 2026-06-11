@@ -2,34 +2,39 @@ import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, task, withPromptEnvironment } from '../src/index';
 
 describe('task helper', () => {
-  it('passes a bounded logger to the callback and returns the callback value', async () => {
-    const output = createMemoryOutput();
-    const result = await withPromptEnvironment({ output, error: output }, async () => {
-      return task('Running...', (logger) => {
-        logger.log('line one');
-        logger.log('line two');
-        logger.log('line three');
+	it('passes a bounded logger to the callback and returns the callback value', async () => {
+		const output = createMemoryOutput();
 
-        return 'done';
-      }, 2);
-    });
+		const result = await withPromptEnvironment({ output, error: output }, async () => {
+			return task(
+				'Running...',
+				(logger) => {
+					logger.log('line one');
+					logger.log('line two');
+					logger.log('line three');
 
-    expect(result).toBe('done');
-    expect(output.text()).toContain('Running...');
-    expect(output.text()).not.toContain('line one');
-    expect(output.text()).toContain('line two');
-    expect(output.text()).toContain('line three');
-  });
+					return 'done';
+				},
+				2,
+			);
+		});
 
-  it('strips cursor reset control sequences from log lines', async () => {
-    const output = createMemoryOutput();
+		expect(result).toBe('done');
+		expect(output.text()).toContain('Running...');
+		expect(output.text()).not.toContain('line one');
+		expect(output.text()).toContain('line two');
+		expect(output.text()).toContain('line three');
+	});
 
-    await withPromptEnvironment({ output, error: output }, async () => {
-      await task('Running...', (logger) => {
-        logger.log('before\u001B[1G\u001B[2Kafter');
-      });
-    });
+	it('strips cursor reset control sequences from log lines', async () => {
+		const output = createMemoryOutput();
 
-    expect(output.text()).toContain('beforeafter');
-  });
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.log('before\u001B[1G\u001B[2Kafter');
+			});
+		});
+
+		expect(output.text()).toContain('beforeafter');
+	});
 });

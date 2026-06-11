@@ -1,9 +1,9 @@
 import { clearTerminal, setTerminalTitle } from '#tui/terminal';
 
 export const title = (value: string): void => {
-  setTerminalTitle(value);
+	setTerminalTitle(value);
 };
 
 export const clear = (): void => {
-  clearTerminal();
+	clearTerminal();
 };

@@ -5,9 +5,11 @@ import { FormBuilder } from '#tui/form/builder';
 import type { MaybePromise } from '#tui/types';
 
 export function form(): FormBuilder;
-export function form<T>(builder: (form: FormBuilder) => MaybePromise<T>): Promise<T>;
-export function form<T>(builder?: (form: FormBuilder) => MaybePromise<T>): FormBuilder | Promise<T> {
-  const instance = new FormBuilder();
 
-  return builder ? Promise.resolve(builder(instance)) : instance;
+export function form<T>(builder: (form: FormBuilder) => MaybePromise<T>): Promise<T>;
+
+export function form<T>(builder?: (form: FormBuilder) => MaybePromise<T>): FormBuilder | Promise<T> {
+	const instance = new FormBuilder();
+
+	return builder ? Promise.resolve(builder(instance)) : instance;
 }
