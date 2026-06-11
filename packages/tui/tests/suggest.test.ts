@@ -52,6 +52,10 @@ describe('suggest prompt', () => {
 		await expectSuggestion(['b', Key.ctrlN, Key.ctrlN, Key.ctrlN, Key.ctrlP, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Black');
 	});
 
+	it('navigates suggestions backwards with shift tab', async () => {
+		await expectSuggestion(['b', Key.shiftTab, Key.enter], ['Red', 'Blue', 'Black', 'Blurple'], 'Blurple');
+	});
+
 	it('supports callback options', async () => {
 		await expectSuggestion(['e', 'e', Key.down, Key.enter], (value) => ['Red', 'Green', 'Blue'].filter((option) => option.toLowerCase().includes(value.toLowerCase())), 'Green');
 	});

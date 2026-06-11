@@ -38,7 +38,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 			continue;
 		}
 
-		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.shiftTab) {
+		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? null : ((highlighted ?? -1) + 1) % matches.length;
@@ -46,7 +46,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 			continue;
 		}
 
-		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? null : ((highlighted ?? matches.length) - 1 + matches.length) % matches.length;
