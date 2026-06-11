@@ -1,0 +1,30 @@
+import { Key, oneOf } from '#tui/key';
+import { moveLine, moveToLineBoundary } from '#tui/typed-value/lines';
+
+export const moveTypedValueCursor = (value: string[], cursor: number, key: string, allowNewLine: boolean): number | undefined => {
+	if (key === Key.left || key === Key.leftArrow || key === Key.ctrlB) {
+		return Math.max(0, cursor - 1);
+	}
+
+	if (key === Key.right || key === Key.rightArrow || key === Key.ctrlF) {
+		return Math.min(value.length, cursor + 1);
+	}
+
+	if (allowNewLine && (key === Key.up || key === Key.upArrow)) {
+		return moveLine(value, cursor, -1);
+	}
+
+	if (allowNewLine && (key === Key.down || key === Key.downArrow)) {
+		return moveLine(value, cursor, 1);
+	}
+
+	if (oneOf([Key.home, Key.ctrlA], key)) {
+		return allowNewLine ? moveToLineBoundary(value, cursor, 'start') : 0;
+	}
+
+	if (oneOf([Key.end, Key.ctrlE], key)) {
+		return allowNewLine ? moveToLineBoundary(value, cursor, 'end') : value.length;
+	}
+
+	return undefined;
+};

@@ -1,7 +1,9 @@
-import { Key, oneOf } from '#tui/key';
-import { characterLength, characters, fromCharacters, isPrintable } from '#tui/typed-value/characters';
-import { deleteNextCharacter, deletePreviousCharacter, deletePreviousWord, deleteToLineStart } from '#tui/typed-value/delete';
-import { moveLine, moveToLineBoundary } from '#tui/typed-value/lines';
+import { Key } from '#tui/key';
+import { characterLength, characters } from '#tui/typed-value/characters';
+import { deleteTypedValueKey } from '#tui/typed-value/edit/deletion';
+import { insertPrintableKey } from '#tui/typed-value/edit/insertion';
+import { moveTypedValueCursor } from '#tui/typed-value/edit/navigation';
+import { typedKeyResult } from '#tui/typed-value/edit/result';
 import type { AppliedTypedKey, TypedValueState } from '#tui/typed-value/types';
 
 export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false): AppliedTypedKey => {
@@ -10,84 +12,43 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 	let cursor = Math.max(0, Math.min(value.length, state.cursor));
 
 	if (key === Key.ctrlC) {
-		return { cursor, value: fromCharacters(value), submitted: false, cancelled: true };
+		return typedKeyResult(value, cursor, { cancelled: true });
 	}
 
 	if (key === Key.ctrlD && allowNewLine) {
-		return { cursor, value: fromCharacters(value), submitted: true, cancelled: false };
+		return typedKeyResult(value, cursor, { submitted: true });
 	}
 
 	if (key === Key.enter) {
 		if (!allowNewLine) {
-			return { cursor, value: fromCharacters(value), submitted: true, cancelled: false };
+			return typedKeyResult(value, cursor, { submitted: true });
 		}
 
 		value.splice(cursor, 0, '\n');
 		cursor += 1;
 
-		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
+		return typedKeyResult(value, cursor);
 	}
 
-	if (key === Key.left || key === Key.leftArrow || key === Key.ctrlB) {
-		return { cursor: Math.max(0, cursor - 1), value: fromCharacters(value), submitted: false, cancelled: false };
+	const moved = moveTypedValueCursor(value, cursor, key, allowNewLine);
+
+	if (moved !== undefined) {
+		return typedKeyResult(value, moved);
 	}
 
-	if (key === Key.right || key === Key.rightArrow || key === Key.ctrlF) {
-		return { cursor: Math.min(value.length, cursor + 1), value: fromCharacters(value), submitted: false, cancelled: false };
+	const deleted = deleteTypedValueKey(value, cursor, key, allowNewLine);
+
+	if (deleted !== undefined) {
+		return typedKeyResult(value, deleted);
 	}
 
-	if (allowNewLine && (key === Key.up || key === Key.upArrow)) {
-		return { cursor: moveLine(value, cursor, -1), value: fromCharacters(value), submitted: false, cancelled: false };
+	const inserted = insertPrintableKey(value, cursor, key);
+
+	if (inserted !== undefined) {
+		cursor = inserted;
 	}
 
-	if (allowNewLine && (key === Key.down || key === Key.downArrow)) {
-		return { cursor: moveLine(value, cursor, 1), value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (oneOf([Key.home, Key.ctrlA], key)) {
-		const nextCursor = allowNewLine ? moveToLineBoundary(value, cursor, 'start') : 0;
-
-		return { cursor: nextCursor, value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (oneOf([Key.end, Key.ctrlE], key)) {
-		const nextCursor = allowNewLine ? moveToLineBoundary(value, cursor, 'end') : value.length;
-
-		return { cursor: nextCursor, value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (key === Key.delete) {
-		cursor = deleteNextCharacter(value, cursor);
-
-		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (key === Key.ctrlU) {
-		cursor = deleteToLineStart(value, cursor, allowNewLine);
-
-		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (key === Key.backspace || key === Key.ctrlH) {
-		cursor = deletePreviousCharacter(value, cursor);
-
-		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (key === Key.optionBackspace) {
-		cursor = deletePreviousWord(value, cursor);
-
-		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
-	}
-
-	if (isPrintable(key)) {
-		for (const character of characters(key)) {
-			value.splice(cursor, 0, character);
-			cursor += 1;
-		}
-	}
-
-	return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
+	return typedKeyResult(value, cursor);
 };
 
 export const initialTypedValueState = (value = ''): TypedValueState => {

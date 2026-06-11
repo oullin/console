@@ -61,6 +61,15 @@ describe('typed value editing', () => {
 		expect(apply(['J', 'z', 'e', Key.ctrlB, Key.ctrlH, Key.ctrlF, 's', 's'])).toBe('Jess');
 	});
 
+	it('marks typed values as cancelled without changing the current value', () => {
+		expect(applyTypedKey({ cursor: 3, value: 'Ada' }, Key.ctrlC)).toEqual({
+			cancelled: true,
+			cursor: 3,
+			submitted: false,
+			value: 'Ada',
+		});
+	});
+
 	it('clamps UTF-16 cursor offsets to character positions before editing', () => {
 		expect(applyMultilineState('😀', '😀'.length, ['!'])).toEqual({
 			cursor: 2,
