@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { choiceWindow } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
+import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { searchMessage } from '#tui/prompts/search/choices';
 import { cyan, dim } from '#tui/theme/styles';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
@@ -41,13 +42,17 @@ const renderSearchRows = <T>(message: string, choices: Array<Choice<T>>, highlig
 
 	environment.output.write(`${message}\n`);
 
-	for (const [offset, choice] of choices.slice(window.start, window.end).entries()) {
+	const rows = choices.slice(window.start, window.end).map((choice, offset) => {
 		const index = window.start + offset;
 		const active = highlighted === index;
 		const selected = marked.has(index);
 		const label = choiceLabel(choice);
 
-		environment.output.write(`${multiple ? multiSearchRow(label, active, selected) : searchRow(label, active)}\n`);
+		return multiple ? multiSearchRow(label, active, selected) : searchRow(label, active);
+	});
+
+	for (const row of renderScrollbarRows(rows, window.start, window.end - window.start, choices.length)) {
+		environment.output.write(`${row}\n`);
 	}
 };
 

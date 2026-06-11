@@ -31,6 +31,7 @@ TypeScript and OpenTUI internals.
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
+| Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
@@ -64,7 +65,7 @@ later phases:
 - Multi-search full rendering and selected-result summary parity
 - Multi-select boxed layout and submit/cancel frame parity
 - Prompt lifecycle
-- Search boxed layout, scrollbar, and submit/cancel frame parity
+- Search boxed layout and submit/cancel frame parity
 - Textarea wrapping, cursor, and scrollbar parity
 - Default theme
 - Feature parity tests

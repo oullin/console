@@ -2,6 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { parseChoiceAnswerIndex, parseChoiceRecordKey } from '#tui/concerns/validators/choice-answer';
 import { parseChoice, parseChoiceRecord } from '#tui/concerns/validators/choice';
 import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
+import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { cyan, dim } from '#tui/theme/styles';
 import type { Choice, ChoiceOptions } from '#tui/types';
 
@@ -85,14 +86,18 @@ export const renderInteractiveChoices = <T>(message: string, choices: Array<Choi
 
 	environment.output.write(`${message}\n`);
 
-	for (const [offset, choice] of choices.slice(window.start, window.end).entries()) {
+	const rows = choices.slice(window.start, window.end).map((choice, offset) => {
 		const index = window.start + offset;
 		const pointer = index === selected ? '›' : ' ';
 		const checked = marked.size > 0 ? (marked.has(index) ? '[x]' : '[ ]') : '  ';
 		const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
 		const hint = choice.hint ? ` ${choice.hint}` : '';
 
-		environment.output.write(`${pointer} ${checked} ${choice.label}${hint}${disabled}\n`);
+		return `${pointer} ${checked} ${choice.label}${hint}${disabled}`;
+	});
+
+	for (const row of renderScrollbarRows(rows, window.start, window.end - window.start, choices.length)) {
+		environment.output.write(`${row}\n`);
 	}
 };
 
@@ -102,7 +107,7 @@ export const renderInteractiveChecklist = <T>(message: string, choices: Array<Ch
 
 	environment.output.write(`${message}\n`);
 
-	for (const [offset, choice] of choices.slice(window.start, window.end).entries()) {
+	const rows = choices.slice(window.start, window.end).map((choice, offset) => {
 		const index = window.start + offset;
 		const active = index === selected;
 		const checked = marked.has(index);
@@ -113,20 +118,21 @@ export const renderInteractiveChecklist = <T>(message: string, choices: Array<Ch
 		const label = `${choice.label}${hint}${disabled}`;
 
 		if (active && checked) {
-			environment.output.write(`${cyan(`${pointer} ${marker}`)} ${label}\n`);
-			continue;
+			return `${cyan(`${pointer} ${marker}`)} ${label}`;
 		}
 
 		if (active) {
-			environment.output.write(`${cyan(pointer)} ${marker} ${label}\n`);
-			continue;
+			return `${cyan(pointer)} ${marker} ${label}`;
 		}
 
 		if (checked) {
-			environment.output.write(`  ${cyan(marker)} ${dim(label)}\n`);
-			continue;
+			return `  ${cyan(marker)} ${dim(label)}`;
 		}
 
-		environment.output.write(`  ${dim(marker)} ${dim(label)}\n`);
+		return `  ${dim(marker)} ${dim(label)}`;
+	});
+
+	for (const row of renderScrollbarRows(rows, window.start, window.end - window.start, choices.length)) {
+		environment.output.write(`${row}\n`);
 	}
 };

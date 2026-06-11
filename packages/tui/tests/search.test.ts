@@ -114,6 +114,8 @@ describe('search prompt', () => {
 		expect(latestFrame).toContain('two');
 		expect(latestFrame).toContain('three');
 		expect(latestFrame).toContain('four');
+		expect(latestFrame).toContain('┃');
+		expect(latestFrame).toContain('│');
 	});
 
 	it('supports page search navigation keys', async () => {
@@ -752,6 +754,8 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['blue', 'red']);
 		expect(output.text()).toContain('Selected: Blue, Red');
+		expect(output.text()).toContain('┃');
+		expect(output.text()).toContain('│');
 	});
 
 	it('skips disabled multisearch results while navigating and toggling all', async () => {

@@ -193,6 +193,8 @@ describe('choice prompts', () => {
 		expect(latestFrame).toContain('second');
 		expect(latestFrame).toContain('third');
 		expect(latestFrame).toContain('fourth');
+		expect(latestFrame).toContain('┃');
+		expect(latestFrame).toContain('│');
 	});
 
 	it('supports alternate select navigation keys', async () => {
@@ -603,6 +605,8 @@ describe('choice prompts', () => {
 
 		expect(output.text()).toContain('0 selected');
 		expect(output.text()).toContain('1 selected');
+		expect(output.text()).toContain('┃');
+		expect(output.text()).toContain('│');
 	});
 
 	it('supports page multiselect navigation keys', async () => {
