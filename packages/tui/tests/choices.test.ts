@@ -51,5 +51,23 @@ describe('choice prompts', () => {
     );
 
     expect(result).toEqual(['first', 'second']);
+    expect(output.text()).toContain('Selected: first');
+    expect(output.text()).toContain('Selected: first, second');
+  });
+
+  it('requires multiselect choices when configured', async () => {
+    const output = createMemoryOutput();
+    const result = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.enter, Key.space, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => multiselect({ message: 'Pick many', options: ['first', 'second'], required: true })
+    );
+
+    expect(result).toEqual(['first']);
+    expect(output.text()).toContain('A value is required.');
   });
 });

@@ -75,6 +75,19 @@ const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: string)
   return selected.map((choice) => choice.value);
 };
 
+const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number): void => {
+  renderInteractiveChoices(message, choices, selected, marked, scroll);
+
+  const labels = [...marked]
+    .sort((left, right) => left - right)
+    .map((index) => choices[index]?.label)
+    .filter((label): label is string => label !== undefined);
+
+  if (labels.length > 0) {
+    promptEnvironment().output.write(`Selected: ${labels.join(', ')}\n`);
+  }
+};
+
 const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>, defaults: T[] = [], hint?: string, scroll?: number): Promise<T[]> => {
   const environment = promptEnvironment();
   const selectedValues = new Set(defaults);
@@ -88,7 +101,7 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
 
   let selected = firstEnabledIndex(choices);
   const marked = new Set(choices.flatMap((choice, index) => selectedValues.has(choice.value) ? [index] : []));
-  renderInteractiveChoices(message, choices, selected, marked, scroll);
+  renderMultipleChoices(message, choices, selected, marked, scroll);
 
   while (true) {
     const key = await environment.input.readKey();
@@ -112,19 +125,19 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
         marked.add(index);
       }
 
-      renderInteractiveChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll);
       continue;
     }
 
     if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
       selected = nextEnabledIndex(choices, selected, 1);
-      renderInteractiveChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll);
       continue;
     }
 
     if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
       selected = nextEnabledIndex(choices, selected, -1);
-      renderInteractiveChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll);
       continue;
     }
 
@@ -135,7 +148,7 @@ const readMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>
         marked.add(selected);
       }
 
-      renderInteractiveChoices(message, choices, selected, marked, scroll);
+      renderMultipleChoices(message, choices, selected, marked, scroll);
       continue;
     }
 
