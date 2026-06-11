@@ -227,6 +227,33 @@ describe('choice prompts', () => {
 		expect(result).toBe('first');
 	});
 
+	it('supports control-line select navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const endResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlE, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second', 'third'] }),
+		);
+
+		const homeResult = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlE, Key.ctrlA, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second', 'third'] }),
+		);
+
+		expect(endResult).toBe('third');
+		expect(homeResult).toBe('first');
+	});
+
 	it('supports page select navigation keys', async () => {
 		const output = createMemoryOutput();
 

@@ -1,9 +1,10 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key, oneOf } from '#tui/key';
+import { Key } from '#tui/key';
 import { ask, PromptValidationError } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
-import { findChoice, firstEnabledIndex, nextEnabledIndex } from '#tui/concerns/choices';
-import { lastEnabledChoiceIndex, nextChoiceKeys, pageEnabledChoiceIndex, parseChoiceIndex, previousChoiceKeys } from '#tui/prompts/select/navigation';
+import { findChoice, firstEnabledIndex } from '#tui/concerns/choices';
+import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
+import { parseChoiceIndex } from '#tui/prompts/select/navigation';
 import { renderSelectedChoice } from '#tui/prompts/select/render';
 import type { Choice, SelectPromptOptions } from '#tui/types';
 
@@ -63,38 +64,10 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 			return choices[numeric - 1].value;
 		}
 
-		if (nextChoiceKeys(key)) {
-			selected = nextEnabledIndex(choices, selected, 1);
-			renderSelectedChoice(message, choices, selected, scroll, info);
-			continue;
-		}
+		const action = selectNavigationAction(key, { lineControls: true });
 
-		if (previousChoiceKeys(key)) {
-			selected = nextEnabledIndex(choices, selected, -1);
-			renderSelectedChoice(message, choices, selected, scroll, info);
-			continue;
-		}
-
-		if (key === Key.pageDown) {
-			selected = pageEnabledChoiceIndex(choices, selected, 1, scroll);
-			renderSelectedChoice(message, choices, selected, scroll, info);
-			continue;
-		}
-
-		if (key === Key.pageUp) {
-			selected = pageEnabledChoiceIndex(choices, selected, -1, scroll);
-			renderSelectedChoice(message, choices, selected, scroll, info);
-			continue;
-		}
-
-		if (oneOf([Key.home, Key.ctrlA], key)) {
-			selected = firstEnabledIndex(choices);
-			renderSelectedChoice(message, choices, selected, scroll, info);
-			continue;
-		}
-
-		if (oneOf([Key.end, Key.ctrlE], key)) {
-			selected = lastEnabledChoiceIndex(choices);
+		if (action !== null) {
+			selected = moveSelectHighlight(choices, selected, action, scroll);
 			renderSelectedChoice(message, choices, selected, scroll, info);
 			continue;
 		}
