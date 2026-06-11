@@ -239,6 +239,12 @@ describe('data table prompt', () => {
 		);
 
 		expect(result).toBe('beta');
+
+		const latestFrame = output.text().split('Pick project\n').at(-1) ?? '';
+
+		expect(latestFrame).not.toContain('Pick project B');
+		expect(latestFrame).toContain('Alpha');
+		expect(latestFrame).toContain('Beta');
 	});
 
 	it('cancels data table prompts with the current selected row', async () => {

@@ -1,11 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
-import { applyTypedKey } from '#tui/typed-value';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
 import { dataTableRowValue, deriveDataTableHeaders, visibleDataTableRows } from '#tui/output/data-table/rows';
 import { renderDataTableFrame } from '#tui/output/data-table/render';
+import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTablePromptOptions } from '#tui/types';
 
 export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number> => {
@@ -15,17 +15,16 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 		const environment = promptEnvironment();
 
 		let selected = 0;
-		let mode: 'browse' | 'search' = 'browse';
-		let query = { cursor: 0, value: '' };
+		let search = initialDataTableSearchState();
 
-		const visibleRows = () => visibleDataTableRows(options, headers, query.value);
+		const visibleRows = () => visibleDataTableRows(options, headers, search.query.value);
 
 		const render = (): void => {
 			selected = renderDataTableFrame({
 				headers,
 				message: options.message,
-				mode,
-				query: query.value,
+				mode: search.mode,
+				query: search.query.value,
 				rows: visibleRows(),
 				scroll: options.scroll,
 				selected,
@@ -66,35 +65,17 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				return dataTableRowValue(selectedRow.row, selectedRow.index);
 			}
 
-			if (mode === 'search') {
-				if (key === Key.enter) {
-					mode = 'browse';
-					selected = 0;
-					render();
-					continue;
-				}
+			const nextSearch = applyDataTableSearchKey(search, key);
 
-				if (key === Key.escape) {
-					mode = 'browse';
-					query = { cursor: 0, value: '' };
-					selected = 0;
-					render();
-					continue;
-				}
-
-				const next = applyTypedKey(query, key);
-
-				if (next.value !== query.value || next.cursor !== query.cursor) {
-					query = { cursor: next.cursor, value: next.value };
-					selected = 0;
-					render();
-					continue;
-				}
+			if (nextSearch.changed) {
+				search = nextSearch.state;
+				selected = 0;
+				render();
+				continue;
 			}
 
 			if (startsDataTableSearch(key)) {
-				mode = 'search';
-				query = { cursor: 0, value: '' };
+				search = startDataTableSearch();
 				selected = 0;
 				render();
 				continue;
