@@ -1,5 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/progress';
+import { renderProgressFrame } from '#tui/status/progress/render';
+import { progressValues } from '#tui/status/progress/steps';
 import type { MaybePromise } from '#tui/types';
 
 export class Progress {
@@ -53,12 +55,7 @@ export class Progress {
 	}
 
 	render(): void {
-		const width = 20;
-		const filled = Math.ceil(width * this.percentage());
-		const bar = `${'█'.repeat(filled)}${' '.repeat(width - filled)}`;
-		const hint = this.#hint ? ` ${this.#hint}` : '';
-
-		promptEnvironment().output.write(`${this.#label}: ${bar} ${this.#current} / ${this.total}${hint}\n`);
+		promptEnvironment().output.write(renderProgressFrame({ current: this.#current, hint: this.#hint, label: this.#label, total: this.total }));
 	}
 }
 
@@ -82,7 +79,7 @@ export function progress<T, R>(
 		throw new Error('Progress steps must be an iterable or a number.');
 	}
 
-	const values = typeof steps === 'number' ? Array.from({ length: parseProgressTotal(steps) }, (_, index) => index) : Array.from(steps);
+	const values = progressValues(steps);
 	const bar = new Progress(values.length, labelOrTotal, hint);
 
 	if (!callback) {

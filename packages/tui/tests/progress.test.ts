@@ -45,6 +45,18 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('1 / 100');
 	});
 
+	it('renders a fully filled progress bar at completion', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const bar = progress('Adding States', 2);
+
+			bar.finish();
+		});
+
+		expect(output.text()).toContain('████████████████████ 2 / 2');
+	});
+
 	it('returns a completion value separately from the current count', async () => {
 		const output = createMemoryOutput();
 
