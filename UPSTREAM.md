@@ -21,6 +21,7 @@ TypeScript and OpenTUI internals.
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
 | Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/text.test.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
+| Textarea defaults, transforms, validation, editing keys, line navigation, and non-interactive behavior | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea control-key line navigation and empty-line movement | `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea boxed renderer and placeholder styling | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea scrollbar rendering | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts` |
