@@ -135,6 +135,38 @@ describe('search prompt', () => {
 		expect(result).toBe('green');
 	});
 
+	it('keeps search highlights empty when submitting without a highlighted result', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors }),
+		);
+
+		expect(result).toBe('red');
+	});
+
+	it('clears search highlights with horizontal navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.left, Key.enter, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors }),
+		);
+
+		expect(result).toBe('red');
+	});
+
 	it('rejects optional single search prompts', async () => {
 		const options = {
 			message: 'Favorite color?',

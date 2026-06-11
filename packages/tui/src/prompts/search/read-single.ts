@@ -70,6 +70,12 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			continue;
 		}
 
+		if (oneOf([Key.left, Key.leftArrow, Key.right, Key.rightArrow, Key.ctrlB, Key.ctrlF], key) && highlighted !== null) {
+			highlighted = null;
+			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
+			continue;
+		}
+
 		if (key === Key.enter) {
 			if (highlighted !== null) {
 				const choice = choices[highlighted];
@@ -79,7 +85,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			highlighted = choices.length > 0 ? firstEnabledIndex(choices) : null;
+			highlighted = null;
 			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info);
 			continue;
 		}
