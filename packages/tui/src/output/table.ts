@@ -1,4 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
+import { parseTableOptions } from '#tui/output/validators/table';
 import { renderTable } from '#tui/theme';
 import type { TableOptions } from '#tui/types';
 
@@ -6,21 +7,8 @@ const stringify = (value: string | number | boolean | null | undefined): string 
 	return value === null || value === undefined ? '' : String(value);
 };
 
-const normalizeTableOptions = (headersOrOptions: TableOptions | string[] = [], rows: TableOptions['rows'] | null = null): Required<TableOptions> => {
-	if (!Array.isArray(headersOrOptions) && 'rows' in headersOrOptions) {
-		const headers = headersOrOptions.headers ?? Object.keys(headersOrOptions.rows[0] ?? {});
-
-		return { headers, rows: headersOrOptions.rows };
-	}
-
-	return {
-		headers: headersOrOptions,
-		rows: rows ?? [],
-	};
-};
-
 export const table = (headersOrOptions: TableOptions | string[] = [], rows: TableOptions['rows'] | null = null): boolean => {
-	const options = normalizeTableOptions(headersOrOptions, rows);
+	const options = parseTableOptions(headersOrOptions, rows);
 
 	const normalizedRows = options.rows.map((row) => {
 		if (Array.isArray(row)) {

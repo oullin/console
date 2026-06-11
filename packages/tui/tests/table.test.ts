@@ -12,6 +12,32 @@ describe('table output', () => {
 		expect(output.text()).toContain('| Name  | Runtime |');
 		expect(output.text()).toContain('| Ollin | OpenTUI |');
 	});
+
+	it('renders object-form table options with inferred headers', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table({
+				rows: [
+					{ Name: 'Ollin', Runtime: 'OpenTUI' },
+					{ Name: 'Prompts', Runtime: 'TypeScript' },
+				],
+			});
+		});
+
+		expect(output.text()).toContain('| Name    | Runtime    |');
+		expect(output.text()).toContain('| Prompts | TypeScript |');
+	});
+
+	it('rejects invalid table runtime shapes through the validator layer', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			expect(() => table(null as never)).toThrow();
+			expect(() => table(['Name'], null as never)).not.toThrow();
+			expect(() => table(['Name'], [null] as never)).toThrow();
+		});
+	});
 });
 
 describe('data table prompt', () => {
