@@ -232,6 +232,31 @@ describe('search prompt', () => {
 		expect(output.text()).toContain('Cancelled.');
 	});
 
+	it('uses the default when cancelling a disabled highlighted search result', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: [
+						{ label: 'Red', value: 'red', disabled: true },
+						{ label: 'Green', value: 'green' },
+					],
+					default: 'green',
+				}),
+		);
+
+		expect(result).toBe('green');
+		expect(output.text()).toContain('Cancelled.');
+	});
+
 	it('rejects optional single search prompts', async () => {
 		const options = {
 			message: 'Favorite color?',

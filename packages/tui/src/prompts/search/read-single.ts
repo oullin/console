@@ -1,20 +1,17 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { resolveLineSearchChoice } from '#tui/prompts/search/line-mode';
 import { renderSearchChoices } from '#tui/prompts/search/render';
+import { cancelledSearchValue, lineSearchValue, selectedSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchPromptOptions } from '#tui/types';
 
 export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0): Promise<T | undefined> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const query = (await ask(options.message, options.hint)).trim();
-
-		return resolveLineSearchChoice(options, query);
+		return lineSearchValue(options);
 	}
 
 	let state = { cursor: 0, value: '' };
@@ -33,15 +30,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		}
 
 		if (key === Key.ctrlC) {
-			environment.error.write('Cancelled.\n');
-
-			if (highlighted !== null) {
-				const choice = choices[highlighted];
-
-				return choice?.disabled ? options.default : (choice?.value ?? options.default);
-			}
-
-			return options.default;
+			return cancelledSearchValue(choices, highlighted, options.default);
 		}
 
 		const action = searchNavigationAction(key, { controlNavigation: true, lineControls: true });
@@ -62,9 +51,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 		if (key === Key.enter) {
 			if (highlighted !== null) {
-				const choice = choices[highlighted];
-
-				return choice?.disabled ? undefined : choice?.value;
+				return selectedSearchValue(choices, highlighted);
 			}
 
 			choices = await resolveSearchChoices(options.options, state.value);
