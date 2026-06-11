@@ -376,6 +376,64 @@ describe('data table prompt', () => {
 		expect(activeFrame).toContain('|   | Bob   | Designer  |');
 	});
 
+	it('renders data table rows without headers', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: [],
+					rows: [
+						['Alice', 'Developer'],
+						['Bob', 'Designer'],
+					],
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+
+		expect(result).toBe(0);
+		expect(activeFrame).not.toContain('---');
+		expect(activeFrame).toContain('| › | Alice | Developer |');
+		expect(activeFrame).toContain('|   | Bob   | Designer  |');
+	});
+
+	it('renders blank data table cells as empty columns', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name', 'Role'],
+					rows: [
+						['Alice', null],
+						['Bob', undefined],
+					],
+				}),
+		);
+
+		const activeFrame = output.text().split('Pick row\n').at(-2) ?? '';
+
+		expect(result).toBe(0);
+		expect(activeFrame).toContain('| Name  | Role |');
+		expect(activeFrame).toMatch(/\| › \| Alice \|\s+\|/);
+		expect(activeFrame).toMatch(/\|   \| Bob\s+\|\s+\|/);
+	});
+
 	it('edits Unicode data table search queries without corrupting input', async () => {
 		const output = createMemoryOutput();
 

@@ -17,6 +17,8 @@ type RenderDataTableFrameOptions<T> = {
 	selected: number;
 };
 
+const renderHeaders = (headers: string[]): string[] => (headers.length > 0 ? ['', ...headers] : []);
+
 export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>): number => {
 	const environment = promptEnvironment();
 	const selected = clampDataTableSelection(options.selected, options.rows);
@@ -37,7 +39,9 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 		return [index === selected ? '›' : ' ', ...dataTableRowCells(options.headers, row)];
 	});
 
-	environment.output.write(`${renderScrollableDataTable(['', ...options.headers], expandMultilineDataTableRows(renderedRows), window.start, window.end - window.start, options.rows.length)}\n`);
+	environment.output.write(
+		`${renderScrollableDataTable(renderHeaders(options.headers), expandMultilineDataTableRows(renderedRows), window.start, window.end - window.start, options.rows.length)}\n`,
+	);
 
 	if (window.end - window.start < options.rows.length) {
 		const suffix = options.query.length > 0 ? ' results' : '';
@@ -79,6 +83,6 @@ export const renderCancelledDataTableFrame = <T>(message: string, headers: strin
 
 	environment.output.write(`${message}\n`);
 	environment.output.write(`${dim('/ Search')}\n`);
-	environment.output.write(`${renderTable(['', ...headers], outputRows)}\n`);
+	environment.output.write(`${renderTable(renderHeaders(headers), outputRows)}\n`);
 	environment.error.write(`${red('Cancelled.')}\n`);
 };
