@@ -70,6 +70,12 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 			return [...selected.keys()];
 		}
 
+		if (key === Key.ctrlC) {
+			environment.error.write('Cancelled.\n');
+
+			return [...selected.keys()];
+		}
+
 		if (key === Key.down || key === Key.downArrow || key === Key.tab) {
 			choices = await resolveSearchChoices(options.options, state.value);
 

@@ -358,6 +358,23 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('1 selected (1 hidden)');
 	});
 
+	it('cancels multisearch prompts with the current selected values', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.space, 'B', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual(['red']);
+		expect(output.text()).toContain('Cancelled.');
+	});
+
 	it('toggles all current multisearch results with ctrl-a', async () => {
 		const output = createMemoryOutput();
 
