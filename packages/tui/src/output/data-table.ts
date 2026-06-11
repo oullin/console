@@ -1,5 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key } from '#tui/key';
+import { Key, oneOf } from '#tui/key';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderTable } from '#tui/theme';
 import { isDataObjectRow } from '#tui/output/validators/data-table';
@@ -94,6 +94,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 		const environment = promptEnvironment();
 
 		let selected = 0;
+		let mode: 'browse' | 'search' = 'browse';
 		let query = '';
 
 		const visibleRows = (): Array<VisibleRow<T>> => {
@@ -113,7 +114,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				return [index === selected ? '›' : ' ', ...rowCells(headers, row)];
 			});
 
-			const querySuffix = query.length > 0 ? ` ${query}` : '';
+			const querySuffix = mode === 'search' || query.length > 0 ? ` ${query}` : '';
 
 			environment.output.write(`${options.message}${querySuffix}\n`);
 			environment.output.write(`${renderTable(['', ...headers], renderedRows)}\n`);
@@ -141,6 +142,45 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 
 			const rows = visibleRows();
 
+			if (mode === 'search') {
+				if (key === Key.enter) {
+					mode = 'browse';
+					selected = 0;
+					render();
+					continue;
+				}
+
+				if (key === Key.escape) {
+					mode = 'browse';
+					query = '';
+					selected = 0;
+					render();
+					continue;
+				}
+
+				if (key === Key.backspace || key === Key.ctrlH) {
+					query = query.slice(0, -1);
+					selected = 0;
+					render();
+					continue;
+				}
+
+				if (isPrintable(key)) {
+					query += key;
+					selected = 0;
+					render();
+					continue;
+				}
+			}
+
+			if (key === '/') {
+				mode = 'search';
+				query = '';
+				selected = 0;
+				render();
+				continue;
+			}
+
 			if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
 				selected = rows.length === 0 ? 0 : (selected + 1) % rows.length;
 				render();
@@ -153,9 +193,26 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				continue;
 			}
 
-			if (key === Key.backspace || key === Key.ctrlH) {
-				query = query.slice(0, -1);
+			if (key === Key.pageDown) {
+				selected = rows.length === 0 ? 0 : Math.min(rows.length - 1, selected + (options.scroll ?? 10));
+				render();
+				continue;
+			}
+
+			if (key === Key.pageUp) {
+				selected = Math.max(0, selected - (options.scroll ?? 10));
+				render();
+				continue;
+			}
+
+			if (oneOf([Key.home, Key.ctrlA], key)) {
 				selected = 0;
+				render();
+				continue;
+			}
+
+			if (oneOf([Key.end, Key.ctrlE], key)) {
+				selected = Math.max(0, rows.length - 1);
 				render();
 				continue;
 			}
@@ -168,12 +225,6 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				}
 
 				return rowValue(selectedRow.row, selectedRow.index);
-			}
-
-			if (isPrintable(key)) {
-				query += key;
-				selected = 0;
-				render();
 			}
 		}
 	});

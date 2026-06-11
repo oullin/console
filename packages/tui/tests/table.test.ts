@@ -42,7 +42,31 @@ describe('data table prompt', () => {
 		expect(output.text()).toContain('›');
 	});
 
-	it('filters rows from typed input', async () => {
+	it('filters rows in explicit search mode', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'B', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Pick project B');
+	});
+
+	it('does not filter rows from printable keys in browse mode', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -62,8 +86,30 @@ describe('data table prompt', () => {
 				}),
 		);
 
+		expect(result).toBe('alpha');
+	});
+
+	it('cancels data table search with escape', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'B', Key.escape, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
 		expect(result).toBe('beta');
-		expect(output.text()).toContain('Pick project B');
 	});
 
 	it('falls back to row indexes when rows have no explicit value', async () => {
