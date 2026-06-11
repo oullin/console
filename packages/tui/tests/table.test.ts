@@ -247,6 +247,32 @@ describe('data table prompt', () => {
 		expect(latestFrame).toContain('Beta');
 	});
 
+	it('renders a no-results row for unmatched data table searches', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'Z', Key.escape, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					headers: ['Name'],
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('alpha');
+		expect(output.text()).toContain('Pick project Z');
+		expect(output.text()).toContain('No results found.');
+	});
+
 	it('cancels data table prompts with the current selected row', async () => {
 		const output = createMemoryOutput();
 

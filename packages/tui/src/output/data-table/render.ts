@@ -18,6 +18,15 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 	const environment = promptEnvironment();
 	const selected = clampDataTableSelection(options.selected, options.rows);
 	const window = dataTableRowWindow(options.rows.length, selected, options.scroll);
+	const querySuffix = options.mode === 'search' || options.query.length > 0 ? ` ${options.query}` : '';
+
+	environment.output.write(`${options.message}${querySuffix}\n`);
+
+	if (options.rows.length === 0) {
+		environment.output.write(`${renderTable([], [['No results found.']])}\n`);
+
+		return selected;
+	}
 
 	const renderedRows = options.rows.slice(window.start, window.end).map(({ row }, offset) => {
 		const index = window.start + offset;
@@ -25,9 +34,6 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 		return [index === selected ? '›' : ' ', ...dataTableRowCells(options.headers, row)];
 	});
 
-	const querySuffix = options.mode === 'search' || options.query.length > 0 ? ` ${options.query}` : '';
-
-	environment.output.write(`${options.message}${querySuffix}\n`);
 	environment.output.write(`${renderTable(['', ...options.headers], renderedRows)}\n`);
 
 	return selected;
