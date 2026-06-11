@@ -1,7 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key, oneOf } from '#tui/key';
+import { Key } from '#tui/key';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
+import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { firstDataTableSelection, lastDataTableSelection, nextDataTableSelection, pageDataTableSelection, previousDataTableSelection } from '#tui/output/data-table/navigation';
 import { dataTableRowValue, deriveDataTableHeaders, visibleDataTableRows } from '#tui/output/data-table/rows';
 import { renderDataTableFrame } from '#tui/output/data-table/render';
@@ -91,7 +92,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				}
 			}
 
-			if (key === '/') {
+			if (startsDataTableSearch(key)) {
 				mode = 'search';
 				query = { cursor: 0, value: '' };
 				selected = 0;
@@ -99,38 +100,10 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				continue;
 			}
 
-			if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
-				selected = nextDataTableSelection(selected, rows.length);
-				render();
-				continue;
-			}
+			const action = dataTableNavigationAction(key);
 
-			if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
-				selected = previousDataTableSelection(selected, rows.length);
-				render();
-				continue;
-			}
-
-			if (key === Key.pageDown) {
-				selected = pageDataTableSelection(selected, rows.length, 1, options.scroll);
-				render();
-				continue;
-			}
-
-			if (key === Key.pageUp) {
-				selected = pageDataTableSelection(selected, rows.length, -1, options.scroll);
-				render();
-				continue;
-			}
-
-			if (oneOf([Key.home, Key.ctrlA], key)) {
-				selected = firstDataTableSelection();
-				render();
-				continue;
-			}
-
-			if (oneOf([Key.end, Key.ctrlE], key)) {
-				selected = lastDataTableSelection(rows.length);
+			if (action !== null) {
+				selected = moveDataTableSelection(action, selected, rows.length, options.scroll);
 				render();
 				continue;
 			}
@@ -146,4 +119,28 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 			}
 		}
 	});
+};
+
+const moveDataTableSelection = (action: NonNullable<ReturnType<typeof dataTableNavigationAction>>, selected: number, total: number, scroll?: number): number => {
+	if (action === 'next') {
+		return nextDataTableSelection(selected, total);
+	}
+
+	if (action === 'previous') {
+		return previousDataTableSelection(selected, total);
+	}
+
+	if (action === 'page-next') {
+		return pageDataTableSelection(selected, total, 1, scroll);
+	}
+
+	if (action === 'page-previous') {
+		return pageDataTableSelection(selected, total, -1, scroll);
+	}
+
+	if (action === 'first') {
+		return firstDataTableSelection();
+	}
+
+	return lastDataTableSelection(total);
 };
