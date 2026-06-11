@@ -2,8 +2,13 @@ import { spawn } from 'node:child_process';
 import { platform } from 'node:process';
 import { note } from '#tui/output/notes';
 
-export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
-	if (platform === 'darwin') {
+export type NotificationCommand = {
+	args: string[];
+	bin: string;
+};
+
+export const notificationCommand = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = ''): NotificationCommand | null => {
+	if (targetPlatform === 'darwin') {
 		const script = [
 			'display notification',
 			JSON.stringify(body),
@@ -15,18 +20,30 @@ export const notify = (title: string, body = '', subtitle = '', sound = '', icon
 			.filter(Boolean)
 			.join(' ');
 
-		spawn('osascript', ['-e', script], { detached: true, stdio: 'ignore' }).unref();
-
-		return;
+		return { args: ['-e', script], bin: 'osascript' };
 	}
 
-	if (platform === 'linux') {
+	if (targetPlatform === 'linux') {
 		const args = icon ? ['--icon', icon, title, body] : [title, body];
 
-		spawn('notify-send', args, { detached: true, stdio: 'ignore' }).unref();
+		return { args, bin: 'notify-send' };
+	}
+
+	return null;
+};
+
+export const notifyForPlatform = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
+	const command = notificationCommand(targetPlatform, title, body, subtitle, sound, icon);
+
+	if (command) {
+		spawn(command.bin, command.args, { detached: true, stdio: 'ignore' }).unref();
 
 		return;
 	}
 
 	note(body ? `${title}: ${body}` : title, 'info');
+};
+
+export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
+	notifyForPlatform(platform, title, body, subtitle, sound, icon);
 };
