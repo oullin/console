@@ -129,6 +129,29 @@ describe('prompt environment', () => {
 		await expect(backspace).resolves.toBe(Key.backspace);
 	});
 
+	it('buffers split raw terminal escape sequences', async () => {
+		const input = new FakeRawInput();
+		const key = readRawKey(input);
+
+		input.emit('data', Buffer.from('\u001B'));
+		input.emit('data', Buffer.from('['));
+		input.emit('data', Buffer.from('A'));
+
+		await expect(key).resolves.toBe(Key.up);
+
+		expect(input.rawModes).toEqual([true, false]);
+	});
+
+	it('returns buffered partial escape sequences when input ends', async () => {
+		const input = new FakeRawInput();
+		const key = readRawKey(input);
+
+		input.emit('data', Buffer.from('\u001B'));
+		input.emit('end');
+
+		await expect(key).resolves.toBe(Key.escape);
+	});
+
 	it('restores raw input mode when key input ends', async () => {
 		const input = new FakeRawInput();
 		const key = readRawKey(input);

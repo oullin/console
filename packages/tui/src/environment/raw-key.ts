@@ -1,7 +1,7 @@
 import type { EventEmitter } from 'node:events';
-import { normalizeRawKey } from '#tui/environment/raw-key/normalize';
+import { isCompleteRawKey, normalizeRawKey } from '#tui/environment/raw-key/normalize';
 
-export type RawKeyInput = Pick<EventEmitter, 'off' | 'once'> & {
+export type RawKeyInput = Pick<EventEmitter, 'off' | 'on' | 'once'> & {
 	isRaw?: boolean;
 	isTTY?: boolean;
 	pause(): unknown;
@@ -25,21 +25,38 @@ export const readRawKey = async (input: RawKeyInput): Promise<null | string> =>
 	new Promise((resolve, reject) => {
 		const wasRaw = Boolean(input.isRaw);
 
+		let buffer = '';
+		let escapeTimer: NodeJS.Timeout | undefined;
+
 		const cleanup = (): void => {
+			clearTimeout(escapeTimer);
 			input.off('data', onData);
 			input.off('end', onEnd);
 			input.off('error', onError);
 			restoreInput(input, wasRaw);
 		};
 
-		const onData = (chunk: Buffer | string): void => {
+		const resolveBufferedKey = (): void => {
 			cleanup();
-			resolve(normalizeRawKey(Buffer.isBuffer(chunk) ? chunk.toString('utf8') : chunk));
+			resolve(normalizeRawKey(buffer));
+		};
+
+		const onData = (chunk: Buffer | string): void => {
+			buffer += Buffer.isBuffer(chunk) ? chunk.toString('utf8') : chunk;
+
+			if (isCompleteRawKey(buffer)) {
+				resolveBufferedKey();
+
+				return;
+			}
+
+			clearTimeout(escapeTimer);
+			escapeTimer = setTimeout(resolveBufferedKey, 25);
 		};
 
 		const onEnd = (): void => {
 			cleanup();
-			resolve(null);
+			resolve(buffer.length > 0 ? normalizeRawKey(buffer) : null);
 		};
 
 		const onError = (error: Error): void => {
@@ -47,7 +64,7 @@ export const readRawKey = async (input: RawKeyInput): Promise<null | string> =>
 			reject(error);
 		};
 
-		input.once('data', onData);
+		input.on('data', onData);
 		input.once('end', onEnd);
 		input.once('error', onError);
 

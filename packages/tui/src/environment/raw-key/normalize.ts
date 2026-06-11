@@ -1,5 +1,7 @@
 import { Key } from '#tui/key';
 
+const knownRawKeys: string[] = Object.values(Key).flatMap((value) => (typeof value === 'string' ? [value] : [...value]));
+
 const rawKeyAliases = new Map<string, string>([
 	['\r', Key.enter],
 	['\u0008', Key.backspace],
@@ -7,4 +9,12 @@ const rawKeyAliases = new Map<string, string>([
 
 export const normalizeRawKey = (value: string): string => {
 	return rawKeyAliases.get(value) ?? value;
+};
+
+export const isCompleteRawKey = (value: string): boolean => {
+	return rawKeyAliases.has(value) || !isPartialRawKey(value);
+};
+
+export const isPartialRawKey = (value: string): boolean => {
+	return knownRawKeys.some((key) => key !== value && key.startsWith(value));
 };
