@@ -81,6 +81,27 @@ describe('task helper', () => {
 		expect(output.text()).toContain('error: failed optional step');
 	});
 
+	it('bounds stable task summaries with the task log limit', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task(
+				'Running...',
+				(logger) => {
+					logger.success('first');
+					logger.warning('second');
+					logger.error('third');
+				},
+				2,
+				true,
+			);
+		});
+
+		expect(output.text()).not.toContain('success: first');
+		expect(output.text()).toContain('warning: second');
+		expect(output.text()).toContain('error: third');
+	});
+
 	it('omits stable task summaries by default', async () => {
 		const output = createMemoryOutput();
 

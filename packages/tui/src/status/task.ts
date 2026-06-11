@@ -26,9 +26,11 @@ export class Logger {
 	#partialBuffer = '';
 	#partialStartIndex: number | null = null;
 	private readonly limit: number;
+	private readonly stableLimit: number;
 
 	constructor(limit: number, label: string, subLabel = '') {
 		this.limit = parseLogLimit(limit, 10);
+		this.stableLimit = parseLogLimit(limit, 10);
 		this.labelValue = label;
 		this.subLabelValue = subLabel;
 	}
@@ -77,15 +79,23 @@ export class Logger {
 	}
 
 	success(message: string): void {
-		this.stableMessages.push({ message, type: 'success' });
+		this.stable('success', message);
 	}
 
 	warning(message: string): void {
-		this.stableMessages.push({ message, type: 'warning' });
+		this.stable('warning', message);
 	}
 
 	error(message: string): void {
-		this.stableMessages.push({ message, type: 'error' });
+		this.stable('error', message);
+	}
+
+	private stable(type: StableMessage['type'], message: string): void {
+		this.stableMessages.push({ message, type });
+
+		while (this.stableMessages.length > this.stableLimit) {
+			this.stableMessages.shift();
+		}
 	}
 }
 
