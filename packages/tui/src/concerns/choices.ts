@@ -94,3 +94,22 @@ export const renderInteractiveChoices = <T>(message: string, choices: Array<Choi
 		environment.output.write(`${pointer} ${checked} ${choice.label}${hint}${disabled}\n`);
 	}
 };
+
+export const renderInteractiveChecklist = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number): void => {
+	const environment = promptEnvironment();
+	const window = choiceWindow(choices.length, selected, scroll);
+
+	environment.output.write(`${message}\n`);
+
+	for (const [offset, choice] of choices.slice(window.start, window.end).entries()) {
+		const index = window.start + offset;
+		const active = index === selected;
+		const checked = marked.has(index);
+		const pointer = active ? '›' : ' ';
+		const marker = checked ? '◼' : '◻';
+		const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
+		const hint = choice.hint ? ` ${choice.hint}` : '';
+
+		environment.output.write(`${pointer} ${marker} ${choice.label}${hint}${disabled}\n`);
+	}
+};

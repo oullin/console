@@ -408,6 +408,24 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Selected: first, second');
 	});
 
+	it('renders multiselect options as a checklist', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second'] }),
+		);
+
+		expect(output.text()).toContain('› ◻ first');
+		expect(output.text()).toContain('  ◻ second');
+		expect(output.text()).toContain('› ◼ first');
+	});
+
 	it('returns keys from keyed multiselect options', async () => {
 		const output = createMemoryOutput();
 

@@ -1,5 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
-import { renderInteractiveChoices } from '#tui/concerns/choices';
+import { renderInteractiveChecklist, renderInteractiveChoices } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
 import type { Choice, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
@@ -14,7 +14,7 @@ export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T
 };
 
 export const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): void => {
-	renderInteractiveChoices(message, choices, selected, marked, scroll);
+	renderInteractiveChecklist(message, choices, selected, marked, scroll);
 
 	const text = resolveInfo(info, choices[selected]?.value ?? null);
 	const summary = scroll !== undefined && choices.length > scroll ? `${marked.size} selected` : '';
