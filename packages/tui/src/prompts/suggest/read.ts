@@ -66,6 +66,12 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 			continue;
 		}
 
+		if (oneOf([Key.left, Key.leftArrow, Key.right, Key.rightArrow, Key.ctrlB, Key.ctrlF], key) && highlighted !== null) {
+			highlighted = null;
+			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+			continue;
+		}
+
 		if (key === Key.enter) {
 			if (highlighted !== null && matches[highlighted] !== undefined) {
 				return matches[highlighted];

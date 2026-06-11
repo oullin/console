@@ -75,6 +75,10 @@ describe('suggest prompt', () => {
 		expect(output).not.toContain('Favorite color? Blue');
 	});
 
+	it('clears highlighted suggestions with horizontal navigation keys', async () => {
+		await expectSuggestion(['b', Key.down, Key.left, Key.enter], ['Red', 'Green', 'Blue'], 'b');
+	});
+
 	it('renders suggest info for the highlighted result', async () => {
 		const output = createMemoryOutput();
 
