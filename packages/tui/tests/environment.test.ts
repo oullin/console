@@ -1,5 +1,28 @@
 import { describe, expect, it } from 'vitest';
+import { EventEmitter } from 'node:events';
 import { configurePrompts, createMemoryOutput, createScriptedInput, promptEnvironment, withPromptEnvironment } from '#tui/environment';
+import { readRawKey } from '#tui/environment/raw-key';
+
+class FakeRawInput extends EventEmitter {
+	isRaw = false;
+	isTTY = true;
+	paused = 0;
+	rawModes: boolean[] = [];
+	resumed = 0;
+
+	pause(): void {
+		this.paused += 1;
+	}
+
+	resume(): void {
+		this.resumed += 1;
+	}
+
+	setRawMode(mode: boolean): void {
+		this.rawModes.push(mode);
+		this.isRaw = mode;
+	}
+}
 
 describe('prompt environment', () => {
 	it('restores the previous environment when a scoped callback fails', async () => {
@@ -69,5 +92,47 @@ describe('prompt environment', () => {
 		await expect(input.readKey?.()).resolves.toBeNull();
 
 		await expect(input.readLine?.('Question')).resolves.toBe('');
+	});
+
+	it('restores raw input mode after reading a key', async () => {
+		const input = new FakeRawInput();
+		const key = readRawKey(input);
+
+		expect(input.rawModes).toEqual([true]);
+		expect(input.resumed).toBe(1);
+
+		input.emit('data', Buffer.from('x'));
+
+		await expect(key).resolves.toBe('x');
+
+		expect(input.rawModes).toEqual([true, false]);
+		expect(input.paused).toBe(1);
+		expect(input.listenerCount('data')).toBe(0);
+		expect(input.listenerCount('end')).toBe(0);
+		expect(input.listenerCount('error')).toBe(0);
+	});
+
+	it('restores raw input mode when key input ends', async () => {
+		const input = new FakeRawInput();
+		const key = readRawKey(input);
+
+		input.emit('end');
+
+		await expect(key).resolves.toBeNull();
+
+		expect(input.rawModes).toEqual([true, false]);
+		expect(input.paused).toBe(1);
+	});
+
+	it('restores raw input mode when key input errors', async () => {
+		const input = new FakeRawInput();
+		const key = readRawKey(input);
+
+		input.emit('error', new Error('read failed'));
+
+		await expect(key).rejects.toThrow('read failed');
+
+		expect(input.rawModes).toEqual([true, false]);
+		expect(input.paused).toBe(1);
 	});
 });
