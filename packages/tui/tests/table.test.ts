@@ -63,6 +63,17 @@ describe('table output', () => {
 		expect(output.text()).toContain('| Paris | OpenTUI |');
 	});
 
+	it('renders missing table cells as empty columns', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table(['Name', 'Runtime'], [['Ollin'], ['Prompts', 'TypeScript']]);
+		});
+
+		expect(output.text()).toContain('| Ollin   |            |');
+		expect(output.text()).toContain('| Prompts | TypeScript |');
+	});
+
 	it('rejects invalid table runtime shapes through the validator layer', async () => {
 		const output = createMemoryOutput();
 

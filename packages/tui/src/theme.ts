@@ -40,7 +40,7 @@ export const renderTable = (headers: string[], rows: string[][]): string => {
 	const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
 
 	const renderRow = (columns: string[]): string => {
-		return `| ${columns.map((column, index) => padVisible(column, widths[index] ?? 0)).join(' | ')} |`;
+		return `| ${widths.map((width, index) => padVisible(columns[index] ?? '', width)).join(' | ')} |`;
 	};
 
 	const divider = `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`;
