@@ -31,12 +31,12 @@ later phases:
 - `src/AutoCompletePrompt.php` advanced ghost-text rendering
 - `src/DataTablePrompt.php`
 - `src/FormBuilder.php`
-- `src/MultiSearchPrompt.php`
+- `src/MultiSearchPrompt.php` full rendering and selected-result summary parity
 - `src/MultiSelectPrompt.php`
 - `src/NotifyPrompt.php`
 - `src/Progress.php`
 - `src/Prompt.php`
-- `src/SearchPrompt.php` full search lifecycle and highlighted result labels
+- `src/SearchPrompt.php` full rendering and highlighted result label parity
 - `src/Spinner.php`
 - `src/Stream.php`
 - `src/Task.php`

@@ -35,7 +35,7 @@ export const ensureRequired = <T>(value: T, required?: boolean | string): string
 
 export const promptUntilValid = async <T>(
   options: BasePromptOptions<T>,
-  read: () => Promise<T>
+  read: (attempt: number) => Promise<T>
 ): Promise<T> => {
   const environment = promptEnvironment();
 
@@ -51,11 +51,13 @@ export const promptUntilValid = async <T>(
     return value;
   }
 
+  let attempt = 0;
+
   while (true) {
     let value: T;
 
     try {
-      value = await read();
+      value = await read(attempt);
     } catch (error) {
       if (error instanceof PromptValidationError) {
         if (!environment.interactive) {
@@ -63,6 +65,7 @@ export const promptUntilValid = async <T>(
         }
 
         environment.error.write(renderError(error.message));
+        attempt += 1;
         continue;
       }
 
@@ -81,6 +84,7 @@ export const promptUntilValid = async <T>(
     }
 
     environment.error.write(renderError(validation));
+    attempt += 1;
   }
 };
 

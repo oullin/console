@@ -77,7 +77,7 @@ export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
 
 export type SearchPromptOptions<T> = BasePromptOptions<T> & {
   label?: string;
-  options: Array<ChoiceInput<T>> | ((query: string) => MaybePromise<Array<ChoiceInput<T>>>);
+  options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
   placeholder?: string;
   scroll?: number;
   info?: string | ((value: T) => string);
