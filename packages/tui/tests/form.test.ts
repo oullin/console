@@ -115,6 +115,23 @@ describe('form builder', () => {
 		expect(responses[1]).toBe('D');
 	});
 
+	it('reuses boolean previous responses when reverting confirm steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['n', Key.enter, Key.ctrlU, Key.enter, 'D', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().confirm('Active?').text('Done').submit(),
+		);
+
+		expect(responses[0]).toBe(false);
+		expect(responses[1]).toBe('D');
+	});
+
 	it('reverts past ignored side-effect steps', async () => {
 		const output = createMemoryOutput();
 

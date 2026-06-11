@@ -1,5 +1,5 @@
 import { autocomplete, confirm, multiselect, multisearch, pause, search, select, suggest } from '#tui/prompts/choices';
-import { previousArray, previousString } from '#tui/form/builder/previous';
+import { previousArray, previousBoolean, previousString } from '#tui/form/builder/previous';
 import { isSearchPromptLabel } from '#tui/form/builder/prompts/validators/search';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ChoicePromptBuilderMethods } from '#tui/form/builder/prompts/types';
@@ -10,7 +10,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 		return this.add((_, previous) => autocomplete({ message: label, label, options, default: previousString(previous, defaultValue), required, validate, hint, transform }), name);
 	},
 	confirm(label, defaultValue = true, yes = 'Yes', no = 'No', required = false, validate = undefined, hint = '', name, transform = undefined) {
-		return this.add(() => confirm(label, defaultValue, yes, no, required, validate, hint, transform), name);
+		return this.add((_, previous) => confirm(label, previousBoolean(previous, defaultValue), yes, no, required, validate, hint, transform), name);
 	},
 	multisearch<T>(
 		optionsOrLabel: MultiSearchPromptOptions<T> | string,

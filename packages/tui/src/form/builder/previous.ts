@@ -1,4 +1,4 @@
-import { parsePreviousArray, parsePreviousNumber, parsePreviousString } from '#tui/form/builder/validators/previous';
+import { parsePreviousArray, parsePreviousBoolean, parsePreviousNumber, parsePreviousString } from '#tui/form/builder/validators/previous';
 
 export const previousString = (previous: unknown, defaultValue: string): string => {
 	return parsePreviousString(previous, defaultValue);
@@ -10,4 +10,8 @@ export const previousNumber = (previous: unknown, defaultValue: number | string)
 
 export const previousArray = <T>(previous: unknown, defaultValue: T[]): T[] => {
 	return parsePreviousArray(previous, defaultValue);
+};
+
+export const previousBoolean = (previous: unknown, defaultValue: boolean): boolean => {
+	return parsePreviousBoolean(previous, defaultValue);
 };
