@@ -175,6 +175,23 @@ describe('form builder', () => {
 		expect(responses.many).toEqual(['red']);
 	});
 
+	it('runs password and textarea form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['s', 'e', 'c', 'r', 'e', 't', Key.enter, 'L', '1', Key.enter, 'L', '2', Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().password('Secret', '', false, undefined, '', 'secret').textarea('Body', '', '', false, undefined, '', 3, 'body').submit(),
+		);
+
+		expect(responses.secret).toBe('secret');
+		expect(responses.body).toBe('L1\nL2');
+	});
+
 	it('runs task, pause, and stream form steps', async () => {
 		const output = createMemoryOutput();
 
