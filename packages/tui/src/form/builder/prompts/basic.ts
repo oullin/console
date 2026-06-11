@@ -4,8 +4,8 @@ import type { FormBuilder } from '#tui/form/builder/index';
 import type { BasicPromptBuilderMethods } from '#tui/form/builder/prompts/types';
 
 export const basicPromptBuilderMethods: BasicPromptBuilderMethods & ThisType<FormBuilder> = {
-	number(label, placeholder = '', defaultValue = 0, required = false, validate = undefined, hint = '', min, max, step, name) {
-		return this.add((_, previous) => number(label, placeholder, previousNumber(previous, defaultValue), required, validate, hint, min, max, step), name);
+	number(label, placeholder = '', defaultValue = 0, required = false, validate = undefined, hint = '', min, max, step, name, transform = undefined) {
+		return this.add((_, previous) => number(label, placeholder, previousNumber(previous, defaultValue), required, validate, hint, min, max, step, transform), name);
 	},
 	password(label, placeholder = '', required = false, validate = undefined, hint = '', name, transform = undefined) {
 		return this.add(() => password(label, placeholder, required, validate, hint, transform), name);

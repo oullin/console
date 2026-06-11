@@ -119,6 +119,22 @@ describe('number prompt', () => {
 		expect(result).toBe(1);
 	});
 
+	it('applies transforms from positional number prompts', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['4', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number('Count', '', '', false, undefined, '', undefined, undefined, undefined, (value) => Number(value) * 2),
+		);
+
+		expect(result).toBe(8);
+	});
+
 	it('parses numeric values as integers', () => {
 		expect(parseNumberInput('1.9')).toEqual({ value: 1 });
 		expect(parseNumberInput('1.9', { integer: true })).toEqual({ value: 1 });

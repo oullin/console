@@ -1,5 +1,5 @@
 import type { FormBuilder } from '#tui/form/builder/index';
-import type { TextPromptOptions } from '#tui/types';
+import type { NumberPromptOptions, TextPromptOptions } from '#tui/types';
 import type { MaybePromise } from '#tui/types';
 
 export type BasicPromptBuilderMethods = {
@@ -15,6 +15,7 @@ export type BasicPromptBuilderMethods = {
 		max?: number,
 		step?: number,
 		name?: string,
+		transform?: NumberPromptOptions['transform'],
 	): FormBuilder;
 	password(
 		this: FormBuilder,

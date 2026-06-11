@@ -98,6 +98,25 @@ describe('form builder', () => {
 		expect(responses[1]).toBe('D');
 	});
 
+	it('applies number transforms from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['4', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.number('Count', '', '', false, undefined, '', undefined, undefined, undefined, 'count', (value) => Number(value) * 2)
+					.submit(),
+		);
+
+		expect(responses.count).toBe(8);
+	});
+
 	it('reuses array previous responses when reverting prompt builder steps', async () => {
 		const output = createMemoryOutput();
 

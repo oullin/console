@@ -15,6 +15,7 @@ export function number(
 	min?: number,
 	max?: number,
 	step?: number,
+	transform?: NumberPromptOptions['transform'],
 ): Promise<number | string>;
 
 export async function number(
@@ -27,9 +28,12 @@ export async function number(
 	min: number | undefined = undefined,
 	max: number | undefined = undefined,
 	step: number | undefined = undefined,
+	transform: NumberPromptOptions['transform'] = undefined,
 ): Promise<number | string> {
 	const options: NumberPromptOptions =
-		typeof message === 'string' ? { message, label: message, placeholder, default: defaultValue, required, validate, hint, min, max, step } : { ...message, default: message.default ?? '' };
+		typeof message === 'string'
+			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, min, max, step, transform }
+			: { ...message, default: message.default ?? '' };
 
 	return promptUntilValid(options, async () => {
 		const answer = await readNumberValue(options.message, {
