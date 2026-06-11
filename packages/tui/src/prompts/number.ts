@@ -1,5 +1,5 @@
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
-import { readTypedValue } from '#tui/typed-value';
+import { readNumberValue } from '#tui/prompts/number/input';
 import type { NumberPromptOptions } from '#tui/types';
 
 const integerPattern = /^[+-]?\d+$/u;
@@ -22,7 +22,7 @@ export function number(
 export async function number(
 	message: string | NumberPromptOptions,
 	_placeholder = '',
-	defaultValue = 0,
+	defaultValue: number | undefined = undefined,
 	required: boolean | string = false,
 	validate: NumberPromptOptions['validate'] = undefined,
 	hint = '',
@@ -30,13 +30,15 @@ export async function number(
 	max: number | undefined = undefined,
 	step: number | undefined = undefined,
 ): Promise<number> {
-	const options: NumberPromptOptions =
-		typeof message === 'string' ? { message, label: message, default: defaultValue, required, validate, hint, min, max, step } : { ...message, default: message.default ?? defaultValue };
+	const options: NumberPromptOptions = typeof message === 'string' ? { message, label: message, default: defaultValue, required, validate, hint, min, max, step } : { ...message };
 
 	return promptUntilValid(options, async () => {
-		const answer = await readTypedValue(options.message, {
-			default: options.default === undefined ? undefined : String(options.default),
+		const answer = await readNumberValue(options.message, {
+			default: options.default,
 			hint: options.hint,
+			max: options.max,
+			min: options.min,
+			step: options.step,
 		});
 
 		if (answer === '' && options.default !== undefined) {
