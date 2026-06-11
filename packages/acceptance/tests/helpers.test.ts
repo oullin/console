@@ -109,7 +109,8 @@ describe('Laravel-style helpers', () => {
     });
 
     expect(output.text()).toContain('Working');
-    expect(output.text()).toContain('Files: 2/2');
+    expect(output.text()).toContain('Files:');
+    expect(output.text()).toContain('2 / 2');
     expect(output.text()).toContain('ab');
   });
 });

@@ -34,7 +34,7 @@ later phases:
 - `src/MultiSearchPrompt.php` full rendering and selected-result summary parity
 - `src/MultiSelectPrompt.php`
 - `src/NotifyPrompt.php`
-- `src/Progress.php`
+- `src/Progress.php` exact box drawing and signal handling parity
 - `src/Prompt.php`
 - `src/SearchPrompt.php` full rendering and highlighted result label parity
 - `src/Spinner.php`
