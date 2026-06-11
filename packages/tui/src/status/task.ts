@@ -20,6 +20,8 @@ type StableMessage = {
 export class Logger {
 	readonly lines: string[] = [];
 	readonly stableMessages: StableMessage[] = [];
+	#partialBuffer = '';
+	#partialStartIndex: number | null = null;
 
 	constructor(private readonly limit: number) {}
 
@@ -35,6 +37,23 @@ export class Logger {
 
 	log(message: string): void {
 		this.line(message);
+	}
+
+	partial(chunk: string): void {
+		this.#partialBuffer += chunk;
+
+		if (this.#partialStartIndex === null) {
+			this.#partialStartIndex = this.lines.length;
+		}
+
+		this.lines.splice(this.#partialStartIndex);
+		this.line(this.#partialBuffer);
+		this.#partialStartIndex = Math.min(this.#partialStartIndex, this.lines.length);
+	}
+
+	commitPartial(): void {
+		this.#partialBuffer = '';
+		this.#partialStartIndex = null;
 	}
 
 	info(message: string): void {

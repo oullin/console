@@ -73,4 +73,37 @@ describe('task helper', () => {
 		expect(output.text()).not.toContain('success: created');
 		expect(output.text()).toContain('Done: Running...');
 	});
+
+	it('accumulates partial task output until committed', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.partial('Downloading ');
+				logger.partial('states');
+				logger.commitPartial();
+				logger.line('Done');
+			});
+		});
+
+		expect(output.text()).toContain('Downloading states');
+		expect(output.text()).toContain('Done');
+		expect(output.text()).not.toContain('Downloading \n');
+	});
+
+	it('starts a new partial line after committing the previous partial', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.partial('one');
+				logger.commitPartial();
+				logger.partial('two');
+				logger.commitPartial();
+			});
+		});
+
+		expect(output.text()).toContain('one');
+		expect(output.text()).toContain('two');
+	});
 });
