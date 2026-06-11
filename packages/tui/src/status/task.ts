@@ -1,4 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
+import { parseLogLimit } from '#tui/status/validators/limit';
 import type { MaybePromise } from '#tui/types';
 
 const cursorReset = `${String.fromCharCode(27)}[1G`;
@@ -24,12 +25,10 @@ export class Logger {
 	subLabelValue: string;
 	#partialBuffer = '';
 	#partialStartIndex: number | null = null;
+	private readonly limit: number;
 
-	constructor(
-		private readonly limit: number,
-		label: string,
-		subLabel = '',
-	) {
+	constructor(limit: number, label: string, subLabel = '') {
+		this.limit = parseLogLimit(limit, 10);
 		this.labelValue = label;
 		this.subLabelValue = subLabel;
 	}

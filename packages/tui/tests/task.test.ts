@@ -26,6 +26,26 @@ describe('task helper', () => {
 		expect(output.text()).toContain('line three');
 	});
 
+	it('keeps task logging finite for invalid limits', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task(
+				'Running...',
+				(logger) => {
+					logger.log('line one');
+					logger.log('line two');
+				},
+				-1,
+			);
+		});
+
+		expect(output.text()).toContain('Running...');
+		expect(output.text()).not.toContain('line one');
+		expect(output.text()).not.toContain('line two');
+		expect(output.text()).toContain('Done: Running...');
+	});
+
 	it('strips cursor reset control sequences from log lines', async () => {
 		const output = createMemoryOutput();
 
