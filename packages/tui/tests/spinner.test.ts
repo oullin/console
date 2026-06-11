@@ -12,6 +12,7 @@ describe('spinner helper', () => {
 
 		expect(result).toBe('done');
 		expect(output.text()).toContain('\u001B[?25l');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 		expect(output.text()).toContain('\u001B[?25h');
 		expect(output.text()).toContain(' ⠶ Working');
 		expect(output.text()).not.toContain('Done: Working');
@@ -42,6 +43,7 @@ describe('spinner helper', () => {
 		).rejects.toBe(failure);
 
 		expect(output.text()).toContain(' ⠶ Working');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 		expect(output.text()).toContain('\u001B[?25h');
 		expect(output.text()).not.toContain('Failed: Working');
 		expect(output.text()).not.toContain('Done: Working');

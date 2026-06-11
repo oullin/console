@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, task, withPromptEnvironment } from '#tui/index';
+import { eraseRenderedFrame, renderedFrameLineCount } from '#tui/status/frame';
 import { renderTaskFrame } from '#tui/status/task/render';
 
 describe('task helper', () => {
@@ -22,6 +23,7 @@ describe('task helper', () => {
 
 		expect(result).toBe('done');
 		expect(output.text()).toContain('\u001B[?25l');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 		expect(output.text()).toContain('\u001B[?25h');
 		expect(output.text()).toContain('Running...');
 		expect(output.text()).not.toContain('line one');
@@ -247,6 +249,25 @@ describe('task helper', () => {
 		).toContain(' ⠶ Running...');
 	});
 
+	it('counts and erases rendered task frames', async () => {
+		const frame = renderTaskFrame({
+			label: 'Running...',
+			limit: 2,
+			lines: ['line one'],
+			stableMessages: [],
+		});
+
+		const output = createMemoryOutput();
+
+		expect(renderedFrameLineCount(frame)).toBe(4);
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			eraseRenderedFrame(frame);
+		});
+
+		expect(output.text()).toBe('\u001B[1A\u001B[2K'.repeat(4));
+	});
+
 	it('restores the cursor when task callbacks fail', async () => {
 		const output = createMemoryOutput();
 		const failure = new Error('failed');
@@ -260,5 +281,6 @@ describe('task helper', () => {
 		).rejects.toBe(failure);
 
 		expect(output.text()).toContain('\u001B[?25h');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 	});
 });

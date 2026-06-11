@@ -7,6 +7,7 @@ import {
 	createMemoryOutput,
 	cursorToStart,
 	eraseLine,
+	erasePreviousLines,
 	foregroundColor,
 	hideCursor,
 	setTerminalTitle,
@@ -45,11 +46,13 @@ describe('terminal helpers', () => {
 		await withPromptEnvironment({ output, error: output }, async () => {
 			cursorToStart();
 			eraseLine();
+			erasePreviousLines(2);
+			erasePreviousLines(-1);
 			hideCursor();
 			showCursor();
 		});
 
-		expect(output.text()).toBe('\r\u001B[2K\u001B[?25l\u001B[?25h');
+		expect(output.text()).toBe('\r\u001B[2K\u001B[1A\u001B[2K\u001B[1A\u001B[2K\u001B[?25l\u001B[?25h');
 	});
 
 	it('detects true color terminal modes', () => {

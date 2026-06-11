@@ -24,6 +24,16 @@ export const eraseLine = (): void => {
 	promptEnvironment().output.write('\u001B[2K');
 };
 
+export const erasePreviousLines = (count: number): void => {
+	const lines = Math.max(0, Math.floor(count));
+
+	if (lines === 0) {
+		return;
+	}
+
+	promptEnvironment().output.write('\u001B[1A\u001B[2K'.repeat(lines));
+};
+
 export const cursorToStart = (): void => {
 	promptEnvironment().output.write('\r');
 };

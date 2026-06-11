@@ -1,4 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { Logger } from '#tui/status/task/logger';
 import { renderTaskFrame } from '#tui/status/task/render';
 import { hideCursor, showCursor } from '#tui/terminal';
@@ -33,42 +34,43 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 	const output = promptEnvironment().output;
 
 	hideCursor();
-	output.write(
-		renderTaskFrame({
+
+	let frame = renderTaskFrame({
+		label: logger.labelValue,
+		limit: logger.limitValue,
+		lines: logger.lines,
+		stableMessages: logger.stableMessages,
+		subLabel: logger.subLabelValue,
+	});
+
+	output.write(frame);
+
+	try {
+		const result = await run(logger);
+
+		eraseRenderedFrame(frame);
+		frame = renderTaskFrame({
+			finished: true,
+			keepSummary: summary,
+			label: logger.labelValue,
+			limit: logger.limitValue,
+			lines: logger.lines,
+			stableMessages: summary ? logger.stableMessages : [],
+			subLabel: logger.subLabelValue,
+		});
+		output.write(frame);
+
+		return result;
+	} catch (error) {
+		eraseRenderedFrame(frame);
+		frame = renderTaskFrame({
 			label: logger.labelValue,
 			limit: logger.limitValue,
 			lines: logger.lines,
 			stableMessages: logger.stableMessages,
 			subLabel: logger.subLabelValue,
-		}),
-	);
-
-	try {
-		const result = await run(logger);
-
-		output.write(
-			renderTaskFrame({
-				finished: true,
-				keepSummary: summary,
-				label: logger.labelValue,
-				limit: logger.limitValue,
-				lines: logger.lines,
-				stableMessages: summary ? logger.stableMessages : [],
-				subLabel: logger.subLabelValue,
-			}),
-		);
-
-		return result;
-	} catch (error) {
-		output.write(
-			renderTaskFrame({
-				label: logger.labelValue,
-				limit: logger.limitValue,
-				lines: logger.lines,
-				stableMessages: logger.stableMessages,
-				subLabel: logger.subLabelValue,
-			}),
-		);
+		});
+		output.write(frame);
 
 		throw error;
 	} finally {
