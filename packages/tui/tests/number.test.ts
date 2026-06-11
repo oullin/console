@@ -52,6 +52,23 @@ describe('number prompt', () => {
 		expect(result).toBe('');
 	});
 
+	it('requires number input when configured', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, '4', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count', required: true }),
+		);
+
+		expect(result).toBe(4);
+		expect(output.text()).toContain('Required.');
+	});
+
 	it('coerces decimal input to an integer value', async () => {
 		const output = createMemoryOutput();
 

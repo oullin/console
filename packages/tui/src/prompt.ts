@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderError, renderQuestion } from '#tui/theme';
+import { requiredMessage } from '#tui/validators/required';
 import type { BasePromptOptions, Validator } from '#tui/types';
 
 export class PromptValidationError extends Error {
@@ -24,13 +25,7 @@ export const validationMessage = async <T>(value: T, validator?: Validator<T>): 
 };
 
 export const ensureRequired = <T>(value: T, required?: boolean | string): string | undefined => {
-	const empty = value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
-
-	if (!empty || !required) {
-		return undefined;
-	}
-
-	return typeof required === 'string' ? required : 'A value is required.';
+	return requiredMessage(value, required);
 };
 
 export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: (attempt: number) => Promise<T>): Promise<T> => {

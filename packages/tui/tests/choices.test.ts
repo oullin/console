@@ -47,6 +47,23 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('[No]');
 	});
 
+	it('treats false confirm answers as invalid when required', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['n', Key.enter, 'y', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?', true, 'Yes', 'No', true),
+		);
+
+		expect(result).toBe(true);
+		expect(output.text()).toContain('Required.');
+	});
+
 	it('selects with arrow keys and enter', async () => {
 		const output = createMemoryOutput();
 
@@ -201,7 +218,7 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual(['first']);
-		expect(output.text()).toContain('A value is required.');
+		expect(output.text()).toContain('Required.');
 	});
 
 	it('toggles all multiselect choices with ctrl-a', async () => {
