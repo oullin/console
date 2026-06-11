@@ -13,7 +13,7 @@ TypeScript and OpenTUI internals.
 | --- | --- |
 | `src/helpers.php` | `packages/tui/src/index.ts` |
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts`, `packages/tui/src/environment/*` |
-| Key constants | `packages/tui/src/key.ts` |
+| Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |

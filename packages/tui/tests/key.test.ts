@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Key, keyFromEvent } from '#tui/index';
+import { Key, keyFromEvent, oneOf } from '#tui/index';
 
 describe('keyboard mapping', () => {
 	it('maps named keys', () => {
@@ -29,5 +29,11 @@ describe('keyboard mapping', () => {
 
 	it('maps shifted tab events', () => {
 		expect(keyFromEvent({ name: 'tab', shift: true })).toBe(Key.shiftTab);
+	});
+
+	it('matches nested key variants', () => {
+		expect(oneOf([Key.home, Key.end], Key.home[2])).toBe(Key.home[2]);
+		expect(oneOf([Key.home, Key.end], Key.end[3])).toBe(Key.end[3]);
+		expect(oneOf([Key.home, Key.end], Key.enter)).toBeUndefined();
 	});
 });
