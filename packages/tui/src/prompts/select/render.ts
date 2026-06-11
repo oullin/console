@@ -17,9 +17,11 @@ export const renderMultipleChoices = <T>(message: string, choices: Array<Choice<
 	renderInteractiveChoices(message, choices, selected, marked, scroll);
 
 	const text = resolveInfo(info, choices[selected]?.value ?? null);
+	const summary = scroll !== undefined && choices.length > scroll ? `${marked.size} selected` : '';
+	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
 
-	if (text.length > 0) {
-		promptEnvironment().output.write(`${text}\n`);
+	if (details.length > 0) {
+		promptEnvironment().output.write(`${details}\n`);
 	}
 
 	const labels = [...marked]

@@ -170,6 +170,23 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Selected: first, second');
 	});
 
+	it('starts multiselect prompts with default selected values', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second'], default: ['second'] }),
+		);
+
+		expect(result).toEqual(['second']);
+		expect(output.text()).toContain('Selected: second');
+	});
+
 	it('requires multiselect choices when configured', async () => {
 		const output = createMemoryOutput();
 
@@ -219,5 +236,38 @@ describe('choice prompts', () => {
 
 		expect(output.text()).toContain('About first');
 		expect(output.text()).toContain('About second');
+	});
+
+	it('renders multiselect selected counts for scrollable option lists', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second', 'third'], scroll: 2 }),
+		);
+
+		expect(output.text()).toContain('0 selected');
+		expect(output.text()).toContain('1 selected');
+	});
+
+	it('combines multiselect info with selected counts', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second', 'third'], scroll: 2, info: (value) => `About ${value ?? 'none'}` }),
+		);
+
+		expect(output.text()).toContain('About first · 0 selected');
 	});
 });
