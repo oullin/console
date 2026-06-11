@@ -37,4 +37,40 @@ describe('task helper', () => {
 
 		expect(output.text()).toContain('beforeafter');
 	});
+
+	it('keeps stable task summaries when requested', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task(
+				'Running...',
+				(logger) => {
+					logger.line('line one');
+					logger.success('created');
+					logger.warning('check this');
+					logger.error('failed optional step');
+				},
+				10,
+				true,
+			);
+		});
+
+		expect(output.text()).toContain('line one');
+		expect(output.text()).toContain('success: created');
+		expect(output.text()).toContain('warning: check this');
+		expect(output.text()).toContain('error: failed optional step');
+	});
+
+	it('omits stable task summaries by default', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await task('Running...', (logger) => {
+				logger.success('created');
+			});
+		});
+
+		expect(output.text()).not.toContain('success: created');
+		expect(output.text()).toContain('Done: Running...');
+	});
 });

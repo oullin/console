@@ -5,17 +5,25 @@ const cursorReset = `${String.fromCharCode(27)}[1G`;
 const eraseLine = `${String.fromCharCode(27)}[2K`;
 
 export type TaskDefinition<T> = {
+	keepSummary?: boolean;
+	subLabel?: string;
 	title: string;
 	limit?: number;
 	task: (logger: Logger) => MaybePromise<T>;
 };
 
+type StableMessage = {
+	message: string;
+	type: 'error' | 'success' | 'warning';
+};
+
 export class Logger {
 	readonly lines: string[] = [];
+	readonly stableMessages: StableMessage[] = [];
 
 	constructor(private readonly limit: number) {}
 
-	log(message: string): void {
+	line(message: string): void {
 		for (const line of message.split(/\r?\n/u).filter((value) => value.length > 0)) {
 			this.lines.push(line.replaceAll(cursorReset, '').replaceAll(eraseLine, ''));
 		}
@@ -25,20 +33,24 @@ export class Logger {
 		}
 	}
 
+	log(message: string): void {
+		this.line(message);
+	}
+
 	info(message: string): void {
-		this.log(message);
+		this.line(message);
 	}
 
 	success(message: string): void {
-		this.log(message);
+		this.stableMessages.push({ message, type: 'success' });
 	}
 
 	warning(message: string): void {
-		this.log(message);
+		this.stableMessages.push({ message, type: 'warning' });
 	}
 
 	error(message: string): void {
-		this.log(message);
+		this.stableMessages.push({ message, type: 'error' });
 	}
 }
 
@@ -46,9 +58,11 @@ export async function task<T>(definition: TaskDefinition<T>): Promise<T>;
 
 export async function task<T>(label: string, callback: (logger: Logger) => MaybePromise<T>, limit?: number, keepSummary?: boolean, subLabel?: string): Promise<T>;
 
-export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, callback?: (logger: Logger) => MaybePromise<T>, limit = 10, _keepSummary = false, subLabel?: string): Promise<T> {
+export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, callback?: (logger: Logger) => MaybePromise<T>, limit = 10, keepSummary = false, subLabel?: string): Promise<T> {
 	const title = typeof definitionOrLabel === 'string' ? definitionOrLabel : definitionOrLabel.title;
 	const run = typeof definitionOrLabel === 'string' ? callback : definitionOrLabel.task;
+	const summary = typeof definitionOrLabel === 'string' ? keepSummary : (definitionOrLabel.keepSummary ?? keepSummary);
+	const subtitle = typeof definitionOrLabel === 'string' ? subLabel : (definitionOrLabel.subLabel ?? subLabel);
 
 	if (!run) {
 		throw new Error('A task callback is required.');
@@ -56,12 +70,18 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 	const logger = new Logger(typeof definitionOrLabel === 'string' ? limit : (definitionOrLabel.limit ?? limit));
 
-	promptEnvironment().output.write(`${title}${subLabel ? ` ${subLabel}` : ''}\n`);
+	promptEnvironment().output.write(`${title}${subtitle ? ` ${subtitle}` : ''}\n`);
 
 	const result = await run(logger);
 
 	for (const line of logger.lines) {
 		promptEnvironment().output.write(`${line}\n`);
+	}
+
+	if (summary) {
+		for (const message of logger.stableMessages) {
+			promptEnvironment().output.write(`${message.type}: ${message.message}\n`);
+		}
 	}
 
 	promptEnvironment().output.write(`Done: ${title}\n`);
