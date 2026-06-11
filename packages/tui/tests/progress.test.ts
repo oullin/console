@@ -58,4 +58,21 @@ describe('progress helper', () => {
 			expect(bar.value()).toBe(true);
 		});
 	});
+
+	it('clamps manual progress updates to the valid range', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const bar = progress('Adding States', 2);
+
+			bar.advance(3);
+			expect(bar.current()).toBe(2);
+
+			bar.advance(-5);
+			expect(bar.current()).toBe(0);
+		});
+
+		expect(output.text()).toContain('2 / 2');
+		expect(output.text()).toContain('0 / 2');
+	});
 });

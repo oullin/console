@@ -24,7 +24,7 @@ export class Progress {
 	}
 
 	advance(step = 1): void {
-		this.#current = Math.min(this.total, this.#current + step);
+		this.#current = Math.max(0, Math.min(this.total, this.#current + step));
 		this.render();
 	}
 
