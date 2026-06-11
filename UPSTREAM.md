@@ -38,6 +38,7 @@ TypeScript and OpenTUI internals.
 | Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table.ts` |
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
+| Form builder label-first search and multisearch methods | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/tests/form.test.ts` |
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
 | Spinner static and deterministic animated frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | Task static and deterministic animated frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/*` |
@@ -56,7 +57,7 @@ TypeScript and OpenTUI internals.
 The following reference areas still need full line-by-line behavioral mapping in
 later phases:
 
-- Form builder
+- Form builder remaining method-surface and validation parity
 - Multi-search full rendering and selected-result summary parity
 - Multi-select boxed layout and submit/cancel frame parity
 - Progress signal handling parity

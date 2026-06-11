@@ -193,6 +193,53 @@ describe('form builder', () => {
 		expect(responses.many).toEqual(['red']);
 	});
 
+	it('runs label-first search and multisearch form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['g', Key.down, Key.enter, 'r', Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.search(
+						'Searched color',
+						(value) => {
+							const options = { green: 'Green', blue: 'Blue', red: 'Red' };
+
+							return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+						},
+						'',
+						5,
+						undefined,
+						'',
+						true,
+						'searched',
+					)
+					.multisearch(
+						'Many colors',
+						(value) => {
+							const options = { red: 'Red', green: 'Green', blue: 'Blue' };
+
+							return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+						},
+						'',
+						5,
+						false,
+						undefined,
+						'Use the space bar to select options.',
+						'many',
+					)
+					.submit(),
+		);
+
+		expect(responses.searched).toBe('green');
+		expect(responses.many).toEqual(['red']);
+	});
+
 	it('runs password and textarea form steps', async () => {
 		const output = createMemoryOutput();
 
