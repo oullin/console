@@ -179,7 +179,7 @@ describe('form builder', () => {
 			},
 			() =>
 				form()
-					.suggest('Suggested color', ['Red', 'Green', 'Blue'], '', 5, false, undefined, '', 'suggested')
+					.suggest('Suggested color', ['Red', 'Green', 'Blue'], '', '', 5, false, undefined, '', 'suggested')
 					.search(
 						{
 							message: 'Searched color',
@@ -208,6 +208,39 @@ describe('form builder', () => {
 		expect(responses.suggested).toBe('Blue');
 		expect(responses.searched).toBe('green');
 		expect(responses.many).toEqual(['red']);
+	});
+
+	it('passes suggest placeholders and defaults from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().suggest('Suggested color', ['Red', 'Green', 'Blue'], 'Type a color', 'Blue', 5, false, undefined, '', 'suggested').submit(),
+		);
+
+		expect(responses.suggested).toBe('Blue');
+	});
+
+	it('passes autocomplete placeholders from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().autocomplete('Auto color', ['Red', 'Green', 'Blue'], 'Type a color', '', false, undefined, '', 'auto').submit(),
+		);
+
+		expect(responses.auto).toBe('');
+		expect(output.text()).toContain('Type a color');
 	});
 
 	it('runs label-first search and multisearch form steps', async () => {
