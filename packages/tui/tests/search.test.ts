@@ -493,7 +493,7 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('Selected: Blue, Red');
 	});
 
-	it('supports end-of-list control navigation for multisearch prompts', async () => {
+	it('ignores end-of-line control navigation while multisearch results are highlighted', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -506,8 +506,8 @@ describe('multisearch prompt', () => {
 			() => multisearch({ message: 'Favorite colors?', options: colors }),
 		);
 
-		expect(result).toEqual(['blue']);
-		expect(output.text()).toContain('Selected: Blue');
+		expect(result).toEqual(['red']);
+		expect(output.text()).toContain('Selected: Red');
 	});
 
 	it('supports page multisearch navigation keys', async () => {
