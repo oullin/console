@@ -172,7 +172,8 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toBe('third');
-		expect(output.text()).toContain('›    third');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mPick one\u001B[39m ');
+		expect(output.text()).toContain('\u001B[36m›\u001B[39m \u001B[36m●\u001B[39m third');
 		expect(output.text()).toContain('│ third');
 	});
 
@@ -189,15 +190,14 @@ describe('choice prompts', () => {
 			() => select({ message: 'Pick one', options: ['first', 'second', 'third', 'fourth'], scroll: 3 }),
 		);
 
-		const latestFrame = output.text().split('Pick one\n').at(-1) ?? '';
+		const rendered = parseAnsiText(output.text());
 
 		expect(result).toBe('third');
-		expect(latestFrame).not.toContain('first');
-		expect(latestFrame).toContain('second');
-		expect(latestFrame).toContain('third');
-		expect(latestFrame).toContain('fourth');
-		expect(latestFrame).toContain('┃');
-		expect(latestFrame).toContain('│');
+		expect(rendered).toContain('│   ○ second');
+		expect(rendered).toContain('│ › ● third');
+		expect(rendered).toContain('│   ○ fourth');
+		expect(rendered).toContain('┃');
+		expect(rendered).toContain('│');
 	});
 
 	it('supports alternate select navigation keys', async () => {
@@ -288,13 +288,11 @@ describe('choice prompts', () => {
 			() => select({ message: 'Pick one', options: ['first', 'second', 'third', 'fourth'], scroll: 2.9 }),
 		);
 
-		const latestFrame = output.text().split('Pick one\n').at(-1) ?? '';
+		const rendered = parseAnsiText(output.text());
 
 		expect(result).toBe('third');
-		expect(latestFrame).not.toContain('first');
-		expect(latestFrame).not.toContain('second');
-		expect(latestFrame).toContain('third');
-		expect(latestFrame).toContain('fourth');
+		expect(rendered).toContain('│ › ● third');
+		expect(rendered).toContain('│   ○ fourth');
 	});
 
 	it('renders select info for the highlighted option', async () => {
@@ -412,8 +410,8 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual(['first', 'second']);
-		expect(output.text()).toContain('Selected: first');
-		expect(output.text()).toContain('Selected: first, second');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mPick many\u001B[39m ');
+		expect(output.text()).toContain('\u001B[36m› ◼\u001B[39m first');
 		expect(output.text()).toContain('┌ \u001B[2mPick many\u001B[22m ');
 		expect(output.text()).toContain('│ first');
 		expect(output.text()).toContain('│ second');
@@ -467,7 +465,7 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual(['second']);
-		expect(output.text()).toContain('Selected: second');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mPick many\u001B[39m ');
 		expect(output.text()).toContain('│ second');
 	});
 
@@ -554,7 +552,9 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual(['first', 'second', 'third']);
-		expect(output.text()).toContain('Selected: first, second, third');
+		expect(output.text()).toContain('│ first');
+		expect(output.text()).toContain('│ second');
+		expect(output.text()).toContain('│ third');
 	});
 
 	it('toggles only enabled multiselect choices with ctrl-a', async () => {
@@ -579,8 +579,9 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual(['first', 'third']);
-		expect(output.text()).toContain('Selected: first, third');
-		expect(output.text()).not.toContain('Selected: first, second, third');
+		expect(output.text()).toContain('│ first');
+		expect(output.text()).toContain('│ third');
+		expect(output.text()).not.toContain('│ second');
 	});
 
 	it('renders multiselect info for the highlighted option', async () => {

@@ -23,10 +23,10 @@ TypeScript and OpenTUI internals.
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
+| Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
-| Multi-select checklist markers | `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
-| Multi-select active and selected row styling | `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
@@ -73,7 +73,6 @@ later phases:
 
 - Form builder remaining method-surface and validation parity
 - Multi-search active boxed layout parity
-- Multi-select active boxed layout parity
 - Prompt lifecycle
 - Search active boxed layout parity
 - Textarea wrapping and cursor parity
