@@ -161,6 +161,23 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('? Count 1');
 	});
 
+	it('increments and decrements with control navigation keys', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlP, Key.ctrlP, Key.ctrlN, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count', step: 2 }),
+		);
+
+		expect(result).toBe(1);
+		expect(output.text()).toContain('? Count 1');
+	});
+
 	it('increments and decrements decimal values with fractional steps', async () => {
 		const output = createMemoryOutput();
 

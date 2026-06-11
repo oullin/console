@@ -68,14 +68,14 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 			return state.value;
 		}
 
-		if (key === Key.up || key === Key.upArrow) {
+		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
 			state.value = steppedValue(state.value, 1, options);
 			state.cursor = state.value.length;
 			renderNumberValue(message, state.value, options);
 			continue;
 		}
 
-		if (key === Key.down || key === Key.downArrow) {
+		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
 			state.value = steppedValue(state.value, -1, options);
 			state.cursor = state.value.length;
 			renderNumberValue(message, state.value, options);
