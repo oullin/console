@@ -4,6 +4,7 @@ import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
+import { pageIndex } from '#tui/prompts/select/navigation';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const readAutocompleteValue = async (options: SuggestOptions): Promise<string> => {
@@ -42,6 +43,22 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted + 1) % matches.length;
+			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+			continue;
+		}
+
+		if (key === Key.pageDown) {
+			matches = await resolveSuggestions(options.options, state.value);
+
+			highlighted = pageIndex(matches.length, highlighted, 1, options.scroll);
+			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+			continue;
+		}
+
+		if (key === Key.pageUp) {
+			matches = await resolveSuggestions(options.options, state.value);
+
+			highlighted = pageIndex(matches.length, highlighted, -1, options.scroll);
 			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}

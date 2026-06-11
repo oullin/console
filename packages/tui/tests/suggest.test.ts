@@ -182,4 +182,21 @@ describe('autocomplete prompt', () => {
 
 		expect(result).toBe('Black');
 	});
+
+	it('supports page autocomplete navigation before accepting completion', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.pageDown, Key.pageUp, Key.pageDown, Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete({ message: 'Favorite color?', options: ['Blue', 'Black', 'Blurple'], scroll: 2 }),
+		);
+
+		expect(result).toBe('Blurple');
+		expect(output.text()).toContain('Favorite color? Blurple');
+	});
 });
