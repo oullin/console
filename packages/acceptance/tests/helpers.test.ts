@@ -38,7 +38,7 @@ const scripted = async <T>(lines: string[], callback: () => Promise<T>): Promise
 
 describe('prompt helpers', () => {
   it('reads text and number prompts', async () => {
-    await expect(scripted(['Tay', 'lor', '\n'], () => text('Name'))).resolves.toMatchObject({ result: 'Taylor' });
+    await expect(scripted(['A', 'd', 'a', '\n'], () => text('Name'))).resolves.toMatchObject({ result: 'Ada' });
     await expect(scripted(['4', '2', '\n'], () => number({ message: 'Age', integer: true }))).resolves.toMatchObject({ result: 42 });
   });
 

@@ -27,7 +27,7 @@ TypeScript and OpenTUI internals.
 | Form builder | `packages/tui/src/form/*`, `packages/tui/src/form.ts` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
-| Tables and grids | `packages/tui/src/output/table.ts` |
+| Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table.ts` |
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
@@ -39,7 +39,6 @@ The following upstream files still need full line-by-line behavioral mapping in
 later phases:
 
 - `src/AutoCompletePrompt.php` advanced ghost-text rendering
-- `src/DataTablePrompt.php`
 - `src/FormBuilder.php`
 - `src/MultiSearchPrompt.php` full rendering and selected-result summary parity
 - `src/MultiSelectPrompt.php`

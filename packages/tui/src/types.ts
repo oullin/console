@@ -91,10 +91,29 @@ export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
   info?: string | ((value: T[]) => string);
 };
 
+export type TableCell = string | number | boolean | null | undefined;
+
 export type TableOptions = {
   headers?: string[];
-  rows: Array<Array<string | number | boolean | null | undefined> | Record<string, string | number | boolean | null | undefined>>;
+  rows: Array<Array<TableCell> | Record<string, TableCell>>;
 };
+
+export type DataTablePromptOptions<T = unknown> = BasePromptOptions<T | number> & {
+  filter?: (query: string, row: DataTableRow<T>) => boolean;
+  headers?: string[];
+  rows: Array<DataTableRow<T>>;
+  scroll?: number;
+};
+
+export type DataTableObjectRow<T = unknown> = {
+  cells: Record<string, TableCell>;
+  value?: T;
+};
+
+export type DataTableRow<T = unknown> =
+  | Array<TableCell>
+  | Record<string, TableCell>
+  | DataTableObjectRow<T>;
 
 export type StatusOptions = {
   message: string;

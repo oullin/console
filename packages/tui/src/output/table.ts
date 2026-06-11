@@ -45,5 +45,3 @@ export const grid = (items: Array<string | number | boolean> = [], maxWidth?: nu
 };
 
 export const dataTable = table;
-
-export const datatable = table;

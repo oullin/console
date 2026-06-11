@@ -1,9 +1,9 @@
-import { alert, error, info, intro, note, outro, table, warning } from '#tui/output';
+import { alert, datatable, error, info, intro, note, outro, table, warning } from '#tui/output';
 import { confirm, multiselect, select } from '#tui/prompts/choices';
 import { number, password, text, textarea } from '#tui/prompts/basic';
 import { progress, spin } from '#tui/status';
 import type { FormResponses, FormStep } from '#tui/form/types';
-import type { ChoiceInput, MaybePromise, TableOptions, TextPromptOptions } from '#tui/types';
+import type { ChoiceInput, DataTablePromptOptions, MaybePromise, TableOptions, TextPromptOptions } from '#tui/types';
 
 export class FormBuilder {
   readonly #steps: FormStep[] = [];
@@ -138,6 +138,10 @@ export class FormBuilder {
       table(headersOrOptions, rows);
       return null;
     }, name, true);
+  }
+
+  datatable<T = unknown>(options: DataTablePromptOptions<T>, name?: string): this {
+    return this.add(() => datatable(options), name);
   }
 
   progress<T, R>(label: string, steps: Iterable<T> | number, callback?: (step: T | number, bar: import('#tui/status').Progress) => MaybePromise<R>, hint = '', name?: string): this {
