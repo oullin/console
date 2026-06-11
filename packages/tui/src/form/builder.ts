@@ -1,9 +1,11 @@
 import { alert, datatable, error, info, intro, note, outro, table, warning } from '#tui/output';
-import { confirm, multiselect, select } from '#tui/prompts/choices';
+import { autocomplete, confirm, multiselect, multisearch, pause, search, select, suggest } from '#tui/prompts/choices';
 import { number, password, text, textarea } from '#tui/prompts/basic';
-import { progress, spin } from '#tui/status';
+import { progress, spin, stream, task } from '#tui/status';
 import type { FormResponses, FormStep } from '#tui/form/types';
-import type { ChoiceInput, DataTablePromptOptions, MaybePromise, TableOptions, TextPromptOptions } from '#tui/types';
+import type { ChoiceInput, DataTablePromptOptions, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TableOptions, TextPromptOptions } from '#tui/types';
+import type { SuggestOptions } from '#tui/prompts/choices';
+import type { Logger } from '#tui/status';
 
 export class FormBuilder {
   readonly #steps: FormStep[] = [];
@@ -80,8 +82,44 @@ export class FormBuilder {
     return this.add((_, previous) => multiselect({ message: label, options, default: Array.isArray(previous) ? previous as T[] : defaultValue, scroll, required, validate, hint }), name);
   }
 
+  suggest(label: string, options: SuggestOptions['options'], defaultValue = '', scroll = 5, required: boolean | string = false, validate: TextPromptOptions['validate'] = undefined, hint = '', name?: string, transform?: TextPromptOptions['transform']): this {
+    return this.add((_, previous) => suggest({ message: label, label, options, default: previous === undefined || previous === null ? defaultValue : String(previous), scroll, required, validate, hint, transform }), name);
+  }
+
+  autocomplete(label: string, options: SuggestOptions['options'], defaultValue = '', required: boolean | string = false, validate: TextPromptOptions['validate'] = undefined, hint = '', name?: string, transform?: TextPromptOptions['transform']): this {
+    return this.add((_, previous) => autocomplete({ message: label, label, options, default: previous === undefined || previous === null ? defaultValue : String(previous), required, validate, hint, transform }), name);
+  }
+
+  search<T>(options: SearchPromptOptions<T>, name?: string): this {
+    return this.add(() => search(options), name);
+  }
+
+  multisearch<T>(options: MultiSearchPromptOptions<T>, name?: string): this {
+    return this.add(() => multisearch(options), name);
+  }
+
   spin<T>(callback: () => MaybePromise<T>, message = '', name?: string): this {
     return this.add(() => spin(callback, { message }), name, true);
+  }
+
+  task<T>(label: string, callback: (logger: Logger) => MaybePromise<T>, limit = 10, keepSummary = false, subLabel = '', name?: string): this {
+    return this.add(() => task(label, callback, limit, keepSummary, subLabel), name);
+  }
+
+  pause(message = 'Press enter to continue', name?: string): this {
+    return this.add(async () => {
+      await pause(message);
+
+      return null;
+    }, name, true);
+  }
+
+  stream(source: AsyncIterable<string> | Iterable<string>, name?: string): this {
+    return this.add(async () => {
+      await stream(source);
+
+      return null;
+    }, name, true);
   }
 
   note(message: string, type: string | null = null, name?: string): this {

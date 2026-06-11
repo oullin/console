@@ -62,4 +62,67 @@ describe('form builder', () => {
     expect(responses.include).toBe(false);
     expect(responses.details).toBeNull();
   });
+
+  it('runs suggest, search, and multisearch form steps', async () => {
+    const output = createMemoryOutput();
+    const responses = await withPromptEnvironment(
+      {
+        input: createScriptedInput(['b', Key.tab, Key.enter, 'g', Key.down, Key.enter, 'r', Key.down, Key.space, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () =>
+        form()
+          .suggest('Suggested color', ['Red', 'Green', 'Blue'], '', 5, false, undefined, '', 'suggested')
+          .search({
+            message: 'Searched color',
+            options: (value) => {
+              const options = { green: 'Green', blue: 'Blue', red: 'Red' };
+
+              return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+            }
+          }, 'searched')
+          .multisearch({
+            message: 'Many colors',
+            options: (value) => {
+              const options = { red: 'Red', green: 'Green', blue: 'Blue' };
+
+              return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+            }
+          }, 'many')
+          .submit()
+    );
+
+    expect(responses.suggested).toBe('Blue');
+    expect(responses.searched).toBe('green');
+    expect(responses.many).toEqual(['red']);
+  });
+
+  it('runs task, pause, and stream form steps', async () => {
+    const output = createMemoryOutput();
+    const responses = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () =>
+        form()
+          .task('Build', (logger) => {
+            logger.log('done');
+
+            return 1;
+          }, 10, false, '', 'task')
+          .pause('Continue')
+          .stream(['line one\n'], 'streamed')
+          .submit()
+    );
+
+    expect(responses.task).toBe(1);
+    expect(responses.streamed).toBeNull();
+    expect(output.text()).toContain('Build');
+    expect(output.text()).toContain('line one');
+  });
 });
