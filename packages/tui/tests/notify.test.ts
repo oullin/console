@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, notificationCommand, notificationCommands, notifyForPlatform, withPromptEnvironment } from '#tui/index';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import { createMemoryOutput, notificationCommand, notificationCommands, notify, notifyForPlatform, withPromptEnvironment } from '#tui/index';
 import type { NotificationCommand } from '#tui/index';
 
 describe('notify helper', () => {
@@ -52,6 +52,10 @@ describe('notify helper', () => {
 		});
 
 		expect(output.text()).toContain('Deploy: Done');
+	});
+
+	it('does not expose a public notification return value', () => {
+		expectTypeOf(notify).returns.toBeVoid();
 	});
 
 	it('executes the first available Linux notifier and reports the process result', () => {

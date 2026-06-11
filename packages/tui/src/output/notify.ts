@@ -26,6 +26,6 @@ export const notifyForPlatform = (targetPlatform: NodeJS.Platform, title: string
 	return false;
 };
 
-export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): boolean => {
-	return notifyForPlatform(platform, title, body, subtitle, sound, icon);
+export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
+	notifyForPlatform(platform, title, body, subtitle, sound, icon);
 };

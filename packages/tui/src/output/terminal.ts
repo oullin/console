@@ -1,13 +1,9 @@
 import { clearTerminal, setTerminalTitle } from '#tui/terminal';
 
-export const title = (value: string): boolean => {
+export const title = (value: string): void => {
 	setTerminalTitle(value);
-
-	return true;
 };
 
-export const clear = (): boolean => {
+export const clear = (): void => {
 	clearTerminal();
-
-	return true;
 };
