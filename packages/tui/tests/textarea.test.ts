@@ -17,7 +17,9 @@ describe('textarea prompt', () => {
 
 		expect(result).toBe('A\nB');
 		expect(output.text()).toContain('Description');
-		expect(output.text()).toContain('? Description A\nB');
+		expect(output.text()).toContain('┌ Description ');
+		expect(output.text()).toContain('│ A');
+		expect(output.text()).toContain('│ B');
 	});
 
 	it('renders textarea placeholders before input', async () => {
@@ -33,7 +35,8 @@ describe('textarea prompt', () => {
 			() => textarea('Description', 'Type here'),
 		);
 
-		expect(output.text()).toContain('? Description Type here');
+		expect(output.text()).toContain('┌ Description ');
+		expect(output.text()).toContain('\u001B[2mType here\u001B[22m');
 	});
 
 	it('keeps rendered textarea output within the configured row window', async () => {
@@ -49,10 +52,31 @@ describe('textarea prompt', () => {
 			() => textarea('Description', '', '', false, undefined, '', 2),
 		);
 
-		const latestFrame = output.text().split('? Description ').at(-1) ?? '';
+		const latestFrame = output.text().split('┌ Description ').at(-1) ?? '';
 
-		expect(latestFrame).toContain('B\nC');
+		expect(latestFrame).toContain('│ B');
+		expect(latestFrame).toContain('│ C');
 		expect(latestFrame).not.toContain('A\nB\nC');
+	});
+
+	it('pads textarea frames to the configured rows', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description', '', '', false, undefined, 'Use full sentences.', 3),
+		);
+
+		const latestFrame = output.text().split('┌ Description ').at(-1) ?? '';
+
+		expect(latestFrame).toContain('│ A');
+		expect(latestFrame).toContain('│                                                              │');
+		expect(output.text()).toContain('\u001B[2mUse full sentences.\u001B[22m');
 	});
 
 	it('uses control navigation keys to move between textarea lines', async () => {
