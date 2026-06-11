@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, spin, withPromptEnvironment } from '#tui/index';
+import { renderSpinnerFrame, spinnerFrame } from '#tui/status/spinner/render';
 
 describe('spinner helper', () => {
 	it('runs callback-first spinner callbacks', async () => {
@@ -41,5 +42,11 @@ describe('spinner helper', () => {
 		expect(output.text()).toContain(' ⠶ Working');
 		expect(output.text()).not.toContain('Failed: Working');
 		expect(output.text()).not.toContain('Done: Working');
+	});
+
+	it('renders deterministic animated spinner frames', () => {
+		expect(Array.from({ length: 10 }, (_, index) => spinnerFrame(index))).toEqual(['⠂', '⠒', '⠐', '⠰', '⠠', '⠤', '⠄', '⠆', '⠂', '⠒']);
+		expect(renderSpinnerFrame('Working', 3)).toBe(' ⠰ Working\n');
+		expect(renderSpinnerFrame('Working')).toBe(' ⠶ Working\n');
 	});
 });

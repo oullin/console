@@ -36,7 +36,7 @@ TypeScript and OpenTUI internals.
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
-| Spinner static frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
+| Spinner static and deterministic animated frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | Task static frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/*` |
 | Stream frame rendering, wrapping, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/*` |
 | Terminal clear/title, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
@@ -55,7 +55,7 @@ later phases:
 - Progress signal handling and terminal cleanup parity
 - Prompt lifecycle
 - Search full rendering and highlighted result label parity
-- Spinner animated frame and terminal cleanup parity
+- Spinner terminal cleanup parity
 - Stream true-color fade and terminal cleanup parity
 - Task animated frame, terminal cleanup, and process-log parity
 - Terminal interactive read parity
