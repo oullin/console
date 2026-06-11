@@ -42,4 +42,14 @@ describe('output helpers', () => {
 		expect(output.text()).toContain('A\nB');
 		expect(output.text()).toContain('C\nD');
 	});
+
+	it('normalizes fractional grid widths without overlapping rows', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			expect(grid(['A', 'B', 'C', 'D'], 2.5)).toBe(true);
+		});
+
+		expect(output.text()).toBe('A  B\nC  D\n');
+	});
 });
