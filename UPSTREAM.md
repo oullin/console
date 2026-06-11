@@ -24,6 +24,7 @@ TypeScript and OpenTUI internals.
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
+| Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |

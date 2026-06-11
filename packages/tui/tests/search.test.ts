@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, multisearch, PromptValidationError, search, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, multisearch, parseAnsiText, PromptValidationError, search, withPromptEnvironment } from '#tui/index';
 import type { SearchPromptOptions } from '#tui/index';
 
 const colors = (value: string): Record<string, string> => {
@@ -158,6 +158,23 @@ describe('search prompt', () => {
 		);
 
 		expect(output.text()).toContain('About red');
+	});
+
+	it('renders an empty result message for unmatched search queries', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['z', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors, default: 'red' }),
+		);
+
+		expect(parseAnsiText(output.text())).toContain('No results.');
+		expect(output.text()).toContain('\u001B[2m  No results.\u001B[22m');
 	});
 
 	it('skips disabled search results while navigating', async () => {
@@ -510,6 +527,23 @@ describe('multisearch prompt', () => {
 
 		expect(output.text()).toContain('About red');
 		expect(output.text()).toContain('0 selected');
+	});
+
+	it('renders an empty result message for unmatched multisearch queries', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['z', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(parseAnsiText(output.text())).toContain('No results.');
+		expect(output.text()).toContain('\u001B[2m  No results.\u001B[22m');
 	});
 
 	it('renders hidden selected counts when multisearch results are filtered', async () => {
