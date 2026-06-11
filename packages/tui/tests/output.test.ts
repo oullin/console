@@ -2,29 +2,29 @@ import { describe, expect, it } from 'vitest';
 import { alert, createMemoryOutput, error, grid, info, intro, note, outro, table, warning, withPromptEnvironment } from '#tui/index';
 
 describe('output helpers', () => {
-	it('returns success from note-style helpers', async () => {
+	it('renders note-style helpers without returning a value', async () => {
 		const output = createMemoryOutput();
 
 		await withPromptEnvironment({ output, error: output }, async () => {
-			expect(note('Hello')).toBe(true);
-			expect(error('Nope')).toBe(true);
-			expect(warning('Careful')).toBe(true);
-			expect(alert('Heads up')).toBe(true);
-			expect(info('Facts')).toBe(true);
-			expect(intro('Start')).toBe(true);
-			expect(outro('Done')).toBe(true);
+			expect(note('Hello')).toBeUndefined();
+			expect(error('Nope')).toBeUndefined();
+			expect(warning('Careful')).toBeUndefined();
+			expect(alert('Heads up')).toBeUndefined();
+			expect(info('Facts')).toBeUndefined();
+			expect(intro('Start')).toBeUndefined();
+			expect(outro('Done')).toBeUndefined();
 		});
 
 		expect(output.text()).toContain('Hello');
 		expect(output.text()).toContain('Done');
 	});
 
-	it('returns success from table and grid helpers', async () => {
+	it('renders table and grid helpers without returning a value', async () => {
 		const output = createMemoryOutput();
 
 		await withPromptEnvironment({ output, error: output }, async () => {
-			expect(table(['Name'], [['Ollin']])).toBe(true);
-			expect(grid(['A', 'B'], 2)).toBe(true);
+			expect(table(['Name'], [['Ollin']])).toBeUndefined();
+			expect(grid(['A', 'B'], 2)).toBeUndefined();
 		});
 
 		expect(output.text()).toContain('| Name');
@@ -35,8 +35,8 @@ describe('output helpers', () => {
 		const output = createMemoryOutput();
 
 		await withPromptEnvironment({ output, error: output }, async () => {
-			expect(grid(['A', 'B'], 0)).toBe(true);
-			expect(grid(['C', 'D'], -2)).toBe(true);
+			expect(grid(['A', 'B'], 0)).toBeUndefined();
+			expect(grid(['C', 'D'], -2)).toBeUndefined();
 		});
 
 		expect(output.text()).toContain('A\nB');
@@ -47,7 +47,7 @@ describe('output helpers', () => {
 		const output = createMemoryOutput();
 
 		await withPromptEnvironment({ output, error: output }, async () => {
-			expect(grid(['A', 'B', 'C', 'D'], 2.5)).toBe(true);
+			expect(grid(['A', 'B', 'C', 'D'], 2.5)).toBeUndefined();
 		});
 
 		expect(output.text()).toBe('A  B\nC  D\n');

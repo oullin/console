@@ -129,7 +129,7 @@ describe('form builder', () => {
 		);
 
 		expect(responses[0]).toBe('C');
-		expect(responses.note).toBe(true);
+		expect(responses.note).toBeNull();
 		expect(responses[2]).toBe('D');
 	});
 
@@ -316,7 +316,7 @@ describe('form builder', () => {
 		expect(output.text()).toContain('2 / 2');
 	});
 
-	it('stores output helper success responses', async () => {
+	it('stores null for display-only output helper responses', async () => {
 		const output = createMemoryOutput();
 
 		const responses = await withPromptEnvironment(
@@ -331,7 +331,7 @@ describe('form builder', () => {
 					.submit(),
 		);
 
-		expect(responses.note).toBe(true);
-		expect(responses.table).toBe(true);
+		expect(responses.note).toBeNull();
+		expect(responses.table).toBeNull();
 	});
 });
