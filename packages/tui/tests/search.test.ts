@@ -25,6 +25,7 @@ describe('search prompt', () => {
     );
 
     expect(result).toBe('blue');
+    expect(output.text()).toContain('Favorite color? ue');
   });
 
   it('validates selected values and allows another selection', async () => {
@@ -46,6 +47,22 @@ describe('search prompt', () => {
 
     expect(result).toBe('green');
     expect(output.text()).toContain('Please choose green.');
+  });
+
+  it('renders the typed query while navigating results', async () => {
+    const output = createMemoryOutput();
+    await withPromptEnvironment(
+      {
+        input: createScriptedInput(['r', Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => search({ message: 'Favorite color?', options: colors })
+    );
+
+    expect(output.text()).toContain('Favorite color? r');
+    expect(output.text()).toContain('›');
   });
 });
 
@@ -71,5 +88,7 @@ describe('multisearch prompt', () => {
     );
 
     expect(result).toEqual(['violet', 'green']);
+    expect(output.text()).toContain('Selected: Violet');
+    expect(output.text()).toContain('Selected: Violet, Green');
   });
 });
