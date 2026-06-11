@@ -41,6 +41,7 @@ TypeScript and OpenTUI internals.
 | Stream frame rendering, wrapping, fade styles, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/*` |
 | Status cursor visibility cleanup | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
 | Status rendered-frame cleanup | `packages/tui/src/status/frame.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/task.ts` |
+| Progress cursor visibility and rendered-frame redraw cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/frame.ts` |
 | Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
@@ -54,7 +55,7 @@ later phases:
 - Form builder
 - Multi-search full rendering and selected-result summary parity
 - Multi-select
-- Progress signal handling and terminal cleanup parity
+- Progress signal handling parity
 - Prompt lifecycle
 - Search full rendering and highlighted result label parity
 - Task process-log parity

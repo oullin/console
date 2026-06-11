@@ -1,8 +1,10 @@
 import { promptEnvironment } from '#tui/environment';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/progress';
 import { renderProgressFrame } from '#tui/status/progress/render';
 import { runProgressSteps } from '#tui/status/progress/run';
 import { progressValues } from '#tui/status/progress/steps';
+import { hideCursor, showCursor } from '#tui/terminal';
 import type { ProgressFrameState } from '#tui/status/progress/render';
 import type { MaybePromise } from '#tui/types';
 
@@ -11,6 +13,8 @@ export class Progress {
 	#label: string;
 	#hint: string;
 	#state: ProgressFrameState = 'active';
+	#renderedFrame: string | null = null;
+	#cursorHidden = false;
 	readonly total: number;
 
 	constructor(total: number, message = 'Progress', hint = '') {
@@ -33,11 +37,13 @@ export class Progress {
 	finish(): void {
 		this.#state = 'submit';
 		this.render();
+		this.#restoreTerminal();
 	}
 
 	fail(): void {
 		this.#state = 'error';
 		this.render();
+		this.#restoreTerminal();
 	}
 
 	label(value: string): this {
@@ -65,7 +71,31 @@ export class Progress {
 	}
 
 	render(): void {
-		promptEnvironment().output.write(renderProgressFrame({ current: this.#current, hint: this.#hint, label: this.#label, state: this.#state, total: this.total }));
+		const frame = renderProgressFrame({ current: this.#current, hint: this.#hint, label: this.#label, state: this.#state, total: this.total });
+
+		if (!this.#cursorHidden) {
+			hideCursor();
+			this.#cursorHidden = true;
+		}
+
+		if (this.#renderedFrame) {
+			eraseRenderedFrame(this.#renderedFrame);
+		}
+
+		promptEnvironment().output.write(frame);
+		this.#renderedFrame = frame;
+	}
+
+	#restoreTerminal(): void {
+		if (this.#renderedFrame) {
+			eraseRenderedFrame(this.#renderedFrame);
+			this.#renderedFrame = null;
+		}
+
+		if (this.#cursorHidden) {
+			showCursor();
+			this.#cursorHidden = false;
+		}
 	}
 }
 

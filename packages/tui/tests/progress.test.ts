@@ -12,6 +12,8 @@ describe('progress helper', () => {
 		expect(result).toEqual(['ALABAMA', 'ALASKA']);
 		expect(output.text()).toContain('Uppercasing States');
 		expect(output.text()).toContain('2 / 2');
+		expect(output.text()).toContain('\u001B[?25l');
+		expect(output.text()).toContain('\u001B[?25h');
 	});
 
 	it('passes the current count to progress callbacks before advancing', async () => {
@@ -39,6 +41,7 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('Adding States');
 		expect(output.text()).toContain('ALABAMA');
 		expect(output.text()).toContain('alaska');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 	});
 
 	it('renders visible progress for small non-zero percentages', async () => {
@@ -135,5 +138,7 @@ describe('progress helper', () => {
 
 		expect(output.text()).toContain('Adding States');
 		expect(output.text()).toContain('0 / 1');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
+		expect(output.text()).toContain('\u001B[?25h');
 	});
 });
