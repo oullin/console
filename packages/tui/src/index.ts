@@ -43,7 +43,8 @@ export {
 	terminalSize,
 } from '#tui/terminal';
 export { applyTypedKey, readTypedValue } from '#tui/typed-value';
-export { parseAnsiText, truncate, visibleWidth, wrap } from '#tui/strings';
+export { parseAnsiSegments, parseAnsiText, truncate, visibleWidth, wrap } from '#tui/strings';
+export type { AnsiSegment } from '#tui/strings';
 export type {
 	BasePromptOptions,
 	Choice,
