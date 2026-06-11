@@ -54,6 +54,7 @@ export type TextareaPromptOptions = TextPromptOptions & {
 
 export type NumberPromptOptions = BasePromptOptions<number | string> & {
 	label?: string;
+	placeholder?: string;
 	min?: number;
 	max?: number;
 	integer?: boolean;

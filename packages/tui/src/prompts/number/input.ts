@@ -9,6 +9,7 @@ type NumberInputOptions = {
 	hint?: string;
 	max?: number;
 	min?: number;
+	placeholder?: string;
 	step?: number;
 };
 
@@ -34,6 +35,12 @@ const steppedValue = (value: string, direction: 1 | -1, options: NumberInputOpti
 	return String(clamp(Math.trunc(Number(value)) + step * direction, options.min, options.max));
 };
 
+const renderNumberValue = (message: string, value: string, options: NumberInputOptions): void => {
+	const displayValue = value.length > 0 ? value : (options.placeholder ?? '');
+
+	promptEnvironment().output.write(`${renderQuestion(message, options.hint)}${displayValue}\n`);
+};
+
 export const readNumberValue = async (message: string, options: NumberInputOptions = {}): Promise<string> => {
 	const environment = promptEnvironment();
 
@@ -47,12 +54,12 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		return answer === '' && options.default !== undefined ? String(options.default) : answer;
 	}
 
-	environment.output.write(renderQuestion(message, options.hint));
-
 	let state = {
 		cursor: options.default === undefined ? 0 : String(options.default).length,
 		value: options.default === undefined ? '' : String(options.default),
 	};
+
+	renderNumberValue(message, state.value, options);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -64,12 +71,14 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		if (key === Key.up || key === Key.upArrow) {
 			state.value = steppedValue(state.value, 1, options);
 			state.cursor = state.value.length;
+			renderNumberValue(message, state.value, options);
 			continue;
 		}
 
 		if (key === Key.down || key === Key.downArrow) {
 			state.value = steppedValue(state.value, -1, options);
 			state.cursor = state.value.length;
+			renderNumberValue(message, state.value, options);
 			continue;
 		}
 
@@ -91,5 +100,7 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 
 			return state.value;
 		}
+
+		renderNumberValue(message, state.value, options);
 	}
 };

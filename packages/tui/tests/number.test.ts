@@ -53,6 +53,40 @@ describe('number prompt', () => {
 		expect(result).toBe('');
 	});
 
+	it('renders placeholders before number input', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number('Count', '0'),
+		);
+
+		expect(output.text()).toContain('? Count 0');
+	});
+
+	it('renders typed number values while reading raw key input', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['4', '2', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count' }),
+		);
+
+		expect(result).toBe(42);
+		expect(output.text()).toContain('? Count 4');
+		expect(output.text()).toContain('? Count 42');
+	});
+
 	it('requires number input when configured', async () => {
 		const output = createMemoryOutput();
 
@@ -124,6 +158,24 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(1);
+		expect(output.text()).toContain('? Count 1');
+	});
+
+	it('renders default number values before input', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count', default: 7 }),
+		);
+
+		expect(result).toBe(7);
+		expect(output.text()).toContain('? Count 7');
 	});
 
 	it('clamps arrow key changes to min and max', async () => {

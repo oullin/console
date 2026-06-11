@@ -19,7 +19,7 @@ export function number(
 
 export async function number(
 	message: string | NumberPromptOptions,
-	_placeholder = '',
+	placeholder = '',
 	defaultValue: number | string | undefined = undefined,
 	required: boolean | string = false,
 	validate: NumberPromptOptions['validate'] = undefined,
@@ -28,7 +28,7 @@ export async function number(
 	max: number | undefined = undefined,
 	step: number | undefined = undefined,
 ): Promise<number | string> {
-	const options: NumberPromptOptions = typeof message === 'string' ? { message, label: message, default: defaultValue, required, validate, hint, min, max, step } : { ...message };
+	const options: NumberPromptOptions = typeof message === 'string' ? { message, label: message, placeholder, default: defaultValue, required, validate, hint, min, max, step } : { ...message };
 
 	return promptUntilValid(options, async () => {
 		const answer = await readNumberValue(options.message, {
@@ -36,6 +36,7 @@ export async function number(
 			hint: options.hint,
 			max: options.max,
 			min: options.min,
+			placeholder: options.placeholder,
 			step: options.step,
 		});
 
