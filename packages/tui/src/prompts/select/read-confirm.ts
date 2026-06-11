@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
+import { rejectPromptRevert } from '#tui/prompt/revert';
 import { renderQuestion } from '#tui/theme';
 import type { ConfirmPromptOptions } from '#tui/types';
 
@@ -67,6 +68,11 @@ export const readConfirm = async (options: ConfirmPromptOptions): Promise<boolea
 			environment.error.write('Cancelled.\n');
 
 			return cancelPrompt(confirmed);
+		}
+
+		if (key === Key.ctrlU) {
+			rejectPromptRevert();
+			continue;
 		}
 	}
 };

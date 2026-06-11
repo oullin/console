@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, form, Key, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, form, Key, withPromptEnvironment } from '#tui/index';
 
 describe('form builder', () => {
 	it('runs chained steps and returns positional responses', async () => {
@@ -164,6 +164,27 @@ describe('form builder', () => {
 		);
 
 		expect(responses[0]).toBe('A');
+		expect(output.text()).toContain('This cannot be reverted.');
+	});
+
+	it('does not allow reverting a normal prompt after form submit', async () => {
+		const output = createMemoryOutput();
+
+		const confirmed = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.enter, Key.ctrlU, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			async () => {
+				await form().text('Name').submit();
+
+				return confirm('Ready?');
+			},
+		);
+
+		expect(confirmed).toBe(true);
 		expect(output.text()).toContain('This cannot be reverted.');
 	});
 

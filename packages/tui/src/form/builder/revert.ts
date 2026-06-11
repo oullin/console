@@ -1,6 +1,6 @@
 import { configurePrompts, promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { renderError } from '#tui/theme';
+import { rejectPromptRevert } from '#tui/prompt/revert';
 import type { MaybePromise, PromptInput } from '#tui/types';
 
 export class FormRevertedError extends Error {
@@ -33,7 +33,7 @@ export const runWithFormRevert = async <T>(canRevert: boolean, callback: () => M
 					throw new FormRevertedError();
 				}
 
-				environment.error.write(renderError('This cannot be reverted.'));
+				rejectPromptRevert();
 			}
 		},
 	};
