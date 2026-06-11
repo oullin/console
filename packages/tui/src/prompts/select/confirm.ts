@@ -1,4 +1,5 @@
-import { ask, promptUntilValid } from '#tui/prompt';
+import { promptUntilValid } from '#tui/prompt';
+import { readConfirm } from '#tui/prompts/select/read-confirm';
 import type { ConfirmPromptOptions } from '#tui/types';
 
 export function confirm(options: ConfirmPromptOptions): Promise<boolean>;
@@ -17,15 +18,5 @@ export async function confirm(
 	const options: ConfirmPromptOptions =
 		typeof message === 'string' ? { message, label: message, default: defaultValue, yes, no, required, validate, hint } : { ...message, default: message.default ?? true };
 
-	return promptUntilValid(options, async () => {
-		const suffix = options.default === false ? ' [y/N]' : ' [Y/n]';
-
-		const answer = (await ask(`${options.message}${suffix}`, options.hint)).trim().toLowerCase();
-
-		if (answer === '' && options.default !== undefined) {
-			return options.default;
-		}
-
-		return ['y', 'yes', options.yes?.toLowerCase()].includes(answer);
-	});
+	return promptUntilValid(options, async () => readConfirm(options));
 }
