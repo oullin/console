@@ -219,6 +219,31 @@ describe('search prompt', () => {
 
 		expect(result).toBe('RED');
 	});
+
+	it('returns search defaults for empty line-mode answers', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: colors,
+					default: 'green',
+				}),
+		);
+
+		expect(result).toBe('green');
+	});
 });
 
 describe('multisearch prompt', () => {

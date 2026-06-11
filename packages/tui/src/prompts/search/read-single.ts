@@ -16,9 +16,13 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 		const choices = await resolveSearchChoices(options.options, query);
 
+		if (query.trim() === '' && options.default !== undefined) {
+			return options.default;
+		}
+
 		const choice = findChoice(choices, query) ?? choices.find((candidate) => !candidate.disabled);
 
-		return choice?.value ?? options.default ?? choices[0]?.value;
+		return choice?.value ?? choices[0]?.value;
 	}
 
 	let state = { cursor: 0, value: '' };
