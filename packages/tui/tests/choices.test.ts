@@ -188,6 +188,32 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('│ third');
 	});
 
+	it('returns the default value for non-interactive select prompts', async () => {
+		const result = await withPromptEnvironment(
+			{
+				output: createMemoryOutput(),
+				error: createMemoryOutput(),
+				interactive: false,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'], default: 'second' }),
+		);
+
+		expect(result).toBe('second');
+	});
+
+	it('rejects non-interactive select prompts without defaults', async () => {
+		await expect(
+			withPromptEnvironment(
+				{
+					output: createMemoryOutput(),
+					error: createMemoryOutput(),
+					interactive: false,
+				},
+				() => select({ message: 'Pick one', options: ['first', 'second'] }),
+			),
+		).rejects.toThrow('Required.');
+	});
+
 	it('renders a scrolling select window around the highlighted choice', async () => {
 		const output = createMemoryOutput();
 
