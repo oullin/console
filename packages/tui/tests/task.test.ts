@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, task, withPromptEnvironment } from '#tui/index';
+import { renderTaskFrame } from '#tui/status/task/render';
 
 describe('task helper', () => {
 	it('passes a bounded logger to the callback and returns the callback value', async () => {
@@ -221,5 +222,26 @@ describe('task helper', () => {
 		expect(output.text()).toContain(' ⠶ Running...\n   assets');
 		expect(output.text()).toContain(' ⠶ Building');
 		expect(output.text()).not.toContain(' ⠶ Building\n   assets');
+	});
+
+	it('renders deterministic animated task frames', () => {
+		expect(
+			renderTaskFrame({
+				frameCount: 2,
+				label: 'Running...',
+				limit: 2,
+				lines: ['line one'],
+				stableMessages: [],
+			}),
+		).toContain(' ⠐ Running...');
+
+		expect(
+			renderTaskFrame({
+				label: 'Running...',
+				limit: 2,
+				lines: [],
+				stableMessages: [],
+			}),
+		).toContain(' ⠶ Running...');
 	});
 });

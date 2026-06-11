@@ -4,6 +4,7 @@ import type { StableTaskMessage } from '#tui/status/task/messages';
 const TASK_DIVIDER_WIDTH = 60;
 
 type TaskFrameOptions = {
+	frameCount?: number;
 	finished?: boolean;
 	keepSummary?: boolean;
 	label: string;
@@ -29,12 +30,12 @@ const renderStableMessage = (message: StableTaskMessage): string => {
 	return `   ${stableMessageSymbol(message.type)} ${message.message}`;
 };
 
-export const renderTaskFrame = ({ finished = false, keepSummary = false, label, limit, lines, stableMessages, subLabel }: TaskFrameOptions): string => {
+export const renderTaskFrame = ({ finished = false, frameCount, keepSummary = false, label, limit, lines, stableMessages, subLabel }: TaskFrameOptions): string => {
 	if (finished && keepSummary && stableMessages.length > 0) {
 		return [` • ${label}`, ...stableMessages.map(renderStableMessage), ''].join('\n');
 	}
 
-	const output = [renderSpinnerFrame(label).trimEnd()];
+	const output = [renderSpinnerFrame(label, frameCount).trimEnd()];
 
 	if (subLabel) {
 		output.push(`   ${subLabel}`);
