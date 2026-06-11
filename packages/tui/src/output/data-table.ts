@@ -1,11 +1,10 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
-import { parseScrollSize } from '#tui/concerns/validators/scroll';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
-import { renderTable } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
-import { dataTableRowCells, dataTableRowValue, deriveDataTableHeaders, visibleDataTableRows } from '#tui/output/data-table/rows';
-import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
+import { firstDataTableSelection, lastDataTableSelection, nextDataTableSelection, pageDataTableSelection, previousDataTableSelection } from '#tui/output/data-table/navigation';
+import { dataTableRowValue, deriveDataTableHeaders, visibleDataTableRows } from '#tui/output/data-table/rows';
+import { renderDataTableFrame } from '#tui/output/data-table/render';
 import type { DataTablePromptOptions } from '#tui/types';
 
 export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number> => {
@@ -21,22 +20,15 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 		const visibleRows = () => visibleDataTableRows(options, headers, query.value);
 
 		const render = (): void => {
-			const rows = visibleRows();
-
-			selected = clampDataTableSelection(selected, rows);
-
-			const window = dataTableRowWindow(rows.length, selected, options.scroll);
-
-			const renderedRows = rows.slice(window.start, window.end).map(({ row }, offset) => {
-				const index = window.start + offset;
-
-				return [index === selected ? '›' : ' ', ...dataTableRowCells(headers, row)];
+			selected = renderDataTableFrame({
+				headers,
+				message: options.message,
+				mode,
+				query: query.value,
+				rows: visibleRows(),
+				scroll: options.scroll,
+				selected,
 			});
-
-			const querySuffix = mode === 'search' || query.value.length > 0 ? ` ${query.value}` : '';
-
-			environment.output.write(`${options.message}${querySuffix}\n`);
-			environment.output.write(`${renderTable(['', ...headers], renderedRows)}\n`);
 		};
 
 		if (!environment.input.readKey) {
@@ -108,37 +100,37 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 			}
 
 			if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
-				selected = rows.length === 0 ? 0 : (selected + 1) % rows.length;
+				selected = nextDataTableSelection(selected, rows.length);
 				render();
 				continue;
 			}
 
 			if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
-				selected = rows.length === 0 ? 0 : (selected - 1 + rows.length) % rows.length;
+				selected = previousDataTableSelection(selected, rows.length);
 				render();
 				continue;
 			}
 
 			if (key === Key.pageDown) {
-				selected = rows.length === 0 ? 0 : Math.min(rows.length - 1, selected + parseScrollSize(options.scroll, 10));
+				selected = pageDataTableSelection(selected, rows.length, 1, options.scroll);
 				render();
 				continue;
 			}
 
 			if (key === Key.pageUp) {
-				selected = Math.max(0, selected - parseScrollSize(options.scroll, 10));
+				selected = pageDataTableSelection(selected, rows.length, -1, options.scroll);
 				render();
 				continue;
 			}
 
 			if (oneOf([Key.home, Key.ctrlA], key)) {
-				selected = 0;
+				selected = firstDataTableSelection();
 				render();
 				continue;
 			}
 
 			if (oneOf([Key.end, Key.ctrlE], key)) {
-				selected = Math.max(0, rows.length - 1);
+				selected = lastDataTableSelection(rows.length);
 				render();
 				continue;
 			}

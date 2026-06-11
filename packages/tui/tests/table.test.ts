@@ -446,6 +446,27 @@ describe('data table prompt', () => {
 		expect(result).toBe(1);
 	});
 
+	it('wraps data table navigation from the first row to the last row', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.up, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second'], ['Third']],
+				}),
+		);
+
+		expect(result).toBe(2);
+	});
+
 	it('normalizes fractional scroll sizes for data table page navigation', async () => {
 		const output = createMemoryOutput();
 
