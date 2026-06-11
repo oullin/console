@@ -24,7 +24,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 		transform: MultiSearchPromptOptions<T>['transform'] = undefined,
 	) {
 		if (!isSearchPromptLabel(optionsOrLabel)) {
-			return this.add(() => multisearch<T>(optionsOrLabel), options as string | undefined);
+			return this.add((_, previous) => multisearch<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), options as string | undefined);
 		}
 
 		const promptOptions: MultiSearchPromptOptions<T> = {
@@ -39,7 +39,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 			transform,
 		};
 
-		return this.add(() => multisearch<T>(promptOptions), name);
+		return this.add((_, previous) => multisearch<T>({ ...promptOptions, default: previousArray(previous, promptOptions.default ?? []) }), name);
 	},
 	multiselect<T>(
 		label: string,
@@ -69,7 +69,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 		transform: SearchPromptOptions<T>['transform'] = undefined,
 	) {
 		if (!isSearchPromptLabel(optionsOrLabel)) {
-			return this.add(() => search<T>(optionsOrLabel), options as string | undefined);
+			return this.add((_, previous) => search<T>({ ...optionsOrLabel, default: previous === undefined ? optionsOrLabel.default : (previous as T) }), options as string | undefined);
 		}
 
 		const promptOptions: SearchPromptOptions<T> = {
@@ -84,7 +84,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 			transform,
 		};
 
-		return this.add(() => search<T>(promptOptions), name);
+		return this.add((_, previous) => search<T>({ ...promptOptions, default: previous === undefined ? promptOptions.default : (previous as T) }), name);
 	},
 	select<T>(label: string, options: ChoiceOptions<T>, defaultValue?: T, scroll = 5, validate = undefined, hint = '', required: boolean | string = true, name?: string, transform = undefined) {
 		return this.add((_, previous) => select({ message: label, options, default: previous === undefined ? defaultValue : (previous as T), scroll, validate, hint, required, transform }), name);

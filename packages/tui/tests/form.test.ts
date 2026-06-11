@@ -330,6 +330,66 @@ describe('form builder', () => {
 		expect(responses.many).toEqual(['red']);
 	});
 
+	it('reuses previous search responses when reverting object-option form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['g', Key.down, Key.enter, Key.ctrlU]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.search(
+						{
+							message: 'Searched color',
+							options: (value) => {
+								const options = { green: 'Green', blue: 'Blue', red: 'Red' };
+
+								return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+							},
+						},
+						'searched',
+					)
+					.confirm('Done?')
+					.submit(),
+		);
+
+		expect(responses.searched).toBe('green');
+	});
+
+	it('reuses previous multisearch responses when reverting object-option form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['r', Key.down, Key.space, Key.enter, Key.ctrlU]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.multisearch(
+						{
+							message: 'Many colors',
+							options: (value) => {
+								const options = { red: 'Red', green: 'Green', blue: 'Blue' };
+
+								return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+							},
+						},
+						'many',
+					)
+					.confirm('Done?')
+					.submit(),
+		);
+
+		expect(responses.many).toEqual(['red']);
+	});
+
 	it('runs password and textarea form steps', async () => {
 		const output = createMemoryOutput();
 
