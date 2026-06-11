@@ -97,6 +97,22 @@ describe('suggest prompt', () => {
 });
 
 describe('autocomplete prompt', () => {
+	it('renders autocomplete prompts with question formatting, hints, and placeholders', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue'], 'Type a color', '', false, undefined, 'Optional'),
+		);
+
+		expect(output.text()).toContain('? Favorite color? Optional Type a color');
+	});
+
 	it('renders autocomplete ghost text without a suggestion list', async () => {
 		const output = createMemoryOutput();
 

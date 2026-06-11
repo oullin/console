@@ -21,7 +21,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	renderAutocomplete(options.message, state.value, matches, highlighted);
+	renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -34,7 +34,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted - 1 + matches.length) % matches.length;
-			renderAutocomplete(options.message, state.value, matches, highlighted);
+			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -42,7 +42,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = matches.length === 0 ? 0 : (highlighted + 1) % matches.length;
-			renderAutocomplete(options.message, state.value, matches, highlighted);
+			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -59,7 +59,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 				highlighted = 0;
 			}
 
-			renderAutocomplete(options.message, state.value, matches, highlighted);
+			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -72,7 +72,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 				state = { cursor: match.length, value: match };
 			}
 
-			renderAutocomplete(options.message, state.value, matches, highlighted);
+			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -93,6 +93,6 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderAutocomplete(options.message, state.value, matches, highlighted);
+		renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
 	}
 };
