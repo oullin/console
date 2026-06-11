@@ -33,15 +33,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (key === Key.tab) {
 			matches = await resolveSuggestions(options.options, state.value);
 
-			const match = matches[highlighted ?? 0];
-
-			if (match !== undefined) {
-				state = { cursor: match.length, value: match };
-			}
-
-			matches = await resolveSuggestions(options.options, state.value);
-
-			highlighted = null;
+			highlighted = matches.length === 0 ? null : ((highlighted ?? -1) + 1) % matches.length;
 			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
 			continue;
 		}

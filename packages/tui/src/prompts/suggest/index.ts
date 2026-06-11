@@ -1,4 +1,5 @@
 import { promptUntilValid } from '#tui/prompt';
+import { readAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete';
 import { readSuggestionValue } from '#tui/prompts/suggest/read';
 import { suggestOptions } from '#tui/prompts/suggest/options';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
@@ -65,5 +66,14 @@ export async function autocomplete(
 	hint = '',
 	transform: TextPromptOptions['transform'] = undefined,
 ): Promise<string> {
-	return suggest(typeof message === 'string' ? { message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform } : message);
+	const options =
+		typeof message === 'string' ? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform }) : suggestOptions(message);
+
+	return promptUntilValid(options, async () => {
+		const answer = await readAutocompleteValue(options);
+
+		const value = answer === '' && options.default !== undefined ? options.default : answer;
+
+		return options.transform ? options.transform(value) : value;
+	});
 }

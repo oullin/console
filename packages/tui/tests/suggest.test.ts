@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, suggest, withPromptEnvironment } from '#tui/index';
+import { autocomplete, createMemoryOutput, createScriptedInput, Key, suggest, withPromptEnvironment } from '#tui/index';
 
 const runSuggest = async (keys: string[], options: string[] | ((query: string) => string[])): Promise<{ output: string; result: string }> => {
 	const output = createMemoryOutput();
@@ -64,10 +64,11 @@ describe('suggest prompt', () => {
 		expect(output).toContain('Blue');
 	});
 
-	it('renders completed values after tab completion', async () => {
+	it('highlights suggestions on tab without replacing typed input', async () => {
 		const output = await outputFor(['b', Key.tab, Key.enter], ['Red', 'Green', 'Blue']);
 
-		expect(output).toContain('Favorite color? Blue');
+		expect(output).toContain('Favorite color? b');
+		expect(output).not.toContain('Favorite color? Blue');
 	});
 
 	it('renders suggest info for the highlighted result', async () => {
@@ -84,5 +85,40 @@ describe('suggest prompt', () => {
 		);
 
 		expect(output.text()).toContain('About Blue');
+	});
+});
+
+describe('autocomplete prompt', () => {
+	it('accepts ghost completion with tab', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue']),
+		);
+
+		expect(result).toBe('Blue');
+		expect(output.text()).toContain('Favorite color? Blue');
+	});
+
+	it('cycles autocomplete matches before accepting completion', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.down, Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue', 'Black', 'Blurple']),
+		);
+
+		expect(result).toBe('Black');
 	});
 });
