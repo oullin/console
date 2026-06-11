@@ -57,6 +57,8 @@ describe('textarea prompt', () => {
 		expect(latestFrame).toContain('│ B');
 		expect(latestFrame).toContain('│ C');
 		expect(latestFrame).not.toContain('A\nB\nC');
+		expect(latestFrame).toContain('\u001B[2m│\u001B[22m');
+		expect(latestFrame).toContain('\u001B[36m┃\u001B[39m');
 	});
 
 	it('pads textarea frames to the configured rows', async () => {

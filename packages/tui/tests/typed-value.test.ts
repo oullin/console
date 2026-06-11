@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyTypedKey, Key } from '#tui/index';
+import { visibleLineWindow } from '#tui/typed-value/lines';
 
 const apply = (keys: string[]): string => {
 	let state = { cursor: 0, value: '' };
@@ -152,6 +153,14 @@ describe('typed value editing', () => {
 		expect(applyMultilineState('abc\nde\nfghi', 9, [Key.ctrlU])).toEqual({
 			cursor: 7,
 			value: 'abc\nde\nhi',
+		});
+	});
+
+	it('reports visible textarea line windows', () => {
+		expect(visibleLineWindow('A\nB\nC', 5, 2)).toEqual({
+			lines: ['B', 'C'],
+			start: 1,
+			total: 3,
 		});
 	});
 });

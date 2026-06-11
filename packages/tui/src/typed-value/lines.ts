@@ -5,6 +5,12 @@ type LineRange = {
 	start: number;
 };
 
+export type VisibleLineWindow = {
+	lines: string[];
+	start: number;
+	total: number;
+};
+
 const lineRanges = (value: string[]): LineRange[] => {
 	const ranges: LineRange[] = [];
 
@@ -29,20 +35,30 @@ const currentLine = (ranges: LineRange[], cursor: number): number => {
 };
 
 export const visibleLines = (value: string, cursor: number, rows: number | undefined): string => {
-	if (rows === undefined || rows <= 0) {
-		return value;
-	}
+	return visibleLineWindow(value, cursor, rows).lines.join('\n');
+};
 
+export const visibleLineWindow = (value: string, cursor: number, rows: number | undefined): VisibleLineWindow => {
 	const valueCharacters = [...value];
 	const ranges = lineRanges(valueCharacters);
+
+	if (rows === undefined || rows <= 0) {
+		return {
+			lines: ranges.map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
+			start: 0,
+			total: ranges.length,
+		};
+	}
+
 	const line = currentLine(ranges, cursor);
 	const start = Math.max(0, line - rows + 1);
 	const end = start + rows;
 
-	return ranges
-		.slice(start, end)
-		.map((range) => fromCharacters(valueCharacters.slice(range.start, range.end)))
-		.join('\n');
+	return {
+		lines: ranges.slice(start, end).map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
+		start,
+		total: ranges.length,
+	};
 };
 
 export const moveLine = (value: string[], cursor: number, direction: 1 | -1): number => {
