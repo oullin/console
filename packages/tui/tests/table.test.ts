@@ -29,6 +29,40 @@ describe('table output', () => {
 		expect(output.text()).toContain('| Prompts | TypeScript |');
 	});
 
+	it('pads ANSI-styled table cells by visible width', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table(
+				['Name', 'Runtime'],
+				[
+					['\u001B[31mRed\u001B[39m', 'Node'],
+					['Blue', 'OpenTUI'],
+				],
+			);
+		});
+
+		expect(output.text()).toContain('\u001B[31mRed\u001B[39m  | Node');
+		expect(output.text()).toContain('| Blue | OpenTUI |');
+	});
+
+	it('pads wide Unicode table cells by visible width', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table(
+				['Name', 'Runtime'],
+				[
+					['東京', 'Node'],
+					['Paris', 'OpenTUI'],
+				],
+			);
+		});
+
+		expect(output.text()).toContain('| 東京  | Node');
+		expect(output.text()).toContain('| Paris | OpenTUI |');
+	});
+
 	it('rejects invalid table runtime shapes through the validator layer', async () => {
 		const output = createMemoryOutput();
 

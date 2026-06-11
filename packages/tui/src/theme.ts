@@ -37,8 +37,10 @@ export const renderTable = (headers: string[], rows: string[][]): string => {
 		return Math.max(visibleWidth(header), ...rows.map((row) => visibleWidth(row[index] ?? '')));
 	});
 
+	const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
+
 	const renderRow = (columns: string[]): string => {
-		return `| ${columns.map((column, index) => column.padEnd(widths[index] ?? 0)).join(' | ')} |`;
+		return `| ${columns.map((column, index) => padVisible(column, widths[index] ?? 0)).join(' | ')} |`;
 	};
 
 	const divider = `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`;
