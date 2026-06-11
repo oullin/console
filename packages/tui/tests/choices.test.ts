@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { confirm, createMemoryOutput, createScriptedInput, Key, multiselect, parseAnsiText, PromptValidationError, select, withPromptEnvironment } from '#tui/index';
+import type { SelectPromptOptions } from '#tui/index';
 
 describe('choice prompts', () => {
 	it('confirms with direct y and n keys', async () => {
@@ -124,6 +125,16 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Pick one');
 		expect(output.text()).toContain('┌ \u001B[2mPick one\u001B[22m ');
 		expect(output.text()).toContain('│ second');
+	});
+
+	it('rejects optional single select prompts', async () => {
+		const options = {
+			message: 'Pick one',
+			options: ['first', 'second'],
+			required: false,
+		} as unknown as SelectPromptOptions<string>;
+
+		await expect(select(options)).rejects.toThrow('Argument [required] must be true or a string.');
 	});
 
 	it('returns keys from keyed select options', async () => {

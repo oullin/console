@@ -4,9 +4,12 @@ import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { normalizeChoices } from '#tui/concerns/choices';
 import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
+import { assertSelectOptions } from '#tui/prompts/select/validators/options';
 import type { MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => {
+	assertSelectOptions(options);
+
 	const choices = normalizeChoices(options.options);
 
 	return promptUntilValid(options, async () => {
