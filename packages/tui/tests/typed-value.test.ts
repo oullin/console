@@ -12,6 +12,19 @@ const apply = (keys: string[]): string => {
   return state.value;
 };
 
+const applyMultiline = (keys: string[]): { submitted: boolean; value: string } => {
+  let state = { cursor: 0, value: '' };
+  let submitted = false;
+
+  for (const key of keys) {
+    const next = applyTypedKey(state, key, true);
+    state = { cursor: next.cursor, value: next.value };
+    submitted = next.submitted;
+  }
+
+  return { submitted, value: state.value };
+};
+
 describe('typed value editing', () => {
   it('inserts buffered characters', () => {
     expect(apply(['Je', 'ss'])).toBe('Jess');
@@ -28,5 +41,12 @@ describe('typed value editing', () => {
 
   it('moves to the start and end of a line', () => {
     expect(apply(['A', 'r', Key.home[0], 'J', Key.end[0], 'c', 'h', 'e', 'r'])).toBe('JArcher');
+  });
+
+  it('submits multiline input with ctrl-d', () => {
+    expect(applyMultiline(['A', Key.enter, 'B', Key.ctrlD])).toEqual({
+      submitted: true,
+      value: 'A\nB'
+    });
   });
 });

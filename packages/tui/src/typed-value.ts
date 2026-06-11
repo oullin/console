@@ -28,6 +28,10 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
     return { cursor, value: fromCharacters(value), submitted: false, cancelled: true };
   }
 
+  if (key === Key.ctrlD && allowNewLine) {
+    return { cursor, value: fromCharacters(value), submitted: true, cancelled: false };
+  }
+
   if (key === Key.enter) {
     if (!allowNewLine) {
       return { cursor, value: fromCharacters(value), submitted: true, cancelled: false };
