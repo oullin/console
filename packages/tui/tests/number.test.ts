@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, createScriptedInput, Key, number, withPromptEnvironment } from '#tui/index';
+import { parseNumberInput } from '#tui/prompts/number/validators/value';
 
 describe('number prompt', () => {
 	it('rejects partial decimal input and accepts a retry', async () => {
@@ -69,7 +70,7 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('Required.');
 	});
 
-	it('coerces decimal input to an integer value', async () => {
+	it('returns decimal input as a decimal value', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -82,7 +83,13 @@ describe('number prompt', () => {
 			() => number({ message: 'Count' }),
 		);
 
-		expect(result).toBe(1);
+		expect(result).toBe(1.9);
+	});
+
+	it('parses decimals unless integer input is required', () => {
+		expect(parseNumberInput('1.9')).toEqual({ value: 1.9 });
+		expect(parseNumberInput('1.9', { integer: true })).toEqual({ error: 'Must be a number' });
+		expect(parseNumberInput('1', { integer: true })).toEqual({ value: 1 });
 	});
 
 	it('validates typed values against min and max bounds', async () => {
