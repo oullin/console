@@ -10,18 +10,24 @@ export const select = async <T>(options: SelectPromptOptions<T>): Promise<T> => 
 	const choices = normalizeChoices(options.options);
 
 	return promptUntilValid(options, async () => {
-		return readSelectedChoice(options.message, choices, options.default, options.hint, options.scroll, options.info).catch((error: unknown) => {
+		const selected = await readSelectedChoice(options.message, choices, options.default, options.hint, options.scroll, options.info).catch((error: unknown) => {
 			if (options.default !== undefined && error instanceof PromptValidationError) {
 				return options.default;
 			}
 
 			throw error;
 		});
+
+		return options.transform ? options.transform(selected) : selected;
 	});
 };
 
 export const multiselect = async <T>(options: MultiSelectPromptOptions<T>): Promise<T[]> => {
 	const choices = normalizeChoices(options.options);
 
-	return promptUntilValid(options, async () => readMultipleChoices(options.message, choices, options.default, options.hint, options.scroll, options.info));
+	return promptUntilValid(options, async () => {
+		const selected = await readMultipleChoices(options.message, choices, options.default, options.hint, options.scroll, options.info);
+
+		return options.transform ? options.transform(selected) : selected;
+	});
 };

@@ -61,6 +61,7 @@ export type ConfirmPromptOptions = BasePromptOptions<boolean> & {
 	label?: string;
 	yes?: string;
 	no?: string;
+	transform?: (value: boolean) => MaybePromise<boolean>;
 };
 
 export type SelectPromptOptions<T> = BasePromptOptions<T> & {
@@ -68,6 +69,7 @@ export type SelectPromptOptions<T> = BasePromptOptions<T> & {
 	options: Array<ChoiceInput<T>>;
 	scroll?: number;
 	info?: PromptInfo<T>;
+	transform?: (value: T) => MaybePromise<T>;
 };
 
 export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
@@ -75,6 +77,7 @@ export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
 	options: Array<ChoiceInput<T>>;
 	scroll?: number;
 	info?: PromptInfo<T>;
+	transform?: (value: T[]) => MaybePromise<T[]>;
 };
 
 export type SearchPromptOptions<T> = Omit<BasePromptOptions<T>, 'required'> & {
@@ -84,6 +87,7 @@ export type SearchPromptOptions<T> = Omit<BasePromptOptions<T>, 'required'> & {
 	required?: true | string;
 	scroll?: number;
 	info?: PromptInfo<T>;
+	transform?: (value: T) => MaybePromise<T>;
 };
 
 export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
@@ -92,6 +96,7 @@ export type MultiSearchPromptOptions<T> = BasePromptOptions<T[]> & {
 	placeholder?: string;
 	scroll?: number;
 	info?: PromptInfo<T>;
+	transform?: (value: T[]) => MaybePromise<T[]>;
 };
 
 export type TableCell = string | number | boolean | null | undefined;

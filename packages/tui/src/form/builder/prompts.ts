@@ -27,6 +27,7 @@ export type PromptBuilderMethods = {
 		validate?: (value: boolean) => MaybePromise<string | null | undefined>,
 		hint?: string,
 		name?: string,
+		transform?: (value: boolean) => MaybePromise<boolean>,
 	): FormBuilder;
 	multisearch<T>(this: FormBuilder, options: MultiSearchPromptOptions<T>, name?: string): FormBuilder;
 	multiselect<T>(
@@ -39,6 +40,7 @@ export type PromptBuilderMethods = {
 		validate?: (value: T[]) => MaybePromise<string | null | undefined>,
 		hint?: string,
 		name?: string,
+		transform?: (value: T[]) => MaybePromise<T[]>,
 	): FormBuilder;
 	number(
 		this: FormBuilder,
@@ -75,6 +77,7 @@ export type PromptBuilderMethods = {
 		hint?: string,
 		required?: boolean | string,
 		name?: string,
+		transform?: (value: T) => MaybePromise<T>,
 	): FormBuilder;
 	suggest(
 		this: FormBuilder,
@@ -117,8 +120,8 @@ export const promptBuilderMethods: PromptBuilderMethods & ThisType<FormBuilder> 
 	autocomplete(label, options, defaultValue = '', required = false, validate = undefined, hint = '', name, transform = undefined) {
 		return this.add((_, previous) => autocomplete({ message: label, label, options, default: previousString(previous, defaultValue), required, validate, hint, transform }), name);
 	},
-	confirm(label, defaultValue = true, yes = 'Yes', no = 'No', required = false, validate = undefined, hint = '', name) {
-		return this.add(() => confirm(label, defaultValue, yes, no, required, validate, hint), name);
+	confirm(label, defaultValue = true, yes = 'Yes', no = 'No', required = false, validate = undefined, hint = '', name, transform = undefined) {
+		return this.add(() => confirm(label, defaultValue, yes, no, required, validate, hint, transform), name);
 	},
 	multisearch<T>(options: MultiSearchPromptOptions<T>, name?: string) {
 		return this.add(() => multisearch(options), name);
@@ -132,8 +135,9 @@ export const promptBuilderMethods: PromptBuilderMethods & ThisType<FormBuilder> 
 		validate = undefined,
 		hint = 'Use the space bar to select options.',
 		name?: string,
+		transform = undefined,
 	) {
-		return this.add((_, previous) => multiselect({ message: label, options, default: previousArray(previous, defaultValue), scroll, required, validate, hint }), name);
+		return this.add((_, previous) => multiselect({ message: label, options, default: previousArray(previous, defaultValue), scroll, required, validate, hint, transform }), name);
 	},
 	number(label, placeholder = '', defaultValue = 0, required = false, validate = undefined, hint = '', min, max, step, name) {
 		return this.add((_, previous) => number(label, placeholder, previousNumber(previous, defaultValue), required, validate, hint, min, max, step), name);
@@ -147,8 +151,8 @@ export const promptBuilderMethods: PromptBuilderMethods & ThisType<FormBuilder> 
 	search<T>(options: SearchPromptOptions<T>, name?: string) {
 		return this.add(() => search(options), name);
 	},
-	select<T>(label: string, options: Array<ChoiceInput<T>>, defaultValue?: T, scroll = 5, validate = undefined, hint = '', required: boolean | string = true, name?: string) {
-		return this.add((_, previous) => select({ message: label, options, default: previous === undefined ? defaultValue : (previous as T), scroll, validate, hint, required }), name);
+	select<T>(label: string, options: Array<ChoiceInput<T>>, defaultValue?: T, scroll = 5, validate = undefined, hint = '', required: boolean | string = true, name?: string, transform = undefined) {
+		return this.add((_, previous) => select({ message: label, options, default: previous === undefined ? defaultValue : (previous as T), scroll, validate, hint, required, transform }), name);
 	},
 	suggest(label, options, defaultValue = '', scroll = 5, required = false, validate = undefined, hint = '', name, transform = undefined) {
 		return this.add((_, previous) => suggest({ message: label, label, options, default: previousString(previous, defaultValue), scroll, required, validate, hint, transform }), name);

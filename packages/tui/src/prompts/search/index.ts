@@ -14,10 +14,14 @@ export const search = async <T>(options: SearchPromptOptions<T>): Promise<T> => 
 			throw new PromptValidationError('Please select a valid option.');
 		}
 
-		return selected;
+		return options.transform ? options.transform(selected) : selected;
 	});
 };
 
 export const multisearch = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
-	return promptUntilValid(options, async () => readMultiSearchChoices(options));
+	return promptUntilValid(options, async () => {
+		const selected = await readMultiSearchChoices(options);
+
+		return options.transform ? options.transform(selected) : selected;
+	});
 };

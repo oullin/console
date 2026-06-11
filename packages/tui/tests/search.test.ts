@@ -176,6 +176,28 @@ describe('search prompt', () => {
 
 		await expect(search(options)).rejects.toThrow('Argument [required] must be true or a string.');
 	});
+
+	it('transforms search values before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: colors,
+					transform: (value) => value.toUpperCase(),
+					validate: (value) => (value === 'RED' ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe('RED');
+	});
 });
 
 describe('multisearch prompt', () => {
@@ -365,5 +387,27 @@ describe('multisearch prompt', () => {
 
 		expect(result).toEqual(['green', 'blue']);
 		expect(output.text()).toContain('Selected: Green, Blue');
+	});
+
+	it('transforms multisearch values before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlA, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: colors,
+					transform: (value) => value.toReversed(),
+					validate: (value) => (value[0] === 'blue' ? null : 'Unexpected order.'),
+				}),
+		);
+
+		expect(result).toEqual(['blue', 'green', 'red']);
 	});
 });

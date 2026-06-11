@@ -64,6 +64,22 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Required.');
 	});
 
+	it('transforms confirm answers before returning', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['y', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?', true, 'Yes', 'No', false, undefined, '', (value) => !value),
+		);
+
+		expect(result).toBe(false);
+	});
+
 	it('selects with arrow keys and enter', async () => {
 		const output = createMemoryOutput();
 
@@ -167,6 +183,28 @@ describe('choice prompts', () => {
 
 		expect(output.text()).toContain('About first');
 		expect(output.text()).toContain('About second');
+	});
+
+	it('transforms selected values before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				select({
+					message: 'Pick one',
+					options: ['first', 'second'],
+					transform: (value) => value.toUpperCase(),
+					validate: (value) => (value === 'FIRST' ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe('FIRST');
 	});
 
 	it('toggles multiselect choices with the space bar', async () => {
@@ -286,5 +324,27 @@ describe('choice prompts', () => {
 		);
 
 		expect(output.text()).toContain('About first · 0 selected');
+	});
+
+	it('transforms multiselect values before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.space, Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multiselect({
+					message: 'Pick many',
+					options: ['first', 'second'],
+					transform: (value) => value.toReversed(),
+					validate: (value) => (value[0] === 'second' ? null : 'Unexpected order.'),
+				}),
+		);
+
+		expect(result).toEqual(['second', 'first']);
 	});
 });
