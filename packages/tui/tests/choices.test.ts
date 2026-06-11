@@ -18,6 +18,26 @@ describe('choice prompts', () => {
     expect(output.text()).toContain('Pick one');
   });
 
+  it('renders a scrolling select window around the highlighted choice', async () => {
+    const output = createMemoryOutput();
+    const result = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.down, Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () => select({ message: 'Pick one', options: ['first', 'second', 'third', 'fourth'], scroll: 3 })
+    );
+    const latestFrame = output.text().split('Pick one\n').at(-1) ?? '';
+
+    expect(result).toBe('third');
+    expect(latestFrame).not.toContain('first');
+    expect(latestFrame).toContain('second');
+    expect(latestFrame).toContain('third');
+    expect(latestFrame).toContain('fourth');
+  });
+
   it('toggles multiselect choices with the space bar', async () => {
     const output = createMemoryOutput();
     const result = await withPromptEnvironment(

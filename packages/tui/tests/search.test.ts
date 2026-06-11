@@ -64,6 +64,31 @@ describe('search prompt', () => {
     expect(output.text()).toContain('Favorite color? r');
     expect(output.text()).toContain('›');
   });
+
+  it('respects scroll windows when rendering results', async () => {
+    const output = createMemoryOutput();
+    const result = await withPromptEnvironment(
+      {
+        input: createScriptedInput([Key.down, Key.down, Key.down, Key.enter]),
+        output,
+        error: output,
+        interactive: true
+      },
+      () =>
+        search({
+          message: 'Pick number',
+          options: ['one', 'two', 'three', 'four'],
+          scroll: 3
+        })
+    );
+    const latestFrame = output.text().split('Pick number\n').at(-1) ?? '';
+
+    expect(result).toBe('three');
+    expect(latestFrame).not.toContain('one');
+    expect(latestFrame).toContain('two');
+    expect(latestFrame).toContain('three');
+    expect(latestFrame).toContain('four');
+  });
 });
 
 describe('multisearch prompt', () => {

@@ -59,12 +59,25 @@ export const nextEnabledIndex = <T>(choices: Array<Choice<T>>, current: number, 
   return current;
 };
 
-export const renderInteractiveChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number> = new Set()): void => {
+const choiceWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
+  if (scroll === undefined || scroll <= 0 || scroll >= total) {
+    return { end: total, start: 0 };
+  }
+
+  const before = Math.floor((scroll - 1) / 2);
+  const start = Math.max(0, Math.min(selected - before, total - scroll));
+
+  return { end: start + scroll, start };
+};
+
+export const renderInteractiveChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number> = new Set(), scroll?: number): void => {
   const environment = promptEnvironment();
+  const window = choiceWindow(choices.length, selected, scroll);
 
   environment.output.write(`${message}\n`);
 
-  for (const [index, choice] of choices.entries()) {
+  for (const [offset, choice] of choices.slice(window.start, window.end).entries()) {
+    const index = window.start + offset;
     const pointer = index === selected ? '›' : ' ';
     const checked = marked.size > 0 ? (marked.has(index) ? '[x]' : '[ ]') : '  ';
     const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';

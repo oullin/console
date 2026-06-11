@@ -21,9 +21,10 @@ const renderSearchChoices = <T>(
   choices: Array<Choice<T>>,
   highlighted: number | null,
   marked: Set<number> = new Set(),
-  selectedLabels: string[] = []
+  selectedLabels: string[] = [],
+  scroll?: number
 ): void => {
-  renderInteractiveChoices(searchMessage(message, query), choices, highlighted ?? 0, marked);
+  renderInteractiveChoices(searchMessage(message, query), choices, highlighted ?? 0, marked, scroll);
 
   if (selectedLabels.length > 0) {
     promptEnvironment().output.write(`Selected: ${selectedLabels.join(', ')}\n`);
@@ -45,7 +46,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
   let choices = await resolveSearchChoices(options.options, state.value);
   let highlighted: number | null = null;
 
-  renderSearchChoices(options.message, state.value, choices, highlighted);
+  renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
 
   while (true) {
     const key = await environment.input.readKey();
@@ -57,26 +58,26 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
     if (key === Key.down || key === Key.downArrow || key === Key.ctrlN || key === Key.tab) {
       choices = await resolveSearchChoices(options.options, state.value);
       highlighted = choices.length === 0 ? null : ((highlighted ?? (attempt > 0 ? 0 : -1)) + 1) % choices.length;
-      renderSearchChoices(options.message, state.value, choices, highlighted);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
       continue;
     }
 
     if (key === Key.up || key === Key.upArrow || key === Key.ctrlP || key === Key.shiftTab) {
       choices = await resolveSearchChoices(options.options, state.value);
       highlighted = choices.length === 0 ? null : ((highlighted ?? choices.length) - 1 + choices.length) % choices.length;
-      renderSearchChoices(options.message, state.value, choices, highlighted);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
       continue;
     }
 
     if (oneOf([Key.home, Key.ctrlA], key) && highlighted !== null) {
       highlighted = 0;
-      renderSearchChoices(options.message, state.value, choices, highlighted);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
       continue;
     }
 
     if (oneOf([Key.end, Key.ctrlE], key) && highlighted !== null) {
       highlighted = Math.max(0, choices.length - 1);
-      renderSearchChoices(options.message, state.value, choices, highlighted);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
       continue;
     }
 
@@ -87,7 +88,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
 
       choices = await resolveSearchChoices(options.options, state.value);
       highlighted = choices.length > 0 ? 0 : null;
-      renderSearchChoices(options.message, state.value, choices, highlighted);
+      renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
       continue;
     }
 
@@ -102,7 +103,7 @@ const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0)
     state = { cursor: next.cursor, value: next.value };
     highlighted = null;
     choices = await resolveSearchChoices(options.options, state.value);
-    renderSearchChoices(options.message, state.value, choices, highlighted);
+    renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll);
   }
 };
 
@@ -149,7 +150,7 @@ const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): 
   const render = (): void => {
     const marked = new Set(choices.flatMap((choice, index) => selected.has(choice.value) ? [index] : []));
 
-    renderSearchChoices(options.message, state.value, choices, highlighted, marked, [...selected.values()]);
+    renderSearchChoices(options.message, state.value, choices, highlighted, marked, [...selected.values()], options.scroll);
   };
 
   render();
