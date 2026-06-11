@@ -49,6 +49,10 @@ describe('typed value editing', () => {
 		expect(apply(['J', 'e', 'z', Key.left, Key.delete, 's', 's'])).toBe('Jess');
 	});
 
+	it('deletes typed input back to the line start', () => {
+		expect(apply(['J', 'a', 'n', 'e', Key.left, Key.left, Key.ctrlU, 'D', 'o'])).toBe('Done');
+	});
+
 	it('supports emacs-style movement keys', () => {
 		expect(apply(['J', 'z', 'e', Key.ctrlB, Key.ctrlH, Key.ctrlF, 's', 's'])).toBe('Jess');
 	});
@@ -95,6 +99,13 @@ describe('typed value editing', () => {
 		expect(applyMultilineState('abc\nde\nfghi', 9, [Key.ctrlA, 'X', Key.ctrlE, 'Y'])).toEqual({
 			cursor: 13,
 			value: 'abc\nde\nXfghiY',
+		});
+	});
+
+	it('deletes textarea input back to the current line start', () => {
+		expect(applyMultilineState('abc\nde\nfghi', 9, [Key.ctrlU])).toEqual({
+			cursor: 7,
+			value: 'abc\nde\nhi',
 		});
 	});
 });

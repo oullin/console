@@ -168,6 +168,14 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 		return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
 	}
 
+	if (key === Key.ctrlU) {
+		const start = allowNewLine ? moveToLineBoundary(value, cursor, 'start') : 0;
+
+		value.splice(start, cursor - start);
+
+		return { cursor: start, value: fromCharacters(value), submitted: false, cancelled: false };
+	}
+
 	if (key === Key.backspace || key === Key.ctrlH) {
 		if (cursor === 0) {
 			return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
