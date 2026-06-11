@@ -74,6 +74,39 @@ describe('table output', () => {
 		expect(output.text()).toContain('| Prompts | TypeScript |');
 	});
 
+	it('renders object table rows in explicit header order', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table({
+				headers: ['Runtime', 'Name', 'Notes'],
+				rows: [
+					{ Name: 'Ollin', Runtime: 'OpenTUI' },
+					{ Name: 'Prompts', Runtime: 'TypeScript', Notes: 'Port' },
+				],
+			});
+		});
+
+		expect(output.text()).toContain('| Runtime    | Name    | Notes |');
+		expect(output.text()).toContain('| OpenTUI    | Ollin   |       |');
+		expect(output.text()).toContain('| TypeScript | Prompts | Port  |');
+	});
+
+	it('renders tables without headers from row-only input', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table([
+				['Ollin', 'OpenTUI'],
+				['Prompts', 'TypeScript'],
+			]);
+		});
+
+		expect(output.text()).not.toContain('---');
+		expect(output.text()).toContain('| Ollin   | OpenTUI    |');
+		expect(output.text()).toContain('| Prompts | TypeScript |');
+	});
+
 	it('rejects invalid table runtime shapes through the validator layer', async () => {
 		const output = createMemoryOutput();
 

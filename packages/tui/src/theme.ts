@@ -33,8 +33,10 @@ export const renderChoices = <T>(choices: Array<Choice<T>>): string => {
 };
 
 export const renderTable = (headers: string[], rows: string[][]): string => {
-	const widths = headers.map((header, index) => {
-		return Math.max(visibleWidth(header), ...rows.map((row) => visibleWidth(row[index] ?? '')));
+	const columnCount = Math.max(headers.length, ...rows.map((row) => row.length));
+
+	const widths = Array.from({ length: columnCount }, (_, index) => {
+		return Math.max(visibleWidth(headers[index] ?? ''), ...rows.map((row) => visibleWidth(row[index] ?? '')));
 	});
 
 	const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
@@ -45,5 +47,5 @@ export const renderTable = (headers: string[], rows: string[][]): string => {
 
 	const divider = `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`;
 
-	return [renderRow(headers), divider, ...rows.map(renderRow)].join('\n');
+	return headers.length > 0 ? [renderRow(headers), divider, ...rows.map(renderRow)].join('\n') : rows.map(renderRow).join('\n');
 };

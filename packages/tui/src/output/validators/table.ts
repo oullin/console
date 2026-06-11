@@ -22,6 +22,14 @@ export const parseTableOptions = (headersOrOptions: unknown = [], rows: unknown 
 		return { headers, rows: tableOptions.data.rows };
 	}
 
+	if (rows === null) {
+		const rowOnlyOptions = tableRowsSchema.safeParse(headersOrOptions);
+
+		if (rowOnlyOptions.success) {
+			return { headers: [], rows: rowOnlyOptions.data };
+		}
+	}
+
 	return {
 		headers: tableHeadersSchema.parse(headersOrOptions),
 		rows: rows === null ? [] : tableRowsSchema.parse(rows),
