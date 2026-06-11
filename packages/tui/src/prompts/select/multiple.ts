@@ -1,0 +1,51 @@
+import { findChoice } from '#tui/concerns/choices';
+import { PromptValidationError } from '#tui/prompt';
+import type { Choice } from '#tui/types';
+
+export const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: string): T[] => {
+	const parts = answer
+		.split(',')
+		.map((part) => part.trim())
+		.filter((part) => part.length > 0);
+
+	const selected = parts.map((part) => findChoice(choices, part)).filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
+
+	if (selected.length !== parts.length) {
+		throw new PromptValidationError('Please select valid options.');
+	}
+
+	return selected.map((choice) => choice.value);
+};
+
+export const markedChoiceIndexes = <T>(choices: Array<Choice<T>>, defaults: T[] = []): Set<number> => {
+	const selectedValues = new Set(defaults);
+
+	return new Set(choices.flatMap((choice, index) => (selectedValues.has(choice.value) ? [index] : [])));
+};
+
+export const markedChoiceValues = <T>(choices: Array<Choice<T>>, marked: Set<number>): T[] => {
+	return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
+};
+
+export const toggleMarkedChoice = <T>(choices: Array<Choice<T>>, marked: Set<number>, index: number): Set<number> => {
+	const next = new Set(marked);
+
+	if (next.has(index)) {
+		next.delete(index);
+	} else if (!choices[index]?.disabled) {
+		next.add(index);
+	}
+
+	return next;
+};
+
+export const toggleAllEnabledChoices = <T>(choices: Array<Choice<T>>, marked: Set<number>): Set<number> => {
+	const enabledIndexes = choices.flatMap((choice, index) => (choice.disabled ? [] : [index]));
+	const allEnabledMarked = enabledIndexes.every((index) => marked.has(index));
+
+	if (allEnabledMarked) {
+		return new Set();
+	}
+
+	return new Set(enabledIndexes);
+};

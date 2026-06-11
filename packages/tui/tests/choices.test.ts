@@ -500,6 +500,32 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Selected: first, second, third');
 	});
 
+	it('toggles only enabled multiselect choices with ctrl-a', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlA, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multiselect({
+					message: 'Pick many',
+					options: [
+						{ label: 'first', value: 'first' },
+						{ label: 'second', value: 'second', disabled: true },
+						{ label: 'third', value: 'third' },
+					],
+				}),
+		);
+
+		expect(result).toEqual(['first', 'third']);
+		expect(output.text()).toContain('Selected: first, third');
+		expect(output.text()).not.toContain('Selected: first, second, third');
+	});
+
 	it('renders multiselect info for the highlighted option', async () => {
 		const output = createMemoryOutput();
 
