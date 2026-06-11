@@ -161,6 +161,40 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('? Count 1');
 	});
 
+	it('increments and decrements decimal values with fractional steps', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.up, Key.down, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Amount', default: 1.5, step: 0.25 }),
+		);
+
+		expect(result).toBe(1.25);
+		expect(output.text()).toContain('? Amount 1.75');
+		expect(output.text()).toContain('? Amount 1.25');
+	});
+
+	it('falls back to a whole step for invalid step sizes', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.up, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Amount', default: 1.5, step: 0 }),
+		);
+
+		expect(result).toBe(2.5);
+	});
+
 	it('renders default number values before input', async () => {
 		const output = createMemoryOutput();
 

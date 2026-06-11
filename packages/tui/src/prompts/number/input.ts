@@ -22,7 +22,7 @@ const clamp = (value: number, min?: number, max?: number): number => {
 };
 
 const steppedValue = (value: string, direction: 1 | -1, options: NumberInputOptions): string => {
-	const step = Math.max(1, options.step ?? 1);
+	const step = options.step !== undefined && options.step > 0 ? options.step : 1;
 
 	if (value === '') {
 		return String(direction === 1 ? (options.min ?? 1) : (options.max ?? 0));
@@ -32,7 +32,7 @@ const steppedValue = (value: string, direction: 1 | -1, options: NumberInputOpti
 		return value;
 	}
 
-	return String(clamp(Math.trunc(Number(value)) + step * direction, options.min, options.max));
+	return String(clamp(Number(value) + step * direction, options.min, options.max));
 };
 
 const renderNumberValue = (message: string, value: string, options: NumberInputOptions): void => {
