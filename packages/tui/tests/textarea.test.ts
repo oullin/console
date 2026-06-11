@@ -35,4 +35,23 @@ describe('textarea prompt', () => {
 
 		expect(output.text()).toContain('? Description Type here');
 	});
+
+	it('keeps rendered textarea output within the configured row window', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.enter, 'B', Key.enter, 'C', Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description', '', '', false, undefined, '', 2),
+		);
+
+		const latestFrame = output.text().split('? Description ').at(-1) ?? '';
+
+		expect(latestFrame).toContain('B\nC');
+		expect(latestFrame).not.toContain('A\nB\nC');
+	});
 });

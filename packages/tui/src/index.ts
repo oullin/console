@@ -33,6 +33,7 @@ export type {
 	StatusOptions,
 	TableCell,
 	TableOptions,
+	TextareaPromptOptions,
 	TextPromptOptions,
 	ValidationResult,
 	Validator,

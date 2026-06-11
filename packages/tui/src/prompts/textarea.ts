@@ -1,32 +1,34 @@
-import { textOptions } from '#tui/concerns/text-options';
 import { promptUntilValid } from '#tui/prompt';
 import { readTypedValue } from '#tui/typed-value';
-import type { TextPromptOptions } from '#tui/types';
+import type { TextareaPromptOptions } from '#tui/types';
 
-export function textarea(options: TextPromptOptions & { rows?: number }): Promise<string>;
+export function textarea(options: TextareaPromptOptions): Promise<string>;
 
 export function textarea(
 	label: string,
 	placeholder?: string,
 	defaultValue?: string,
 	required?: boolean | string,
-	validate?: TextPromptOptions['validate'],
+	validate?: TextareaPromptOptions['validate'],
 	hint?: string,
 	rows?: number,
-	transform?: TextPromptOptions['transform'],
+	transform?: TextareaPromptOptions['transform'],
 ): Promise<string>;
 
 export async function textarea(
-	message: string | (TextPromptOptions & { rows?: number }),
+	message: string | TextareaPromptOptions,
 	placeholder = '',
 	defaultValue = '',
 	required: boolean | string = false,
-	validate: TextPromptOptions['validate'] = undefined,
+	validate: TextareaPromptOptions['validate'] = undefined,
 	hint = '',
-	_rows = 5,
-	transform: TextPromptOptions['transform'] = undefined,
+	rows = 5,
+	transform: TextareaPromptOptions['transform'] = undefined,
 ): Promise<string> {
-	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, default: defaultValue, required, validate, hint, transform }) : textOptions(message);
+	const options: TextareaPromptOptions =
+		typeof message === 'string'
+			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, rows, transform }
+			: { ...message, default: message.default ?? '', rows: message.rows ?? rows };
 
 	return promptUntilValid(options, async () => {
 		const answer = await readTypedValue(options.message, {
@@ -34,6 +36,7 @@ export async function textarea(
 			hint: options.hint,
 			allowNewLine: true,
 			placeholder: options.placeholder,
+			rows: options.rows ?? rows,
 		});
 
 		const value = answer === '' && options.default !== undefined ? options.default : answer;

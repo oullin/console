@@ -13,6 +13,7 @@ type TypedValueOptions = {
 	default?: string;
 	hint?: string;
 	placeholder?: string;
+	rows?: number;
 };
 
 const characters = (value: string): string[] => [...value];
@@ -31,8 +32,25 @@ const isPrintable = (key: string): boolean => {
 	});
 };
 
-const renderTypedValue = (message: string, value: string, options: TypedValueOptions): void => {
-	const displayValue = value.length > 0 ? value : (options.placeholder ?? '');
+const visibleLines = (value: string, cursor: number, rows: number | undefined): string => {
+	if (rows === undefined || rows <= 0) {
+		return value;
+	}
+
+	const valueCharacters = characters(value);
+	const ranges = lineRanges(valueCharacters);
+	const line = currentLine(ranges, cursor);
+	const start = Math.max(0, line - rows + 1);
+	const end = start + rows;
+
+	return ranges
+		.slice(start, end)
+		.map((range) => fromCharacters(valueCharacters.slice(range.start, range.end)))
+		.join('\n');
+};
+
+const renderTypedValue = (message: string, state: TypedValueState, options: TypedValueOptions): void => {
+	const displayValue = state.value.length > 0 ? visibleLines(state.value, state.cursor, options.rows) : (options.placeholder ?? '');
 
 	promptEnvironment().output.write(`${renderQuestion(message, options.hint)}${displayValue}\n`);
 };
@@ -183,7 +201,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		value: options.default ?? '',
 	};
 
-	renderTypedValue(message, state.value, options);
+	renderTypedValue(message, state, options);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -211,6 +229,6 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 			return state.value;
 		}
 
-		renderTypedValue(message, state.value, options);
+		renderTypedValue(message, state, options);
 	}
 };

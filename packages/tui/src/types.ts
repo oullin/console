@@ -48,6 +48,10 @@ export type TextPromptOptions = BasePromptOptions<string> & {
 	transform?: (value: string) => MaybePromise<string>;
 };
 
+export type TextareaPromptOptions = TextPromptOptions & {
+	rows?: number;
+};
+
 export type NumberPromptOptions = BasePromptOptions<number | string> & {
 	label?: string;
 	min?: number;
