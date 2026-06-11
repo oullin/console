@@ -24,9 +24,9 @@ export const acceptAutocompleteMatch = (state: TypedValueState, match: string | 
 		return null;
 	}
 
-	if (requireGrowth && match.length <= state.value.length) {
+	if (requireGrowth && characterLength(match) <= characterLength(state.value)) {
 		return null;
 	}
 
-	return { cursor: match.length, value: match };
+	return { cursor: characterLength(match), value: match };
 };

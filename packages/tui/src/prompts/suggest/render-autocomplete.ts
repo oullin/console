@@ -1,22 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
+import { autocompleteDisplayValue } from '#tui/prompts/suggest/ghost-text';
 import { renderQuestion } from '#tui/theme';
+import type { TypedValueState } from '#tui/typed-value/types';
 
-const startsWithInput = (match: string, value: string): boolean => {
-	return match.toLowerCase().startsWith(value.toLowerCase());
-};
-
-const completionValue = (value: string, match: string | undefined, placeholder = ''): string => {
-	if (value.length === 0) {
-		return placeholder;
-	}
-
-	if (match === undefined || !startsWithInput(match, value) || match.length <= value.length) {
-		return value;
-	}
-
-	return value + match.slice(value.length);
-};
-
-export const renderAutocomplete = (message: string, value: string, matches: string[], highlighted: number, hint = '', placeholder = ''): void => {
-	promptEnvironment().output.write(`${renderQuestion(message, hint)}${completionValue(value, matches[highlighted], placeholder)}\n`);
+export const renderAutocomplete = (message: string, state: TypedValueState, matches: string[], highlighted: number, hint = '', placeholder = ''): void => {
+	promptEnvironment().output.write(`${renderQuestion(message, hint)}${autocompleteDisplayValue(state, matches[highlighted], placeholder)}\n`);
 };

@@ -23,7 +23,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+	renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -38,7 +38,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = moveAutocompleteHighlight(matches, highlighted, direction);
-			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -55,7 +55,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 				highlighted = 0;
 			}
 
-			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -64,7 +64,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 			state = acceptAutocompleteMatch(state, matches[highlighted], false) ?? state;
 
-			renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
 			continue;
 		}
 
@@ -85,6 +85,6 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderAutocomplete(options.message, state.value, matches, highlighted, options.hint, options.placeholder);
+		renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
 	}
 };

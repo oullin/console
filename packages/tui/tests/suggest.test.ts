@@ -177,6 +177,25 @@ describe('autocomplete prompt', () => {
 		expect(result).toBe('b');
 	});
 
+	it('hides autocomplete ghost text while editing before the end', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.left, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue']),
+		);
+
+		const frames = output.text().trimEnd().split('\n');
+
+		expect(frames.at(-1)).toContain('Favorite color? b');
+		expect(frames.at(-1)).not.toContain('Blue');
+	});
+
 	it('accepts same-length autocomplete matches with right arrow', async () => {
 		const output = createMemoryOutput();
 
