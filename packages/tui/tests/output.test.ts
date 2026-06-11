@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alert, createMemoryOutput, error, grid, info, intro, note, outro, table, warning, withPromptEnvironment } from '#tui/index';
+import { alert, createMemoryOutput, error, grid, info, intro, note, outro, parseAnsiText, table, warning, withPromptEnvironment } from '#tui/index';
 import { renderGrid } from '#tui/output/grid';
 
 describe('output helpers', () => {
@@ -18,6 +18,36 @@ describe('output helpers', () => {
 
 		expect(output.text()).toContain('Hello');
 		expect(output.text()).toContain('Done');
+	});
+
+	it('renders plain multiline notes without symbol prefixes', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			note('Hello\nWorld');
+		});
+
+		expect(output.text()).toBe(' Hello\n World\n');
+	});
+
+	it('renders typed note helpers with line-oriented styling', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			warning('Careful');
+			error('Nope');
+			alert('Heads up');
+			info('Facts');
+			intro('Start\nLonger');
+			outro('Done');
+		});
+
+		expect(parseAnsiText(output.text())).toBe(' Careful\n Nope\n  Heads up \n Facts\n  Start  \n  Longer \n  Done \n');
+		expect(output.text()).toContain('\u001B[33m Careful\u001B[39m');
+		expect(output.text()).toContain('\u001B[31m Nope\u001B[39m');
+		expect(output.text()).toContain('\u001B[41m\u001B[37m Heads up \u001B[39m\u001B[49m');
+		expect(output.text()).toContain('\u001B[32m Facts\u001B[39m');
+		expect(output.text()).toContain('\u001B[46m\u001B[30m Start  \u001B[39m\u001B[49m');
 	});
 
 	it('renders table and boxed grid helpers without returning a value', async () => {
