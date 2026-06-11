@@ -45,7 +45,32 @@ export type KeyboardEventLike = {
 	shift?: boolean;
 };
 
+const ctrlKeyMap: Record<string, KeyName> = {
+	a: Key.ctrlA,
+	b: Key.ctrlB,
+	c: Key.ctrlC,
+	d: Key.ctrlD,
+	e: Key.ctrlE,
+	f: Key.ctrlF,
+	h: Key.ctrlH,
+	n: Key.ctrlN,
+	p: Key.ctrlP,
+	u: Key.ctrlU,
+};
+
 export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
+	if (event.ctrl && event.name) {
+		const key = ctrlKeyMap[event.name.toLowerCase()];
+
+		if (key !== undefined) {
+			return key;
+		}
+	}
+
+	if (event.meta && event.name === 'backspace') {
+		return Key.optionBackspace;
+	}
+
 	if (event.name && event.name in Key) {
 		const key = Key[event.name as keyof typeof Key];
 

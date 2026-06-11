@@ -10,4 +10,14 @@ describe('keyboard mapping', () => {
 		expect(keyFromEvent({ sequence: ' ' })).toBe(Key.space);
 		expect(keyFromEvent({ sequence: '\n' })).toBe(Key.enter);
 	});
+
+	it('maps control-modified key names', () => {
+		expect(keyFromEvent({ ctrl: true, name: 'c' })).toBe(Key.ctrlC);
+		expect(keyFromEvent({ ctrl: true, name: 'n' })).toBe(Key.ctrlN);
+		expect(keyFromEvent({ ctrl: true, name: 'U' })).toBe(Key.ctrlU);
+	});
+
+	it('maps option backspace events', () => {
+		expect(keyFromEvent({ meta: true, name: 'backspace' })).toBe(Key.optionBackspace);
+	});
 });
