@@ -66,7 +66,27 @@ describe('search prompt', () => {
 		);
 
 		expect(output.text()).toContain('Favorite color? r');
-		expect(output.text()).toContain('›');
+		expect(output.text()).toContain('\u001B[36m›\u001B[39m Red');
+		expect(output.text()).toContain('\u001B[2mGreen\u001B[22m');
+	});
+
+	it('does not render an active search row before navigation highlights a result', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors, default: 'red' }),
+		);
+
+		const firstFrame = output.text().split('Favorite color?\n')[1] ?? '';
+
+		expect(firstFrame).not.toContain('›');
+		expect(firstFrame).toContain('\u001B[2mRed\u001B[22m');
 	});
 
 	it('respects scroll windows when rendering results', async () => {
@@ -404,6 +424,7 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['violet', 'green']);
+		expect(output.text()).toContain('\u001B[36m› ◼\u001B[39m Violet');
 		expect(output.text()).toContain('Selected: Violet');
 		expect(output.text()).toContain('Selected: Violet, Green');
 	});

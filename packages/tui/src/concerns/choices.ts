@@ -65,7 +65,7 @@ export const nextEnabledIndex = <T>(choices: Array<Choice<T>>, current: number, 
 	return current;
 };
 
-const choiceWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
+export const choiceWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
 	const size = parseOptionalScrollSize(scroll);
 
 	if (size === undefined || size >= total) {
