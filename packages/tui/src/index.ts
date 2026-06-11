@@ -4,8 +4,28 @@ export { Key, keyFromEvent, oneOf } from '#tui/key';
 export { renderOpenTuiTextFrame } from '#tui/opentui';
 export { confirm, select, multiselect, suggest, search, multisearch, autocomplete, pause } from '#tui/prompts/choices';
 export { number, password, text, textarea } from '#tui/prompts/basic';
-export { alert, clear, dataTable, datatable, error, grid, info, intro, note, notificationCommand, notificationCommands, notify, notifyForPlatform, outro, table, title, warning } from '#tui/output';
-export type { NotificationCommand } from '#tui/output';
+export {
+	alert,
+	clear,
+	commandExists,
+	dataTable,
+	datatable,
+	error,
+	executeNotificationCommand,
+	grid,
+	info,
+	intro,
+	note,
+	notificationCommand,
+	notificationCommands,
+	notify,
+	notifyForPlatform,
+	outro,
+	table,
+	title,
+	warning,
+} from '#tui/output';
+export type { NotificationCommand, NotificationRuntime } from '#tui/output';
 export { PromptValidationError } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
 export { backgroundColor, clearTerminal, cursorToStart, eraseLine, foregroundColor, setTerminalTitle, supportsTrueColor, terminalSize } from '#tui/terminal';

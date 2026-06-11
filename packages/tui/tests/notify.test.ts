@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, notificationCommand, notificationCommands, notifyForPlatform, withPromptEnvironment } from '#tui/index';
+import type { NotificationCommand } from '#tui/index';
 
 describe('notify helper', () => {
 	it('builds macOS notification commands', () => {
@@ -47,9 +48,38 @@ describe('notify helper', () => {
 		const output = createMemoryOutput();
 
 		await withPromptEnvironment({ output, error: output }, async () => {
-			notifyForPlatform('freebsd', 'Deploy', 'Done');
+			expect(notifyForPlatform('freebsd', 'Deploy', 'Done')).toBe(false);
 		});
 
 		expect(output.text()).toContain('Deploy: Done');
+	});
+
+	it('executes the first available Linux notifier and reports the process result', () => {
+		const executed: NotificationCommand[] = [];
+
+		const result = notifyForPlatform('linux', 'Deploy', 'Done', '', '', '', {
+			commandExists: (bin) => bin === 'kdialog',
+			execute: (command) => {
+				executed.push(command);
+
+				return true;
+			},
+		});
+
+		expect(result).toBe(true);
+		expect(executed).toEqual([
+			{
+				args: ['--passivepopup', 'Deploy: Done', '5', '--title', 'Deploy'],
+				bin: 'kdialog',
+			},
+		]);
+	});
+
+	it('returns false when notification command execution fails', () => {
+		const result = notifyForPlatform('darwin', 'Deploy', 'Done', '', '', '', {
+			execute: () => false,
+		});
+
+		expect(result).toBe(false);
 	});
 });

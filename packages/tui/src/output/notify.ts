@@ -1,43 +1,31 @@
-import { spawn, spawnSync } from 'node:child_process';
 import { platform } from 'node:process';
 import { note } from '#tui/output/notes';
 import { notificationCommands } from '#tui/output/notify/commands';
+import { availableNotificationCommand, commandExists, executeNotificationCommand } from '#tui/output/notify/executor';
 import type { NotificationCommand } from '#tui/output/notify/commands';
+import type { NotificationRuntime } from '#tui/output/notify/executor';
 
+export type { NotificationRuntime };
 export type { NotificationCommand };
-export { notificationCommands };
-
-const commandExists = (bin: string): boolean => {
-	const result = spawnSync('command', ['-v', bin], { shell: true, stdio: 'ignore' });
-
-	return result.status === 0;
-};
-
-const availableNotificationCommand = (targetPlatform: NodeJS.Platform, commands: NotificationCommand[]): NotificationCommand | null => {
-	if (targetPlatform !== 'linux') {
-		return commands.at(0) ?? null;
-	}
-
-	return commands.find((command) => commandExists(command.bin)) ?? null;
-};
+export { commandExists, executeNotificationCommand, notificationCommands };
 
 export const notificationCommand = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = ''): NotificationCommand | null => {
 	return notificationCommands(targetPlatform, { body, icon, sound, subtitle, title }).at(0) ?? null;
 };
 
-export const notifyForPlatform = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
+export const notifyForPlatform = (targetPlatform: NodeJS.Platform, title: string, body = '', subtitle = '', sound = '', icon = '', runtime: NotificationRuntime = {}): boolean => {
 	const commands = notificationCommands(targetPlatform, { body, icon, sound, subtitle, title });
-	const command = availableNotificationCommand(targetPlatform, commands);
+	const command = availableNotificationCommand(targetPlatform, commands, runtime.commandExists ?? commandExists);
 
 	if (command) {
-		spawn(command.bin, command.args, { detached: true, stdio: 'ignore' }).unref();
-
-		return;
+		return (runtime.execute ?? executeNotificationCommand)(command);
 	}
 
 	note(body ? `${title}: ${body}` : title, 'info');
+
+	return false;
 };
 
-export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
-	notifyForPlatform(platform, title, body, subtitle, sound, icon);
+export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): boolean => {
+	return notifyForPlatform(platform, title, body, subtitle, sound, icon);
 };

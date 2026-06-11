@@ -29,7 +29,7 @@ TypeScript and OpenTUI internals.
 | Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
-| Notification command construction and Linux fallback command ordering | `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*` |
+| Notification command construction, executable discovery, and process result reporting | `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*` |
 | Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table.ts` |
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
@@ -51,7 +51,6 @@ later phases:
 - Form builder
 - Multi-search full rendering and selected-result summary parity
 - Multi-select
-- Notifications executable discovery and process-result parity
 - Progress signal handling and terminal cleanup parity
 - Prompt lifecycle
 - Search full rendering and highlighted result label parity
