@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, progress, withPromptEnvironment } from '#tui/index';
+import { EventEmitter } from 'node:events';
+import { createMemoryOutput, Progress, progress, withPromptEnvironment } from '#tui/index';
 
 describe('progress helper', () => {
 	it('maps iterable steps and returns callback results', async () => {
@@ -52,6 +53,7 @@ describe('progress helper', () => {
 
 			bar.start();
 			bar.advance();
+			bar.finish();
 		});
 
 		expect(output.text()).toContain('█');
@@ -84,6 +86,8 @@ describe('progress helper', () => {
 
 			expect(bar.current()).toBe(1);
 			expect(bar.value()).toBe(true);
+
+			bar.finish();
 		});
 	});
 
@@ -98,6 +102,8 @@ describe('progress helper', () => {
 
 			bar.advance(-5);
 			expect(bar.current()).toBe(0);
+
+			bar.finish();
 		});
 
 		expect(output.text()).toContain('2 / 2');
@@ -115,6 +121,8 @@ describe('progress helper', () => {
 			bar.advance(Number.NaN);
 
 			expect(bar.current()).toBe(0);
+
+			bar.finish();
 		});
 
 		expect(output.text()).toContain('0 / 2');
@@ -140,5 +148,28 @@ describe('progress helper', () => {
 		expect(output.text()).toContain('0 / 1');
 		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 		expect(output.text()).toContain('\u001B[?25h');
+	});
+
+	it('restores progress terminal state when process signals are received', async () => {
+		const output = createMemoryOutput();
+		const signals = new EventEmitter();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			const bar = new Progress(2, 'Adding States', '', signals);
+
+			bar.start();
+
+			expect(signals.listenerCount('SIGINT')).toBe(1);
+			expect(signals.listenerCount('SIGTERM')).toBe(1);
+
+			signals.emit('SIGINT');
+
+			expect(signals.listenerCount('SIGINT')).toBe(0);
+			expect(signals.listenerCount('SIGTERM')).toBe(0);
+		});
+
+		expect(output.text()).toContain('\u001B[?25l');
+		expect(output.text()).toContain('\u001B[?25h');
+		expect(output.text()).toContain('\u001B[1A\u001B[2K');
 	});
 });

@@ -47,6 +47,7 @@ TypeScript and OpenTUI internals.
 | Status cursor visibility cleanup | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
 | Status rendered-frame cleanup | `packages/tui/src/status/frame.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/task.ts` |
 | Progress cursor visibility and rendered-frame redraw cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/frame.ts` |
+| Progress signal cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/tests/progress.test.ts` |
 | Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
 | Terminal raw key alias normalization | `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | Terminal split escape-sequence buffering | `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
@@ -62,7 +63,6 @@ later phases:
 - Form builder remaining method-surface and validation parity
 - Multi-search full rendering and selected-result summary parity
 - Multi-select boxed layout and submit/cancel frame parity
-- Progress signal handling parity
 - Prompt lifecycle
 - Search boxed layout, scrollbar, and submit/cancel frame parity
 - Textarea wrapping, cursor, and scrollbar parity
