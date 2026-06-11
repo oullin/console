@@ -77,10 +77,11 @@ export type MultiSelectPromptOptions<T> = BasePromptOptions<T[]> & {
 	info?: PromptInfo<T>;
 };
 
-export type SearchPromptOptions<T> = BasePromptOptions<T> & {
+export type SearchPromptOptions<T> = Omit<BasePromptOptions<T>, 'required'> & {
 	label?: string;
 	options: Array<ChoiceInput<T>> | Record<string, string> | ((query: string) => MaybePromise<Array<ChoiceInput<T>> | Record<string, string>>);
 	placeholder?: string;
+	required?: true | string;
 	scroll?: number;
 	info?: PromptInfo<T>;
 };

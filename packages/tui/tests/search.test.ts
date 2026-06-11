@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryOutput, createScriptedInput, Key, multisearch, search, withPromptEnvironment } from '#tui/index';
+import type { SearchPromptOptions } from '#tui/index';
 
 const colors = (value: string): Record<string, string> => {
 	const options = {
@@ -132,6 +133,16 @@ describe('search prompt', () => {
 		);
 
 		expect(result).toBe('green');
+	});
+
+	it('rejects optional single search prompts', async () => {
+		const options = {
+			message: 'Favorite color?',
+			options: colors,
+			required: false,
+		} as unknown as SearchPromptOptions<string>;
+
+		await expect(search(options)).rejects.toThrow('Argument [required] must be true or a string.');
 	});
 });
 
