@@ -1,0 +1,14 @@
+import type { PromptInput } from '#tui/types';
+
+export const createScriptedInput = (lines: string[]): PromptInput => {
+	const queued = [...lines];
+
+	return {
+		async readKey(): Promise<string | null> {
+			return queued.shift() ?? null;
+		},
+		async readLine(): Promise<string> {
+			return queued.shift() ?? '';
+		},
+	};
+};
