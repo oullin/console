@@ -4,6 +4,7 @@ import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
 
 type PasswordInputOptions = {
+	default?: string;
 	hint?: string;
 	placeholder?: string;
 };
@@ -24,12 +25,14 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 			throw new PromptValidationError('The configured prompt input cannot read input.');
 		}
 
-		return environment.input.readLine(renderQuestion(message, options.hint));
+		const answer = await environment.input.readLine(renderQuestion(message, options.hint));
+
+		return answer === '' && options.default !== undefined ? options.default : answer;
 	}
 
 	let state = {
-		cursor: 0,
-		value: '',
+		cursor: options.default?.length ?? 0,
+		value: options.default ?? '',
 	};
 
 	renderPasswordValue(message, state.value, options);

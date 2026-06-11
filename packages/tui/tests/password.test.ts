@@ -35,4 +35,42 @@ describe('password prompt', () => {
 
 		expect(output.text()).toContain('? Password Required');
 	});
+
+	it('returns object-option defaults without rendering the raw value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => password({ message: 'Password', default: 'secret' }),
+		);
+
+		expect(result).toBe('secret');
+		expect(output.text()).not.toContain('secret');
+		expect(output.text()).toContain('••••••');
+	});
+
+	it('edits object-option defaults without rendering the raw value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.backspace, 'x', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => password({ message: 'Password', default: 'secret' }),
+		);
+
+		expect(result).toBe('secrex');
+		expect(output.text()).not.toContain('secret');
+		expect(output.text()).not.toContain('secrex');
+		expect(output.text()).toContain('•••••');
+		expect(output.text()).toContain('••••••');
+	});
 });

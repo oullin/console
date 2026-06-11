@@ -26,6 +26,7 @@ export async function password(
 
 	return promptUntilValid(options, async () => {
 		const value = await readPasswordValue(options.message, {
+			default: options.default,
 			hint: options.hint,
 			placeholder: options.placeholder,
 		});
