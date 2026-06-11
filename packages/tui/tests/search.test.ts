@@ -28,6 +28,8 @@ describe('search prompt', () => {
 
 		expect(result).toBe('blue');
 		expect(output.text()).toContain('Favorite color? ue');
+		expect(output.text()).toContain('┌ \u001B[2mFavorite color?\u001B[22m ');
+		expect(output.text()).toContain('│ Blue');
 	});
 
 	it('validates selected values and allows another selection', async () => {
@@ -137,6 +139,7 @@ describe('search prompt', () => {
 		);
 
 		expect(result).toBe('three');
+		expect(output.text()).toContain('│ three');
 	});
 
 	it('supports control-key search navigation', async () => {

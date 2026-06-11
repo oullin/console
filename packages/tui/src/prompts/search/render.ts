@@ -3,6 +3,7 @@ import { choiceWindow } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { searchMessage } from '#tui/prompts/search/choices';
+import { renderBox } from '#tui/theme/box';
 import { cyan, dim } from '#tui/theme/styles';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
@@ -34,6 +35,10 @@ export const renderSearchChoices = <T>(
 	if (selectedLabels.length > 0) {
 		promptEnvironment().output.write(`Selected: ${selectedLabels.join(', ')}\n`);
 	}
+};
+
+export const renderSubmittedSearchChoice = (message: string, label: string): void => {
+	promptEnvironment().output.write(`${renderBox({ body: label, title: dim(message) })}\n`);
 };
 
 const renderSearchRows = <T>(message: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): void => {

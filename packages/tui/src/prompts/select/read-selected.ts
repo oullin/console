@@ -5,7 +5,7 @@ import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { renderSelectedChoice } from '#tui/prompts/select/render';
+import { renderSelectedChoice, renderSubmittedChoice } from '#tui/prompts/select/render';
 import type { Choice, SelectPromptOptions } from '#tui/types';
 
 const defaultChoiceIndex = <T>(choices: Array<Choice<T>>, defaultValue: T | undefined): number => {
@@ -61,7 +61,11 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 		const numeric = parseChoiceIndex(key);
 
 		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
-			return choices[numeric - 1].value;
+			const choice = choices[numeric - 1];
+
+			renderSubmittedChoice(message, choice.label);
+
+			return choice.value;
 		}
 
 		const action = selectNavigationAction(key, { lineControls: true });
@@ -78,6 +82,8 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 			if (!choice || choice.disabled) {
 				throw new PromptValidationError('Please select a valid option.');
 			}
+
+			renderSubmittedChoice(message, choice.label);
 
 			return choice.value;
 		}

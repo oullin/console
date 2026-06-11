@@ -122,6 +122,8 @@ describe('choice prompts', () => {
 
 		expect(result).toBe('second');
 		expect(output.text()).toContain('Pick one');
+		expect(output.text()).toContain('┌ \u001B[2mPick one\u001B[22m ');
+		expect(output.text()).toContain('│ second');
 	});
 
 	it('returns keys from keyed select options', async () => {
@@ -171,6 +173,7 @@ describe('choice prompts', () => {
 
 		expect(result).toBe('third');
 		expect(output.text()).toContain('›    third');
+		expect(output.text()).toContain('│ third');
 	});
 
 	it('renders a scrolling select window around the highlighted choice', async () => {

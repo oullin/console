@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderSearchChoices } from '#tui/prompts/search/render';
+import { renderSearchChoices, renderSubmittedSearchChoice } from '#tui/prompts/search/render';
 import { cancelledSearchValue, lineSearchValue, selectedSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchPromptOptions } from '#tui/types';
 
@@ -51,7 +51,14 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 		if (key === Key.enter) {
 			if (highlighted !== null) {
-				return selectedSearchValue(choices, highlighted);
+				const choice = choices[highlighted];
+				const value = selectedSearchValue(choices, highlighted);
+
+				if (choice && value !== undefined) {
+					renderSubmittedSearchChoice(options.message, choice.label);
+				}
+
+				return value;
 			}
 
 			choices = await resolveSearchChoices(options.options, state.value);

@@ -1,6 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderInteractiveChecklist, renderInteractiveChoices } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
+import { renderBox } from '#tui/theme/box';
+import { dim } from '#tui/theme/styles';
 import type { Choice, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll: number | undefined, info: SelectPromptOptions<T>['info']): void => {
@@ -11,6 +13,10 @@ export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T
 	if (text.length > 0) {
 		promptEnvironment().output.write(`${text}\n`);
 	}
+};
+
+export const renderSubmittedChoice = (message: string, label: string): void => {
+	promptEnvironment().output.write(`${renderBox({ body: label, title: dim(message) })}\n`);
 };
 
 export const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): void => {
