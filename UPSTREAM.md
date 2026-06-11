@@ -17,6 +17,7 @@ TypeScript and OpenTUI internals.
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
+| Textarea control-key line navigation and empty-line movement | `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/tests/textarea.test.ts` |
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
@@ -56,7 +57,7 @@ later phases:
 - Stream true-color fade and terminal cleanup parity
 - Task animated frame, terminal cleanup, and process-log parity
 - Terminal raw TTY restoration and interactive read parity
-- Textarea
+- Textarea boxed renderer, wrapped cursor, and scrollbar parity
 - Default theme
 - Feature parity tests
 

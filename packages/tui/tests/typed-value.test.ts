@@ -119,14 +119,14 @@ describe('typed value editing', () => {
 		});
 	});
 
-	it('does not move between textarea lines with control navigation keys', () => {
+	it('moves between textarea lines with control navigation keys', () => {
 		expect(applyMultilineState('abc\nde\nfghi', 6, [Key.ctrlP])).toEqual({
-			cursor: 6,
+			cursor: 2,
 			value: 'abc\nde\nfghi',
 		});
 
 		expect(applyMultilineState('abc\nde\nfghi', 2, [Key.ctrlN])).toEqual({
-			cursor: 2,
+			cursor: 6,
 			value: 'abc\nde\nfghi',
 		});
 	});

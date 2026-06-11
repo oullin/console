@@ -10,11 +10,11 @@ export const moveTypedValueCursor = (value: string[], cursor: number, key: strin
 		return Math.min(value.length, cursor + 1);
 	}
 
-	if (allowNewLine && (key === Key.up || key === Key.upArrow)) {
+	if (allowNewLine && (key === Key.up || key === Key.upArrow || key === Key.ctrlP)) {
 		return moveLine(value, cursor, -1);
 	}
 
-	if (allowNewLine && (key === Key.down || key === Key.downArrow)) {
+	if (allowNewLine && (key === Key.down || key === Key.downArrow || key === Key.ctrlN)) {
 		return moveLine(value, cursor, 1);
 	}
 

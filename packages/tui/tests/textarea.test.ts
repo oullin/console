@@ -54,4 +54,36 @@ describe('textarea prompt', () => {
 		expect(latestFrame).toContain('B\nC');
 		expect(latestFrame).not.toContain('A\nB\nC');
 	});
+
+	it('uses control navigation keys to move between textarea lines', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['e', 's', 's', Key.enter, 'o', 'e', Key.ctrlP, Key.left, Key.left, 'J', Key.ctrlN, Key.left, 'J', Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description'),
+		);
+
+		expect(result).toBe('Jess\nJoe');
+	});
+
+	it('can move back to an empty textarea line', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['J', 'e', 's', 's', Key.enter, Key.up, Key.down, 'J', 'o', 'e', Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description'),
+		);
+
+		expect(result).toBe('Jess\nJoe');
+	});
 });
