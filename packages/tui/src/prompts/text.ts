@@ -30,6 +30,7 @@ export async function text(
 		const answer = await readTypedValue(options.message, {
 			default: options.default,
 			hint: options.hint,
+			placeholder: options.placeholder,
 		});
 
 		const value = answer === '' && options.default !== undefined ? options.default : answer;

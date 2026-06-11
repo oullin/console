@@ -17,5 +17,22 @@ describe('textarea prompt', () => {
 
 		expect(result).toBe('A\nB');
 		expect(output.text()).toContain('Description');
+		expect(output.text()).toContain('? Description A\nB');
+	});
+
+	it('renders textarea placeholders before input', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description', 'Type here'),
+		);
+
+		expect(output.text()).toContain('? Description Type here');
 	});
 });

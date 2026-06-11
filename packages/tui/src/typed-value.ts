@@ -8,6 +8,13 @@ export type TypedValueState = {
 	value: string;
 };
 
+type TypedValueOptions = {
+	allowNewLine?: boolean;
+	default?: string;
+	hint?: string;
+	placeholder?: string;
+};
+
 const characters = (value: string): string[] => [...value];
 const fromCharacters = (value: string[]): string => value.join('');
 
@@ -22,6 +29,12 @@ const isPrintable = (key: string): boolean => {
 
 		return code >= 32 && code !== 127;
 	});
+};
+
+const renderTypedValue = (message: string, value: string, options: TypedValueOptions): void => {
+	const displayValue = value.length > 0 ? value : (options.placeholder ?? '');
+
+	promptEnvironment().output.write(`${renderQuestion(message, options.hint)}${displayValue}\n`);
 };
 
 const lineRanges = (value: string[]): LineRange[] => {
@@ -152,7 +165,7 @@ export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine 
 	return { cursor, value: fromCharacters(value), submitted: false, cancelled: false };
 };
 
-export const readTypedValue = async (message: string, options: { default?: string; hint?: string; allowNewLine?: boolean } = {}): Promise<string> => {
+export const readTypedValue = async (message: string, options: TypedValueOptions = {}): Promise<string> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -165,12 +178,12 @@ export const readTypedValue = async (message: string, options: { default?: strin
 		return answer === '' && options.default !== undefined ? options.default : answer;
 	}
 
-	environment.output.write(renderQuestion(message, options.hint));
-
 	let state: TypedValueState = {
 		cursor: options.default?.length ?? 0,
 		value: options.default ?? '',
 	};
+
+	renderTypedValue(message, state.value, options);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -197,5 +210,7 @@ export const readTypedValue = async (message: string, options: { default?: strin
 
 			return state.value;
 		}
+
+		renderTypedValue(message, state.value, options);
 	}
 };

@@ -33,6 +33,7 @@ export async function textarea(
 			default: options.default,
 			hint: options.hint,
 			allowNewLine: true,
+			placeholder: options.placeholder,
 		});
 
 		const value = answer === '' && options.default !== undefined ? options.default : answer;
