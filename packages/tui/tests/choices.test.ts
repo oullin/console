@@ -245,6 +245,26 @@ describe('choice prompts', () => {
 		expect(result).toBe('FIRST');
 	});
 
+	it('trims line-mode select answers before matching choices', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return ' 2 ';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'] }),
+		);
+
+		expect(result).toBe('second');
+	});
+
 	it('cancels select prompts with the current highlighted option', async () => {
 		const output = createMemoryOutput();
 

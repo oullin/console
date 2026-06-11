@@ -262,6 +262,26 @@ describe('search prompt', () => {
 		expect(result).toBe('green');
 	});
 
+	it('trims line-mode search answers before matching choices', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return ' Green ';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search({ message: 'Favorite color?', options: colors }),
+		);
+
+		expect(result).toBe('green');
+	});
+
 	it('rejects disabled exact line-mode matches and retries', async () => {
 		const output = createMemoryOutput();
 		const answers = ['Red', 'Green'];
@@ -535,5 +555,25 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual(['blue', 'green', 'red']);
+	});
+
+	it('trims line-mode multisearch answers before matching choices', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return ' Green ';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors }),
+		);
+
+		expect(result).toEqual(['green']);
 	});
 });

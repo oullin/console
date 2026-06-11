@@ -30,13 +30,15 @@ export const normalizeSearchChoices = <T>(options: Array<ChoiceInput<T>> | Recor
 };
 
 export const findChoice = <T>(choices: Array<Choice<T>>, answer: string): Choice<T> | undefined => {
-	if (/^\d+$/u.test(answer)) {
-		const index = Number.parseInt(answer, 10);
+	const normalizedAnswer = answer.trim();
+
+	if (/^\d+$/u.test(normalizedAnswer)) {
+		const index = Number.parseInt(normalizedAnswer, 10);
 
 		return choices[index - 1];
 	}
 
-	return choices.find((choice) => choice.label === answer || String(choice.value) === answer);
+	return choices.find((choice) => choice.label === normalizedAnswer || String(choice.value) === normalizedAnswer);
 };
 
 export const firstEnabledIndex = <T>(choices: Array<Choice<T>>): number => {

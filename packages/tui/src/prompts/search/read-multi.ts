@@ -12,11 +12,11 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const query = await ask(options.message, options.hint);
+		const query = (await ask(options.message, options.hint)).trim();
 
 		const choices = await resolveSearchChoices(options.options, query);
 
-		if (query.trim() === '' && options.default !== undefined) {
+		if (query === '' && options.default !== undefined) {
 			return options.default;
 		}
 
