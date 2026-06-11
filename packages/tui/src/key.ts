@@ -77,6 +77,10 @@ export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
 		return Key.optionBackspace;
 	}
 
+	if (event.shift && event.name?.toLowerCase() === 'tab') {
+		return Key.shiftTab;
+	}
+
 	if (event.name) {
 		const key = namedKeyMap[event.name.toLowerCase()];
 

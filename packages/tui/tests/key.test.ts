@@ -26,4 +26,8 @@ describe('keyboard mapping', () => {
 	it('maps option backspace events', () => {
 		expect(keyFromEvent({ meta: true, name: 'backspace' })).toBe(Key.optionBackspace);
 	});
+
+	it('maps shifted tab events', () => {
+		expect(keyFromEvent({ name: 'tab', shift: true })).toBe(Key.shiftTab);
+	});
 });
