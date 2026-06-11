@@ -71,6 +71,13 @@ describe('typed value editing', () => {
 		});
 	});
 
+	it('deletes the previous punctuation group as a word boundary', () => {
+		expect(applyMultilineState('hello --', [...'hello --'].length, [Key.optionBackspace])).toEqual({
+			cursor: 6,
+			value: 'hello ',
+		});
+	});
+
 	it('moves to the start and end of a line', () => {
 		expect(apply(['A', 'r', Key.home[0], 'J', Key.end[0], 'c', 'h', 'e', 'r'])).toBe('JArcher');
 	});
