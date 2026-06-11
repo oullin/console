@@ -24,7 +24,7 @@ TypeScript and OpenTUI internals.
 | Search, multisearch | `packages/tui/src/prompts/search.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
-| Form builder | `packages/tui/src/form.ts` |
+| Form builder | `packages/tui/src/form/*`, `packages/tui/src/form.ts` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
 | Tables and grids | `packages/tui/src/output/table.ts` |

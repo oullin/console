@@ -66,13 +66,14 @@ describe('prompt helpers', () => {
 
   it('runs form builders', async () => {
     const response = await scripted(['A', 'd', 'a', '\n', 'y'], () =>
-      form(async (builder) => ({
-        name: await builder.text('Name'),
-        active: await builder.confirm('Active')
-      }))
+      form()
+        .text('Name', '', '', false, undefined, '', 'name')
+        .confirm('Active', true, 'Yes', 'No', false, undefined, '', 'active')
+        .submit()
     );
 
-    expect(response.result).toEqual({ name: 'Ada', active: true });
+    expect(response.result.name).toBe('Ada');
+    expect(response.result.active).toBe(true);
   });
 
   it('writes output helpers', async () => {
