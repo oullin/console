@@ -39,13 +39,15 @@ export const readConfirm = async (options: ConfirmPromptOptions): Promise<boolea
 			return confirmed;
 		}
 
-		if (key === 'y') {
+		const normalizedKey = key.toLowerCase();
+
+		if (normalizedKey === 'y') {
 			confirmed = true;
 			renderConfirm(options, confirmed);
 			continue;
 		}
 
-		if (key === 'n') {
+		if (normalizedKey === 'n') {
 			confirmed = false;
 			renderConfirm(options, confirmed);
 			continue;

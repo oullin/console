@@ -29,6 +29,33 @@ describe('choice prompts', () => {
 		expect(declined).toBe(false);
 	});
 
+	it('confirms with uppercase direct y and n keys', async () => {
+		const output = createMemoryOutput();
+
+		const accepted = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['Y', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?', false),
+		);
+
+		const declined = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['N', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?'),
+		);
+
+		expect(accepted).toBe(true);
+		expect(declined).toBe(false);
+	});
+
 	it('toggles confirm values with navigation keys', async () => {
 		const output = createMemoryOutput();
 
