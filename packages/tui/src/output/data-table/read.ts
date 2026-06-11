@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { PromptValidationError } from '#tui/prompt';
+import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
 import { renderDataTableFrame } from '#tui/output/data-table/render';
@@ -60,7 +60,7 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		if (key === Key.ctrlC) {
 			environment.error.write('Cancelled.\n');
 
-			return selectedDataTableValue(rows, selected);
+			return cancelPrompt(selectedDataTableValue(rows, selected));
 		}
 
 		const nextSearch = applyDataTableSearchKey(search, key);

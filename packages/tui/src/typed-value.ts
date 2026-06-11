@@ -1,5 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
-import { PromptValidationError } from '#tui/prompt';
+import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey, initialTypedValueState } from '#tui/typed-value/edit';
 import { renderTypedValue } from '#tui/typed-value/render';
@@ -38,7 +38,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		if (next.cancelled) {
 			environment.error.write('Cancelled.\n');
 
-			return state.value;
+			return cancelPrompt(state.value);
 		}
 
 		state = {

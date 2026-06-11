@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { PromptValidationError } from '#tui/prompt';
+import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
 import { renderNumberValue } from '#tui/prompts/number/render';
@@ -53,7 +53,7 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		if (next.cancelled) {
 			environment.error.write('Cancelled.\n');
 
-			return state.value;
+			return cancelPrompt(state.value);
 		}
 
 		state = {

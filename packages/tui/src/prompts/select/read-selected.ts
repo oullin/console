@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, PromptValidationError } from '#tui/prompt';
+import { ask, cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
@@ -55,7 +55,7 @@ export const readSelectedChoice = async <T>(message: string, choices: Array<Choi
 				throw new PromptValidationError('Please select a valid option.');
 			}
 
-			return choice.value;
+			return cancelPrompt(choice.value);
 		}
 
 		const numeric = parseChoiceIndex(key);

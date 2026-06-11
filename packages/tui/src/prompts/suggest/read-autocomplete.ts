@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt';
+import { ask, cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { acceptAutocompleteMatch, autocompleteNavigationDirection, canAcceptAutocomplete, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
 import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
@@ -77,7 +77,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 		if (next.cancelled) {
 			environment.error.write('Cancelled.\n');
 
-			return state.value;
+			return cancelPrompt(state.value);
 		}
 
 		state = { cursor: next.cursor, value: next.value };

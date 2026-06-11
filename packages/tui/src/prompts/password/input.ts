@@ -1,5 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
-import { PromptValidationError } from '#tui/prompt';
+import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
 
@@ -50,7 +50,7 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		if (next.cancelled) {
 			environment.error.write('Cancelled.\n');
 
-			return state.value;
+			return cancelPrompt(state.value);
 		}
 
 		state = {

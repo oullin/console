@@ -1,8 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { createMemoryOutput, withPromptEnvironment } from '#tui/environment';
-import { ask, ensureRequired, promptUntilValid, PromptValidationError, validationMessage } from '#tui/prompt';
+import { createScriptedInput } from '#tui/environment/scripted-input';
+import { Key } from '#tui/key';
+import { ask, cancelUsing, ensureRequired, promptUntilValid, PromptValidationError, validationMessage } from '#tui/prompt';
+import { text } from '#tui/prompts/basic';
 
 describe('prompt validation', () => {
+	afterEach(() => {
+		cancelUsing(null);
+	});
+
 	it('uses the default required message for empty values', () => {
 		expect(ensureRequired('', true)).toBe('Required.');
 		expect(ensureRequired([], true)).toBe('Required.');
@@ -88,5 +95,46 @@ describe('prompt validation', () => {
 				await expect(ask('Name')).rejects.toThrow('The configured prompt input cannot read lines.');
 			},
 		);
+	});
+
+	it('uses a custom cancellation return value after rendering the cancelled state', async () => {
+		const output = createMemoryOutput();
+
+		cancelUsing(() => 'Manual');
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => text('Name'),
+		);
+
+		expect(result).toBe('Manual');
+		expect(output.text()).toContain('Cancelled.');
+	});
+
+	it('propagates custom cancellation errors after rendering the cancelled state', async () => {
+		const output = createMemoryOutput();
+
+		cancelUsing(() => {
+			throw new Error('Stopped.');
+		});
+
+		await expect(
+			withPromptEnvironment(
+				{
+					input: createScriptedInput([Key.ctrlC]),
+					output,
+					error: output,
+					interactive: true,
+				},
+				() => text('Name'),
+			),
+		).rejects.toThrow('Stopped.');
+
+		expect(output.text()).toContain('Cancelled.');
 	});
 });

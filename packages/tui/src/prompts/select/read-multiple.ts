@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt';
+import { ask, cancelPrompt } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
 import { firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
@@ -52,7 +52,7 @@ export const readMultipleChoices = async <T>(
 		if (key === Key.ctrlC) {
 			renderCancelledChoices(message, choices, selected, marked, scroll);
 
-			return markedChoiceValues(choices, marked);
+			return cancelPrompt(markedChoiceValues(choices, marked));
 		}
 
 		if (key.includes(',')) {

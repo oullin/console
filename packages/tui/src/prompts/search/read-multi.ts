@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
+import { cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
@@ -45,7 +46,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		if (key === Key.ctrlC) {
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
-			return selectedSearchValues(selected);
+			return cancelPrompt(selectedSearchValues(selected));
 		}
 
 		const action = searchNavigationAction(key);
@@ -83,7 +84,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		if (next.cancelled) {
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
-			return options.default ?? [];
+			return cancelPrompt(options.default ?? []);
 		}
 
 		state = { cursor: next.cursor, value: next.value };

@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt';
+import { ask, cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { clearsSuggestionHighlight, moveSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
 import { renderSuggestions } from '#tui/prompts/suggest/render';
@@ -65,7 +65,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 		if (next.cancelled) {
 			environment.error.write('Cancelled.\n');
 
-			return state.value;
+			return cancelPrompt(state.value);
 		}
 
 		state = { cursor: next.cursor, value: next.value };

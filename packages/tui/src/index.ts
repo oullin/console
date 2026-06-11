@@ -26,7 +26,8 @@ export {
 	warning,
 } from '#tui/output';
 export type { NotificationCommand, NotificationRuntime } from '#tui/output';
-export { PromptValidationError } from '#tui/prompt';
+export { cancelUsing, PromptValidationError } from '#tui/prompt';
+export type { PromptCancelHandler } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
 export {
 	backgroundColor,
