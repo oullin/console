@@ -440,6 +440,51 @@ describe('data table prompt', () => {
 		expect(latestFrame).toContain('Second');
 		expect(latestFrame).toContain('Third');
 		expect(latestFrame).toContain('Fourth');
+		expect(latestFrame).toContain('Viewing 2-4 of 4');
+	});
+
+	it('does not render data table viewing info when all rows are visible', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['First'], ['Second']],
+					scroll: 5,
+				}),
+		);
+
+		expect(output.text()).not.toContain('Viewing');
+	});
+
+	it('renders data table viewing info for filtered result windows', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'a', Key.pageDown, Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick row',
+					headers: ['Name'],
+					rows: [['Alpha'], ['Atlas'], ['Beta'], ['Gamma'], ['Delta']],
+					scroll: 2,
+				}),
+		);
+
+		expect(output.text()).toContain('Viewing 3-4 of 5 results');
 	});
 
 	it('supports page, home, and end data table navigation keys', async () => {

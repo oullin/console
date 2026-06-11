@@ -36,5 +36,11 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 
 	environment.output.write(`${renderTable(['', ...options.headers], renderedRows)}\n`);
 
+	if (window.end - window.start < options.rows.length) {
+		const suffix = options.query.length > 0 ? ' results' : '';
+
+		environment.output.write(`  Viewing ${window.start + 1}-${window.end} of ${options.rows.length}${suffix}\n`);
+	}
+
 	return selected;
 };
