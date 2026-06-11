@@ -1,94 +1,15 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key, oneOf } from '#tui/key';
-import { parseOptionalScrollSize, parseScrollSize } from '#tui/concerns/validators/scroll';
+import { parseScrollSize } from '#tui/concerns/validators/scroll';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderTable } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
-import { isDataObjectRow } from '#tui/output/validators/data-table';
-import type { DataTablePromptOptions, DataTableRow, TableCell } from '#tui/types';
-
-type VisibleRow<T> = {
-	index: number;
-	row: DataTableRow<T>;
-};
-
-const stringify = (value: TableCell): string => {
-	return value === null || value === undefined ? '' : String(value);
-};
-
-const rowFields = <T>(row: DataTableRow<T>): Record<string, TableCell> => {
-	if (Array.isArray(row)) {
-		return Object.fromEntries(row.map((value, index) => [String(index), value]));
-	}
-
-	if (isDataObjectRow(row)) {
-		return row.cells;
-	}
-
-	return row;
-};
-
-const derivedHeaders = <T>(rows: Array<DataTableRow<T>>): string[] => {
-	const first = rows[0];
-
-	if (!first) {
-		return [];
-	}
-
-	if (Array.isArray(first)) {
-		return first.map((_, index) => String(index + 1));
-	}
-
-	return Object.keys(rowFields(first)).filter((key) => key !== 'value');
-};
-
-const rowCells = <T>(headers: string[], row: DataTableRow<T>): string[] => {
-	if (Array.isArray(row)) {
-		return headers.length > 0 ? headers.map((_, index) => stringify(row[index])) : row.map(stringify);
-	}
-
-	const fields = rowFields(row);
-
-	return headers.map((header) => stringify(fields[header]));
-};
-
-const rowValue = <T>(row: DataTableRow<T>, index: number): T | number => {
-	if (isDataObjectRow(row) && row.value !== undefined) {
-		return row.value;
-	}
-
-	if (!Array.isArray(row) && 'value' in row && row.value !== undefined) {
-		return row.value as T;
-	}
-
-	return index;
-};
-
-const rowLabel = <T>(headers: string[], row: DataTableRow<T>): string => rowCells(headers, row).join(' ');
-
-const clampSelected = <T>(selected: number, rows: Array<VisibleRow<T>>): number => {
-	if (rows.length === 0) {
-		return 0;
-	}
-
-	return Math.min(selected, rows.length - 1);
-};
-
-const rowWindow = (total: number, selected: number, scroll?: number): { end: number; start: number } => {
-	const size = parseOptionalScrollSize(scroll);
-
-	if (size === undefined || size >= total) {
-		return { end: total, start: 0 };
-	}
-
-	const before = Math.floor((size - 1) / 2);
-	const start = Math.max(0, Math.min(selected - before, total - size));
-
-	return { end: start + size, start };
-};
+import { dataTableRowCells, dataTableRowValue, deriveDataTableHeaders, visibleDataTableRows } from '#tui/output/data-table/rows';
+import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-table/selection';
+import type { DataTablePromptOptions } from '#tui/types';
 
 export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number> => {
-	const headers = options.headers ?? derivedHeaders(options.rows);
+	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
 	return promptUntilValid(options, async () => {
 		const environment = promptEnvironment();
@@ -97,23 +18,19 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 		let mode: 'browse' | 'search' = 'browse';
 		let query = { cursor: 0, value: '' };
 
-		const visibleRows = (): Array<VisibleRow<T>> => {
-			return options.rows
-				.map((row, index) => ({ index, row }))
-				.filter(({ row }) => options.filter?.(query.value, row) ?? rowLabel(headers, row).toLowerCase().includes(query.value.toLowerCase()));
-		};
+		const visibleRows = () => visibleDataTableRows(options, headers, query.value);
 
 		const render = (): void => {
 			const rows = visibleRows();
 
-			selected = clampSelected(selected, rows);
+			selected = clampDataTableSelection(selected, rows);
 
-			const window = rowWindow(rows.length, selected, options.scroll);
+			const window = dataTableRowWindow(rows.length, selected, options.scroll);
 
 			const renderedRows = rows.slice(window.start, window.end).map(({ row }, offset) => {
 				const index = window.start + offset;
 
-				return [index === selected ? '›' : ' ', ...rowCells(headers, row)];
+				return [index === selected ? '›' : ' ', ...dataTableRowCells(headers, row)];
 			});
 
 			const querySuffix = mode === 'search' || query.value.length > 0 ? ` ${query.value}` : '';
@@ -130,7 +47,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 				throw new PromptValidationError('Please select a valid row.');
 			}
 
-			return rowValue(selectedRow.row, selectedRow.index);
+			return dataTableRowValue(selectedRow.row, selectedRow.index);
 		}
 
 		render();
@@ -153,7 +70,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 					throw new PromptValidationError('Please select a valid row.');
 				}
 
-				return rowValue(selectedRow.row, selectedRow.index);
+				return dataTableRowValue(selectedRow.row, selectedRow.index);
 			}
 
 			if (mode === 'search') {
@@ -233,7 +150,7 @@ export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>)
 					throw new PromptValidationError('Please select a valid row.');
 				}
 
-				return rowValue(selectedRow.row, selectedRow.index);
+				return dataTableRowValue(selectedRow.row, selectedRow.index);
 			}
 		}
 	});

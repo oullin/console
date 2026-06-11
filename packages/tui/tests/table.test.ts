@@ -170,6 +170,31 @@ describe('data table prompt', () => {
 		expect(output.text()).toContain('Pick project B');
 	});
 
+	it('uses custom data table filters for search mode', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'slow', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					filter: (query, row) => !Array.isArray(row) && row.Tag === query,
+					rows: [
+						{ Name: 'Alpha', Tag: 'fast', value: 'alpha' },
+						{ Name: 'Beta', Tag: 'slow', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Pick project slow');
+	});
+
 	it('does not filter rows from printable keys in browse mode', async () => {
 		const output = createMemoryOutput();
 
