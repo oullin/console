@@ -1,22 +1,13 @@
 import { promptEnvironment } from '#tui/environment';
-import { z } from 'zod';
+import { parseChoice } from '#tui/concerns/validators/choice';
 import type { Choice, ChoiceInput } from '#tui/types';
-
-const choiceSchema = z
-	.object({
-		disabled: z.union([z.boolean(), z.string()]).optional(),
-		hint: z.string().optional(),
-		label: z.string(),
-		value: z.unknown(),
-	})
-	.passthrough();
 
 export const normalizeChoices = <T>(options: Array<ChoiceInput<T>>): Array<Choice<T>> => {
 	return options.map((choice) => {
-		const parsed = choiceSchema.safeParse(choice);
+		const parsed = parseChoice<T>(choice);
 
-		if (parsed.success) {
-			return parsed.data as Choice<T>;
+		if (parsed) {
+			return parsed;
 		}
 
 		return {

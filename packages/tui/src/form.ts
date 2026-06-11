@@ -1,7 +1,7 @@
-export { FormBuilder } from '#tui/form/builder';
+export { FormBuilder } from '#tui/form/builder/index';
 export type { FormResponses, FormStep } from '#tui/form/types';
 
-import { FormBuilder } from '#tui/form/builder';
+import { FormBuilder } from '#tui/form/builder/index';
 import type { MaybePromise } from '#tui/types';
 
 export function form(): FormBuilder;

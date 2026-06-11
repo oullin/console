@@ -2,6 +2,8 @@ import { alert, datatable, error, info, intro, note, outro, table, warning } fro
 import { autocomplete, confirm, multiselect, multisearch, pause, search, select, suggest } from '#tui/prompts/choices';
 import { number, password, text, textarea } from '#tui/prompts/basic';
 import { progress, spin, stream, task } from '#tui/status';
+import { previousArray, previousNumber, previousString } from '#tui/form/builder/previous';
+import { sideEffectStep } from '#tui/form/builder/step';
 import type { FormResponses, FormStep } from '#tui/form/types';
 import type { ChoiceInput, DataTablePromptOptions, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TableOptions, TextPromptOptions } from '#tui/types';
 import type { SuggestOptions } from '#tui/prompts/choices';
@@ -64,7 +66,7 @@ export class FormBuilder {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): this {
-		return this.add((_, previous) => text(label, placeholder, previous === undefined || previous === null ? defaultValue : String(previous), required, validate, hint, transform), name);
+		return this.add((_, previous) => text(label, placeholder, previousString(previous, defaultValue), required, validate, hint, transform), name);
 	}
 
 	textarea(
@@ -78,7 +80,7 @@ export class FormBuilder {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): this {
-		return this.add((_, previous) => textarea(label, placeholder, previous === undefined || previous === null ? defaultValue : String(previous), required, validate, hint, rows, transform), name);
+		return this.add((_, previous) => textarea(label, placeholder, previousString(previous, defaultValue), required, validate, hint, rows, transform), name);
 	}
 
 	password(
@@ -105,7 +107,7 @@ export class FormBuilder {
 		step?: number,
 		name?: string,
 	): this {
-		return this.add((_, previous) => number(label, placeholder, typeof previous === 'number' ? previous : defaultValue, required, validate, hint, min, max, step), name);
+		return this.add((_, previous) => number(label, placeholder, previousNumber(previous, defaultValue), required, validate, hint, min, max, step), name);
 	}
 
 	confirm(
@@ -144,7 +146,7 @@ export class FormBuilder {
 		hint = 'Use the space bar to select options.',
 		name?: string,
 	): this {
-		return this.add((_, previous) => multiselect({ message: label, options, default: Array.isArray(previous) ? (previous as T[]) : defaultValue, scroll, required, validate, hint }), name);
+		return this.add((_, previous) => multiselect({ message: label, options, default: previousArray(previous, defaultValue), scroll, required, validate, hint }), name);
 	}
 
 	suggest(
@@ -158,11 +160,7 @@ export class FormBuilder {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): this {
-		return this.add(
-			(_, previous) =>
-				suggest({ message: label, label, options, default: previous === undefined || previous === null ? defaultValue : String(previous), scroll, required, validate, hint, transform }),
-			name,
-		);
+		return this.add((_, previous) => suggest({ message: label, label, options, default: previousString(previous, defaultValue), scroll, required, validate, hint, transform }), name);
 	}
 
 	autocomplete(
@@ -175,11 +173,7 @@ export class FormBuilder {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): this {
-		return this.add(
-			(_, previous) =>
-				autocomplete({ message: label, label, options, default: previous === undefined || previous === null ? defaultValue : String(previous), required, validate, hint, transform }),
-			name,
-		);
+		return this.add((_, previous) => autocomplete({ message: label, label, options, default: previousString(previous, defaultValue), required, validate, hint, transform }), name);
 	}
 
 	search<T>(options: SearchPromptOptions<T>, name?: string): this {
@@ -200,11 +194,7 @@ export class FormBuilder {
 
 	pause(message = 'Press enter to continue', name?: string): this {
 		return this.add(
-			async () => {
-				await pause(message);
-
-				return null;
-			},
+			sideEffectStep(() => pause(message)),
 			name,
 			true,
 		);
@@ -212,11 +202,7 @@ export class FormBuilder {
 
 	stream(source: AsyncIterable<string> | Iterable<string>, name?: string): this {
 		return this.add(
-			async () => {
-				await stream(source);
-
-				return null;
-			},
+			sideEffectStep(() => stream(source)),
 			name,
 			true,
 		);
@@ -224,11 +210,7 @@ export class FormBuilder {
 
 	note(message: string, type: string | null = null, name?: string): this {
 		return this.add(
-			() => {
-				note(message, type);
-
-				return null;
-			},
+			sideEffectStep(() => note(message, type)),
 			name,
 			true,
 		);
@@ -236,11 +218,7 @@ export class FormBuilder {
 
 	error(message: string, name?: string): this {
 		return this.add(
-			() => {
-				error(message);
-
-				return null;
-			},
+			sideEffectStep(() => error(message)),
 			name,
 			true,
 		);
@@ -248,11 +226,7 @@ export class FormBuilder {
 
 	warning(message: string, name?: string): this {
 		return this.add(
-			() => {
-				warning(message);
-
-				return null;
-			},
+			sideEffectStep(() => warning(message)),
 			name,
 			true,
 		);
@@ -260,11 +234,7 @@ export class FormBuilder {
 
 	alert(message: string, name?: string): this {
 		return this.add(
-			() => {
-				alert(message);
-
-				return null;
-			},
+			sideEffectStep(() => alert(message)),
 			name,
 			true,
 		);
@@ -272,11 +242,7 @@ export class FormBuilder {
 
 	info(message: string, name?: string): this {
 		return this.add(
-			() => {
-				info(message);
-
-				return null;
-			},
+			sideEffectStep(() => info(message)),
 			name,
 			true,
 		);
@@ -284,11 +250,7 @@ export class FormBuilder {
 
 	intro(message: string, name?: string): this {
 		return this.add(
-			() => {
-				intro(message);
-
-				return null;
-			},
+			sideEffectStep(() => intro(message)),
 			name,
 			true,
 		);
@@ -296,11 +258,7 @@ export class FormBuilder {
 
 	outro(message: string, name?: string): this {
 		return this.add(
-			() => {
-				outro(message);
-
-				return null;
-			},
+			sideEffectStep(() => outro(message)),
 			name,
 			true,
 		);
@@ -308,11 +266,7 @@ export class FormBuilder {
 
 	table(headersOrOptions: TableOptions | string[] = [], rows: TableOptions['rows'] | null = null, name?: string): this {
 		return this.add(
-			() => {
-				table(headersOrOptions, rows);
-
-				return null;
-			},
+			sideEffectStep(() => table(headersOrOptions, rows)),
 			name,
 			true,
 		);

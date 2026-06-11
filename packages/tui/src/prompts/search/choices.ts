@@ -1,0 +1,22 @@
+import { normalizeSearchChoices } from '#tui/concerns/choices';
+import type { Choice, SearchPromptOptions } from '#tui/types';
+
+export const resolveSearchChoices = async <T>(source: SearchPromptOptions<T>['options'], query: string): Promise<Array<Choice<T>>> => {
+	const options = typeof source === 'function' ? await source(query) : source;
+
+	return normalizeSearchChoices(options);
+};
+
+export const searchMessage = (message: string, query: string): string => {
+	return query.length > 0 ? `${message} ${query}` : message;
+};
+
+export const lastEnabledIndex = <T>(choices: Array<Choice<T>>): number => {
+	for (let index = choices.length - 1; index >= 0; index -= 1) {
+		if (!choices[index]?.disabled) {
+			return index;
+		}
+	}
+
+	return 0;
+};
