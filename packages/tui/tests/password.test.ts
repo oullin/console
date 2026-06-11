@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, password, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, password, PromptValidationError, withPromptEnvironment } from '#tui/index';
 
 describe('password prompt', () => {
 	it('returns typed values without rendering the raw password', async () => {
@@ -72,5 +72,101 @@ describe('password prompt', () => {
 		expect(output.text()).not.toContain('secrex');
 		expect(output.text()).toContain('•••••');
 		expect(output.text()).toContain('••••••');
+	});
+
+	it('transforms values before returning them', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['s', 'e', 'c', 'r', 'e', 't', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => password({ message: 'Password', transform: (value) => value.toUpperCase() }),
+		);
+
+		expect(result).toBe('SECRET');
+		expect(output.text()).not.toContain('secret');
+	});
+
+	it('retries after validation errors without rendering the raw value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['p', 'a', 's', Key.enter, 's', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => password({ message: 'Password', validate: (value) => (value.length < 4 ? 'Password must be at least 4 characters.' : '') }),
+		);
+
+		expect(result).toBe('pass');
+		expect(output.text()).toContain('Password must be at least 4 characters.');
+		expect(output.text()).not.toContain('pas');
+		expect(output.text()).not.toContain('pass');
+	});
+
+	it('edits values with backspace and delete keys without rendering the raw value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['p', 'a', 'z', Key.backspace, 's', 's', Key.left, Key.delete, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => password('Password'),
+		);
+
+		expect(result).toBe('pas');
+		expect(output.text()).not.toContain('pas');
+		expect(output.text()).toContain('•••');
+	});
+
+	it('renders cancellation without exposing the raw value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['s', 'e', 'c', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => password('Password'),
+		);
+
+		expect(result).toBe('sec');
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).not.toContain('sec');
+	});
+
+	it('returns empty strings and validates required values in non-interactive mode', async () => {
+		await expect(
+			withPromptEnvironment(
+				{
+					output: createMemoryOutput(),
+					error: createMemoryOutput(),
+					interactive: false,
+				},
+				() => password('Password'),
+			),
+		).resolves.toBe('');
+
+		await expect(
+			withPromptEnvironment(
+				{
+					output: createMemoryOutput(),
+					error: createMemoryOutput(),
+					interactive: false,
+				},
+				() => password({ message: 'Password', required: true }),
+			),
+		).rejects.toThrow(PromptValidationError);
 	});
 });

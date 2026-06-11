@@ -27,6 +27,7 @@ TypeScript and OpenTUI internals.
 | Textarea wrapped frame line windows | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts`, `packages/tui/tests/typed-value.test.ts` |
 | Textarea wrapped-line cursor navigation | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/edit.ts`, `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts`, `packages/tui/tests/typed-value.test.ts` |
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
+| Password input transforms, validation retry, editing keys, cancellation, masking, and non-interactive behavior | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/password.test.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
