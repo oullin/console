@@ -22,7 +22,10 @@ TypeScript and OpenTUI internals.
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
 | Form builder | `packages/tui/src/form.ts` |
-| Note, notify, table, grid, title, clear | `packages/tui/src/output.ts` |
+| Notes and alert-style output | `packages/tui/src/output/notes.ts` |
+| Native notifications | `packages/tui/src/output/notify.ts` |
+| Tables and grids | `packages/tui/src/output/table.ts` |
+| Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | ANSI, wrapping, truncation, Unicode width | `packages/tui/src/strings.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
