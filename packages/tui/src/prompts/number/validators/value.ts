@@ -9,7 +9,6 @@ export type NumberValidationResult = {
 };
 
 const numericInputSchema = z.string();
-const integerPattern = /^[+-]?\d+$/u;
 
 const isNumeric = (value: string): boolean => value.trim() !== '' && Number.isFinite(Number(value));
 
@@ -21,7 +20,7 @@ export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptio
 		return { value: '' };
 	}
 
-	if (!isNumeric(normalized) || (options.integer === true && !integerPattern.test(normalized))) {
+	if (!isNumeric(normalized)) {
 		return { error: 'Must be a number' };
 	}
 
@@ -35,5 +34,5 @@ export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptio
 		return { error: `Must be less than ${options.max}` };
 	}
 
-	return { value: options.integer === true ? Math.trunc(numeric) : numeric };
+	return { value: Math.trunc(numeric) };
 };

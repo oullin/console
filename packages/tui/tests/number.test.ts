@@ -20,12 +20,12 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('Must be a number');
 	});
 
-	it('rejects decimal values for integer prompts', async () => {
+	it('casts decimal numeric values to integers', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
 			{
-				input: createScriptedInput(['1', '.', '5', Key.enter, '2', Key.enter]),
+				input: createScriptedInput(['1', '.', '5', Key.enter]),
 				output,
 				error: output,
 				interactive: true,
@@ -33,8 +33,7 @@ describe('number prompt', () => {
 			() => number({ message: 'Count', integer: true }),
 		);
 
-		expect(result).toBe(2);
-		expect(output.text()).toContain('Must be a number');
+		expect(result).toBe(1);
 	});
 
 	it('returns an empty string for optional empty input', async () => {
@@ -104,7 +103,7 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('Required.');
 	});
 
-	it('returns decimal input as a decimal value', async () => {
+	it('returns decimal input as an integer value', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -117,12 +116,12 @@ describe('number prompt', () => {
 			() => number({ message: 'Count' }),
 		);
 
-		expect(result).toBe(1.9);
+		expect(result).toBe(1);
 	});
 
-	it('parses decimals unless integer input is required', () => {
-		expect(parseNumberInput('1.9')).toEqual({ value: 1.9 });
-		expect(parseNumberInput('1.9', { integer: true })).toEqual({ error: 'Must be a number' });
+	it('parses numeric values as integers', () => {
+		expect(parseNumberInput('1.9')).toEqual({ value: 1 });
+		expect(parseNumberInput('1.9', { integer: true })).toEqual({ value: 1 });
 		expect(parseNumberInput('1', { integer: true })).toEqual({ value: 1 });
 	});
 
@@ -161,7 +160,7 @@ describe('number prompt', () => {
 		expect(output.text()).toContain('? Count 1');
 	});
 
-	it('increments and decrements with control navigation keys', async () => {
+	it('does not increment or decrement with control navigation keys', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -174,11 +173,11 @@ describe('number prompt', () => {
 			() => number({ message: 'Count', step: 2 }),
 		);
 
-		expect(result).toBe(1);
-		expect(output.text()).toContain('? Count 1');
+		expect(result).toBe('');
+		expect(output.text()).not.toContain('? Count 1');
 	});
 
-	it('increments and decrements decimal values with fractional steps', async () => {
+	it('increments and decrements decimal values with whole steps', async () => {
 		const output = createMemoryOutput();
 
 		const result = await withPromptEnvironment(
@@ -191,9 +190,9 @@ describe('number prompt', () => {
 			() => number({ message: 'Amount', default: 1.5, step: 0.25 }),
 		);
 
-		expect(result).toBe(1.25);
-		expect(output.text()).toContain('? Amount 1.75');
-		expect(output.text()).toContain('? Amount 1.25');
+		expect(result).toBe(0);
+		expect(output.text()).toContain('? Amount 2');
+		expect(output.text()).toContain('? Amount 0');
 	});
 
 	it('falls back to a whole step for invalid step sizes', async () => {
@@ -209,7 +208,7 @@ describe('number prompt', () => {
 			() => number({ message: 'Amount', default: 1.5, step: 0 }),
 		);
 
-		expect(result).toBe(2.5);
+		expect(result).toBe(2);
 	});
 
 	it('renders default number values before input', async () => {

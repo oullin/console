@@ -22,7 +22,7 @@ const clamp = (value: number, min?: number, max?: number): number => {
 };
 
 const steppedValue = (value: string, direction: 1 | -1, options: NumberInputOptions): string => {
-	const step = options.step !== undefined && options.step > 0 ? options.step : 1;
+	const step = options.step !== undefined && options.step > 0 ? Math.max(1, Math.trunc(options.step)) : 1;
 
 	if (value === '') {
 		return String(direction === 1 ? (options.min ?? 1) : (options.max ?? 0));
@@ -32,7 +32,7 @@ const steppedValue = (value: string, direction: 1 | -1, options: NumberInputOpti
 		return value;
 	}
 
-	return String(clamp(Number(value) + step * direction, options.min, options.max));
+	return String(clamp(Math.trunc(Number(value)) + step * direction, options.min, options.max));
 };
 
 const renderNumberValue = (message: string, value: string, options: NumberInputOptions): void => {
@@ -68,14 +68,14 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 			return state.value;
 		}
 
-		if (key === Key.up || key === Key.upArrow || key === Key.ctrlP) {
+		if (key === Key.up || key === Key.upArrow) {
 			state.value = steppedValue(state.value, 1, options);
 			state.cursor = state.value.length;
 			renderNumberValue(message, state.value, options);
 			continue;
 		}
 
-		if (key === Key.down || key === Key.downArrow || key === Key.ctrlN) {
+		if (key === Key.down || key === Key.downArrow) {
 			state.value = steppedValue(state.value, -1, options);
 			state.cursor = state.value.length;
 			renderNumberValue(message, state.value, options);
