@@ -10,7 +10,7 @@ describe('terminal helpers', () => {
 			expect(clear()).toBe(true);
 		});
 
-		expect(output.text()).toBe('\u001Bc\u001Bc');
+		expect(output.text()).toBe('\u001B[H\u001B[J\u001B[H\u001B[J');
 	});
 
 	it('writes terminal title control sequences', async () => {

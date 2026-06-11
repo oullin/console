@@ -11,7 +11,7 @@ export const terminalSize = (): TerminalSize => ({
 });
 
 export const clearTerminal = (): void => {
-	promptEnvironment().output.write('\u001Bc');
+	promptEnvironment().output.write('\u001B[H\u001B[J');
 };
 
 export const setTerminalTitle = (title: string): void => {
