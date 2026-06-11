@@ -2,6 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { renderTable } from '#tui/theme';
+import { z } from 'zod';
 import type { DataTableObjectRow, DataTablePromptOptions, DataTableRow, TableCell } from '#tui/types';
 
 type VisibleRow<T> = {
@@ -13,8 +14,17 @@ const stringify = (value: TableCell): string => {
 	return value === null || value === undefined ? '' : String(value);
 };
 
+const tableCellSchema = z.union([z.string(), z.number(), z.boolean(), z.null(), z.undefined()]);
+
+const dataObjectRowSchema = z
+	.object({
+		cells: z.record(z.string(), tableCellSchema),
+		value: z.unknown().optional(),
+	})
+	.passthrough();
+
 const isDataObjectRow = <T>(row: DataTableRow<T>): row is DataTableObjectRow<T> => {
-	return !Array.isArray(row) && 'cells' in row && typeof row.cells === 'object' && row.cells !== null;
+	return dataObjectRowSchema.safeParse(row).success;
 };
 
 const rowFields = <T>(row: DataTableRow<T>): Record<string, TableCell> => {

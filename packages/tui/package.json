@@ -21,7 +21,8 @@
   "dependencies": {
     "@opentui/core": "^0.4.0",
     "string-width": "^7.2.0",
-    "strip-ansi": "^7.1.2"
+    "strip-ansi": "^7.1.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@ollin/artefacts": "workspace:*",
