@@ -14,6 +14,10 @@ describe('string utilities', () => {
 		expect(wrap('Ollin Prompts', 7)).toEqual(['Ollin', 'Prompts']);
 	});
 
+	it('wraps wide characters without emitting empty lines', () => {
+		expect(wrap('😀', 1)).toEqual(['😀']);
+	});
+
 	it('strips ANSI text', () => {
 		expect(parseAnsiText('\u001B[32mDone\u001B[39m')).toBe('Done');
 	});

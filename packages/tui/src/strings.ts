@@ -55,7 +55,10 @@ export const wrap = (value: string, width: number): string[] => {
 
 				for (const char of word) {
 					if (visibleWidth(`${chunk}${char}`) > width) {
-						lines.push(chunk);
+						if (chunk.length > 0) {
+							lines.push(chunk);
+						}
+
 						chunk = '';
 					}
 
