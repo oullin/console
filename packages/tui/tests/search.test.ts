@@ -414,6 +414,28 @@ describe('multisearch prompt', () => {
 		expect(output.text()).toContain('Selected: Green');
 	});
 
+	it('returns selected defaults when multisearch input is exhausted', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: colors,
+					default: ['green'],
+				}),
+		);
+
+		expect(result).toEqual(['green']);
+		expect(output.text()).toContain('Selected: Green');
+	});
+
 	it('returns an empty array for non-interactive multisearch prompts without defaults', async () => {
 		const output = createMemoryOutput();
 

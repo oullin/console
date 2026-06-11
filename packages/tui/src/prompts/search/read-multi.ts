@@ -1,21 +1,18 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { resolveLineMultiSearchChoices } from '#tui/prompts/search/line-mode';
 import { renderSearchChoices } from '#tui/prompts/search/render';
-import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoice, toggleSearchChoices } from '#tui/prompts/search/selection';
+import { lineMultiSearchValues, selectedSearchValues, toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
+import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
 import type { MultiSearchPromptOptions } from '#tui/types';
 
 export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const query = (await ask(options.message, options.hint)).trim();
-
-		return resolveLineMultiSearchChoices(options, query);
+		return lineMultiSearchValues(options);
 	}
 
 	let state = { cursor: 0, value: '' };
@@ -40,13 +37,13 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const key = await environment.input.readKey();
 
 		if (key === null || key === Key.enter) {
-			return [...selected.keys()];
+			return selectedSearchValues(selected);
 		}
 
 		if (key === Key.ctrlC) {
 			environment.error.write('Cancelled.\n');
 
-			return [...selected.keys()];
+			return selectedSearchValues(selected);
 		}
 
 		const action = searchNavigationAction(key);
@@ -73,11 +70,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		}
 
 		if (key === Key.space && highlighted !== null) {
-			const choice = displayedChoices()[highlighted];
-
-			if (choice && !choice.disabled) {
-				toggleSearchChoice(selected, choice);
-			}
+			toggleHighlightedSearchChoice(selected, displayedChoices(), highlighted);
 
 			render();
 			continue;
