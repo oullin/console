@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, text, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, Progress, text, withPromptEnvironment } from '#tui/index';
 
 describe('form builder', () => {
 	it('runs chained steps and returns positional responses', async () => {
@@ -613,6 +613,33 @@ describe('form builder', () => {
 		expect(output.text()).toContain('Loading');
 		expect(output.text()).toContain('Build');
 		expect(output.text()).toContain('done');
+	});
+
+	it('creates manual progress bars from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+			},
+			async () => {
+				const values = await form().progress(2, 'Manual', 'bar').submit();
+
+				const bar = values.bar as Progress;
+
+				bar.start();
+				bar.advance();
+				bar.finish();
+
+				return values;
+			},
+		);
+
+		expect(responses.bar).toBeInstanceOf(Progress);
+		expect((responses.bar as Progress).total).toBe(2);
+		expect(output.text()).toContain('Manual');
+		expect(output.text()).toContain('1 / 2');
 	});
 
 	it('stores null for display-only output helper responses', async () => {

@@ -5,6 +5,7 @@ import type { MaybePromise } from '#tui/types';
 import type { Logger, Progress, TaskDefinition } from '#tui/status';
 
 export type StatusBuilderMethods = {
+	progress(this: FormBuilder, total: number, message?: string, name?: string): FormBuilder;
 	progress<T, R>(this: FormBuilder, label: string, steps: Iterable<T> | number, callback?: (step: T | number, bar: Progress) => MaybePromise<R>, hint?: string, name?: string): FormBuilder;
 	spin<T>(this: FormBuilder, callback: () => MaybePromise<T>, message?: string, name?: string): FormBuilder;
 	spin<T>(this: FormBuilder, message: string, callback: () => MaybePromise<T>, name?: string): FormBuilder;
@@ -14,8 +15,18 @@ export type StatusBuilderMethods = {
 };
 
 export const statusBuilderMethods: StatusBuilderMethods & ThisType<FormBuilder> = {
-	progress<T, R>(label: string, steps: Iterable<T> | number, callback?: (step: T | number, bar: Progress) => MaybePromise<R>, hint = '', name?: string) {
-		return this.add(() => progress(label, steps, callback, hint), name, true);
+	progress<T, R>(
+		labelOrTotal: string | number,
+		stepsOrMessage?: Iterable<T> | number | string,
+		callbackOrName?: ((step: T | number, bar: Progress) => MaybePromise<R>) | string,
+		hint = '',
+		name?: string,
+	) {
+		if (typeof labelOrTotal === 'number') {
+			return this.add(() => progress(labelOrTotal, typeof stepsOrMessage === 'string' ? stepsOrMessage : undefined), callbackOrName as string | undefined, true);
+		}
+
+		return this.add(() => progress(labelOrTotal, stepsOrMessage as Iterable<T> | number, callbackOrName as (step: T | number, bar: Progress) => MaybePromise<R>, hint), name, true);
 	},
 	spin<T>(callbackOrMessage: (() => MaybePromise<T>) | string, messageOrCallback: string | (() => MaybePromise<T>) = '', name?: string) {
 		if (typeof callbackOrMessage === 'string') {
