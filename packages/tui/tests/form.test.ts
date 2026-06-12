@@ -582,6 +582,39 @@ describe('form builder', () => {
 		expect(output.text()).toContain('2 / 2');
 	});
 
+	it('runs root-aligned status overloads from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+			},
+			() =>
+				form()
+					.spin('Loading', async () => 'spun', 'spin')
+					.task(
+						{
+							keepSummary: true,
+							task: (logger) => {
+								logger.info('done');
+
+								return 2;
+							},
+							title: 'Build',
+						},
+						'task',
+					)
+					.submit(),
+		);
+
+		expect(responses.spin).toBe('spun');
+		expect(responses.task).toBe(2);
+		expect(output.text()).toContain('Loading');
+		expect(output.text()).toContain('Build');
+		expect(output.text()).toContain('done');
+	});
+
 	it('stores null for display-only output helper responses', async () => {
 		const output = createMemoryOutput();
 
