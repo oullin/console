@@ -4,6 +4,7 @@ import { renderQuestion } from '#tui/theme';
 import { applyTypedKey, initialTypedValueState } from '#tui/typed-value/edit';
 import { renderCancelledTypedValue, renderTypedValue } from '#tui/typed-value/render';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
+import { renderCancelledTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
 export { applyTypedKey };
@@ -50,7 +51,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 			if (!options.allowNewLine) {
 				renderCancelledTypedValue(message, state.value, options);
 			} else {
-				environment.error.write('Cancelled.\n');
+				renderCancelledTextareaFrame(message, state.value, options);
 			}
 
 			return {

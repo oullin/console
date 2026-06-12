@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, PromptValidationError, textarea, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, parseAnsiText, PromptValidationError, textarea, withPromptEnvironment } from '#tui/index';
 
 describe('textarea prompt', () => {
 	it('accepts multiline input and submits with ctrl-d', async () => {
@@ -17,7 +17,9 @@ describe('textarea prompt', () => {
 
 		expect(result).toBe('A\nB');
 		expect(output.text()).toContain('Description');
-		expect(output.text()).toContain('┌ Description ');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mDescription\u001B[39m ');
+		expect(output.text()).toContain('Ctrl+D to submit');
+		expect(output.text()).toContain('┌ \u001B[2mDescription\u001B[22m ');
 		expect(output.text()).toContain('│ A');
 		expect(output.text()).toContain('│ B');
 	});
@@ -35,7 +37,7 @@ describe('textarea prompt', () => {
 			() => textarea('Description', 'Type here'),
 		);
 
-		expect(output.text()).toContain('┌ Description ');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mDescription\u001B[39m ');
 		expect(output.text()).toContain('\u001B[2mType here\u001B[22m');
 	});
 
@@ -86,6 +88,7 @@ describe('textarea prompt', () => {
 
 		expect(result).toBe('Jess');
 		expect(output.text()).toContain('Invalid name.');
+		expect(output.text().split('┌ \u001B[2mDescription\u001B[22m').length - 1).toBe(1);
 	});
 
 	it('edits values with backspace and delete keys', async () => {
@@ -117,11 +120,11 @@ describe('textarea prompt', () => {
 			() => textarea('Description', '', '', false, undefined, '', 2),
 		);
 
-		const latestFrame = output.text().split('┌ Description ').at(-1) ?? '';
+		const latestFrame = (output.text().split('\u001B[36mDescription\u001B[39m').at(-1) ?? '').split('┌ \u001B[2mDescription\u001B[22m').at(0) ?? '';
 
-		expect(latestFrame).toContain('│ B');
-		expect(latestFrame).toContain('│ C');
-		expect(latestFrame).not.toContain('A\nB\nC');
+		expect(parseAnsiText(latestFrame)).toContain('│ B');
+		expect(parseAnsiText(latestFrame)).toContain('│ C');
+		expect(parseAnsiText(latestFrame)).not.toContain('A\nB\nC');
 		expect(latestFrame).toContain('\u001B[2m│\u001B[22m');
 		expect(latestFrame).toContain('\u001B[36m┃\u001B[39m');
 	});
@@ -139,10 +142,10 @@ describe('textarea prompt', () => {
 			() => textarea('Description', '', '', false, undefined, 'Use full sentences.', 3),
 		);
 
-		const latestFrame = output.text().split('┌ Description ').at(-1) ?? '';
+		const latestFrame = (output.text().split('\u001B[36mDescription\u001B[39m').at(-1) ?? '').split('┌ \u001B[2mDescription\u001B[22m').at(0) ?? '';
 
-		expect(latestFrame).toContain('│ A');
-		expect(latestFrame).toContain('│                                                              │');
+		expect(parseAnsiText(latestFrame)).toContain('│ A');
+		expect(parseAnsiText(latestFrame)).toContain('│                                                              │');
 		expect(output.text()).toContain('\u001B[2mUse full sentences.\u001B[22m');
 	});
 
@@ -161,11 +164,11 @@ describe('textarea prompt', () => {
 			() => textarea('Description', '', '', false, undefined, '', 2),
 		);
 
-		const latestFrame = output.text().split('┌ Description ').at(-1) ?? '';
+		const latestFrame = (output.text().split('\u001B[36mDescription\u001B[39m').at(-1) ?? '').split('┌ \u001B[2mDescription\u001B[22m').at(0) ?? '';
 
-		expect(latestFrame).toContain(`│ ${firstWrappedLine}`);
-		expect(latestFrame).toContain('│ 89');
-		expect(latestFrame).not.toContain(`│ ${longLine}`);
+		expect(parseAnsiText(latestFrame)).toContain(`│ ${firstWrappedLine}`);
+		expect(parseAnsiText(latestFrame)).toContain('│ 89');
+		expect(parseAnsiText(latestFrame)).not.toContain(`│ ${longLine}`);
 	});
 
 	it('moves the textarea cursor across wrapped rows before editing', async () => {
@@ -283,5 +286,25 @@ describe('textarea prompt', () => {
 				() => textarea({ message: 'Description', required: true }),
 			),
 		).rejects.toThrow(PromptValidationError);
+	});
+
+	it('renders cancelled textarea frames with the current value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.enter, 'B', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => textarea('Description'),
+		);
+
+		expect(result).toBe('A\nB');
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Description ');
+		expect(parseAnsiText(output.text())).toContain('A');
+		expect(parseAnsiText(output.text())).toContain('B');
 	});
 });

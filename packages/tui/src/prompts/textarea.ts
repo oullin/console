@@ -1,5 +1,6 @@
 import { promptUntilValid } from '#tui/prompt';
 import { readTypedValue } from '#tui/typed-value';
+import { renderSubmittedTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TextareaPromptOptions } from '#tui/types';
 
 export function textarea(options: TextareaPromptOptions): Promise<string>;
@@ -30,17 +31,29 @@ export async function textarea(
 			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, rows, transform }
 			: { ...message, default: message.default ?? '', rows: message.rows ?? rows };
 
-	return promptUntilValid(options, async () => {
-		const answer = await readTypedValue(options.message, {
-			default: options.default,
-			hint: options.hint,
-			allowNewLine: true,
-			placeholder: options.placeholder,
-			rows: options.rows ?? rows,
-		});
+	let shouldRenderSubmittedFrame = false;
 
-		const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+	return promptUntilValid(
+		options,
+		async () => {
+			const answer = await readTypedValue(options.message, {
+				default: options.default,
+				hint: options.hint,
+				allowNewLine: true,
+				placeholder: options.placeholder,
+				rows: options.rows ?? rows,
+			});
 
-		return options.transform ? options.transform(value) : value;
-	});
+			const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+
+			shouldRenderSubmittedFrame = !answer.cancelled;
+
+			return options.transform ? options.transform(value) : value;
+		},
+		(value) => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedTextareaFrame(options.message, value);
+			}
+		},
+	);
 }

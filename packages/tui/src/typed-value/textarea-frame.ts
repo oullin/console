@@ -1,12 +1,25 @@
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
+import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
-import { dim } from '#tui/theme/styles';
+import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import { visibleLineWindow } from '#tui/typed-value/lines';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
 export const renderTextareaFrame = (message: string, state: TypedValueState, options: TypedValueOptions): string => {
-	return renderBox({ body: textareaBody(state, options), title: message });
+	return renderBox({ body: textareaBody(state, options), borderStyle: cyan, info: 'Ctrl+D to submit', title: cyan(message) });
+};
+
+export const renderSubmittedTextareaFrame = (message: string, value: string): void => {
+	promptEnvironment().output.write(`${renderBox({ body: value, title: dim(message) })}\n`);
+};
+
+export const renderCancelledTextareaFrame = (message: string, value: string, options: TypedValueOptions): void => {
+	const environment = promptEnvironment();
+	const body = textareaCancelledBody(value, options);
+
+	environment.output.write(`${renderBox({ body, borderStyle: red, title: message })}\n`);
+	environment.error.write(`${red('  ⚠ Cancelled.')}\n`);
 };
 
 const textareaBody = (state: TypedValueState, options: TypedValueOptions): string => {
@@ -35,4 +48,11 @@ const placeholderBody = (options: TypedValueOptions, rows: number | undefined): 
 	}
 
 	return [...lines, ...Array.from({ length: Math.max(0, rows - lines.length) }, () => '')].join('\n');
+};
+
+const textareaCancelledBody = (value: string, options: TypedValueOptions): string => {
+	const text = value.length > 0 ? value : (options.placeholder ?? '');
+	const lines = text.split('\n');
+
+	return lines.map((line) => strikethrough(dim(line))).join('\n');
 };
