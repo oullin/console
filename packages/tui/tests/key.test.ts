@@ -36,4 +36,9 @@ describe('keyboard mapping', () => {
 		expect(oneOf([Key.home, Key.end], Key.end[3])).toBe(Key.end[3]);
 		expect(oneOf([Key.home, Key.end], Key.enter)).toBeUndefined();
 	});
+
+	it('matches scalar and grouped keys through the validator layer', () => {
+		expect(oneOf([Key.enter, Key.home], Key.enter)).toBe(Key.enter);
+		expect(oneOf([Key.enter, Key.home], Key.home[0])).toBe(Key.home[0]);
+	});
 });
