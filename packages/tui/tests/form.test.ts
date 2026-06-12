@@ -695,6 +695,23 @@ describe('form builder', () => {
 		expect(responses.body).toBe('L1\nL2');
 	});
 
+	it('reuses password previous responses when reverting label-first form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['s', 'e', 'c', 'r', 'e', 't', Key.enter, Key.ctrlU, Key.enter, 'D', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().password('Secret').text('Done').submit(),
+		);
+
+		expect(responses[0]).toBe('secret');
+		expect(responses[1]).toBe('D');
+	});
+
 	it('runs task, pause, and stream form steps', async () => {
 		const output = createMemoryOutput();
 

@@ -68,7 +68,20 @@ function passwordFormStep(
 		return this.add((_, previous) => password({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), placeholder);
 	}
 
-	return this.add(() => password(optionsOrLabel, placeholder, required, validate, hint, transform), name);
+	return this.add(
+		(_, previous) =>
+			password({
+				message: optionsOrLabel,
+				label: optionsOrLabel,
+				placeholder,
+				default: previousString(previous, ''),
+				required,
+				validate,
+				hint,
+				transform,
+			}),
+		name,
+	);
 }
 
 function textFormStep(this: FormBuilder, options: TextPromptOptions, name?: string): FormBuilder;
