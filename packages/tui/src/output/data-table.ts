@@ -1,10 +1,52 @@
 import { promptUntilValid } from '#tui/prompt';
 import { readDataTableSelection } from '#tui/output/data-table/read';
 import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
-import type { DataTablePromptOptions } from '#tui/types';
+import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
-export const datatable = async <T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number> => {
+export function datatable<T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number>;
+
+export function datatable<T = unknown>(
+	headers?: string[],
+	rows?: Array<DataTableRow<T>> | null,
+	scroll?: number,
+	label?: string,
+	hint?: string,
+	required?: DataTablePromptOptions<T>['required'],
+	validate?: DataTablePromptOptions<T>['validate'],
+	transform?: DataTablePromptOptions<T>['transform'],
+	filter?: DataTablePromptOptions<T>['filter'],
+): Promise<T | number>;
+
+export async function datatable<T = unknown>(
+	optionsOrHeaders: DataTablePromptOptions<T> | string[] = [],
+	rows: Array<DataTableRow<T>> | null = null,
+	scroll = 10,
+	label = '',
+	hint = '',
+	required: DataTablePromptOptions<T>['required'] = false,
+	validate: DataTablePromptOptions<T>['validate'] = undefined,
+	transform: DataTablePromptOptions<T>['transform'] = undefined,
+	filter: DataTablePromptOptions<T>['filter'] = undefined,
+): Promise<T | number> {
+	const options = Array.isArray(optionsOrHeaders)
+		? {
+				filter,
+				headers: optionsOrHeaders,
+				hint,
+				message: label,
+				required,
+				rows: rows ?? [],
+				scroll,
+				transform,
+				validate,
+			}
+		: optionsOrHeaders;
+
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
-	return promptUntilValid(options, async () => readDataTableSelection(options, headers));
-};
+	return promptUntilValid(options, async () => {
+		const selected = await readDataTableSelection(options, headers);
+
+		return options.transform ? options.transform(selected) : selected;
+	});
+}

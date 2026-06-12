@@ -12,6 +12,7 @@ export type DataTablePromptOptions<T = unknown> = BasePromptOptions<T | number> 
 	headers?: string[];
 	rows: Array<DataTableRow<T>>;
 	scroll?: number;
+	transform?: (value: T | number) => T | number | Promise<T | number>;
 };
 
 export type DataTableObjectRow<T = unknown> = {

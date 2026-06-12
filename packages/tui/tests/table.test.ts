@@ -146,6 +146,59 @@ describe('data table prompt', () => {
 		expect(output.text()).toContain('›');
 	});
 
+	it('supports label-first data table helpers with filters', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'slow', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable(
+					['Name', 'Tag'],
+					[
+						{ Name: 'Alpha', Tag: 'fast', value: 'alpha' },
+						{ Name: 'Beta', Tag: 'slow', value: 'beta' },
+					],
+					10,
+					'Pick project',
+					'',
+					false,
+					undefined,
+					undefined,
+					(query, row) => !Array.isArray(row) && row.Tag === query,
+				),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Pick project slow');
+		expect(output.text()).toContain('Beta');
+	});
+
+	it('transforms selected data table values before return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [{ Name: 'Alpha', value: 'alpha' }],
+					transform: (value) => String(value).toUpperCase(),
+				}),
+		);
+
+		expect(result).toBe('ALPHA');
+	});
+
 	it('filters rows in explicit search mode', async () => {
 		const output = createMemoryOutput();
 
