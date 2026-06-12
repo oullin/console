@@ -821,4 +821,34 @@ describe('form builder', () => {
 		expect(output.text()).toContain('Pick project slow');
 		expect(output.text()).toContain('Beta');
 	});
+
+	it('reuses previous data table responses when reverting object-option form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter, Key.ctrlU, Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.datatable(
+						{
+							message: 'Pick project',
+							rows: [
+								{ Name: 'Alpha', value: 'alpha' },
+								{ Name: 'Beta', value: 'beta' },
+							],
+						},
+						'project',
+					)
+					.confirm('Done?')
+					.submit(),
+		);
+
+		expect(responses.project).toBe('beta');
+		expect(responses[1]).toBe(true);
+	});
 });

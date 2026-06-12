@@ -1,5 +1,7 @@
 import { alert, clear, dataTable, datatable, error, grid, info, intro, note, notify, outro, table, title, warning } from '#tui/output';
+import { previousValue } from '#tui/form/builder/previous';
 import { sideEffectStep } from '#tui/form/builder/step';
+import { dataTableStepName, isDataTablePromptOptions } from '#tui/output/validators/data-table';
 import { isTableOptions, tableStepName } from '#tui/output/validators/table';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { DataTablePromptOptions, DataTableRow, MaybePromise, TableOptions } from '#tui/types';
@@ -76,6 +78,41 @@ function tableFormStep(this: FormBuilder, headersOrOptions: TableOptions | strin
 	);
 }
 
+function datatableFormStep<T = unknown>(this: FormBuilder, options: DataTablePromptOptions<T>, name?: string): FormBuilder;
+function datatableFormStep<T = unknown>(
+	this: FormBuilder,
+	headers?: string[],
+	rows?: Array<DataTableRow<T>> | null,
+	scroll?: number,
+	label?: string,
+	hint?: string,
+	required?: DataTablePromptOptions<T>['required'],
+	validate?: DataTablePromptOptions<T>['validate'],
+	transform?: DataTablePromptOptions<T>['transform'],
+	filter?: DataTablePromptOptions<T>['filter'],
+	name?: string,
+): FormBuilder;
+
+function datatableFormStep<T = unknown>(
+	this: FormBuilder,
+	optionsOrHeaders: DataTablePromptOptions<T> | string[] = [],
+	rowsOrName: Array<DataTableRow<T>> | null | string = null,
+	scroll = 10,
+	label = '',
+	hint = '',
+	required: DataTablePromptOptions<T>['required'] = false,
+	validate: DataTablePromptOptions<T>['validate'] = undefined,
+	transform: DataTablePromptOptions<T>['transform'] = undefined,
+	filter: DataTablePromptOptions<T>['filter'] = undefined,
+	name?: string,
+): FormBuilder {
+	if (isDataTablePromptOptions<T>(optionsOrHeaders)) {
+		return this.add((_, previous) => datatable<T>({ ...optionsOrHeaders, default: previousValue(previous, optionsOrHeaders.default) }), dataTableStepName(rowsOrName));
+	}
+
+	return this.add(() => datatable(optionsOrHeaders, rowsOrName as Array<DataTableRow<T>> | null, scroll, label, hint, required, validate, transform, filter), name);
+}
+
 export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> = {
 	alert(message, name) {
 		return this.add(
@@ -92,24 +129,7 @@ export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> 
 		);
 	},
 	dataTable: dataTableFormStep,
-	datatable<T = unknown>(
-		optionsOrHeaders: DataTablePromptOptions<T> | string[] = [],
-		rowsOrName: Array<DataTableRow<T>> | null | string = null,
-		scroll = 10,
-		label = '',
-		hint = '',
-		required: DataTablePromptOptions<T>['required'] = false,
-		validate: DataTablePromptOptions<T>['validate'] = undefined,
-		transform: DataTablePromptOptions<T>['transform'] = undefined,
-		filter: DataTablePromptOptions<T>['filter'] = undefined,
-		name?: string,
-	) {
-		if (Array.isArray(optionsOrHeaders)) {
-			return this.add(() => datatable(optionsOrHeaders, rowsOrName as Array<DataTableRow<T>> | null, scroll, label, hint, required, validate, transform, filter), name);
-		}
-
-		return this.add(() => datatable(optionsOrHeaders), rowsOrName as string | undefined);
-	},
+	datatable: datatableFormStep,
 	error(message, name) {
 		return this.add(
 			displayStep(() => error(message)),

@@ -22,13 +22,24 @@ const selectedDataTableValue = <T>(rows: Array<VisibleDataTableRow<T>>, selected
 	return dataTableRowValue(selectedRow.row, selectedRow.index);
 };
 
+const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>, defaultValue: T | number | undefined): number => {
+	if (defaultValue === undefined) {
+		return 0;
+	}
+
+	const selected = rows.findIndex(({ index, row }) => Object.is(dataTableRowValue(row, index), defaultValue));
+
+	return Math.max(0, selected);
+};
+
 export const readDataTableSelection = async <T>(options: DataTablePromptOptions<T>, headers: string[]): Promise<T | number> => {
 	const environment = promptEnvironment();
 
-	let selected = 0;
 	let search: DataTableSearchState = initialDataTableSearchState();
 
 	const visibleRows = () => visibleDataTableRows(options, headers, search.query.value);
+
+	let selected = initialDataTableSelection(visibleRows(), options.default);
 
 	const render = (): void => {
 		selected = renderDataTableFrame({
