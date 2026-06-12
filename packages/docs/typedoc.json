@@ -1,0 +1,12 @@
+{
+	"entryPoints": ["../tui/src/index.ts"],
+	"excludeInternal": true,
+	"excludePrivate": true,
+	"excludeProtected": true,
+	"hideBreadcrumbs": true,
+	"hidePageHeader": true,
+	"out": "src/api",
+	"plugin": ["typedoc-plugin-markdown"],
+	"readme": "none",
+	"tsconfig": "../tui/tsconfig.json"
+}

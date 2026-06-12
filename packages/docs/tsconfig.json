@@ -1,0 +1,13 @@
+{
+	"extends": "@ollin/tsconfig/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@ollin/tui": ["../tui/src/index.ts"],
+			"#tui/*": ["../tui/src/*"],
+			"#tui/prompts/*": ["../tui/src/prompts/*"]
+		},
+		"tsBuildInfoFile": "../artefacts/.cache/tsbuild/docs.tsbuildinfo"
+	},
+	"include": ["examples/**/*.ts", "src/.vitepress/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "../tui/src/**/*.ts"]
+}

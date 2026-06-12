@@ -1,0 +1,61 @@
+import { defineConfig } from 'vitepress';
+
+export const guideSections = [
+	{ text: 'Introduction', link: '/guide/introduction' },
+	{ text: 'Installation', link: '/guide/installation' },
+	{ text: 'Available Prompts', link: '/guide/available-prompts' },
+	{ text: 'Text', link: '/guide/text' },
+	{ text: 'Textarea', link: '/guide/textarea' },
+	{ text: 'Number', link: '/guide/number' },
+	{ text: 'Password', link: '/guide/password' },
+	{ text: 'Confirm', link: '/guide/confirm' },
+	{ text: 'Select', link: '/guide/select' },
+	{ text: 'Multi-select', link: '/guide/multiselect' },
+	{ text: 'Suggest', link: '/guide/suggest' },
+	{ text: 'Search', link: '/guide/search' },
+	{ text: 'Multi-search', link: '/guide/multisearch' },
+	{ text: 'Pause', link: '/guide/pause' },
+	{ text: 'Autocomplete', link: '/guide/autocomplete' },
+	{ text: 'Transforming Input Before Validation', link: '/guide/transforms' },
+	{ text: 'Forms', link: '/guide/forms' },
+	{ text: 'Informational Messages', link: '/guide/informational-messages' },
+	{ text: 'Tables', link: '/guide/tables' },
+	{ text: 'Spin', link: '/guide/spin' },
+	{ text: 'Progress Bar', link: '/guide/progress' },
+	{ text: 'Task', link: '/guide/task' },
+	{ text: 'Stream', link: '/guide/stream' },
+	{ text: 'Terminal Title', link: '/guide/terminal-title' },
+	{ text: 'Clearing the Terminal', link: '/guide/clearing-terminal' },
+	{ text: 'Terminal Considerations', link: '/guide/terminal-considerations' },
+	{ text: 'Custom Environments', link: '/guide/fallbacks' },
+	{ text: 'Testing', link: '/guide/testing' },
+] as const;
+
+export default defineConfig({
+	title: '@ollin/tui',
+	description: 'Documentation for the Ollin TUI prompt toolkit.',
+	cleanUrls: true,
+	lastUpdated: true,
+	themeConfig: {
+		nav: [
+			{ text: 'Guide', link: '/guide/introduction' },
+			{ text: 'API', link: '/api/' },
+		],
+		search: {
+			provider: 'local',
+		},
+		sidebar: [
+			{
+				text: 'Guide',
+				items: [...guideSections],
+			},
+			{
+				text: 'Reference',
+				items: [{ text: 'API Reference', link: '/api/' }],
+			},
+		],
+		footer: {
+			message: 'Documentation for the @ollin/tui TypeScript package.',
+		},
+	},
+});
