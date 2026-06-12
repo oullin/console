@@ -218,6 +218,27 @@ describe('choice prompts', () => {
 		expect(result).toBe(false);
 	});
 
+	it('transforms non-interactive confirm defaults before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() =>
+				confirm({
+					message: 'Continue?',
+					default: true,
+					transform: (value) => !value,
+					validate: (value) => (value === false ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe(false);
+	});
+
 	it('selects with arrow keys and enter', async () => {
 		const output = createMemoryOutput();
 
@@ -309,6 +330,26 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toBe('second');
+	});
+
+	it('transforms non-interactive select defaults before validation and return', async () => {
+		const result = await withPromptEnvironment(
+			{
+				output: createMemoryOutput(),
+				error: createMemoryOutput(),
+				interactive: false,
+			},
+			() =>
+				select({
+					message: 'Pick one',
+					options: ['first', 'second'],
+					default: 'second',
+					transform: (value) => value.toUpperCase(),
+					validate: (value) => (value === 'SECOND' ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe('SECOND');
 	});
 
 	it('rejects non-interactive select prompts without defaults', async () => {
@@ -647,6 +688,28 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toEqual([]);
+	});
+
+	it('transforms non-interactive multiselect defaults before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() =>
+				multiselect({
+					message: 'Pick many',
+					options: ['first', 'second'],
+					default: ['first'],
+					transform: (value) => [...value, 'second'],
+					validate: (value) => (value.length === 2 ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toEqual(['first', 'second']);
 	});
 
 	it('rejects invalid comma-separated line-mode multiselect answers and retries', async () => {

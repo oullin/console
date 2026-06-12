@@ -371,6 +371,28 @@ describe('search prompt', () => {
 		expect(result).toBe('green');
 	});
 
+	it('transforms non-interactive search defaults before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: colors,
+					default: 'green',
+					transform: (value) => value.toUpperCase(),
+					validate: (value) => (value === 'GREEN' ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe('GREEN');
+	});
+
 	it('trims line-mode search answers before matching choices', async () => {
 		const output = createMemoryOutput();
 
@@ -510,6 +532,28 @@ describe('multisearch prompt', () => {
 		);
 
 		expect(result).toEqual([]);
+	});
+
+	it('transforms non-interactive multisearch defaults before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() =>
+				multisearch({
+					message: 'Favorite colors?',
+					options: colors,
+					default: ['green'],
+					transform: (value) => [...value, 'red'],
+					validate: (value) => (value.length === 2 ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toEqual(['green', 'red']);
 	});
 
 	it('rejects disabled line-mode multisearch choices and retries', async () => {

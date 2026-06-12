@@ -297,6 +297,27 @@ describe('number prompt', () => {
 		).rejects.toThrow(PromptValidationError);
 	});
 
+	it('transforms non-interactive number defaults before validation and return', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+				interactive: false,
+			},
+			() =>
+				number({
+					message: 'Count',
+					default: 2,
+					transform: (value) => Number(value) * 2,
+					validate: (value) => (value === 4 ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe(4);
+	});
+
 	it('renders cancelled number frames with the current value', async () => {
 		const output = createMemoryOutput();
 

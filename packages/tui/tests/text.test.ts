@@ -157,6 +157,25 @@ describe('text prompt', () => {
 		).rejects.toThrow(PromptValidationError);
 	});
 
+	it('transforms non-interactive default values before validation and return', async () => {
+		const result = await withPromptEnvironment(
+			{
+				output: createMemoryOutput(),
+				error: createMemoryOutput(),
+				interactive: false,
+			},
+			() =>
+				text({
+					message: 'Name',
+					default: ' Ada ',
+					transform: (value) => value.trim(),
+					validate: (value) => (value === 'Ada' ? null : 'Unexpected value.'),
+				}),
+		);
+
+		expect(result).toBe('Ada');
+	});
+
 	it('handles failed empty key reads gracefully', async () => {
 		const output = createMemoryOutput();
 
