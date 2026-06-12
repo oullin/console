@@ -765,6 +765,28 @@ describe('form builder', () => {
 		expect(output.text()).toContain('\u001B[H\u001B[J');
 	});
 
+	it('stores null for named object-option table output form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+			},
+			() =>
+				form()
+					.table({ headers: ['Name'], rows: [['Ada']] }, 'tableOptions')
+					.dataTable({ headers: ['Alias'], rows: [['Display']] }, 'dataTableOptions')
+					.submit(),
+		);
+
+		expect(responses.tableOptions).toBeNull();
+		expect(responses.dataTableOptions).toBeNull();
+		expect(responses[0]).toBeUndefined();
+		expect(output.text()).toContain('Ada');
+		expect(output.text()).toContain('Display');
+	});
+
 	it('runs label-first data table form steps', async () => {
 		const output = createMemoryOutput();
 

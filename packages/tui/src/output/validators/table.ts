@@ -5,6 +5,7 @@ const tableCellSchema: z.ZodType<TableCell> = z.union([z.string(), z.number(), z
 const tableRowSchema = z.union([z.array(tableCellSchema), z.record(z.string(), tableCellSchema)]);
 const tableRowsSchema = z.array(tableRowSchema);
 const tableHeadersSchema = z.array(z.string());
+const tableStepNameSchema = z.string();
 
 const tableOptionsSchema = z
 	.object({
@@ -12,6 +13,16 @@ const tableOptionsSchema = z
 		rows: tableRowsSchema,
 	})
 	.passthrough();
+
+export const isTableOptions = (value: unknown): value is TableOptions => {
+	return tableOptionsSchema.safeParse(value).success;
+};
+
+export const tableStepName = (value: unknown): string | undefined => {
+	const result = tableStepNameSchema.safeParse(value);
+
+	return result.success ? result.data : undefined;
+};
 
 export const parseTableOptions = (headersOrOptions: unknown = [], rows: unknown = null): Required<TableOptions> => {
 	const tableOptions = tableOptionsSchema.safeParse(headersOrOptions);
