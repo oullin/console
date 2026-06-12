@@ -2,8 +2,10 @@ import { z } from 'zod';
 
 const requiredOptionSchema = z.union([z.boolean(), z.string()]).optional();
 
+const invalidRequiredValueSchema = z.union([z.literal(''), z.literal(false), z.null(), z.undefined(), z.array(z.unknown()).length(0)]);
+
 const isInvalidRequiredValue = (value: unknown): boolean => {
-	return value === '' || value === false || value === null || value === undefined || (Array.isArray(value) && value.length === 0);
+	return invalidRequiredValueSchema.safeParse(value).success;
 };
 
 export const requiredMessage = (value: unknown, required?: boolean | string): string | undefined => {

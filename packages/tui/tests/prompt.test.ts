@@ -17,6 +17,10 @@ describe('prompt validation', () => {
 		expect(ensureRequired(null, true)).toBe('Required.');
 	});
 
+	it('accepts non-empty required arrays', () => {
+		expect(ensureRequired(['choice'], true)).toBeUndefined();
+	});
+
 	it('uses custom required messages and treats empty strings as required configuration', () => {
 		expect(ensureRequired('', 'Choose something.')).toBe('Choose something.');
 		expect(ensureRequired('', '')).toBe('Required.');
