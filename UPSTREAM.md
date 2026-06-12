@@ -147,6 +147,7 @@ TypeScript and OpenTUI internals.
 | Public ESM package runtime and type-consumption surface | `packages/tui/src/index.ts`, `packages/tui/src/form/builder/index.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*`, `packages/acceptance/tests/package.test.ts` |
 | Data table prompt argument validation layer | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table.ts`, `packages/tui/tests/table.test.ts` |
 | Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
+| Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 
 ## Remaining Exact-Parity Work
 

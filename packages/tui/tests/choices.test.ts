@@ -302,6 +302,23 @@ describe('choice prompts', () => {
 		expect(result).toBe(2);
 	});
 
+	it('normalizes keyed select options through the validator layer', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: { 1: 'First', second: 'Second' } }),
+		);
+
+		expect(result).toBe(1);
+		expect(output.text()).toContain('First');
+	});
+
 	it('starts select prompts on the default value', async () => {
 		const output = createMemoryOutput();
 

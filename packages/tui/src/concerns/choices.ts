@@ -1,22 +1,22 @@
 import { promptEnvironment } from '#tui/environment';
 import { parseChoiceAnswerIndex, parseChoiceRecordKey } from '#tui/concerns/validators/choice-answer';
-import { parseChoice, parseChoiceRecord } from '#tui/concerns/validators/choice';
+import { parseChoice, parseChoiceOptions } from '#tui/concerns/validators/choice';
 import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { cyan, dim } from '#tui/theme/styles';
 import type { Choice, ChoiceOptions } from '#tui/types';
 
 export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => {
-	if (!Array.isArray(options)) {
-		const parsed = parseChoiceRecord(options);
+	const parsed = parseChoiceOptions(options);
 
-		return Object.entries(parsed ?? {}).map(([value, label]) => ({
+	if (parsed.kind === 'record') {
+		return Object.entries(parsed.options).map(([value, label]) => ({
 			label,
 			value: parseChoiceRecordKey(value) as T,
 		}));
 	}
 
-	return options.map((choice) => {
+	return parsed.options.map((choice) => {
 		const parsed = parseChoice<T>(choice);
 
 		if (parsed) {
