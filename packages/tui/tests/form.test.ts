@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, Progress, text, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, Progress, Stream, text, withPromptEnvironment } from '#tui/index';
 
 describe('form builder', () => {
 	it('runs chained steps and returns positional responses', async () => {
@@ -640,6 +640,32 @@ describe('form builder', () => {
 		expect((responses.bar as Progress).total).toBe(2);
 		expect(output.text()).toContain('Manual');
 		expect(output.text()).toContain('1 / 2');
+	});
+
+	it('creates manual streams from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				output,
+				error: output,
+			},
+			async () => {
+				const values = await form().stream().submit();
+
+				const outputStream = values[0] as Stream;
+
+				outputStream.write('hello');
+				outputStream.close();
+
+				return values;
+			},
+		);
+
+		expect(responses[0]).toBeInstanceOf(Stream);
+		expect((responses[0] as Stream).value()).toBe('hello');
+		expect(output.text()).toContain('hello');
+		expect(output.text()).toContain('\u001B[?25h');
 	});
 
 	it('stores null for display-only output helper responses', async () => {

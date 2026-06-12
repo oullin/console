@@ -2,7 +2,7 @@ import { progress, spin, stream, task } from '#tui/status';
 import { sideEffectStep } from '#tui/form/builder/step';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MaybePromise } from '#tui/types';
-import type { Logger, Progress, TaskDefinition } from '#tui/status';
+import type { Logger, Progress, Stream, TaskDefinition } from '#tui/status';
 
 export type StatusBuilderMethods = {
 	progress(this: FormBuilder, total: number, message?: string, name?: string): FormBuilder;
@@ -10,6 +10,7 @@ export type StatusBuilderMethods = {
 	spin<T>(this: FormBuilder, callback: () => MaybePromise<T>, message?: string, name?: string): FormBuilder;
 	spin<T>(this: FormBuilder, message: string, callback: () => MaybePromise<T>, name?: string): FormBuilder;
 	task<T>(this: FormBuilder, definition: TaskDefinition<T>, name?: string): FormBuilder;
+	stream(this: FormBuilder): FormBuilder;
 	stream(this: FormBuilder, source: AsyncIterable<string> | Iterable<string>, name?: string): FormBuilder;
 	task<T>(this: FormBuilder, label: string, callback: (logger: Logger) => MaybePromise<T>, limit?: number, keepSummary?: boolean, subLabel?: string, name?: string): FormBuilder;
 };
@@ -35,7 +36,11 @@ export const statusBuilderMethods: StatusBuilderMethods & ThisType<FormBuilder> 
 
 		return this.add(() => spin(callbackOrMessage, { message: messageOrCallback as string }), name, true);
 	},
-	stream(source: AsyncIterable<string> | Iterable<string>, name?: string) {
+	stream(source?: AsyncIterable<string> | Iterable<string>, name?: string) {
+		if (source === undefined) {
+			return this.add(() => stream() as Stream);
+		}
+
 		return this.add(
 			sideEffectStep(() => stream(source)),
 			name,
