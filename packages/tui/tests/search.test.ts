@@ -181,6 +181,23 @@ describe('search prompt', () => {
 		expect(output.text()).toContain('About red');
 	});
 
+	it('supports label-first search helpers with info', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => search('Favorite color?', colors, '', 5, undefined, '', true, undefined, (value) => `About ${value ?? 'none'}`),
+		);
+
+		expect(result).toBe('red');
+		expect(output.text()).toContain('About red');
+	});
+
 	it('renders an empty result message for unmatched search queries', async () => {
 		const output = createMemoryOutput();
 
@@ -554,6 +571,24 @@ describe('multisearch prompt', () => {
 
 		expect(output.text()).toContain('About red');
 		expect(output.text()).toContain('0 selected');
+	});
+
+	it('supports label-first multisearch helpers with info', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch('Favorite colors?', colors, '', 5, false, undefined, 'Use the space bar to select options.', undefined, (value) => `About ${value ?? 'none'}`),
+		);
+
+		expect(result).toEqual(['red']);
+		expect(output.text()).toContain('About red');
+		expect(output.text()).toContain('1 selected');
 	});
 
 	it('renders an empty result message for unmatched multisearch queries', async () => {
