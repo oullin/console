@@ -1,6 +1,6 @@
 export { confirm } from '#tui/prompts/select/confirm';
 
-import { promptUntilValid, PromptValidationError } from '#tui/prompt';
+import { promptUntilValid } from '#tui/prompt';
 import { normalizeChoices } from '#tui/concerns/choices';
 import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
@@ -49,13 +49,7 @@ export async function select<T>(
 	return promptUntilValid(
 		promptOptions,
 		async () => {
-			const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info).catch((error: unknown) => {
-				if (promptOptions.default !== undefined && error instanceof PromptValidationError) {
-					return { cancelled: false, submitted: false, submittedLabel: '', value: promptOptions.default };
-				}
-
-				throw error;
-			});
+			const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 
 			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 			submittedLabel = selected.submittedLabel;

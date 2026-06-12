@@ -65,6 +65,14 @@ export const readSelectedChoice = async <T>(
 		const key = await environment.input.readKey();
 
 		if (key === null) {
+			if (defaultValue !== undefined) {
+				const choice = choices.find((candidate) => !candidate.disabled && Object.is(candidate.value, defaultValue));
+
+				if (choice) {
+					return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
+				}
+			}
+
 			throw new PromptValidationError('Please select a valid option.');
 		}
 

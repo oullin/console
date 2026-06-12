@@ -608,6 +608,44 @@ describe('choice prompts', () => {
 		expect(result).toBe('second');
 	});
 
+	it('returns select defaults when key input is exhausted', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'], default: 'second' }),
+		);
+
+		expect(result).toBe('second');
+	});
+
+	it('rejects invalid line-mode select answers before accepting defaults', async () => {
+		const output = createMemoryOutput();
+		const answers = ['invalid', ''];
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return answers.shift() ?? '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'], default: 'second' }),
+		);
+
+		expect(result).toBe('second');
+		expect(output.text()).toContain('Please select a valid option.');
+	});
+
 	it('rejects partial numeric line-mode select answers and retries', async () => {
 		const output = createMemoryOutput();
 		const answers = ['1abc', '2'];
