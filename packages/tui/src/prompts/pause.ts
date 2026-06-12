@@ -1,7 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask } from '#tui/prompt';
-import { renderQuestion } from '#tui/theme';
+import { renderPause } from '#tui/prompts/pause/render';
 
 export const pause = async (message = 'Press enter to continue...'): Promise<boolean> => {
 	const environment = promptEnvironment();
@@ -16,7 +16,7 @@ export const pause = async (message = 'Press enter to continue...'): Promise<boo
 		return true;
 	}
 
-	environment.output.write(renderQuestion(message));
+	environment.output.write(renderPause(message));
 
 	while (true) {
 		const key = await environment.input.readKey();

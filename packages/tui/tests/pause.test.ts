@@ -16,7 +16,7 @@ describe('pause prompt', () => {
 		);
 
 		expect(result).toBe(true);
-		expect(output.text()).toContain('Continue');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mContinue\u001B[39m ');
 		expect(output.text().endsWith('\n')).toBe(true);
 	});
 
