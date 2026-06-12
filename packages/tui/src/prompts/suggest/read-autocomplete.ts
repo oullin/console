@@ -33,7 +33,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
+	renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -52,7 +52,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = moveAutocompleteHighlight(matches, highlighted, direction);
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
+			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
@@ -69,7 +69,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 				highlighted = 0;
 			}
 
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
+			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
@@ -78,7 +78,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 
 			state = acceptAutocompleteMatch(state, matches[highlighted], false) ?? state;
 
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
+			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
@@ -107,6 +107,6 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder);
+		renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 	}
 };

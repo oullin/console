@@ -21,6 +21,7 @@ export function suggest(
 	validate?: TextPromptOptions['validate'],
 	hint?: string,
 	transform?: TextPromptOptions['transform'],
+	info?: SuggestOptions['info'],
 ): Promise<string>;
 
 export async function suggest(
@@ -33,8 +34,9 @@ export async function suggest(
 	validate: TextPromptOptions['validate'] = undefined,
 	hint = '',
 	transform: TextPromptOptions['transform'] = undefined,
+	info: SuggestOptions['info'] = '',
 ): Promise<string> {
-	const options = suggestOptions(message, source, placeholder, defaultValue, scroll, required, validate, hint, transform);
+	const options = suggestOptions(message, source, placeholder, defaultValue, scroll, required, validate, hint, transform, info);
 
 	let shouldRenderSubmittedFrame = false;
 
@@ -68,6 +70,7 @@ export function autocomplete(
 	validate?: TextPromptOptions['validate'],
 	hint?: string,
 	transform?: TextPromptOptions['transform'],
+	info?: SuggestOptions['info'],
 ): Promise<string>;
 
 export async function autocomplete(
@@ -79,9 +82,12 @@ export async function autocomplete(
 	validate: TextPromptOptions['validate'] = undefined,
 	hint = '',
 	transform: TextPromptOptions['transform'] = undefined,
+	info: SuggestOptions['info'] = '',
 ): Promise<string> {
 	const options =
-		typeof message === 'string' ? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform }) : suggestOptions(message);
+		typeof message === 'string'
+			? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform, info })
+			: suggestOptions(message);
 
 	let shouldRenderSubmittedFrame = false;
 

@@ -492,6 +492,29 @@ describe('form builder', () => {
 		expect(output.text()).toContain('Type a color');
 	});
 
+	it('passes suggest and autocomplete info from form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.down, Key.enter, 'g', Key.tab, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.suggest('Suggested color', ['Red', 'Green', 'Blue'], '', '', 5, false, undefined, '', 'suggested', undefined, (value) => `About suggested ${value ?? 'none'}`)
+					.autocomplete('Auto color', ['Red', 'Green', 'Blue'], '', '', false, undefined, '', 'auto', undefined, (value) => `About auto ${value ?? 'none'}`)
+					.submit(),
+		);
+
+		expect(responses.suggested).toBe('Blue');
+		expect(responses.auto).toBe('Green');
+		expect(output.text()).toContain('About suggested Blue');
+		expect(output.text()).toContain('About auto Green');
+	});
+
 	it('runs object-option suggest and autocomplete form steps', async () => {
 		const output = createMemoryOutput();
 

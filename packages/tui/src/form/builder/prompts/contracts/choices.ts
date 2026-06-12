@@ -15,6 +15,7 @@ export type ChoicePromptBuilderMethods = {
 		hint?: string,
 		name?: string,
 		transform?: TextPromptOptions['transform'],
+		info?: SuggestOptions['info'],
 	): FormBuilder;
 	confirm(this: FormBuilder, options: ConfirmPromptOptions, name?: string): FormBuilder;
 	confirm(
@@ -99,5 +100,6 @@ export type ChoicePromptBuilderMethods = {
 		hint?: string,
 		name?: string,
 		transform?: TextPromptOptions['transform'],
+		info?: SuggestOptions['info'],
 	): FormBuilder;
 };

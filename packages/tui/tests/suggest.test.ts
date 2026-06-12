@@ -111,6 +111,22 @@ describe('suggest prompt', () => {
 		expect(output.text()).toContain('About Blue');
 	});
 
+	it('supports label-first suggest helpers with info', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => suggest('Favorite color?', ['Red', 'Green', 'Blue'], '', '', 5, false, undefined, '', undefined, (value) => `About ${value ?? 'none'}`),
+		);
+
+		expect(output.text()).toContain('About Blue');
+	});
+
 	it('renders cancelled suggest frames with the current value', async () => {
 		const output = createMemoryOutput();
 
@@ -166,6 +182,22 @@ describe('autocomplete prompt', () => {
 		expect(parseAnsiText(output.text())).toContain('blue');
 		expect(output.text()).toContain('b\u001B[7ml\u001B[27m\u001B[2mue\u001B[22m');
 		expect(output.text()).not.toContain('›');
+	});
+
+	it('supports label-first autocomplete helpers with info', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue'], '', '', false, undefined, '', undefined, (value) => `About ${value ?? 'none'}`),
+		);
+
+		expect(output.text()).toContain('About Blue');
 	});
 
 	it('accepts ghost completion with tab', async () => {

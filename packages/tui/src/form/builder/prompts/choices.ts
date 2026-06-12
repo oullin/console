@@ -20,6 +20,7 @@ function autocompleteFormStep(
 	hint?: string,
 	name?: string,
 	transform?: TextPromptOptions['transform'],
+	info?: SuggestOptions['info'],
 ): FormBuilder;
 
 function autocompleteFormStep(
@@ -33,6 +34,7 @@ function autocompleteFormStep(
 	hint = '',
 	name?: string,
 	transform: TextPromptOptions['transform'] = undefined,
+	info: SuggestOptions['info'] = '',
 ): FormBuilder {
 	if (!isSuggestPromptLabel(optionsOrLabel)) {
 		return this.add((_, previous) => autocomplete({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), options as string | undefined);
@@ -50,6 +52,7 @@ function autocompleteFormStep(
 				validate,
 				hint,
 				transform,
+				info,
 			}),
 		name,
 	);
@@ -68,6 +71,7 @@ function suggestFormStep(
 	hint?: string,
 	name?: string,
 	transform?: TextPromptOptions['transform'],
+	info?: SuggestOptions['info'],
 ): FormBuilder;
 
 function suggestFormStep(
@@ -82,6 +86,7 @@ function suggestFormStep(
 	hint = '',
 	name?: string,
 	transform: TextPromptOptions['transform'] = undefined,
+	info: SuggestOptions['info'] = '',
 ): FormBuilder {
 	if (!isSuggestPromptLabel(optionsOrLabel)) {
 		return this.add((_, previous) => suggest({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), options as string | undefined);
@@ -100,6 +105,7 @@ function suggestFormStep(
 				validate,
 				hint,
 				transform,
+				info,
 			}),
 		name,
 	);

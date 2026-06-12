@@ -16,9 +16,10 @@ export const suggestOptions = (
 	validate: TextPromptOptions['validate'] = undefined,
 	hint = '',
 	transform: TextPromptOptions['transform'] = undefined,
+	info: SuggestOptions['info'] = '',
 ): SuggestOptions => {
 	if (typeof message === 'string') {
-		return { message, label: message, options, placeholder, default: defaultValue, scroll, required, validate, hint, transform };
+		return { message, label: message, options, placeholder, default: defaultValue, scroll, required, validate, hint, transform, info };
 	}
 
 	return { ...message, default: message.default ?? '' };
