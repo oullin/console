@@ -92,6 +92,17 @@ describe('table output', () => {
 		expect(output.text()).toContain('| TypeScript | Prompts | Port  |');
 	});
 
+	it('normalizes table row cells through the validator layer', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table(['Name', 'Enabled', 'Notes'], [{ Enabled: false, Name: 'Ollin', Notes: null }]);
+		});
+
+		expect(output.text()).toContain('| Name  | Enabled | Notes |');
+		expect(output.text()).toContain('| Ollin | false   |       |');
+	});
+
 	it('renders tables without headers from row-only input', async () => {
 		const output = createMemoryOutput();
 
