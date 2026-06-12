@@ -61,9 +61,11 @@ TypeScript and OpenTUI internals.
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
+| Search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/src/prompts/search/read-multi/result.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Pause themed key-driven frame | `packages/tui/src/prompts/pause.ts`, `packages/tui/src/prompts/pause/render.ts`, `packages/tui/tests/pause.test.ts` |

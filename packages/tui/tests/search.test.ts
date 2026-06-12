@@ -53,6 +53,8 @@ describe('search prompt', () => {
 
 		expect(result).toBe('green');
 		expect(output.text()).toContain('Please choose green.');
+		expect(parseAnsiText(output.text())).not.toMatch(/^ │ Red\s*│$/m);
+		expect(parseAnsiText(output.text())).toMatch(/^ │ Green\s*│$/m);
 	});
 
 	it('renders the typed query while navigating results', async () => {
@@ -598,6 +600,27 @@ describe('multisearch prompt', () => {
 				() => multisearch({ message: 'Favorite colors?', options: colors, required: true }),
 			),
 		).rejects.toThrow(PromptValidationError);
+	});
+
+	it('renders multisearch submitted frames only after validation passes', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multisearch({ message: 'Favorite colors?', options: colors, required: true }),
+		);
+
+		const rendered = parseAnsiText(output.text());
+
+		expect(result).toEqual(['red']);
+		expect(rendered).toContain('Required.');
+		expect(rendered).not.toMatch(/^ │ None\s*│$/m);
+		expect(rendered).toMatch(/^ │ Red\s*│$/m);
 	});
 
 	it('renders multisearch info for the highlighted result', async () => {

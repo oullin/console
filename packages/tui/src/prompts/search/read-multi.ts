@@ -4,16 +4,17 @@ import { cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderCancelledSearch, renderSearchChoices, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
+import { renderCancelledSearch, renderSearchChoices } from '#tui/prompts/search/render';
 import { lineMultiSearchValues, selectedSearchValues, toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
+import type { MultiSearchChoicesReadResult } from '#tui/prompts/search/read-multi/result';
 import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
 import type { MultiSearchPromptOptions } from '#tui/types';
 
-export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<T[]> => {
+export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchChoicesReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return lineMultiSearchValues(options);
+		return { cancelled: false, submitted: false, submittedLabels: [], value: await lineMultiSearchValues(options) };
 	}
 
 	let state = { cursor: 0, value: '' };
@@ -38,15 +39,13 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const key = await environment.input.readKey();
 
 		if (key === null || key === Key.enter) {
-			renderSubmittedSearchChoices(options.message, [...selected.values()]);
-
-			return selectedSearchValues(selected);
+			return { cancelled: false, submitted: true, submittedLabels: [...selected.values()], value: selectedSearchValues(selected) };
 		}
 
 		if (key === Key.ctrlC) {
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
-			return cancelPrompt(selectedSearchValues(selected));
+			return { cancelled: true, submitted: false, submittedLabels: [...selected.values()], value: await cancelPrompt(selectedSearchValues(selected)) };
 		}
 
 		const action = searchNavigationAction(key);
@@ -84,7 +83,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		if (next.cancelled) {
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
-			return cancelPrompt(options.default ?? []);
+			return { cancelled: true, submitted: false, submittedLabels: [], value: await cancelPrompt(options.default ?? []) };
 		}
 
 		state = { cursor: next.cursor, value: next.value };

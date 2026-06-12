@@ -2,6 +2,13 @@ import { ask } from '#tui/prompt';
 import { resolveLineSearchChoice } from '#tui/prompts/search/line-mode';
 import type { Choice, SearchPromptOptions } from '#tui/types';
 
+export type SearchChoiceReadResult<T> = {
+	cancelled: boolean;
+	submitted: boolean;
+	submittedLabel: string;
+	value: T | undefined;
+};
+
 export const lineSearchValue = async <T>(options: SearchPromptOptions<T>): Promise<T | undefined> => {
 	const query = (await ask(options.message, options.hint)).trim();
 

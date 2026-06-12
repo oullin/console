@@ -1,6 +1,7 @@
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { readMultiSearchChoices } from '#tui/prompts/search/read-multi';
 import { readSearchChoice } from '#tui/prompts/search/read-single';
+import { renderSubmittedSearchChoice, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
 import { assertSearchOptions } from '#tui/prompts/search/validators/options';
 import type { ChoiceOptions, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
@@ -36,15 +37,29 @@ export async function search<T>(
 
 	assertSearchOptions(options);
 
-	return promptUntilValid(options, async (attempt) => {
-		const selected = await readSearchChoice(options, attempt);
+	let shouldRenderSubmittedFrame = false;
+	let submittedLabel = '';
 
-		if (selected === undefined) {
-			throw new PromptValidationError('Please select a valid option.');
-		}
+	return promptUntilValid(
+		options,
+		async (attempt) => {
+			const selected = await readSearchChoice(options, attempt);
 
-		return options.transform ? options.transform(selected) : selected;
-	});
+			if (selected.value === undefined) {
+				throw new PromptValidationError('Please select a valid option.');
+			}
+
+			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+			submittedLabel = selected.submittedLabel;
+
+			return options.transform ? options.transform(selected.value) : selected.value;
+		},
+		() => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedSearchChoice(options.message, submittedLabel);
+			}
+		},
+	);
 }
 
 export function multisearch<T>(options: MultiSearchPromptOptions<T>): Promise<T[]>;
@@ -79,9 +94,23 @@ export async function multisearch<T>(
 
 	const promptOptions = { ...options, default: options.default ?? [] };
 
-	return promptUntilValid(promptOptions, async () => {
-		const selected = await readMultiSearchChoices(promptOptions);
+	let shouldRenderSubmittedFrame = false;
+	let submittedLabels: string[] = [];
 
-		return promptOptions.transform ? promptOptions.transform(selected) : selected;
-	});
+	return promptUntilValid(
+		promptOptions,
+		async () => {
+			const selected = await readMultiSearchChoices(promptOptions);
+
+			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+			submittedLabels = selected.submittedLabels;
+
+			return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+		},
+		() => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedSearchChoices(promptOptions.message, submittedLabels);
+			}
+		},
+	);
 }

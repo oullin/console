@@ -4,15 +4,16 @@ import { cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderCancelledSearch, renderSearchChoices, renderSubmittedSearchChoice } from '#tui/prompts/search/render';
+import { renderCancelledSearch, renderSearchChoices } from '#tui/prompts/search/render';
 import { cancelledSearchValue, lineSearchValue, selectedSearchValue } from '#tui/prompts/search/read-single/result';
+import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import type { SearchPromptOptions } from '#tui/types';
 
-export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0): Promise<T | undefined> => {
+export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0): Promise<SearchChoiceReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return lineSearchValue(options);
+		return { cancelled: false, submitted: false, submittedLabel: '', value: await lineSearchValue(options) };
 	}
 
 	let state = { cursor: 0, value: '' };
@@ -27,13 +28,13 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return options.default;
+			return { cancelled: false, submitted: false, submittedLabel: '', value: options.default };
 		}
 
 		if (key === Key.ctrlC) {
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
-			return cancelPrompt(cancelledSearchValue(choices, highlighted, options.default));
+			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(choices, highlighted, options.default)) };
 		}
 
 		const action = searchNavigationAction(key, { controlNavigation: true, lineControls: true });
@@ -57,11 +58,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 				const choice = choices[highlighted];
 				const value = selectedSearchValue(choices, highlighted);
 
-				if (choice && value !== undefined) {
-					renderSubmittedSearchChoice(options.message, choice.label);
-				}
-
-				return value;
+				return { cancelled: false, submitted: choice !== undefined && value !== undefined, submittedLabel: choice?.label ?? '', value };
 			}
 
 			choices = await resolveSearchChoices(options.options, state.value);
@@ -76,7 +73,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		if (next.cancelled) {
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
-			return cancelPrompt(options.default);
+			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(options.default) };
 		}
 
 		state = { cursor: next.cursor, value: next.value };
