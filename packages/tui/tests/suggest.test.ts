@@ -77,15 +77,17 @@ describe('suggest prompt', () => {
 	it('renders typed queries and suggestion matches', async () => {
 		const output = await outputFor(['b', Key.down, Key.enter], ['Red', 'Green', 'Blue']);
 
-		expect(output).toContain('Favorite color? b');
+		expect(output).toContain('\u001B[36m ┌\u001B[39m \u001B[36mFavorite color?\u001B[39m ');
+		expect(parseAnsiText(output)).toContain('b');
 		expect(output).toContain('›');
 		expect(output).toContain('Blue');
+		expect(output).toContain('┌ \u001B[2mFavorite color?\u001B[22m ');
 	});
 
 	it('highlights suggestions on tab without replacing typed input', async () => {
 		const output = await outputFor(['b', Key.tab, Key.enter], ['Red', 'Green', 'Blue']);
 
-		expect(output).toContain('Favorite color? b');
+		expect(parseAnsiText(output)).toContain('b');
 		expect(output).not.toContain('Favorite color? Blue');
 	});
 
@@ -107,6 +109,25 @@ describe('suggest prompt', () => {
 		);
 
 		expect(output.text()).toContain('About Blue');
+	});
+
+	it('renders cancelled suggest frames with the current value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => suggest('Favorite color?', ['Blue']),
+		);
+
+		expect(result).toBe('b');
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Favorite color? ');
+		expect(parseAnsiText(output.text())).toContain('b');
 	});
 });
 

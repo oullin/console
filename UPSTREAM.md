@@ -46,6 +46,7 @@ TypeScript and OpenTUI internals.
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
+| Suggest active, submitted, cancelled, placeholder, info, scrolling, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete active, submitted, cancelled, placeholder, ghost-text, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |

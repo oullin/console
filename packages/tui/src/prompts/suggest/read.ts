@@ -3,16 +3,26 @@ import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { clearsSuggestionHighlight, moveSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
-import { renderSuggestions } from '#tui/prompts/suggest/render';
+import { renderCancelledSuggestion, renderSuggestions } from '#tui/prompts/suggest/render';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import { characterLength } from '#tui/typed-value/characters';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export const readSuggestionValue = async (options: SuggestOptions): Promise<string> => {
+export type SuggestReadResult = {
+	cancelled: boolean;
+	rendered: boolean;
+	value: string;
+};
+
+export const readSuggestionValue = async (options: SuggestOptions): Promise<SuggestReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return ask(options.message, options.hint);
+		return {
+			cancelled: false,
+			rendered: false,
+			value: await ask(options.message, options.hint),
+		};
 	}
 
 	let state = {
@@ -23,13 +33,17 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 
 	let matches: string[] = await resolveSuggestions(options.options, state.value);
 
-	renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+	renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return state.value;
+			return {
+				cancelled: false,
+				rendered: true,
+				value: state.value,
+			};
 		}
 
 		const action = suggestNavigationAction(key);
@@ -38,34 +52,50 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = moveSuggestionHighlight(matches, highlighted, action, options.scroll);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
 			continue;
 		}
 
 		if (clearsSuggestionHighlight(key) && highlighted !== null) {
 			highlighted = null;
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
 			continue;
 		}
 
 		if (key === Key.enter) {
 			if (highlighted !== null && matches[highlighted] !== undefined) {
-				return matches[highlighted];
+				return {
+					cancelled: false,
+					rendered: true,
+					value: matches[highlighted],
+				};
 			}
 
-			return state.value;
+			return {
+				cancelled: false,
+				rendered: true,
+				value: state.value,
+			};
 		}
 
 		const next = applyTypedKey(state, key);
 
 		if (next.submitted) {
-			return state.value;
+			return {
+				cancelled: false,
+				rendered: true,
+				value: state.value,
+			};
 		}
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledSuggestion(options.message, state.value, options.placeholder);
 
-			return cancelPrompt(state.value);
+			return {
+				cancelled: true,
+				rendered: true,
+				value: await cancelPrompt(state.value),
+			};
 		}
 
 		state = { cursor: next.cursor, value: next.value };
@@ -73,6 +103,6 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<stri
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info);
+		renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
 	}
 };
