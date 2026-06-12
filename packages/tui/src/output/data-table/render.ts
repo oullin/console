@@ -92,5 +92,5 @@ export const renderCancelledDataTableFrame = <T>(message: string, headers: strin
 	environment.output.write(`${message}\n`);
 	environment.output.write(`${dim('/ Search')}\n`);
 	environment.output.write(`${renderTable(renderHeaders(headers), outputRows)}\n`);
-	environment.error.write(`${red('Cancelled.')}\n`);
+	environment.error.write(`${red('  ⚠ Cancelled.')}\n`);
 };

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, datatable, form, Key, table, visibleWidth, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, datatable, form, Key, parseAnsiText, table, visibleWidth, withPromptEnvironment } from '#tui/index';
 
 describe('table output', () => {
 	it('renders static table rows', async () => {
@@ -295,6 +295,7 @@ describe('data table prompt', () => {
 
 		expect(result).toBe('beta');
 		expect(output.text()).toContain('Cancelled.');
+		expect(parseAnsiText(output.text())).toContain('⚠ Cancelled.');
 		expect(output.text()).toContain('/ Search');
 	});
 
@@ -320,6 +321,7 @@ describe('data table prompt', () => {
 
 		expect(result).toBe('beta');
 		expect(output.text()).toContain('Cancelled.');
+		expect(parseAnsiText(output.text())).toContain('⚠ Cancelled.');
 	});
 
 	it('renders a submitted data table row summary', async () => {
