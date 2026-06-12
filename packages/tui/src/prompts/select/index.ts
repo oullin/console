@@ -4,7 +4,7 @@ import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { normalizeChoices } from '#tui/concerns/choices';
 import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
-import { renderSubmittedChoice } from '#tui/prompts/select/render';
+import { renderSubmittedChoice, renderSubmittedChoices } from '#tui/prompts/select/render';
 import { assertSelectOptions } from '#tui/prompts/select/validators/options';
 import type { ChoiceOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
@@ -103,9 +103,23 @@ export async function multiselect<T>(
 	const promptOptions = { ...options, default: options.default ?? [] };
 	const choices = normalizeChoices(options.options);
 
-	return promptUntilValid(promptOptions, async () => {
-		const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
+	let shouldRenderSubmittedFrame = false;
+	let submittedLabels: string[] = [];
 
-		return promptOptions.transform ? promptOptions.transform(selected) : selected;
-	});
+	return promptUntilValid(
+		promptOptions,
+		async () => {
+			const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
+
+			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+			submittedLabels = selected.submittedLabels;
+
+			return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+		},
+		() => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedChoices(promptOptions.message, submittedLabels);
+			}
+		},
+	);
 }

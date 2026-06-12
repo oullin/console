@@ -6,8 +6,15 @@ import { firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { choicesFromCommaSeparated, markedChoiceIndexes, markedChoiceValues, toggleAllEnabledChoices, toggleMarkedChoice } from '#tui/prompts/select/multiple';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { renderCancelledChoices, renderMultipleChoices, renderSubmittedChoices } from '#tui/prompts/select/render';
+import { renderCancelledChoices, renderMultipleChoices } from '#tui/prompts/select/render';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
+
+export type MultipleChoicesReadResult<T> = {
+	cancelled: boolean;
+	submitted: boolean;
+	submittedLabels: string[];
+	value: T[];
+};
 
 const markedChoiceLabels = <T>(choices: Array<Choice<T>>, marked: Set<number>): string[] => {
 	return [...marked]
@@ -23,7 +30,7 @@ export const readMultipleChoices = async <T>(
 	hint?: string,
 	scroll?: number,
 	info?: MultiSelectPromptOptions<T>['info'],
-): Promise<T[]> => {
+): Promise<MultipleChoicesReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -31,7 +38,9 @@ export const readMultipleChoices = async <T>(
 
 		const answer = await ask(`${message}\n${rendered}\n`, hint);
 
-		return answer.trim() === '' ? defaults : choicesFromCommaSeparated(choices, answer);
+		const value = answer.trim() === '' ? defaults : choicesFromCommaSeparated(choices, answer);
+
+		return { cancelled: false, submitted: false, submittedLabels: [], value };
 	}
 
 	let selected = firstEnabledIndex(choices);
@@ -44,19 +53,17 @@ export const readMultipleChoices = async <T>(
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			renderSubmittedChoices(message, markedChoiceLabels(choices, marked));
-
-			return markedChoiceValues(choices, marked);
+			return { cancelled: false, submitted: true, submittedLabels: markedChoiceLabels(choices, marked), value: markedChoiceValues(choices, marked) };
 		}
 
 		if (key === Key.ctrlC) {
 			renderCancelledChoices(message, choices, selected, marked, scroll);
 
-			return cancelPrompt(markedChoiceValues(choices, marked));
+			return { cancelled: true, submitted: false, submittedLabels: markedChoiceLabels(choices, marked), value: await cancelPrompt(markedChoiceValues(choices, marked)) };
 		}
 
 		if (key.includes(',')) {
-			return choicesFromCommaSeparated(choices, key);
+			return { cancelled: false, submitted: false, submittedLabels: [], value: choicesFromCommaSeparated(choices, key) };
 		}
 
 		const numeric = parseChoiceIndex(key);
@@ -97,9 +104,7 @@ export const readMultipleChoices = async <T>(
 		}
 
 		if (key === Key.enter) {
-			renderSubmittedChoices(message, markedChoiceLabels(choices, marked));
-
-			return markedChoiceValues(choices, marked);
+			return { cancelled: false, submitted: true, submittedLabels: markedChoiceLabels(choices, marked), value: markedChoiceValues(choices, marked) };
 		}
 	}
 };

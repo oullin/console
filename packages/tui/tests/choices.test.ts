@@ -794,6 +794,27 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('Required.');
 	});
 
+	it('renders multiselect submitted frames only after validation passes', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect({ message: 'Pick many', options: ['first', 'second'], required: true }),
+		);
+
+		const rendered = parseAnsiText(output.text());
+
+		expect(result).toEqual(['first']);
+		expect(rendered).toContain('Required.');
+		expect(rendered).not.toMatch(/^ │ None\s*│$/m);
+		expect(rendered).toMatch(/^ │ first\s*│$/m);
+	});
+
 	it('toggles all multiselect choices with ctrl-a', async () => {
 		const output = createMemoryOutput();
 
