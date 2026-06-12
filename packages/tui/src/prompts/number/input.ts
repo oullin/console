@@ -3,11 +3,16 @@ import { Key } from '#tui/key';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
-import { renderNumberValue } from '#tui/prompts/number/render';
+import { renderCancelledNumberValue, renderNumberValue } from '#tui/prompts/number/render';
 import { steppedNumberValue } from '#tui/prompts/number/step';
 import type { NumberInputOptions } from '#tui/prompts/number/types';
 
-export const readNumberValue = async (message: string, options: NumberInputOptions = {}): Promise<string> => {
+export type NumberReadResult = {
+	cancelled: boolean;
+	value: string;
+};
+
+export const readNumberValue = async (message: string, options: NumberInputOptions = {}): Promise<NumberReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -17,7 +22,10 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 
 		const answer = await environment.input.readLine(renderQuestion(message, options.hint));
 
-		return answer === '' && options.default !== undefined ? String(options.default) : answer;
+		return {
+			cancelled: false,
+			value: answer === '' && options.default !== undefined ? String(options.default) : answer,
+		};
 	}
 
 	let state = {
@@ -31,7 +39,10 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return state.value;
+			return {
+				cancelled: false,
+				value: state.value,
+			};
 		}
 
 		if (key === Key.up || key === Key.upArrow) {
@@ -51,9 +62,12 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		const next = applyTypedKey(state, key);
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledNumberValue(message, state.value, options);
 
-			return cancelPrompt(state.value);
+			return {
+				cancelled: true,
+				value: await cancelPrompt(state.value),
+			};
 		}
 
 		state = {
@@ -62,9 +76,10 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		};
 
 		if (next.submitted) {
-			environment.output.write('\n');
-
-			return state.value;
+			return {
+				cancelled: false,
+				value: state.value,
+			};
 		}
 
 		renderNumberValue(message, state.value, options);

@@ -1,5 +1,7 @@
+import { promptEnvironment } from '#tui/environment';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { readNumberValue } from '#tui/prompts/number/input';
+import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
 import type { NumberPromptOptions } from '#tui/types';
 
@@ -36,6 +38,8 @@ export async function number(
 			: { ...message, default: message.default ?? '' };
 
 	return promptUntilValid(options, async () => {
+		const shouldRenderSubmittedFrame = Boolean(promptEnvironment().input.readKey);
+
 		const answer = await readNumberValue(options.message, {
 			default: options.default,
 			hint: options.hint,
@@ -45,16 +49,28 @@ export async function number(
 			step: options.step,
 		});
 
-		if (answer === '' && options.default !== undefined) {
+		const value = answer.value;
+
+		if (value === '' && options.default !== undefined) {
+			if (shouldRenderSubmittedFrame && !answer.cancelled) {
+				renderSubmittedNumberValue(options.message, options.default);
+			}
+
 			return options.default;
 		}
 
-		const result = parseNumberInput(answer, options);
+		const result = parseNumberInput(value, options);
 
 		if (result.error !== undefined) {
 			throw new PromptValidationError(result.error);
 		}
 
-		return options.transform ? options.transform(result.value ?? '') : (result.value ?? '');
+		const parsedValue = result.value ?? '';
+
+		if (shouldRenderSubmittedFrame && !answer.cancelled) {
+			renderSubmittedNumberValue(options.message, parsedValue);
+		}
+
+		return options.transform ? options.transform(parsedValue) : parsedValue;
 	});
 }

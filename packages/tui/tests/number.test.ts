@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, number, PromptValidationError, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, number, parseAnsiText, PromptValidationError, withPromptEnvironment } from '#tui/index';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
 
 describe('number prompt', () => {
@@ -65,7 +65,9 @@ describe('number prompt', () => {
 			() => number('Count', '0'),
 		);
 
-		expect(output.text()).toContain('? Count 0');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mCount\u001B[39m ');
+		expect(parseAnsiText(output.text())).toContain('0  ▲▼');
+		expect(output.text()).toContain('┌ \u001B[2mCount\u001B[22m ');
 	});
 
 	it('renders typed number values while reading raw key input', async () => {
@@ -82,8 +84,9 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(42);
-		expect(output.text()).toContain('? Count 4');
-		expect(output.text()).toContain('? Count 42');
+		expect(parseAnsiText(output.text())).toContain('4  ▲▼');
+		expect(parseAnsiText(output.text())).toContain('42  ▲▼');
+		expect(output.text()).toContain('┌ \u001B[2mCount\u001B[22m ');
 	});
 
 	it('requires number input when configured', async () => {
@@ -173,7 +176,7 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(1);
-		expect(output.text()).toContain('? Count 1');
+		expect(parseAnsiText(output.text())).toContain('1  ▲▼');
 	});
 
 	it('uses the max value when decrementing from an empty number input', async () => {
@@ -190,7 +193,8 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(9);
-		expect(output.text()).toContain('? Count 9');
+		expect(parseAnsiText(output.text())).toContain('9  ▲▼');
+		expect(output.text()).toContain('\u001B[2m▲\u001B[22m▼');
 	});
 
 	it('does not increment or decrement with control navigation keys', async () => {
@@ -207,7 +211,7 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe('');
-		expect(output.text()).not.toContain('? Count 1');
+		expect(parseAnsiText(output.text())).not.toContain('1  ▲▼');
 	});
 
 	it('increments and decrements decimal values with whole steps', async () => {
@@ -224,8 +228,8 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(0);
-		expect(output.text()).toContain('? Amount 2');
-		expect(output.text()).toContain('? Amount 0');
+		expect(parseAnsiText(output.text())).toContain('2  ▲▼');
+		expect(parseAnsiText(output.text())).toContain('0  ▲▼');
 	});
 
 	it('falls back to a whole step for invalid step sizes', async () => {
@@ -258,7 +262,8 @@ describe('number prompt', () => {
 		);
 
 		expect(result).toBe(7);
-		expect(output.text()).toContain('? Count 7');
+		expect(parseAnsiText(output.text())).toContain('7  ▲▼');
+		expect(output.text()).toContain('┌ \u001B[2mCount\u001B[22m ');
 	});
 
 	it('returns an empty string for non-interactive number prompts without defaults', async () => {
@@ -289,6 +294,25 @@ describe('number prompt', () => {
 				() => number({ message: 'Count', required: true }),
 			),
 		).rejects.toThrow(PromptValidationError);
+	});
+
+	it('renders cancelled number frames with the current value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['4', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => number({ message: 'Count' }),
+		);
+
+		expect(result).toBe(4);
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Count ');
+		expect(parseAnsiText(output.text())).toContain('4');
 	});
 
 	it('clamps arrow key changes to min and max', async () => {
