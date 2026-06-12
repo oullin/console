@@ -40,6 +40,14 @@ export const readSelectedChoice = async <T>(
 
 		const answer = await ask(`${message}\n${rendered}\n`, hint);
 
+		if (answer.trim() === '' && defaultValue !== undefined) {
+			const choice = choices.find((candidate) => !candidate.disabled && Object.is(candidate.value, defaultValue));
+
+			if (choice) {
+				return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
+			}
+		}
+
 		const choice = findChoice(choices, answer);
 
 		if (!choice || choice.disabled) {

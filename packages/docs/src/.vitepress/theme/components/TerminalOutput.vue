@@ -178,7 +178,7 @@ onMounted(async () => {
 		convertEol: true,
 		cursorBlink: false,
 		disableStdin: true,
-		fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+		fontFamily: '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
 		fontSize: 13,
 		lineHeight: 1.45,
 		overviewRulerWidth: 0,

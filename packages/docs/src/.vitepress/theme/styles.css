@@ -23,6 +23,8 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--font-sans: var(--docs-font-sans);
+	--font-mono: var(--docs-font-mono);
 	--radius-sm: calc(var(--radius) * 0.6);
 	--radius-md: calc(var(--radius) * 0.8);
 	--radius-lg: var(--radius);
@@ -30,6 +32,10 @@
 }
 
 :root {
+	--docs-font-sans: "Geist Sans", var(--vp-font-family-base);
+	--docs-font-mono: "Geist Mono", var(--vp-font-family-mono);
+	--vp-font-family-base: "Geist Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+	--vp-font-family-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 	--radius: 0.5rem;
 	--background: var(--vp-c-bg);
 	--foreground: var(--vp-c-text-1);
@@ -77,6 +83,7 @@
 }
 
 .xterm {
+	font-family: var(--docs-font-mono);
 	padding: 0;
 }
 

@@ -588,6 +588,26 @@ describe('choice prompts', () => {
 		expect(result).toBe('second');
 	});
 
+	it('returns select defaults for empty line-mode answers', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(): Promise<string> {
+						return '';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select({ message: 'Pick one', options: ['first', 'second'], default: 'second' }),
+		);
+
+		expect(result).toBe('second');
+	});
+
 	it('rejects partial numeric line-mode select answers and retries', async () => {
 		const output = createMemoryOutput();
 		const answers = ['1abc', '2'];
