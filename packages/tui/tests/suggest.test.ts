@@ -124,7 +124,9 @@ describe('autocomplete prompt', () => {
 			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue'], 'Type a color', '', false, undefined, 'Optional'),
 		);
 
-		expect(output.text()).toContain('? Favorite color? Optional Type a color');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mFavorite color?\u001B[39m ');
+		expect(output.text()).toContain('\u001B[2mType a color\u001B[22m');
+		expect(output.text()).toContain('┌ \u001B[2mFavorite color?\u001B[22m ');
 	});
 
 	it('renders autocomplete ghost text without a suggestion list', async () => {
@@ -140,7 +142,7 @@ describe('autocomplete prompt', () => {
 			() => autocomplete('Favorite color?', ['Red', 'Green', 'Blue']),
 		);
 
-		expect(parseAnsiText(output.text())).toContain('Favorite color? blue');
+		expect(parseAnsiText(output.text())).toContain('blue');
 		expect(output.text()).toContain('b\u001B[7ml\u001B[27m\u001B[2mue\u001B[22m');
 		expect(output.text()).not.toContain('›');
 	});
@@ -159,7 +161,8 @@ describe('autocomplete prompt', () => {
 		);
 
 		expect(result).toBe('Blue');
-		expect(output.text()).toContain('Favorite color? Blue');
+		expect(output.text()).toContain('┌ \u001B[2mFavorite color?\u001B[22m ');
+		expect(parseAnsiText(output.text())).toContain('Blue');
 	});
 
 	it('does not accept tab completion before the cursor reaches the end', async () => {
@@ -193,7 +196,7 @@ describe('autocomplete prompt', () => {
 
 		const frames = output.text().trimEnd().split('\n');
 
-		expect(frames.at(-1)).toContain('Favorite color? b');
+		expect(parseAnsiText(output.text())).toContain('b');
 		expect(frames.at(-1)).not.toContain('Blue');
 	});
 
@@ -275,6 +278,26 @@ describe('autocomplete prompt', () => {
 		);
 
 		expect(result).toBe('Blue');
-		expect(output.text()).toContain('Favorite color? Blue');
+		expect(output.text()).toContain('┌ \u001B[2mFavorite color?\u001B[22m ');
+		expect(parseAnsiText(output.text())).toContain('Blue');
+	});
+
+	it('renders cancelled autocomplete frames with the current value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['b', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => autocomplete('Favorite color?', ['Blue']),
+		);
+
+		expect(result).toBe('b');
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Favorite color? ');
+		expect(parseAnsiText(output.text())).toContain('b');
 	});
 });

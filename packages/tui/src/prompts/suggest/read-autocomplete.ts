@@ -3,16 +3,26 @@ import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
 import { applyTypedKey } from '#tui/typed-value';
 import { acceptAutocompleteMatch, autocompleteNavigationDirection, canAcceptAutocomplete, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
-import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
+import { renderAutocomplete, renderCancelledAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import { characterLength } from '#tui/typed-value/characters';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export const readAutocompleteValue = async (options: SuggestOptions): Promise<string> => {
+export type AutocompleteReadResult = {
+	cancelled: boolean;
+	rendered: boolean;
+	value: string;
+};
+
+export const readAutocompleteValue = async (options: SuggestOptions): Promise<AutocompleteReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return ask(options.message, options.hint);
+		return {
+			cancelled: false,
+			rendered: false,
+			value: await ask(options.message, options.hint),
+		};
 	}
 
 	let state = {
@@ -29,7 +39,11 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return state.value;
+			return {
+				cancelled: false,
+				rendered: true,
+				value: state.value,
+			};
 		}
 
 		const direction = autocompleteNavigationDirection(key);
@@ -71,13 +85,21 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<st
 		const next = applyTypedKey(state, key);
 
 		if (next.submitted) {
-			return state.value;
+			return {
+				cancelled: false,
+				rendered: true,
+				value: state.value,
+			};
 		}
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledAutocomplete(options.message, state.value, options.placeholder);
 
-			return cancelPrompt(state.value);
+			return {
+				cancelled: true,
+				rendered: true,
+				value: await cancelPrompt(state.value),
+			};
 		}
 
 		state = { cursor: next.cursor, value: next.value };

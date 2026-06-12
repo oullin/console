@@ -1,6 +1,7 @@
 import { promptUntilValid } from '#tui/prompt';
 import { readAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete';
 import { readSuggestionValue } from '#tui/prompts/suggest/read';
+import { renderSubmittedAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { suggestOptions } from '#tui/prompts/suggest/options';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { MaybePromise, TextPromptOptions } from '#tui/types';
@@ -69,11 +70,23 @@ export async function autocomplete(
 	const options =
 		typeof message === 'string' ? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform }) : suggestOptions(message);
 
-	return promptUntilValid(options, async () => {
-		const answer = await readAutocompleteValue(options);
+	let shouldRenderSubmittedFrame = false;
 
-		const value = answer === '' && options.default !== undefined ? options.default : answer;
+	return promptUntilValid(
+		options,
+		async () => {
+			const answer = await readAutocompleteValue(options);
 
-		return options.transform ? options.transform(value) : value;
-	});
+			const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+
+			shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
+
+			return options.transform ? options.transform(value) : value;
+		},
+		(value) => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedAutocomplete(options.message, value);
+			}
+		},
+	);
 }
