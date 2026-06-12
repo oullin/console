@@ -271,6 +271,31 @@ describe('data table prompt', () => {
 		expect(output.text()).toContain('Beta');
 	});
 
+	it('returns the current data table selection when key input is exhausted', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					default: 'beta',
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+				}),
+		);
+
+		expect(result).toBe('beta');
+		expect(output.text()).toContain('Beta');
+	});
+
 	it('filters rows in explicit search mode', async () => {
 		const output = createMemoryOutput();
 

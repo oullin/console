@@ -72,7 +72,7 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			throw invalidRow();
+			return dataTableSelectionResult(visibleRows(), selected, false);
 		}
 
 		const rows = visibleRows();

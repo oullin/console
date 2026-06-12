@@ -86,6 +86,7 @@ TypeScript and OpenTUI internals.
 | Data table label-first helper argument surface | `packages/tui/src/output/data-table.ts`, `packages/tui/tests/table.test.ts` |
 | Data table transform callback lifecycle | `packages/tui/src/contracts/output.ts`, `packages/tui/src/output/data-table.ts`, `packages/tui/tests/table.test.ts` |
 | Data table interactive default selection | `packages/tui/src/output/data-table/read.ts`, `packages/tui/tests/table.test.ts` |
+| Data table exhausted-input default selection | `packages/tui/src/output/data-table/read.ts`, `packages/tui/tests/table.test.ts` |
 | Data table no-results search rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table viewing-info rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table submitted and cancelled final frames | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/tests/table.test.ts` |
