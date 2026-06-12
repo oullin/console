@@ -600,4 +600,39 @@ describe('form builder', () => {
 		expect(responses.note).toBeNull();
 		expect(responses.table).toBeNull();
 	});
+
+	it('runs label-first data table form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['/', 'slow', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.datatable(
+						['Name', 'Tag'],
+						[
+							{ Name: 'Alpha', Tag: 'fast', value: 'alpha' },
+							{ Name: 'Beta', Tag: 'slow', value: 'beta' },
+						],
+						10,
+						'Pick project',
+						'',
+						false,
+						undefined,
+						(value) => String(value).toUpperCase(),
+						(query, row) => !Array.isArray(row) && row.Tag === query,
+						'project',
+					)
+					.submit(),
+		);
+
+		expect(responses.project).toBe('BETA');
+		expect(output.text()).toContain('Pick project slow');
+		expect(output.text()).toContain('Beta');
+	});
 });

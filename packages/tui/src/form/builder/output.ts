@@ -1,11 +1,24 @@
 import { alert, datatable, error, info, intro, note, outro, table, warning } from '#tui/output';
 import { sideEffectStep } from '#tui/form/builder/step';
 import type { FormBuilder } from '#tui/form/builder/index';
-import type { DataTablePromptOptions, MaybePromise, TableOptions } from '#tui/types';
+import type { DataTablePromptOptions, DataTableRow, MaybePromise, TableOptions } from '#tui/types';
 
 export type OutputBuilderMethods = {
 	alert(this: FormBuilder, message: string, name?: string): FormBuilder;
 	datatable<T = unknown>(this: FormBuilder, options: DataTablePromptOptions<T>, name?: string): FormBuilder;
+	datatable<T = unknown>(
+		this: FormBuilder,
+		headers?: string[],
+		rows?: Array<DataTableRow<T>> | null,
+		scroll?: number,
+		label?: string,
+		hint?: string,
+		required?: DataTablePromptOptions<T>['required'],
+		validate?: DataTablePromptOptions<T>['validate'],
+		transform?: DataTablePromptOptions<T>['transform'],
+		filter?: DataTablePromptOptions<T>['filter'],
+		name?: string,
+	): FormBuilder;
 	error(this: FormBuilder, message: string, name?: string): FormBuilder;
 	info(this: FormBuilder, message: string, name?: string): FormBuilder;
 	intro(this: FormBuilder, message: string, name?: string): FormBuilder;
@@ -25,8 +38,23 @@ export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> 
 			true,
 		);
 	},
-	datatable<T = unknown>(options: DataTablePromptOptions<T>, name?: string) {
-		return this.add(() => datatable(options), name);
+	datatable<T = unknown>(
+		optionsOrHeaders: DataTablePromptOptions<T> | string[] = [],
+		rowsOrName: Array<DataTableRow<T>> | null | string = null,
+		scroll = 10,
+		label = '',
+		hint = '',
+		required: DataTablePromptOptions<T>['required'] = false,
+		validate: DataTablePromptOptions<T>['validate'] = undefined,
+		transform: DataTablePromptOptions<T>['transform'] = undefined,
+		filter: DataTablePromptOptions<T>['filter'] = undefined,
+		name?: string,
+	) {
+		if (Array.isArray(optionsOrHeaders)) {
+			return this.add(() => datatable(optionsOrHeaders, rowsOrName as Array<DataTableRow<T>> | null, scroll, label, hint, required, validate, transform, filter), name);
+		}
+
+		return this.add(() => datatable(optionsOrHeaders), rowsOrName as string | undefined);
 	},
 	error(message, name) {
 		return this.add(
