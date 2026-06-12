@@ -71,8 +71,118 @@ describe('choice prompts', () => {
 		);
 
 		expect(result).toBe(true);
-		expect(output.text()).toContain('[Yes]');
-		expect(output.text()).toContain('[No]');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mContinue?\u001B[39m ');
+		expect(output.text()).toContain('\u001B[32m●\u001B[39m Yes');
+		expect(output.text()).toContain('\u001B[32m●\u001B[39m No');
+		expect(output.text()).toContain('┌ \u001B[2mContinue?\u001B[22m ');
+	});
+
+	it('renders custom confirm labels in active and submitted frames', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('¿Listo?', true, 'Sí, por favor', 'No, gracias'),
+		);
+
+		expect(result).toBe(true);
+		expect(output.text()).toContain('Sí, por favor');
+		expect(output.text()).toContain('No, gracias');
+		expect(output.text()).toContain('┌ \u001B[2m¿Listo?\u001B[22m ');
+	});
+
+	it('renders cancelled confirm frames with the current value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?'),
+		);
+
+		expect(result).toBe(false);
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Continue? ');
+		expect(parseAnsiText(output.text())).toContain('○ Yes / ● No');
+	});
+
+	it('reads line-mode confirm answers when raw keys are unavailable', async () => {
+		const output = createMemoryOutput();
+		const questions: string[] = [];
+
+		const accepted = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(question) {
+						questions.push(question);
+
+						return ' absolutely ';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?', false, 'Absolutely', 'Nope'),
+		);
+
+		const declined = await withPromptEnvironment(
+			{
+				input: {
+					async readLine(question) {
+						questions.push(question);
+
+						return 'no';
+					},
+				},
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => confirm('Continue?'),
+		);
+
+		expect(accepted).toBe(true);
+		expect(declined).toBe(false);
+		expect(questions).toEqual(['? Continue? [y/N] ', '? Continue? [Y/n] ']);
+	});
+
+	it('returns and validates confirm defaults in non-interactive mode', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([]),
+				output,
+				error: output,
+				interactive: false,
+			},
+			() => confirm('Continue?', false),
+		);
+
+		await expect(
+			withPromptEnvironment(
+				{
+					input: createScriptedInput([]),
+					output,
+					error: output,
+					interactive: false,
+				},
+				() => confirm('Continue?', false, 'Yes', 'No', true),
+			),
+		).rejects.toThrow(PromptValidationError);
+
+		expect(result).toBe(false);
+		expect(output.text()).toBe('');
 	});
 
 	it('treats false confirm answers as invalid when required', async () => {
