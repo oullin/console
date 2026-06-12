@@ -18,6 +18,7 @@ TypeScript and OpenTUI internals.
 | Prompt validation retry default lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/text.test.ts` |
 | Prompt post-validation submitted-frame lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts` |
 | Prompt non-interactive transform lifecycle before validation | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts`, `packages/tui/tests/choices.test.ts`, `packages/tui/tests/search.test.ts` |
+| Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
 | Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |

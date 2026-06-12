@@ -81,6 +81,7 @@ describe('prompt validation', () => {
 
 		expect(result).toBe('Ada');
 		expect(output.text()).toContain('Required.');
+		expect(output.text()).toContain('\u001B[31m! Required.\u001B[39m');
 	});
 
 	it('rejects missing line input support', async () => {
