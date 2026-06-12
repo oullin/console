@@ -87,6 +87,7 @@ TypeScript and OpenTUI internals.
 | Data table no-results search rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table viewing-info rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table submitted and cancelled final frames | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/tests/table.test.ts` |
+| Data table submitted frame renders only after validation passes | `packages/tui/src/output/data-table.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/src/output/data-table/types.ts`, `packages/tui/tests/table.test.ts` |
 | Data table themed cancellation warning | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table multiline cell rendering | `packages/tui/src/output/data-table/multiline.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table scrollbar rendering | `packages/tui/src/output/data-table/scrollbar.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |

@@ -3,11 +3,11 @@ import { Key } from '#tui/key';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
-import { renderCancelledDataTableFrame, renderDataTableFrame, renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
+import { renderCancelledDataTableFrame, renderDataTableFrame } from '#tui/output/data-table/render';
 import { dataTableRowValue, visibleDataTableRows } from '#tui/output/data-table/rows';
 import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTableSearchState } from '#tui/output/data-table/search';
-import type { VisibleDataTableRow } from '#tui/output/data-table/types';
+import type { DataTableSelectionReadResult, VisibleDataTableRow } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions } from '#tui/types';
 
 const invalidRow = (): PromptValidationError => new PromptValidationError('Please select a valid row.');
@@ -32,7 +32,15 @@ const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>, defau
 	return Math.max(0, selected);
 };
 
-export const readDataTableSelection = async <T>(options: DataTablePromptOptions<T>, headers: string[]): Promise<T | number> => {
+const dataTableSelectionResult = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number, submitted: boolean, cancelled = false): DataTableSelectionReadResult<T> => ({
+	cancelled,
+	rows,
+	selected,
+	submitted,
+	value: selectedDataTableValue(rows, selected),
+});
+
+export const readDataTableSelection = async <T>(options: DataTablePromptOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	let search: DataTableSearchState = initialDataTableSearchState();
@@ -55,7 +63,7 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 	};
 
 	if (!environment.input.readKey) {
-		return selectedDataTableValue(visibleRows(), selected);
+		return dataTableSelectionResult(visibleRows(), selected, false);
 	}
 
 	render();
@@ -72,7 +80,13 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		if (key === Key.ctrlC) {
 			renderCancelledDataTableFrame(options.message, headers, rows, selected);
 
-			return cancelPrompt(selectedDataTableValue(rows, selected));
+			return {
+				cancelled: true,
+				rows,
+				selected,
+				submitted: false,
+				value: await cancelPrompt(selectedDataTableValue(rows, selected)),
+			};
 		}
 
 		const nextSearch = applyDataTableSearchKey(search, key);
@@ -100,9 +114,7 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		}
 
 		if (key === Key.enter) {
-			renderSubmittedDataTableFrame(options.message, headers, rows, selected);
-
-			return selectedDataTableValue(rows, selected);
+			return dataTableSelectionResult(rows, selected, true);
 		}
 	}
 };

@@ -199,6 +199,35 @@ describe('data table prompt', () => {
 		expect(result).toBe('ALPHA');
 	});
 
+	it('renders data table submitted frames only after validation passes', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				datatable({
+					message: 'Pick project',
+					rows: [
+						{ Name: 'Alpha', value: 'alpha' },
+						{ Name: 'Beta', value: 'beta' },
+					],
+					validate: (value) => (value === 'beta' ? null : 'Choose beta.'),
+				}),
+		);
+
+		const rendered = parseAnsiText(output.text());
+
+		expect(result).toBe('beta');
+		expect(rendered).toContain('Choose beta.');
+		expect(rendered).not.toMatch(/^Alpha$/m);
+		expect(rendered).toMatch(/^Beta$/m);
+	});
+
 	it('starts data table selection on matching default values', async () => {
 		const output = createMemoryOutput();
 

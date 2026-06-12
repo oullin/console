@@ -1,6 +1,8 @@
 import { promptUntilValid } from '#tui/prompt';
 import { readDataTableSelection } from '#tui/output/data-table/read';
+import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
 import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
+import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
 export function datatable<T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number>;
@@ -44,9 +46,21 @@ export async function datatable<T = unknown>(
 
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
-	return promptUntilValid(options, async () => {
-		const selected = await readDataTableSelection(options, headers);
+	let submittedSelection: DataTableSelectionReadResult<T> | null = null;
 
-		return options.transform ? options.transform(selected) : selected;
-	});
+	return promptUntilValid(
+		options,
+		async () => {
+			const selected = await readDataTableSelection(options, headers);
+
+			submittedSelection = selected.submitted && !selected.cancelled ? selected : null;
+
+			return options.transform ? options.transform(selected.value) : selected.value;
+		},
+		() => {
+			if (submittedSelection) {
+				renderSubmittedDataTableFrame(options.message, headers, submittedSelection.rows, submittedSelection.selected);
+			}
+		},
+	);
 }
