@@ -459,6 +459,24 @@ describe('choice prompts', () => {
 		expect(output.text()).toContain('About second');
 	});
 
+	it('supports label-first select helpers with info', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => select('Pick one', ['first', 'second'], undefined, 5, undefined, '', true, undefined, (value) => `About ${value ?? 'none'}`),
+		);
+
+		expect(result).toBe('second');
+		expect(output.text()).toContain('About first');
+		expect(output.text()).toContain('About second');
+	});
+
 	it('transforms selected values before validation and return', async () => {
 		const output = createMemoryOutput();
 
@@ -744,6 +762,24 @@ describe('choice prompts', () => {
 			() => multiselect({ message: 'Pick many', options: ['first', 'second'], info: (value) => `About ${value ?? 'none'}` }),
 		);
 
+		expect(output.text()).toContain('About first');
+		expect(output.text()).toContain('About second');
+	});
+
+	it('supports label-first multiselect helpers with info', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => multiselect('Pick many', ['first', 'second'], [], 5, false, undefined, 'Use the space bar to select options.', undefined, (value) => `About ${value ?? 'none'}`),
+		);
+
+		expect(result).toEqual(['second']);
 		expect(output.text()).toContain('About first');
 		expect(output.text()).toContain('About second');
 	});

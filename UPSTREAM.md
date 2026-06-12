@@ -38,6 +38,7 @@ TypeScript and OpenTUI internals.
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Confirm active, submitted, cancelled, custom-label, fallback, and non-interactive behavior | `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts`, `packages/tui/tests/choices.test.ts` |
 | Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
+| Select and multi-select label-first helper argument surface with info | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select non-interactive default validation | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
