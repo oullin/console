@@ -110,7 +110,22 @@ function datatableFormStep<T = unknown>(
 		return this.add((_, previous) => datatable<T>({ ...optionsOrHeaders, default: previousValue(previous, optionsOrHeaders.default) }), dataTableStepName(rowsOrName));
 	}
 
-	return this.add(() => datatable(optionsOrHeaders, rowsOrName as Array<DataTableRow<T>> | null, scroll, label, hint, required, validate, transform, filter), name);
+	return this.add(
+		(_, previous) =>
+			datatable<T>({
+				default: previousValue<T | number | undefined>(previous, undefined),
+				filter,
+				headers: optionsOrHeaders,
+				hint,
+				message: label,
+				required,
+				rows: (rowsOrName as Array<DataTableRow<T>> | null) ?? [],
+				scroll,
+				transform,
+				validate,
+			}),
+		name,
+	);
 }
 
 export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> = {

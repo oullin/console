@@ -902,4 +902,39 @@ describe('form builder', () => {
 		expect(responses.project).toBe('beta');
 		expect(responses[1]).toBe(true);
 	});
+
+	it('reuses previous data table responses when reverting label-first form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter, Key.ctrlU, Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.datatable(
+						['Name'],
+						[
+							{ Name: 'Alpha', value: 'alpha' },
+							{ Name: 'Beta', value: 'beta' },
+						],
+						10,
+						'Pick project',
+						'',
+						false,
+						undefined,
+						undefined,
+						undefined,
+						'project',
+					)
+					.confirm('Done?')
+					.submit(),
+		);
+
+		expect(responses.project).toBe('beta');
+		expect(responses[1]).toBe(true);
+	});
 });

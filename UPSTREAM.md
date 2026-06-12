@@ -108,6 +108,7 @@ TypeScript and OpenTUI internals.
 | Form builder search and multisearch previous-response defaults | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder named prompt defaults after skipped conditional responses | `packages/tui/src/form/builder/previous.ts`, `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/src/form/builder/validators/previous.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder label-first data table method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder label-first data table previous-response defaults | `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder interactive data table object-option method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/output/validators/data-table.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder object-option table output method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/output/validators/table.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder output method surface for grid, display data table, terminal helpers, and notifications | `packages/tui/src/form/builder/index.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/form.test.ts` |
