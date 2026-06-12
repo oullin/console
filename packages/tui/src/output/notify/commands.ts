@@ -6,6 +6,8 @@ export type NotificationCommand = {
 	bin: string;
 };
 
+export type NotificationPlatform = 'aix' | 'android' | 'cygwin' | 'darwin' | 'freebsd' | 'haiku' | 'linux' | 'netbsd' | 'openbsd' | 'sunos' | 'win32';
+
 const macOsNotificationCommand = (options: NotificationOptions): NotificationCommand => {
 	const script = [
 		'display notification',
@@ -38,7 +40,7 @@ const kdialogCommand = (options: NotificationOptions): NotificationCommand => {
 	return { args, bin: 'kdialog' };
 };
 
-export const notificationCommands = (targetPlatform: NodeJS.Platform, options: unknown): NotificationCommand[] => {
+export const notificationCommands = (targetPlatform: NotificationPlatform, options: unknown): NotificationCommand[] => {
 	const parsed = parseNotificationOptions(options);
 
 	if (targetPlatform === 'darwin') {

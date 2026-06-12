@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -123,5 +124,93 @@ describe('package consumption', () => {
 		);
 
 		expect(JSON.parse(output) as { missing: string[] }).toEqual({ missing: [], count: expectedExports.length });
+	});
+
+	it('exports public helper types from the built root entrypoint', () => {
+		execFileSync('pnpm', ['--filter', '@ollin/tui', 'build'], {
+			cwd: workspacePath,
+			stdio: 'pipe',
+		});
+
+		const consumerDirectory = mkdtempSync(resolve(acceptancePath, '.types-'));
+		const consumerPath = resolve(consumerDirectory, 'consumer.ts');
+
+		try {
+			writeFileSync(
+				consumerPath,
+				`
+				import type {
+					ChoiceOptions,
+					ConfirmPromptOptions,
+					FormResponses,
+					FormStep,
+					KeyboardEventLike,
+					KeyName,
+					KeyValue,
+					NoteType,
+					PromptCancelHandler,
+					NotificationPlatform,
+					SelectPromptOptions,
+					SuggestOptions,
+					TaskDefinition,
+					TerminalSize,
+					TypedValueOptions,
+					TypedValueReadResult,
+					TypedValueState
+				} from '@ollin/tui';
+
+				const choices: ChoiceOptions<string> = ['one', { label: 'Two', value: 'two' }];
+				const confirmOptions: ConfirmPromptOptions = { message: 'Continue?', default: true };
+				const selectOptions: SelectPromptOptions<string> = { message: 'Pick', options: choices };
+				const suggestOptions: SuggestOptions = { message: 'Suggest', options: ['one'] };
+				const formResponses: FormResponses = [] as unknown as FormResponses;
+				const formStep: FormStep = { condition: true, ignoreWhenReverting: false, run: () => null };
+				const event: KeyboardEventLike = { name: 'return' };
+				const keyName: KeyName = '\\n';
+				const keyValue: KeyValue = keyName;
+				const noteType: NoteType = 'info';
+				const notificationPlatform: NotificationPlatform = 'linux';
+				const cancel: PromptCancelHandler = () => null;
+				const taskDefinition: TaskDefinition<string> = { title: 'Build', task: () => 'done' };
+				const terminalSize: TerminalSize = { columns: 80, rows: 24 };
+				const typedOptions: TypedValueOptions = { default: 'value' };
+				const typedState: TypedValueState = { cursor: 0, value: '' };
+				const typedResult: TypedValueReadResult = { cancelled: false, value: 'value' };
+
+				void [
+					confirmOptions,
+					selectOptions,
+					suggestOptions,
+					formResponses,
+					formStep,
+					event,
+					keyValue,
+					noteType,
+					notificationPlatform,
+					cancel,
+					taskDefinition,
+					terminalSize,
+					typedOptions,
+					typedState,
+					typedResult
+				];
+			`,
+			);
+
+			try {
+				execFileSync('pnpm', ['exec', 'tsc', '--ignoreConfig', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--target', 'ES2022', '--strict', '--noEmit', consumerPath], {
+					cwd: acceptancePath,
+					stdio: 'pipe',
+				});
+			} catch (error) {
+				const result = error as { stderr?: Buffer | string; stdout?: Buffer | string };
+				const stderr = result.stderr?.toString() ?? '';
+				const stdout = result.stdout?.toString() ?? '';
+
+				throw new Error([stdout, stderr].filter(Boolean).join('\n'));
+			}
+		} finally {
+			rmSync(consumerDirectory, { force: true, recursive: true });
+		}
 	});
 });
