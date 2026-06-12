@@ -2,12 +2,18 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
 import { rejectPromptRevert } from '#tui/prompt/revert';
-import { renderActiveConfirm, renderCancelledConfirm, renderSubmittedConfirm } from '#tui/prompts/select/render-confirm';
+import { renderActiveConfirm, renderCancelledConfirm } from '#tui/prompts/select/render-confirm';
 import type { ConfirmPromptOptions } from '#tui/types';
 
 const toggleKeys = new Set([Key.tab, Key.up, Key.upArrow, Key.down, Key.downArrow, Key.left, Key.leftArrow, Key.right, Key.rightArrow, Key.ctrlP, Key.ctrlF, Key.ctrlN, Key.ctrlB, 'h', 'j', 'k', 'l']);
 
-export const readConfirm = async (options: ConfirmPromptOptions): Promise<boolean> => {
+export type ConfirmReadResult = {
+	cancelled: boolean;
+	submitted: boolean;
+	value: boolean;
+};
+
+export const readConfirm = async (options: ConfirmPromptOptions): Promise<ConfirmReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -16,10 +22,10 @@ export const readConfirm = async (options: ConfirmPromptOptions): Promise<boolea
 		const answer = (await ask(`${options.message}${suffix}`, options.hint)).trim().toLowerCase();
 
 		if (answer === '' && options.default !== undefined) {
-			return options.default;
+			return { cancelled: false, submitted: false, value: options.default };
 		}
 
-		return ['y', 'yes', options.yes?.toLowerCase()].includes(answer);
+		return { cancelled: false, submitted: false, value: ['y', 'yes', options.yes?.toLowerCase()].includes(answer) };
 	}
 
 	let confirmed = options.default ?? true;
@@ -30,9 +36,7 @@ export const readConfirm = async (options: ConfirmPromptOptions): Promise<boolea
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			renderSubmittedConfirm(options, confirmed);
-
-			return confirmed;
+			return { cancelled: false, submitted: true, value: confirmed };
 		}
 
 		const normalizedKey = key.toLowerCase();
@@ -56,15 +60,13 @@ export const readConfirm = async (options: ConfirmPromptOptions): Promise<boolea
 		}
 
 		if (key === Key.enter) {
-			renderSubmittedConfirm(options, confirmed);
-
-			return confirmed;
+			return { cancelled: false, submitted: true, value: confirmed };
 		}
 
 		if (key === Key.ctrlC) {
 			renderCancelledConfirm(options, confirmed);
 
-			return cancelPrompt(confirmed);
+			return { cancelled: true, submitted: false, value: await cancelPrompt(confirmed) };
 		}
 
 		if (key === Key.ctrlU) {

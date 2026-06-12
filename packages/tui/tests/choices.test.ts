@@ -200,6 +200,8 @@ describe('choice prompts', () => {
 
 		expect(result).toBe(true);
 		expect(output.text()).toContain('Required.');
+		expect(parseAnsiText(output.text())).not.toContain('│ No ');
+		expect(parseAnsiText(output.text())).toContain('│ Yes ');
 	});
 
 	it('transforms confirm answers before returning', async () => {
