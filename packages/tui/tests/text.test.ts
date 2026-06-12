@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createMemoryOutput, createScriptedInput, Key, PromptValidationError, text, withPromptEnvironment } from '#tui/index';
+import { createMemoryOutput, createScriptedInput, Key, parseAnsiText, PromptValidationError, text, withPromptEnvironment } from '#tui/index';
 
 describe('text prompt', () => {
 	it('renders typed values while reading raw key input', async () => {
@@ -16,7 +16,9 @@ describe('text prompt', () => {
 		);
 
 		expect(result).toBe('Ada');
-		expect(output.text()).toContain('? Name Ada');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mName\u001B[39m ');
+		expect(parseAnsiText(output.text())).toContain('Ada');
+		expect(output.text()).toContain('┌ \u001B[2mName\u001B[22m ');
 	});
 
 	it('renders placeholders before text input', async () => {
@@ -32,7 +34,8 @@ describe('text prompt', () => {
 			() => text('Name', 'Jane Doe'),
 		);
 
-		expect(output.text()).toContain('? Name Jane Doe');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mName\u001B[39m ');
+		expect(output.text()).toContain('\u001B[2mJane Doe\u001B[22m');
 	});
 
 	it('accepts default values', async () => {
@@ -82,6 +85,7 @@ describe('text prompt', () => {
 
 		expect(result).toBe('Jess');
 		expect(output.text()).toContain('Invalid name.');
+		expect(output.text().split('┌ \u001B[2mName\u001B[22m').length - 1).toBe(1);
 	});
 
 	it('edits values with backspace and delete keys', async () => {
@@ -167,5 +171,24 @@ describe('text prompt', () => {
 		);
 
 		expect(result).toBe('');
+	});
+
+	it('renders cancelled text frames with the current value', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', Key.ctrlC]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => text('Name'),
+		);
+
+		expect(result).toBe('A');
+		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Name ');
+		expect(parseAnsiText(output.text())).toContain('A');
 	});
 });

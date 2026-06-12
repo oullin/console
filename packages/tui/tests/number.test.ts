@@ -160,6 +160,7 @@ describe('number prompt', () => {
 		expect(result).toBe(3);
 		expect(output.text()).toContain('Must be at least 2');
 		expect(output.text()).toContain('Must be less than 4');
+		expect(output.text().split('┌ \u001B[2mCount\u001B[22m').length - 1).toBe(1);
 	});
 
 	it('increments and decrements with arrow keys', async () => {

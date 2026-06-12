@@ -2,14 +2,19 @@ import { promptEnvironment } from '#tui/environment';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey, initialTypedValueState } from '#tui/typed-value/edit';
-import { renderTypedValue } from '#tui/typed-value/render';
+import { renderCancelledTypedValue, renderTypedValue } from '#tui/typed-value/render';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
 export { applyTypedKey };
 export type { TypedValueOptions, TypedValueState };
 
-export const readTypedValue = async (message: string, options: TypedValueOptions = {}): Promise<string> => {
+export type TypedValueReadResult = {
+	cancelled: boolean;
+	value: string;
+};
+
+export const readTypedValue = async (message: string, options: TypedValueOptions = {}): Promise<TypedValueReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -19,7 +24,10 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 
 		const answer = await environment.input.readLine(renderQuestion(message, options.hint));
 
-		return answer === '' && options.default !== undefined ? options.default : answer;
+		return {
+			cancelled: false,
+			value: answer === '' && options.default !== undefined ? options.default : answer,
+		};
 	}
 
 	let state: TypedValueState = initialTypedValueState(options.default ?? '');
@@ -30,15 +38,25 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return state.value;
+			return {
+				cancelled: false,
+				value: state.value,
+			};
 		}
 
 		const next = applyTypedKey(state, key, options.allowNewLine, options.allowNewLine ? TEXTAREA_CONTENT_WIDTH : undefined);
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			if (!options.allowNewLine) {
+				renderCancelledTypedValue(message, state.value, options);
+			} else {
+				environment.error.write('Cancelled.\n');
+			}
 
-			return cancelPrompt(state.value);
+			return {
+				cancelled: true,
+				value: await cancelPrompt(state.value),
+			};
 		}
 
 		state = {
@@ -47,9 +65,10 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		};
 
 		if (next.submitted) {
-			environment.output.write('\n');
-
-			return state.value;
+			return {
+				cancelled: false,
+				value: state.value,
+			};
 		}
 
 		renderTypedValue(message, state, options);

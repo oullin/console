@@ -6,11 +6,13 @@ import type { BasePromptOptions } from '#tui/types';
 
 type PromptReader<T> = (attempt: number) => Promise<T>;
 
+type PromptValidHandler<T> = (value: T) => void | Promise<void>;
+
 const validatedPromptValue = async <T>(options: BasePromptOptions<T>, value: T): Promise<string | undefined> => {
 	return ensureRequired(value, options.required) ?? (await validationMessage(value, options.validate));
 };
 
-export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: PromptReader<T>): Promise<T> => {
+export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: PromptReader<T>, onValid?: PromptValidHandler<T>): Promise<T> => {
 	const environment = promptEnvironment();
 
 	if (!environment.interactive) {
@@ -45,6 +47,8 @@ export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: P
 		const validation = await validatedPromptValue(options, value);
 
 		if (!validation) {
+			await onValid?.(value);
+
 			return value;
 		}
 

@@ -1,4 +1,3 @@
-import { promptEnvironment } from '#tui/environment';
 import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
@@ -37,40 +36,42 @@ export async function number(
 			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, min, max, step, transform }
 			: { ...message, default: message.default ?? '' };
 
-	return promptUntilValid(options, async () => {
-		const shouldRenderSubmittedFrame = Boolean(promptEnvironment().input.readKey);
+	let shouldRenderSubmittedFrame = false;
 
-		const answer = await readNumberValue(options.message, {
-			default: options.default,
-			hint: options.hint,
-			max: options.max,
-			min: options.min,
-			placeholder: options.placeholder,
-			step: options.step,
-		});
+	return promptUntilValid(
+		options,
+		async () => {
+			const answer = await readNumberValue(options.message, {
+				default: options.default,
+				hint: options.hint,
+				max: options.max,
+				min: options.min,
+				placeholder: options.placeholder,
+				step: options.step,
+			});
 
-		const value = answer.value;
+			const value = answer.value;
 
-		if (value === '' && options.default !== undefined) {
-			if (shouldRenderSubmittedFrame && !answer.cancelled) {
-				renderSubmittedNumberValue(options.message, options.default);
+			shouldRenderSubmittedFrame = !answer.cancelled;
+
+			if (value === '' && options.default !== undefined) {
+				return options.default;
 			}
 
-			return options.default;
-		}
+			const result = parseNumberInput(value, options);
 
-		const result = parseNumberInput(value, options);
+			if (result.error !== undefined) {
+				throw new PromptValidationError(result.error);
+			}
 
-		if (result.error !== undefined) {
-			throw new PromptValidationError(result.error);
-		}
+			const parsedValue = result.value ?? '';
 
-		const parsedValue = result.value ?? '';
-
-		if (shouldRenderSubmittedFrame && !answer.cancelled) {
-			renderSubmittedNumberValue(options.message, parsedValue);
-		}
-
-		return options.transform ? options.transform(parsedValue) : parsedValue;
-	});
+			return options.transform ? options.transform(parsedValue) : parsedValue;
+		},
+		(value) => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedNumberValue(options.message, value);
+			}
+		},
+	);
 }

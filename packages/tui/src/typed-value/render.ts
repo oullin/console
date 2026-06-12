@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
-import { renderQuestion } from '#tui/theme';
-import { dim } from '#tui/theme/styles';
+import { renderBox } from '#tui/theme/box';
+import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import { visibleLines } from '#tui/typed-value/lines';
 import { renderTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
@@ -16,7 +16,19 @@ export const renderTypedValue = (message: string, state: TypedValueState, option
 		return;
 	}
 
-	const displayValue = state.value.length > 0 ? visibleLines(state.value, state.cursor, options.rows) : (options.placeholder ?? '');
+	const displayValue = state.value.length > 0 ? visibleLines(state.value, state.cursor, options.rows) : dim(options.placeholder ?? '');
 
-	promptEnvironment().output.write(`${renderQuestion(message, options.hint)}${displayValue}\n`);
+	promptEnvironment().output.write(`${renderBox({ body: displayValue, borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`);
+};
+
+export const renderSubmittedTypedValue = (message: string, value: string): void => {
+	promptEnvironment().output.write(`${renderBox({ body: value, title: dim(message) })}\n`);
+};
+
+export const renderCancelledTypedValue = (message: string, value: string, options: TypedValueOptions): void => {
+	const environment = promptEnvironment();
+	const displayValue = value.length > 0 ? value : (options.placeholder ?? '');
+
+	environment.output.write(`${renderBox({ body: strikethrough(dim(displayValue)), borderStyle: red, title: message })}\n`);
+	environment.error.write(`${red('  ⚠ Cancelled.')}\n`);
 };

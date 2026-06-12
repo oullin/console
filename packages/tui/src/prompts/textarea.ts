@@ -39,7 +39,7 @@ export async function textarea(
 			rows: options.rows ?? rows,
 		});
 
-		const value = answer === '' && options.default !== undefined ? options.default : answer;
+		const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
 		return options.transform ? options.transform(value) : value;
 	});
