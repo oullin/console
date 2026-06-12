@@ -594,11 +594,25 @@ describe('form builder', () => {
 				form()
 					.note('Saved', null, 'note')
 					.table(['Name'], [['Ollin']], 'table')
+					.dataTable(['Alias'], [['Display']], 'dataTable')
+					.grid(['A', 'B'], 80, 'grid')
+					.title('Prompt', 'title')
+					.clear('clear')
 					.submit(),
 		);
 
 		expect(responses.note).toBeNull();
 		expect(responses.table).toBeNull();
+		expect(responses.dataTable).toBeNull();
+		expect(responses.grid).toBeNull();
+		expect(responses.title).toBeNull();
+		expect(responses.clear).toBeNull();
+		expect(output.text()).toContain('Ollin');
+		expect(output.text()).toContain('Display');
+		expect(output.text()).toContain('A');
+		expect(output.text()).toContain('B');
+		expect(output.text()).toContain('\u001B]0;Prompt\u0007');
+		expect(output.text()).toContain('\u001B[H\u001B[J');
 	});
 
 	it('runs label-first data table form steps', async () => {

@@ -1,10 +1,12 @@
-import { alert, datatable, error, info, intro, note, outro, table, warning } from '#tui/output';
+import { alert, clear, dataTable, datatable, error, grid, info, intro, note, notify, outro, table, title, warning } from '#tui/output';
 import { sideEffectStep } from '#tui/form/builder/step';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { DataTablePromptOptions, DataTableRow, MaybePromise, TableOptions } from '#tui/types';
 
 export type OutputBuilderMethods = {
 	alert(this: FormBuilder, message: string, name?: string): FormBuilder;
+	clear(this: FormBuilder, name?: string): FormBuilder;
+	dataTable(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
 	datatable<T = unknown>(this: FormBuilder, options: DataTablePromptOptions<T>, name?: string): FormBuilder;
 	datatable<T = unknown>(
 		this: FormBuilder,
@@ -20,11 +22,14 @@ export type OutputBuilderMethods = {
 		name?: string,
 	): FormBuilder;
 	error(this: FormBuilder, message: string, name?: string): FormBuilder;
+	grid(this: FormBuilder, items?: Array<string | number | boolean>, maxWidth?: number, name?: string): FormBuilder;
 	info(this: FormBuilder, message: string, name?: string): FormBuilder;
 	intro(this: FormBuilder, message: string, name?: string): FormBuilder;
 	note(this: FormBuilder, message: string, type?: string | null, name?: string): FormBuilder;
+	notify(this: FormBuilder, title: string, body?: string, subtitle?: string, sound?: string, icon?: string, name?: string): FormBuilder;
 	outro(this: FormBuilder, message: string, name?: string): FormBuilder;
 	table(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
+	title(this: FormBuilder, value: string, name?: string): FormBuilder;
 	warning(this: FormBuilder, message: string, name?: string): FormBuilder;
 };
 
@@ -34,6 +39,20 @@ export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> 
 	alert(message, name) {
 		return this.add(
 			displayStep(() => alert(message)),
+			name,
+			true,
+		);
+	},
+	clear(name) {
+		return this.add(
+			displayStep(() => clear()),
+			name,
+			true,
+		);
+	},
+	dataTable(headersOrOptions = [], rows = null, name) {
+		return this.add(
+			displayStep(() => dataTable(headersOrOptions, rows)),
 			name,
 			true,
 		);
@@ -63,6 +82,13 @@ export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> 
 			true,
 		);
 	},
+	grid(items = [], maxWidth, name) {
+		return this.add(
+			displayStep(() => grid(items, maxWidth)),
+			name,
+			true,
+		);
+	},
 	info(message, name) {
 		return this.add(
 			displayStep(() => info(message)),
@@ -84,6 +110,13 @@ export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> 
 			true,
 		);
 	},
+	notify(message, body = '', subtitle = '', sound = '', icon = '', name) {
+		return this.add(
+			displayStep(() => notify(message, body, subtitle, sound, icon)),
+			name,
+			true,
+		);
+	},
 	outro(message, name) {
 		return this.add(
 			displayStep(() => outro(message)),
@@ -94,6 +127,13 @@ export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> 
 	table(headersOrOptions = [], rows = null, name) {
 		return this.add(
 			displayStep(() => table(headersOrOptions, rows)),
+			name,
+			true,
+		);
+	},
+	title(value, name) {
+		return this.add(
+			displayStep(() => title(value)),
 			name,
 			true,
 		);

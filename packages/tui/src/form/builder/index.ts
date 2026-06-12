@@ -11,13 +11,17 @@ export class FormBuilder {
 	readonly alert = outputBuilderMethods.alert;
 	readonly autocomplete = promptBuilderMethods.autocomplete;
 	readonly confirm = promptBuilderMethods.confirm;
+	readonly clear = outputBuilderMethods.clear;
+	readonly dataTable = outputBuilderMethods.dataTable;
 	readonly datatable = outputBuilderMethods.datatable;
 	readonly error = outputBuilderMethods.error;
+	readonly grid = outputBuilderMethods.grid;
 	readonly info = outputBuilderMethods.info;
 	readonly intro = outputBuilderMethods.intro;
 	readonly multisearch = promptBuilderMethods.multisearch;
 	readonly multiselect = promptBuilderMethods.multiselect;
 	readonly note = outputBuilderMethods.note;
+	readonly notify = outputBuilderMethods.notify;
 	readonly number = promptBuilderMethods.number;
 	readonly outro = outputBuilderMethods.outro;
 	readonly password = promptBuilderMethods.password;
@@ -32,6 +36,7 @@ export class FormBuilder {
 	readonly task = statusBuilderMethods.task;
 	readonly text = promptBuilderMethods.text;
 	readonly textarea = promptBuilderMethods.textarea;
+	readonly title = outputBuilderMethods.title;
 	readonly warning = outputBuilderMethods.warning;
 
 	add(step: (responses: FormResponses, previous: unknown, name?: string) => MaybePromise<unknown>, name?: string, ignoreWhenReverting = false): this {
