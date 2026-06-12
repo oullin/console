@@ -377,6 +377,27 @@ describe('form builder', () => {
 		expect(output.text()).toContain('Type a color');
 	});
 
+	it('runs object-option suggest and autocomplete form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.suggest({ message: 'Suggested color', options: ['Red', 'Green', 'Blue'], default: 'Blue' }, 'suggested')
+					.autocomplete({ message: 'Auto color', options: ['Red', 'Green', 'Blue'], default: 'Green' }, 'auto')
+					.submit(),
+		);
+
+		expect(responses.suggested).toBe('Blue');
+		expect(responses.auto).toBe('Green');
+	});
+
 	it('runs label-first search and multisearch form steps', async () => {
 		const output = createMemoryOutput();
 

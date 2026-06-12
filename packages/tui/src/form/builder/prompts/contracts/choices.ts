@@ -3,6 +3,7 @@ import type { SuggestOptions } from '#tui/prompts/choices';
 import type { ChoiceOptions, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TextPromptOptions } from '#tui/types';
 
 export type ChoicePromptBuilderMethods = {
+	autocomplete(this: FormBuilder, options: SuggestOptions, name?: string): FormBuilder;
 	autocomplete(
 		this: FormBuilder,
 		label: string,
@@ -78,6 +79,7 @@ export type ChoicePromptBuilderMethods = {
 		name?: string,
 		transform?: (value: T) => MaybePromise<T>,
 	): FormBuilder;
+	suggest(this: FormBuilder, options: SuggestOptions, name?: string): FormBuilder;
 	suggest(
 		this: FormBuilder,
 		label: string,
