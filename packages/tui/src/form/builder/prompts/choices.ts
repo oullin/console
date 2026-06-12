@@ -1,5 +1,5 @@
 import { autocomplete, confirm, multiselect, multisearch, pause, search, select, suggest } from '#tui/prompts/choices';
-import { previousArray, previousBoolean, previousString } from '#tui/form/builder/previous';
+import { previousArray, previousBoolean, previousString, previousValue } from '#tui/form/builder/previous';
 import { isSearchPromptLabel } from '#tui/form/builder/prompts/validators/search';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ChoicePromptBuilderMethods } from '#tui/form/builder/prompts/types';
@@ -69,7 +69,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 		transform: SearchPromptOptions<T>['transform'] = undefined,
 	) {
 		if (!isSearchPromptLabel(optionsOrLabel)) {
-			return this.add((_, previous) => search<T>({ ...optionsOrLabel, default: previous === undefined ? optionsOrLabel.default : (previous as T) }), options as string | undefined);
+			return this.add((_, previous) => search<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), options as string | undefined);
 		}
 
 		const promptOptions: SearchPromptOptions<T> = {
@@ -84,10 +84,10 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 			transform,
 		};
 
-		return this.add((_, previous) => search<T>({ ...promptOptions, default: previous === undefined ? promptOptions.default : (previous as T) }), name);
+		return this.add((_, previous) => search<T>({ ...promptOptions, default: previousValue(previous, promptOptions.default) }), name);
 	},
 	select<T>(label: string, options: ChoiceOptions<T>, defaultValue?: T, scroll = 5, validate = undefined, hint = '', required: boolean | string = true, name?: string, transform = undefined) {
-		return this.add((_, previous) => select({ message: label, options, default: previous === undefined ? defaultValue : (previous as T), scroll, validate, hint, required, transform }), name);
+		return this.add((_, previous) => select({ message: label, options, default: previousValue(previous, defaultValue), scroll, validate, hint, required, transform }), name);
 	},
 	suggest(label, options, placeholder = '', defaultValue = '', scroll = 5, required = false, validate = undefined, hint = '', name, transform = undefined) {
 		return this.add((_, previous) => suggest({ message: label, label, options, placeholder, default: previousString(previous, defaultValue), scroll, required, validate, hint, transform }), name);

@@ -240,6 +240,29 @@ describe('form builder', () => {
 		expect(responses[3]).toBe(true);
 	});
 
+	it('uses declared defaults when named choice steps follow skipped conditional responses', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.addIf(false, () => 'skipped', 'choice')
+					.select('Choice', { a: 'A', b: 'B' }, 'b', 5, undefined, '', true, 'choice')
+					.addIf(false, () => 'skipped', 'searched')
+					.search({ message: 'Search', options: { red: 'Red', blue: 'Blue' }, default: 'blue' }, 'searched')
+					.submit(),
+		);
+
+		expect(responses.choice).toBe('b');
+		expect(responses.searched).toBe('blue');
+	});
+
 	it('does not revert the first form step', async () => {
 		const output = createMemoryOutput();
 
