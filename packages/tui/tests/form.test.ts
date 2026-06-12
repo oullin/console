@@ -117,6 +117,31 @@ describe('form builder', () => {
 		expect(responses.count).toBe(8);
 	});
 
+	it('runs object-option basic prompt form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.enter, Key.enter, Key.ctrlD]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.text({ message: 'Name', default: 'Ada', transform: (value) => value.toUpperCase() }, 'name')
+					.number({ message: 'Count', default: 2, transform: (value) => Number(value) * 2 }, 'count')
+					.password({ message: 'Secret', default: 'shh', transform: (value) => `${value}!` }, 'secret')
+					.textarea({ message: 'Body', default: 'Line', rows: 3, transform: (value) => `${value}\nDone` }, 'body')
+					.submit(),
+		);
+
+		expect(responses.name).toBe('ADA');
+		expect(responses.count).toBe(4);
+		expect(responses.secret).toBe('shh!');
+		expect(responses.body).toBe('Line\nDone');
+	});
+
 	it('reuses array previous responses when reverting prompt builder steps', async () => {
 		const output = createMemoryOutput();
 

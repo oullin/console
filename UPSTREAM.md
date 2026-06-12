@@ -92,6 +92,7 @@ TypeScript and OpenTUI internals.
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | Form builder label-first search and multisearch methods | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder previous-response defaults | `packages/tui/src/form/builder/previous.ts`, `packages/tui/src/form/builder/validators/previous.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder basic prompt object-option method surface | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/contracts/basic.ts`, `packages/tui/src/form/builder/prompts/validators/basic.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder suggest and autocomplete placeholder/default arguments | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/src/form/builder/prompts/contracts/choices.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder suggest and autocomplete object-option method surface | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/src/form/builder/prompts/contracts/choices.ts`, `packages/tui/src/form/builder/prompts/validators/suggest.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder number transform argument surface | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/contracts/basic.ts`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/form.test.ts`, `packages/tui/tests/number.test.ts` |

@@ -1,8 +1,9 @@
 import type { FormBuilder } from '#tui/form/builder/index';
-import type { NumberPromptOptions, TextPromptOptions } from '#tui/types';
+import type { NumberPromptOptions, TextareaPromptOptions, TextPromptOptions } from '#tui/types';
 import type { MaybePromise } from '#tui/types';
 
 export type BasicPromptBuilderMethods = {
+	number(this: FormBuilder, options: NumberPromptOptions, name?: string): FormBuilder;
 	number(
 		this: FormBuilder,
 		label: string,
@@ -17,6 +18,7 @@ export type BasicPromptBuilderMethods = {
 		name?: string,
 		transform?: NumberPromptOptions['transform'],
 	): FormBuilder;
+	password(this: FormBuilder, options: TextPromptOptions, name?: string): FormBuilder;
 	password(
 		this: FormBuilder,
 		label: string,
@@ -27,6 +29,7 @@ export type BasicPromptBuilderMethods = {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): FormBuilder;
+	text(this: FormBuilder, options: TextPromptOptions, name?: string): FormBuilder;
 	text(
 		this: FormBuilder,
 		label: string,
@@ -38,6 +41,7 @@ export type BasicPromptBuilderMethods = {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): FormBuilder;
+	textarea(this: FormBuilder, options: TextareaPromptOptions, name?: string): FormBuilder;
 	textarea(
 		this: FormBuilder,
 		label: string,
