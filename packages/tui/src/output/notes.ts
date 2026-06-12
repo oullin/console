@@ -1,13 +1,14 @@
 import { promptEnvironment } from '#tui/environment';
+import { visibleWidth } from '#tui/strings';
 import { backgroundCyan, backgroundRed, black, green, red, white, yellow } from '#tui/theme/styles';
 
 export type NoteType = 'alert' | 'error' | 'info' | 'intro' | 'outro' | 'warning' | string;
 
 const paddedIntroLines = (lines: string[]): string[] => {
 	const padded = lines.map((line) => ` ${line} `);
-	const longest = Math.max(...padded.map((line) => line.length));
+	const longest = Math.max(...padded.map(visibleWidth));
 
-	return padded.map((line) => line.padEnd(longest, ' '));
+	return padded.map((line) => `${line}${' '.repeat(Math.max(0, longest - visibleWidth(line)))}`);
 };
 
 const renderNoteLine = (line: string, type?: NoteType | null): string => {

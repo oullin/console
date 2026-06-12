@@ -50,6 +50,16 @@ describe('output helpers', () => {
 		expect(output.text()).toContain('\u001B[46m\u001B[30m Start  \u001B[39m\u001B[49m');
 	});
 
+	it('pads intro and outro lines by visible width', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			intro('東京\nA');
+		});
+
+		expect(parseAnsiText(output.text())).toBe('  東京 \n  A    \n');
+	});
+
 	it('renders table and boxed grid helpers without returning a value', async () => {
 		const output = createMemoryOutput();
 

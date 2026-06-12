@@ -80,6 +80,7 @@ TypeScript and OpenTUI internals.
 | Form builder asynchronous condition lifecycle | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/src/form/types.ts`, `packages/tui/tests/form.test.ts` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Note multiline and typed theme rendering | `packages/tui/src/output/notes.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/output.test.ts` |
+| Note intro/outro visible-width padding | `packages/tui/src/output/notes.ts`, `packages/tui/tests/output.test.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
 | Notification command construction, executable discovery, and process result reporting | `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*` |
 | Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table.ts` |
