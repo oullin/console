@@ -64,6 +64,29 @@ describe('form builder', () => {
 		expect(responses.details).toBeNull();
 	});
 
+	it('awaits asynchronous conditional steps', async () => {
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['y', Key.enter]),
+				output: createMemoryOutput(),
+				error: createMemoryOutput(),
+				interactive: true,
+			},
+			() =>
+				form()
+					.confirm('Include details?', true, 'Yes', 'No', false, undefined, '', 'include')
+					.addIf(
+						async (values) => values.include === true,
+						() => 'details',
+						'details',
+					)
+					.submit(),
+		);
+
+		expect(responses.include).toBe(true);
+		expect(responses.details).toBe('details');
+	});
+
 	it('reverts to the previous form step and reuses the prior response', async () => {
 		const output = createMemoryOutput();
 
@@ -292,6 +315,34 @@ describe('form builder', () => {
 					.select('Runtime', ['TS', 'JS'])
 					.addIf(
 						(values) => values[1] === 'TS',
+						() => text('Version'),
+					)
+					.confirm('Are you sure?')
+					.submit(),
+		);
+
+		expect(responses[0]).toBe('Ada');
+		expect(responses[1]).toBe('TS');
+		expect(responses[2]).toBe('1');
+		expect(responses[3]).toBe(true);
+	});
+
+	it('re-evaluates asynchronous conditional steps after reverting prior responses', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput(['A', 'd', 'a', Key.enter, Key.down, Key.enter, Key.ctrlU, Key.up, Key.enter, '1', Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.text('Name')
+					.select('Runtime', ['TS', 'JS'])
+					.addIf(
+						async (values) => values[1] === 'TS',
 						() => text('Version'),
 					)
 					.confirm('Are you sure?')

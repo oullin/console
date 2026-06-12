@@ -13,7 +13,7 @@ export const submitFormSteps = async (steps: FormStep[], responses: FormResponse
 			break;
 		}
 
-		if (wasReverted && index > 0 && shouldIgnoreStepWhenReverting(step, responses)) {
+		if (wasReverted && index > 0 && (await shouldIgnoreStepWhenReverting(step, responses))) {
 			index -= 1;
 			continue;
 		}
@@ -22,7 +22,7 @@ export const submitFormSteps = async (steps: FormStep[], responses: FormResponse
 
 		const key = step.name ?? index;
 
-		if (!shouldRunStep(step, responses)) {
+		if (!(await shouldRunStep(step, responses))) {
 			responses[key] = null;
 			index += 1;
 			continue;

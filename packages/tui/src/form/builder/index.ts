@@ -5,7 +5,7 @@ import { submitFormSteps } from '#tui/form/builder/submit';
 import type { OutputBuilderMethods } from '#tui/form/builder/output';
 import type { PromptBuilderMethods } from '#tui/form/builder/prompts';
 import type { StatusBuilderMethods } from '#tui/form/builder/status';
-import type { FormResponses, FormStep } from '#tui/form/types';
+import type { FormResponses, FormStep, FormStepCondition } from '#tui/form/types';
 import type { MaybePromise } from '#tui/types';
 
 export class FormBuilder {
@@ -53,12 +53,7 @@ export class FormBuilder {
 		return this;
 	}
 
-	addIf(
-		condition: boolean | ((responses: FormResponses) => boolean),
-		step: (responses: FormResponses, previous: unknown, name?: string) => MaybePromise<unknown>,
-		name?: string,
-		ignoreWhenReverting = false,
-	): this {
+	addIf(condition: FormStepCondition, step: (responses: FormResponses, previous: unknown, name?: string) => MaybePromise<unknown>, name?: string, ignoreWhenReverting = false): this {
 		this.#steps.push({
 			condition,
 			ignoreWhenReverting,

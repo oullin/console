@@ -144,6 +144,7 @@ describe('package consumption', () => {
 					ConfirmPromptOptions,
 					FormResponses,
 					FormStep,
+					FormStepCondition,
 					KeyboardEventLike,
 					KeyName,
 					KeyValue,
@@ -165,6 +166,7 @@ describe('package consumption', () => {
 				const suggestOptions: SuggestOptions = { message: 'Suggest', options: ['one'] };
 				const formResponses: FormResponses = [] as unknown as FormResponses;
 				const formStep: FormStep = { condition: true, ignoreWhenReverting: false, run: () => null };
+				const formStepCondition: FormStepCondition = async () => true;
 				const event: KeyboardEventLike = { name: 'return' };
 				const keyName: KeyName = '\\n';
 				const keyValue: KeyValue = keyName;
@@ -183,6 +185,7 @@ describe('package consumption', () => {
 					suggestOptions,
 					formResponses,
 					formStep,
+					formStepCondition,
 					event,
 					keyValue,
 					noteType,
