@@ -14,6 +14,18 @@ const tableOptionsSchema = z
 	})
 	.passthrough();
 
+const inferredTableHeaders = (rows: TableOptions['rows']): string[] => {
+	const firstRow = rows[0];
+
+	const arrayRow = z.array(tableCellSchema).safeParse(firstRow);
+
+	if (arrayRow.success || firstRow === undefined) {
+		return [];
+	}
+
+	return Object.keys(firstRow);
+};
+
 export const isTableOptions = (value: unknown): value is TableOptions => {
 	return tableOptionsSchema.safeParse(value).success;
 };
@@ -28,7 +40,7 @@ export const parseTableOptions = (headersOrOptions: unknown = [], rows: unknown 
 	const tableOptions = tableOptionsSchema.safeParse(headersOrOptions);
 
 	if (tableOptions.success) {
-		const headers = tableOptions.data.headers ?? Object.keys(tableOptions.data.rows[0] ?? {});
+		const headers = tableOptions.data.headers ?? inferredTableHeaders(tableOptions.data.rows);
 
 		return { headers, rows: tableOptions.data.rows };
 	}

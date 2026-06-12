@@ -107,6 +107,24 @@ describe('table output', () => {
 		expect(output.text()).toContain('| Prompts | TypeScript |');
 	});
 
+	it('renders option-object tables with array rows as headerless tables unless headers are explicit', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			table({
+				rows: [
+					['Ollin', 'OpenTUI'],
+					['Prompts', 'TypeScript'],
+				],
+			});
+		});
+
+		expect(output.text()).not.toContain('| 0       | 1          |');
+		expect(output.text()).not.toContain('| ------- | ---------- |');
+		expect(output.text()).toContain('| Ollin   | OpenTUI    |');
+		expect(output.text()).toContain('| Prompts | TypeScript |');
+	});
+
 	it('rejects invalid table runtime shapes through the validator layer', async () => {
 		const output = createMemoryOutput();
 
