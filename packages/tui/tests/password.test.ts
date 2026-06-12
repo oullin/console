@@ -18,6 +18,8 @@ describe('password prompt', () => {
 		expect(result).toBe('secret');
 		expect(output.text()).not.toContain('secret');
 		expect(output.text()).toContain('••••••');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mPassword\u001B[39m ');
+		expect(output.text()).toContain('┌ \u001B[2mPassword\u001B[22m ');
 	});
 
 	it('renders password placeholders before input', async () => {
@@ -33,7 +35,8 @@ describe('password prompt', () => {
 			() => password('Password', 'Required'),
 		);
 
-		expect(output.text()).toContain('? Password Required');
+		expect(output.text()).toContain('\u001B[36m ┌\u001B[39m \u001B[36mPassword\u001B[39m ');
+		expect(output.text()).toContain('\u001B[2mRequired\u001B[22m');
 	});
 
 	it('returns object-option defaults without rendering the raw value', async () => {
@@ -108,6 +111,7 @@ describe('password prompt', () => {
 		expect(output.text()).toContain('Password must be at least 4 characters.');
 		expect(output.text()).not.toContain('pas');
 		expect(output.text()).not.toContain('pass');
+		expect(output.text().split('┌ \u001B[2mPassword\u001B[22m').length - 1).toBe(1);
 	});
 
 	it('edits values with backspace and delete keys without rendering the raw value', async () => {
@@ -143,6 +147,8 @@ describe('password prompt', () => {
 
 		expect(result).toBe('sec');
 		expect(output.text()).toContain('Cancelled.');
+		expect(output.text()).toContain('\u001B[31m ┌\u001B[39m Password ');
+		expect(output.text()).toContain('•••');
 		expect(output.text()).not.toContain('sec');
 	});
 

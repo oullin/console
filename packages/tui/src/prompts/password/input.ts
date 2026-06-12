@@ -2,23 +2,10 @@ import { promptEnvironment } from '#tui/environment';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
+import { passwordLength, renderCancelledPasswordValue, renderPasswordValue } from '#tui/prompts/password/render';
+import type { PasswordInputOptions, PasswordReadResult } from '#tui/prompts/password/types';
 
-type PasswordInputOptions = {
-	default?: string;
-	hint?: string;
-	placeholder?: string;
-};
-
-const mask = (value: string): string => '•'.repeat([...value].length);
-const characterLength = (value: string): number => [...value].length;
-
-const renderPasswordValue = (message: string, stateValue: string, options: PasswordInputOptions): void => {
-	const value = stateValue.length > 0 ? mask(stateValue) : (options.placeholder ?? '');
-
-	promptEnvironment().output.write(`${renderQuestion(message, options.hint)}${value}\n`);
-};
-
-export const readPasswordValue = async (message: string, options: PasswordInputOptions = {}): Promise<string> => {
+export const readPasswordValue = async (message: string, options: PasswordInputOptions = {}): Promise<PasswordReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -28,11 +15,14 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 
 		const answer = await environment.input.readLine(renderQuestion(message, options.hint));
 
-		return answer === '' && options.default !== undefined ? options.default : answer;
+		return {
+			cancelled: false,
+			value: answer === '' && options.default !== undefined ? options.default : answer,
+		};
 	}
 
 	let state = {
-		cursor: characterLength(options.default ?? ''),
+		cursor: passwordLength(options.default ?? ''),
 		value: options.default ?? '',
 	};
 
@@ -42,15 +32,21 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return state.value;
+			return {
+				cancelled: false,
+				value: state.value,
+			};
 		}
 
 		const next = applyTypedKey(state, key);
 
 		if (next.cancelled) {
-			environment.error.write('Cancelled.\n');
+			renderCancelledPasswordValue(message, state.value, options);
 
-			return cancelPrompt(state.value);
+			return {
+				cancelled: true,
+				value: await cancelPrompt(state.value),
+			};
 		}
 
 		state = {
@@ -59,9 +55,10 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		};
 
 		if (next.submitted) {
-			environment.output.write('\n');
-
-			return state.value;
+			return {
+				cancelled: false,
+				value: state.value,
+			};
 		}
 
 		renderPasswordValue(message, state.value, options);

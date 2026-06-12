@@ -31,6 +31,7 @@ TypeScript and OpenTUI internals.
 | Textarea wrapped-line cursor navigation | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/edit.ts`, `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts`, `packages/tui/tests/typed-value.test.ts` |
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
 | Password input transforms, validation retry, editing keys, cancellation, masking, and non-interactive behavior | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/password.test.ts` |
+| Password active, submitted, cancelled, placeholder, masked, and validation-safe rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompts/password/render.ts`, `packages/tui/tests/password.test.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Number active, submitted, cancelled, arrow, placeholder, default, and validation-safe rendering | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/prompts/number/render.ts`, `packages/tui/tests/number.test.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
