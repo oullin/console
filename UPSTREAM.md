@@ -141,6 +141,7 @@ TypeScript and OpenTUI internals.
 | Red, strikethrough, and border-styled frames | `packages/tui/src/theme/styles.ts`, `packages/tui/src/theme/box.ts` |
 | ANSI segment parsing, ANSI-aware wrapping, truncation, Unicode width | `packages/tui/src/strings.ts`, `packages/tui/tests/strings.test.ts` |
 | ANSI truncation style cleanup and visible-width markers | `packages/tui/src/strings.ts`, `packages/tui/tests/strings.test.ts` |
+| Key-mode search default submission | `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
 | Public ESM package runtime and type-consumption surface | `packages/tui/src/index.ts`, `packages/tui/src/form/builder/index.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*`, `packages/acceptance/tests/package.test.ts` |

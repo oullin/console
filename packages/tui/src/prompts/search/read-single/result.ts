@@ -25,6 +25,14 @@ export const selectedSearchValue = <T>(choices: Array<Choice<T>>, highlighted: n
 	return choice?.disabled ? undefined : choice?.value;
 };
 
+export const defaultSearchChoice = <T>(choices: Array<Choice<T>>, fallback?: T): Choice<T> | undefined => {
+	if (fallback === undefined) {
+		return undefined;
+	}
+
+	return choices.find((choice) => !choice.disabled && Object.is(choice.value, fallback));
+};
+
 export const cancelledSearchValue = <T>(choices: Array<Choice<T>>, highlighted: number | null, fallback?: T): T | undefined => {
 	return selectedSearchValue(choices, highlighted) ?? fallback;
 };

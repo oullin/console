@@ -373,6 +373,28 @@ describe('search prompt', () => {
 		expect(result).toBe('green');
 	});
 
+	it('returns search defaults for empty key-mode submissions', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				search({
+					message: 'Favorite color?',
+					options: colors,
+					default: 'green',
+				}),
+		);
+
+		expect(result).toBe('green');
+		expect(parseAnsiText(output.text())).toMatch(/^ │ Green\s*│$/m);
+	});
+
 	it('transforms non-interactive search defaults before validation and return', async () => {
 		const output = createMemoryOutput();
 
