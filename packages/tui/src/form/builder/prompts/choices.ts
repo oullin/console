@@ -152,6 +152,7 @@ function multiselectFormStep<T>(
 	hint?: string,
 	name?: string,
 	transform?: MultiSelectPromptOptions<T>['transform'],
+	info?: MultiSelectPromptOptions<T>['info'],
 ): FormBuilder;
 
 function multiselectFormStep<T>(
@@ -165,6 +166,7 @@ function multiselectFormStep<T>(
 	hint = 'Use the space bar to select options.',
 	name?: string,
 	transform: MultiSelectPromptOptions<T>['transform'] = undefined,
+	info: MultiSelectPromptOptions<T>['info'] = '',
 ): FormBuilder {
 	if (!isSelectPromptLabel(optionsOrLabel)) {
 		return this.add((_, previous) => multiselect<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), optionsOrName as string | undefined);
@@ -181,6 +183,7 @@ function multiselectFormStep<T>(
 				validate,
 				hint,
 				transform,
+				info,
 			}),
 		name,
 	);
@@ -198,6 +201,7 @@ function selectFormStep<T>(
 	required?: boolean | string,
 	name?: string,
 	transform?: SelectPromptOptions<T>['transform'],
+	info?: SelectPromptOptions<T>['info'],
 ): FormBuilder;
 
 function selectFormStep<T>(
@@ -211,6 +215,7 @@ function selectFormStep<T>(
 	required: boolean | string = true,
 	name?: string,
 	transform: SelectPromptOptions<T>['transform'] = undefined,
+	info: SelectPromptOptions<T>['info'] = '',
 ): FormBuilder {
 	if (!isSelectPromptLabel(optionsOrLabel)) {
 		return this.add((_, previous) => select<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), optionsOrName as string | undefined);
@@ -227,6 +232,7 @@ function selectFormStep<T>(
 				hint,
 				required,
 				transform,
+				info,
 			}),
 		name,
 	);
@@ -245,6 +251,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 		hint = 'Use the space bar to select options.',
 		name?: string,
 		transform: MultiSearchPromptOptions<T>['transform'] = undefined,
+		info: MultiSearchPromptOptions<T>['info'] = '',
 	) {
 		if (!isSearchPromptLabel(optionsOrLabel)) {
 			return this.add((_, previous) => multisearch<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), options as string | undefined);
@@ -260,6 +267,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 			validate,
 			hint,
 			transform,
+			info,
 		};
 
 		return this.add((_, previous) => multisearch<T>({ ...promptOptions, default: previousArray(previous, promptOptions.default ?? []) }), name);
@@ -278,6 +286,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 		required: SearchPromptOptions<T>['required'] = true,
 		name?: string,
 		transform: SearchPromptOptions<T>['transform'] = undefined,
+		info: SearchPromptOptions<T>['info'] = '',
 	) {
 		if (!isSearchPromptLabel(optionsOrLabel)) {
 			return this.add((_, previous) => search<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), options as string | undefined);
@@ -293,6 +302,7 @@ export const choicePromptBuilderMethods: ChoicePromptBuilderMethods & ThisType<F
 			hint,
 			required,
 			transform,
+			info,
 		};
 
 		return this.add((_, previous) => search<T>({ ...promptOptions, default: previousValue(previous, promptOptions.default) }), name);

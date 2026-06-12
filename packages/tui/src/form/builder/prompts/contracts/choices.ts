@@ -41,6 +41,7 @@ export type ChoicePromptBuilderMethods = {
 		hint?: string,
 		name?: string,
 		transform?: MultiSearchPromptOptions<T>['transform'],
+		info?: MultiSearchPromptOptions<T>['info'],
 	): FormBuilder;
 	multiselect<T>(this: FormBuilder, options: MultiSelectPromptOptions<T>, name?: string): FormBuilder;
 	multiselect<T>(
@@ -54,6 +55,7 @@ export type ChoicePromptBuilderMethods = {
 		hint?: string,
 		name?: string,
 		transform?: (value: T[]) => MaybePromise<T[]>,
+		info?: MultiSelectPromptOptions<T>['info'],
 	): FormBuilder;
 	pause(this: FormBuilder, message?: string, name?: string): FormBuilder;
 	search<T>(this: FormBuilder, options: SearchPromptOptions<T>, name?: string): FormBuilder;
@@ -68,6 +70,7 @@ export type ChoicePromptBuilderMethods = {
 		required?: SearchPromptOptions<T>['required'],
 		name?: string,
 		transform?: SearchPromptOptions<T>['transform'],
+		info?: SearchPromptOptions<T>['info'],
 	): FormBuilder;
 	select<T>(this: FormBuilder, options: SelectPromptOptions<T>, name?: string): FormBuilder;
 	select<T>(
@@ -81,6 +84,7 @@ export type ChoicePromptBuilderMethods = {
 		required?: boolean | string,
 		name?: string,
 		transform?: (value: T) => MaybePromise<T>,
+		info?: SelectPromptOptions<T>['info'],
 	): FormBuilder;
 	suggest(this: FormBuilder, options: SuggestOptions, name?: string): FormBuilder;
 	suggest(

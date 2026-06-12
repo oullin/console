@@ -560,6 +560,41 @@ describe('form builder', () => {
 		expect(responses.many).toEqual(['red']);
 	});
 
+	it('passes label-first choice info through form steps', async () => {
+		const output = createMemoryOutput();
+
+		const colorOptions = (value: string): Record<string, string> => {
+			const options = { red: 'Red', green: 'Green', blue: 'Blue' };
+
+			return Object.fromEntries(Object.entries(options).filter(([, label]) => label.toLowerCase().includes(value.toLowerCase())));
+		};
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.down, Key.enter, Key.down, Key.space, Key.enter, 'g', Key.down, Key.enter, 'r', Key.down, Key.space, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.select('Choice', ['first', 'second'], undefined, 5, undefined, '', true, 'choice', undefined, (value) => `About choice ${value ?? 'none'}`)
+					.multiselect('Choices', ['first', 'second'], [], 5, false, undefined, 'Use the space bar to select options.', 'choices', undefined, (value) => `About choices ${value ?? 'none'}`)
+					.search('Searched color', colorOptions, '', 5, undefined, '', true, 'searched', undefined, (value) => `About search ${value ?? 'none'}`)
+					.multisearch('Many colors', colorOptions, '', 5, false, undefined, 'Use the space bar to select options.', 'many', undefined, (value) => `About multisearch ${value ?? 'none'}`)
+					.submit(),
+		);
+
+		expect(responses.choice).toBe('second');
+		expect(responses.choices).toEqual(['second']);
+		expect(responses.searched).toBe('green');
+		expect(responses.many).toEqual(['red']);
+		expect(output.text()).toContain('About choice second');
+		expect(output.text()).toContain('About choices second');
+		expect(output.text()).toContain('About search green');
+		expect(output.text()).toContain('About multisearch red');
+	});
+
 	it('reuses previous search responses when reverting object-option form steps', async () => {
 		const output = createMemoryOutput();
 

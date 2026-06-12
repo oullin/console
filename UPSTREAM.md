@@ -99,6 +99,7 @@ TypeScript and OpenTUI internals.
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
 | Form builder label-first search and multisearch methods | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder label-first choice and search info rendering | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/src/form/builder/prompts/contracts/choices.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder previous-response defaults | `packages/tui/src/form/builder/previous.ts`, `packages/tui/src/form/builder/validators/previous.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder basic prompt object-option method surface | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/contracts/basic.ts`, `packages/tui/src/form/builder/prompts/validators/basic.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder choice prompt object-option method surface | `packages/tui/src/form/builder/prompts/choices.ts`, `packages/tui/src/form/builder/prompts/contracts/choices.ts`, `packages/tui/src/form/builder/prompts/validators/select.ts`, `packages/tui/tests/form.test.ts` |
