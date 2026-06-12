@@ -3,6 +3,13 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
+			"@docs/*": ["src/*"],
+			"@docs-components/*": ["src/.vitepress/theme/components/*"],
+			"@docs-config": ["src/.vitepress/config.ts"],
+			"@docs-lib/*": ["src/.vitepress/theme/lib/*"],
+			"@docs-tests/*": ["tests/*"],
+			"@docs-theme/*": ["src/.vitepress/theme/*"],
+			"@docs-ui/*": ["src/.vitepress/theme/components/ui/*"],
 			"@ollin/tui": ["../tui/src/index.ts"],
 			"#tui/*": ["../tui/src/*"],
 			"#tui/prompts/*": ["../tui/src/prompts/*"]

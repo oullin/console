@@ -1,4 +1,13 @@
+import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitepress';
+
+const sourcePath = fileURLToPath(new URL('..', import.meta.url));
+const themePath = fileURLToPath(new URL('theme', import.meta.url));
+const themeComponentsPath = fileURLToPath(new URL('theme/components', import.meta.url));
+const themeLibPath = fileURLToPath(new URL('theme/lib', import.meta.url));
+const themeUiPath = fileURLToPath(new URL('theme/components/ui', import.meta.url));
+const tailwindPlugin = tailwindcss() as never;
 
 export const guideSections = [
 	{ text: 'Introduction', link: '/guide/introduction' },
@@ -36,6 +45,18 @@ export default defineConfig({
 	description: 'Documentation for the Ollin TUI prompt toolkit.',
 	cleanUrls: true,
 	lastUpdated: true,
+	vite: {
+		plugins: [tailwindPlugin],
+		resolve: {
+			alias: [
+				{ find: '@docs', replacement: sourcePath },
+				{ find: '@docs-components', replacement: themeComponentsPath },
+				{ find: '@docs-lib', replacement: themeLibPath },
+				{ find: '@docs-theme', replacement: themePath },
+				{ find: '@docs-ui', replacement: themeUiPath },
+			],
+		},
+	},
 	themeConfig: {
 		nav: [
 			{ text: 'Guide', link: '/guide/introduction' },

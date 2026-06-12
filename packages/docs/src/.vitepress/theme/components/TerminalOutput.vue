@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import Badge from '@docs-ui/badge/Badge.vue';
+import Card from '@docs-ui/card/Card.vue';
+import CardContent from '@docs-ui/card/CardContent.vue';
+import CardHeader from '@docs-ui/card/CardHeader.vue';
+import CardTitle from '@docs-ui/card/CardTitle.vue';
+import Separator from '@docs-ui/separator/Separator.vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { Terminal } from '@xterm/xterm';
 import type { ITheme } from '@xterm/xterm';
@@ -26,7 +32,6 @@ const props = withDefaults(
 	},
 );
 
-const host = ref<HTMLDivElement | null>(null);
 const viewport = ref<HTMLDivElement | null>(null);
 let terminal: Terminal | null = null;
 let observer: IntersectionObserver | null = null;
@@ -125,7 +130,10 @@ const writeFrame = (frame: string[]): void => {
 	}
 
 	terminal.reset();
-	terminal.write(frame.map(colourise).join('\r\n'));
+
+	for (const line of frame) {
+		terminal.writeln(colourise(line));
+	}
 };
 
 const paint = (): void => {
@@ -185,10 +193,13 @@ onMounted(async () => {
 		terminal.open(viewport.value);
 	}
 
-	if (!host.value || typeof IntersectionObserver === 'undefined') {
+	window.requestAnimationFrame(() => {
 		visible = true;
+		hasPainted = false;
 		paintWhenVisible();
+	});
 
+	if (!viewport.value || typeof IntersectionObserver === 'undefined') {
 		return;
 	}
 
@@ -199,7 +210,7 @@ onMounted(async () => {
 		},
 		{ threshold: 0.35 },
 	);
-	observer.observe(host.value);
+	observer.observe(viewport.value);
 });
 
 onBeforeUnmount(() => {
@@ -217,13 +228,28 @@ watch(output, () => {
 </script>
 
 <template>
-	<div ref="host" class="terminal-output">
-		<div class="terminal-output__bar" aria-hidden="true">
-			<span class="terminal-output__dot terminal-output__dot--danger" />
-			<span class="terminal-output__dot terminal-output__dot--warning" />
-			<span class="terminal-output__dot terminal-output__dot--success" />
-			<span class="terminal-output__title">{{ title }}</span>
-		</div>
-		<div ref="viewport" class="terminal-output__viewport" />
-	</div>
+	<Card class="my-4 gap-0 overflow-hidden border-border bg-card py-0 shadow-sm">
+		<CardHeader class="flex flex-row items-center gap-2 bg-muted/40 px-3 py-2">
+			<Badge
+				as="span"
+				aria-hidden="true"
+				class="size-2.5 rounded-full border-0 bg-[var(--terminal-danger)] p-0 shadow-none"
+			/>
+			<Badge
+				as="span"
+				aria-hidden="true"
+				class="size-2.5 rounded-full border-0 bg-[var(--terminal-warning)] p-0 shadow-none"
+			/>
+			<Badge
+				as="span"
+				aria-hidden="true"
+				class="size-2.5 rounded-full border-0 bg-[var(--terminal-success)] p-0 shadow-none"
+			/>
+			<CardTitle class="ml-1 font-mono text-xs font-medium text-muted-foreground">{{ title }}</CardTitle>
+		</CardHeader>
+		<Separator />
+		<CardContent class="bg-[var(--terminal-background)] p-3">
+			<div ref="viewport" class="min-h-16 overflow-hidden" />
+		</CardContent>
+	</Card>
 </template>

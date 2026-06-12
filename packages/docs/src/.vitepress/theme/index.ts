@@ -1,7 +1,7 @@
 import DefaultTheme from 'vitepress/theme';
-import TerminalOutput from './components/TerminalOutput.vue';
+import TerminalOutput from '@docs-components/TerminalOutput.vue';
 import '@xterm/xterm/css/xterm.css';
-import './styles.css';
+import '@docs-theme/styles.css';
 import type { Theme } from 'vitepress';
 
 export default {

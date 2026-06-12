@@ -1,55 +1,85 @@
-.terminal-output {
-	margin: 16px 0;
-	overflow: hidden;
-	border: 1px solid var(--vp-c-divider);
-	border-radius: 8px;
-	background: #0c0f14;
-	box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+@import "tailwindcss";
+
+@source "../../**/*.{md,ts,vue}";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
 }
 
-.terminal-output__bar {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 12px;
-	border-bottom: 1px solid rgb(255 255 255 / 8%);
-	background: #111827;
+:root {
+	--radius: 0.5rem;
+	--background: var(--vp-c-bg);
+	--foreground: var(--vp-c-text-1);
+	--card: var(--vp-c-bg-soft);
+	--card-foreground: var(--vp-c-text-1);
+	--popover: var(--vp-c-bg-elv);
+	--popover-foreground: var(--vp-c-text-1);
+	--primary: var(--vp-c-brand-1);
+	--primary-foreground: #ffffff;
+	--secondary: var(--vp-c-bg-alt);
+	--secondary-foreground: var(--vp-c-text-1);
+	--muted: var(--vp-c-bg-soft);
+	--muted-foreground: var(--vp-c-text-2);
+	--accent: var(--vp-c-default-soft);
+	--accent-foreground: var(--vp-c-text-1);
+	--destructive: #ef4444;
+	--border: var(--vp-c-divider);
+	--input: var(--vp-c-divider);
+	--ring: var(--vp-c-brand-2);
+	--terminal-background: #0c0f14;
+	--terminal-danger: #ef4444;
+	--terminal-success: #22c55e;
+	--terminal-warning: #facc15;
 }
 
-.terminal-output__dot {
-	width: 10px;
-	height: 10px;
-	border-radius: 999px;
+.dark {
+	--background: var(--vp-c-bg);
+	--foreground: var(--vp-c-text-1);
+	--card: var(--vp-c-bg-soft);
+	--card-foreground: var(--vp-c-text-1);
+	--popover: var(--vp-c-bg-elv);
+	--popover-foreground: var(--vp-c-text-1);
+	--primary: var(--vp-c-brand-1);
+	--primary-foreground: #ffffff;
+	--secondary: var(--vp-c-bg-alt);
+	--secondary-foreground: var(--vp-c-text-1);
+	--muted: var(--vp-c-bg-soft);
+	--muted-foreground: var(--vp-c-text-2);
+	--accent: var(--vp-c-default-soft);
+	--accent-foreground: var(--vp-c-text-1);
+	--destructive: #f87171;
+	--border: var(--vp-c-divider);
+	--input: var(--vp-c-divider);
+	--ring: var(--vp-c-brand-2);
 }
 
-.terminal-output__dot--danger {
-	background: #ef4444;
-}
-
-.terminal-output__dot--warning {
-	background: #facc15;
-}
-
-.terminal-output__dot--success {
-	background: #22c55e;
-}
-
-.terminal-output__title {
-	margin-left: 4px;
-	color: #9ca3af;
-	font-size: 12px;
-	line-height: 1;
-}
-
-.terminal-output__viewport {
-	min-height: 64px;
-	padding: 12px;
-}
-
-.terminal-output .xterm {
+.xterm {
 	padding: 0;
 }
 
-.terminal-output .xterm-viewport {
+.xterm-viewport {
 	overflow: hidden !important;
 }
