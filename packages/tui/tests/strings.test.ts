@@ -10,6 +10,20 @@ describe('string utilities', () => {
 		expect(truncate('Ollin Prompts', 10)).toBe('Ollin P...');
 	});
 
+	it('closes ANSI styles when truncating styled text', () => {
+		const result = truncate('\u001B[31mOllin Prompts\u001B[39m', 10);
+
+		expect(parseAnsiText(result)).toBe('Ollin P...');
+		expect(result).toContain('\u001B[31m');
+		expect(result).toContain('\u001B[0m...');
+		expect(result.endsWith('\u001B[39m')).toBe(false);
+	});
+
+	it('clips truncation markers by visible width', () => {
+		expect(truncate('Ollin Prompts', 1, '…')).toBe('…');
+		expect(truncate('Ollin Prompts', 1, '東京')).toBe('');
+	});
+
 	it('wraps words to the requested width', () => {
 		expect(wrap('Ollin Prompts', 7)).toEqual(['Ollin', 'Prompts']);
 	});

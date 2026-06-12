@@ -21,18 +21,45 @@ export const truncate = (value: string, width: number, marker = '...'): string =
 		return value;
 	}
 
-	if (width <= marker.length) {
-		return marker.slice(0, width);
+	if (width <= visibleWidth(marker)) {
+		let clippedMarker = '';
+
+		for (const char of marker) {
+			if (visibleWidth(`${clippedMarker}${char}`) > width) {
+				break;
+			}
+
+			clippedMarker += char;
+		}
+
+		return clippedMarker;
 	}
 
 	let result = '';
+	let activeCodes = '';
 
-	for (const char of value) {
-		if (visibleWidth(`${result}${char}${marker}`) > width) {
-			return `${result}${marker}`;
+	const markerWidth = visibleWidth(marker);
+
+	for (const segment of parseAnsiSegments(value)) {
+		if (segment.codes !== activeCodes) {
+			if (activeCodes !== '') {
+				result += ansiCloseSequence(activeCodes);
+			}
+
+			if (segment.codes !== '') {
+				result += segment.codes;
+			}
+
+			activeCodes = segment.codes;
 		}
 
-		result += char;
+		for (const char of segment.text) {
+			if (visibleWidth(`${result}${char}`) + markerWidth > width) {
+				return `${result}${activeCodes === '' ? '' : ansiCloseSequence(activeCodes)}${marker}`;
+			}
+
+			result += char;
+		}
 	}
 
 	return result;
