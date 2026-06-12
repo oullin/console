@@ -542,6 +542,32 @@ describe('choice prompts', () => {
 		expect(result).toBe('FIRST');
 	});
 
+	it('renders select submitted frames only after validation passes', async () => {
+		const output = createMemoryOutput();
+
+		const result = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.down, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				select({
+					message: 'Pick one',
+					options: ['first', 'second'],
+					validate: (value) => (value === 'second' ? null : 'Choose second.'),
+				}),
+		);
+
+		const rendered = parseAnsiText(output.text());
+
+		expect(result).toBe('second');
+		expect(rendered).toContain('Choose second.');
+		expect(rendered).not.toMatch(/^ │ first\s*│$/m);
+		expect(rendered).toMatch(/^ │ second\s*│$/m);
+	});
+
 	it('trims line-mode select answers before matching choices', async () => {
 		const output = createMemoryOutput();
 

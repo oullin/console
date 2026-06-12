@@ -4,6 +4,7 @@ import { promptUntilValid, PromptValidationError } from '#tui/prompt';
 import { normalizeChoices } from '#tui/concerns/choices';
 import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
+import { renderSubmittedChoice } from '#tui/prompts/select/render';
 import { assertSelectOptions } from '#tui/prompts/select/validators/options';
 import type { ChoiceOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
@@ -42,17 +43,31 @@ export async function select<T>(
 	const promptOptions = { ...options, required: options.required ?? true };
 	const choices = normalizeChoices(options.options);
 
-	return promptUntilValid(promptOptions, async () => {
-		const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info).catch((error: unknown) => {
-			if (promptOptions.default !== undefined && error instanceof PromptValidationError) {
-				return promptOptions.default;
+	let shouldRenderSubmittedFrame = false;
+	let submittedLabel = '';
+
+	return promptUntilValid(
+		promptOptions,
+		async () => {
+			const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info).catch((error: unknown) => {
+				if (promptOptions.default !== undefined && error instanceof PromptValidationError) {
+					return { cancelled: false, submitted: false, submittedLabel: '', value: promptOptions.default };
+				}
+
+				throw error;
+			});
+
+			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+			submittedLabel = selected.submittedLabel;
+
+			return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+		},
+		() => {
+			if (shouldRenderSubmittedFrame) {
+				renderSubmittedChoice(promptOptions.message, submittedLabel);
 			}
-
-			throw error;
-		});
-
-		return promptOptions.transform ? promptOptions.transform(selected) : selected;
-	});
+		},
+	);
 }
 
 export function multiselect<T>(options: MultiSelectPromptOptions<T>): Promise<T[]>;

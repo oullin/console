@@ -45,6 +45,7 @@ TypeScript and OpenTUI internals.
 | Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select non-interactive default validation | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
+| Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
