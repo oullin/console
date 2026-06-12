@@ -217,6 +217,16 @@ describe('data table prompt', () => {
 		expect(result).toBe('ALPHA');
 	});
 
+	it('rejects invalid data table runtime shapes through the validator layer', async () => {
+		const output = createMemoryOutput();
+
+		await withPromptEnvironment({ output, error: output }, async () => {
+			await expect(datatable(null as never)).rejects.toThrow();
+
+			await expect(datatable(['Name'], [null] as never)).rejects.toThrow();
+		});
+	});
+
 	it('renders data table submitted frames only after validation passes', async () => {
 		const output = createMemoryOutput();
 

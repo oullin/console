@@ -2,6 +2,7 @@ import { promptUntilValid } from '#tui/prompt';
 import { readDataTableSelection } from '#tui/output/data-table/read';
 import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
 import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
+import { parseDataTablePromptOptions } from '#tui/output/validators/data-table';
 import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
@@ -30,19 +31,7 @@ export async function datatable<T = unknown>(
 	transform: DataTablePromptOptions<T>['transform'] = undefined,
 	filter: DataTablePromptOptions<T>['filter'] = undefined,
 ): Promise<T | number> {
-	const options = Array.isArray(optionsOrHeaders)
-		? {
-				filter,
-				headers: optionsOrHeaders,
-				hint,
-				message: label,
-				required,
-				rows: rows ?? [],
-				scroll,
-				transform,
-				validate,
-			}
-		: optionsOrHeaders;
+	const options = parseDataTablePromptOptions<T>(optionsOrHeaders, rows, scroll, label, hint, required, validate, transform, filter);
 
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 

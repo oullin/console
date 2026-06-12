@@ -145,6 +145,7 @@ TypeScript and OpenTUI internals.
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
 | Public ESM package runtime and type-consumption surface | `packages/tui/src/index.ts`, `packages/tui/src/form/builder/index.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*`, `packages/acceptance/tests/package.test.ts` |
+| Data table prompt argument validation layer | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table.ts`, `packages/tui/tests/table.test.ts` |
 
 ## Remaining Exact-Parity Work
 

@@ -17,10 +17,15 @@ const dataTableRowSchema = z.union([dataObjectRowSchema, dataTableArrayRowSchema
 
 const dataTablePromptOptionsSchema = z
 	.object({
+		headers: z.array(z.string()).optional(),
 		message: z.string(),
 		rows: z.array(dataTableRowSchema),
+		scroll: z.number().optional(),
 	})
 	.passthrough();
+
+const dataTableHeadersSchema = z.array(z.string());
+const dataTableRowsSchema = z.array(dataTableRowSchema);
 
 export type DataTableRowShape<T> =
 	| {
@@ -48,6 +53,36 @@ export const dataTableStepName = (value: unknown): string | undefined => {
 	const result = dataTableStepNameSchema.safeParse(value);
 
 	return result.success ? result.data : undefined;
+};
+
+export const parseDataTablePromptOptions = <T>(
+	optionsOrHeaders: unknown = [],
+	rows: unknown = null,
+	scroll = 10,
+	label = '',
+	hint = '',
+	required: DataTablePromptOptions<T>['required'] = false,
+	validate: DataTablePromptOptions<T>['validate'] = undefined,
+	transform: DataTablePromptOptions<T>['transform'] = undefined,
+	filter: DataTablePromptOptions<T>['filter'] = undefined,
+): DataTablePromptOptions<T> => {
+	const promptOptions = dataTablePromptOptionsSchema.safeParse(optionsOrHeaders);
+
+	if (promptOptions.success) {
+		return promptOptions.data as DataTablePromptOptions<T>;
+	}
+
+	return {
+		filter,
+		headers: dataTableHeadersSchema.parse(optionsOrHeaders),
+		hint,
+		message: label,
+		required,
+		rows: rows === null ? [] : (dataTableRowsSchema.parse(rows) as Array<DataTableRow<T>>),
+		scroll,
+		transform,
+		validate,
+	};
 };
 
 export const parseDataTableRowShape = <T>(row: DataTableRow<T>): DataTableRowShape<T> => {
