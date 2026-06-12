@@ -1,6 +1,6 @@
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SuggestOptions } from '#tui/prompts/choices';
-import type { ChoiceOptions, MaybePromise, MultiSearchPromptOptions, SearchPromptOptions, TextPromptOptions } from '#tui/types';
+import type { ChoiceOptions, ConfirmPromptOptions, MaybePromise, MultiSearchPromptOptions, MultiSelectPromptOptions, SearchPromptOptions, SelectPromptOptions, TextPromptOptions } from '#tui/types';
 
 export type ChoicePromptBuilderMethods = {
 	autocomplete(this: FormBuilder, options: SuggestOptions, name?: string): FormBuilder;
@@ -16,6 +16,7 @@ export type ChoicePromptBuilderMethods = {
 		name?: string,
 		transform?: TextPromptOptions['transform'],
 	): FormBuilder;
+	confirm(this: FormBuilder, options: ConfirmPromptOptions, name?: string): FormBuilder;
 	confirm(
 		this: FormBuilder,
 		label: string,
@@ -41,6 +42,7 @@ export type ChoicePromptBuilderMethods = {
 		name?: string,
 		transform?: MultiSearchPromptOptions<T>['transform'],
 	): FormBuilder;
+	multiselect<T>(this: FormBuilder, options: MultiSelectPromptOptions<T>, name?: string): FormBuilder;
 	multiselect<T>(
 		this: FormBuilder,
 		label: string,
@@ -67,6 +69,7 @@ export type ChoicePromptBuilderMethods = {
 		name?: string,
 		transform?: SearchPromptOptions<T>['transform'],
 	): FormBuilder;
+	select<T>(this: FormBuilder, options: SelectPromptOptions<T>, name?: string): FormBuilder;
 	select<T>(
 		this: FormBuilder,
 		label: string,

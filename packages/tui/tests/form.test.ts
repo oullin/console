@@ -142,6 +142,45 @@ describe('form builder', () => {
 		expect(responses.body).toBe('Line\nDone');
 	});
 
+	it('runs object-option choice prompt form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() =>
+				form()
+					.confirm({ message: 'Continue?', default: false, transform: (value) => !value }, 'confirmed')
+					.select({ message: 'Color', options: { red: 'Red', green: 'Green' }, default: 'green', transform: (value) => value.toUpperCase() }, 'color')
+					.multiselect({ message: 'Colors', options: { red: 'Red', blue: 'Blue' }, default: ['red'], transform: (value) => [...value, 'blue'] }, 'colors')
+					.submit(),
+		);
+
+		expect(responses.confirmed).toBe(true);
+		expect(responses.color).toBe('GREEN');
+		expect(responses.colors).toEqual(['red', 'blue']);
+	});
+
+	it('stores unnamed object-option confirm form steps positionally', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().confirm({ message: 'Continue?' }).submit(),
+		);
+
+		expect(responses[0]).toBe(true);
+	});
+
 	it('reuses array previous responses when reverting prompt builder steps', async () => {
 		const output = createMemoryOutput();
 
