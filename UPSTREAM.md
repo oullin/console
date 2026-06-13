@@ -22,6 +22,7 @@ TypeScript and OpenTUI internals.
 | Prompt non-interactive raw-default validation lifecycle | `packages/tui/src/prompt/lifecycle.ts` |
 | Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt validation warning line styling | `packages/tui/src/theme.ts`, `packages/tui/src/prompt/lifecycle.ts` |
+| Prompt local and global validation composition | `packages/tui/src/prompt/validation.ts`, `packages/tui/src/prompt/validate-using.ts` |
 | Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
