@@ -9,7 +9,7 @@ FMT_RUN := docker run --rm \
 	-e HOST_PROJECT_PATH=$(ROOT_PATH) \
 	$(FMT_IMAGE)
 
-TS_GLOBS := '*.ts' '*.tsx' '*.mts' '*.cts'
+TS_GLOBS := '*.ts' '*.tsx' '*.vue' '*.mts' '*.cts'
 
 .DEFAULT_GOAL := help
 
@@ -18,10 +18,14 @@ define step
 endef
 
 define run_oxfmt
-@cd "$(ROOT_PATH)" && tmp=$$(mktemp); git ls-files -z $(1) --exclude-standard -- $(TS_GLOBS) | while IFS= read -r -d '' f; do [ -f "$$f" ] && printf '%s\0' "$$f"; done > "$$tmp"; if [ ! -s "$$tmp" ]; then echo "No TS files to format."; rm -f "$$tmp"; else xargs -0 $(FMT_RUN) format < "$$tmp"; rc=$$?; rm -f "$$tmp"; exit $$rc; fi
+@cd "$(ROOT_PATH)" && tmp=$$(mktemp); git ls-files -z $(1) --exclude-standard -- $(TS_GLOBS) | while IFS= read -r -d '' f; do [ -f "$$f" ] && printf '%s\0' "$$f"; done > "$$tmp"; if [ ! -s "$$tmp" ]; then echo "No TS/Vue files to format."; rm -f "$$tmp"; else xargs -0 $(FMT_RUN) format < "$$tmp"; rc=$$?; rm -f "$$tmp"; exit $$rc; fi
 endef
 
-.PHONY: help format format-all fresh
+define run_in
+	@cd "$(1)" && $(2)
+endef
+
+.PHONY: help dev format format-all fresh
 
 help:
 	@awk 'BEGIN {FS = ":.*?## "; printf "\nUsage: \033[36mmake <target>\033[0m\n"} \
@@ -29,12 +33,16 @@ help:
 		/^[a-zA-Z0-9_.-]+:.*?##/ { printf "  \033[36m%-28s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
 
+##@ Development
+dev: ## Run the docs dev server
+	$(call run_in,$(ROOT_PATH),pnpm --filter docs dev)
+
 ##@ Formatting
-format: ## Format untracked + modified TS files via oxfmt/oxlint
+format: ## Format + lint untracked + modified TS/Vue files via oxfmt/oxlint
 	$(call run_oxfmt,--others --modified)
 
-format-all: ## Format every non-ignored TS file in the repo via oxfmt/oxlint
-	@cd "$(ROOT_PATH)" && tmp=$$(mktemp); git ls-files -z --cached --others --exclude-standard -- $(TS_GLOBS) | while IFS= read -r -d '' f; do [ -f "$$f" ] && printf '%s\0' "$$f"; done > "$$tmp"; if [ ! -s "$$tmp" ]; then echo "No TS files to format."; rm -f "$$tmp"; else xargs -0 $(FMT_RUN) format < "$$tmp"; rc=$$?; rm -f "$$tmp"; exit $$rc; fi
+format-all: ## Format + lint every non-ignored TS/Vue file in the repo via oxfmt/oxlint
+	@cd "$(ROOT_PATH)" && tmp=$$(mktemp); git ls-files -z --cached --others --exclude-standard -- $(TS_GLOBS) | while IFS= read -r -d '' f; do [ -f "$$f" ] && printf '%s\0' "$$f"; done > "$$tmp"; if [ ! -s "$$tmp" ]; then echo "No TS/Vue files to format."; rm -f "$$tmp"; else xargs -0 $(FMT_RUN) format < "$$tmp"; rc=$$?; rm -f "$$tmp"; exit $$rc; fi
 
 ##@ Maintenance
 fresh: ## Clean generated state, reinstall dependencies, then run local gates

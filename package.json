@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "turbo build",
+    "dev": "make dev",
+    "format": "make format",
+    "format-all": "make format-all",
     "test": "turbo test",
     "typecheck": "turbo typecheck"
   },
