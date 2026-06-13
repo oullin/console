@@ -1,10 +1,9 @@
 import { alert, clear, dataTable, datatable, error, grid, info, intro, note, notify, outro, table, title, warning } from '#tui/output';
 import { previousValue } from '#tui/form/builder/previous';
-import { sideEffectStep } from '#tui/form/builder/step';
 import { dataTableStepName, isDataTablePromptOptions } from '#tui/output/validators/data-table';
 import { isTableOptions, tableStepName } from '#tui/output/validators/table';
 import type { FormBuilder } from '#tui/form/builder/index';
-import type { DataTablePromptOptions, DataTableRow, MaybePromise, TableOptions } from '#tui/types';
+import type { DataTablePromptOptions, DataTableRow, TableOptions } from '#tui/types';
 
 export type OutputBuilderMethods = {
 	alert(this: FormBuilder, message: string, name?: string): FormBuilder;
@@ -38,25 +37,15 @@ export type OutputBuilderMethods = {
 	warning(this: FormBuilder, message: string, name?: string): FormBuilder;
 };
 
-const displayStep = (callback: () => void): (() => MaybePromise<null>) => sideEffectStep(callback);
-
 function dataTableFormStep(this: FormBuilder, options: TableOptions, name?: string): FormBuilder;
 function dataTableFormStep(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
 
 function dataTableFormStep(this: FormBuilder, headersOrOptions: TableOptions | string[] = [], rowsOrName: TableOptions['rows'] | string | null = null, name?: string): FormBuilder {
 	if (isTableOptions(headersOrOptions)) {
-		return this.add(
-			displayStep(() => dataTable(headersOrOptions)),
-			tableStepName(rowsOrName),
-			true,
-		);
+		return this.addSideEffect(() => dataTable(headersOrOptions), tableStepName(rowsOrName));
 	}
 
-	return this.add(
-		displayStep(() => dataTable(headersOrOptions, rowsOrName as TableOptions['rows'] | null)),
-		name,
-		true,
-	);
+	return this.addSideEffect(() => dataTable(headersOrOptions, rowsOrName as TableOptions['rows'] | null), name);
 }
 
 function tableFormStep(this: FormBuilder, options: TableOptions, name?: string): FormBuilder;
@@ -64,18 +53,10 @@ function tableFormStep(this: FormBuilder, headersOrOptions?: TableOptions | stri
 
 function tableFormStep(this: FormBuilder, headersOrOptions: TableOptions | string[] = [], rowsOrName: TableOptions['rows'] | string | null = null, name?: string): FormBuilder {
 	if (isTableOptions(headersOrOptions)) {
-		return this.add(
-			displayStep(() => table(headersOrOptions)),
-			tableStepName(rowsOrName),
-			true,
-		);
+		return this.addSideEffect(() => table(headersOrOptions), tableStepName(rowsOrName));
 	}
 
-	return this.add(
-		displayStep(() => table(headersOrOptions, rowsOrName as TableOptions['rows'] | null)),
-		name,
-		true,
-	);
+	return this.addSideEffect(() => table(headersOrOptions, rowsOrName as TableOptions['rows'] | null), name);
 }
 
 function datatableFormStep<T = unknown>(this: FormBuilder, options: DataTablePromptOptions<T>, name?: string): FormBuilder;
@@ -130,83 +111,39 @@ function datatableFormStep<T = unknown>(
 
 export const outputBuilderMethods: OutputBuilderMethods & ThisType<FormBuilder> = {
 	alert(message, name) {
-		return this.add(
-			displayStep(() => alert(message)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => alert(message), name);
 	},
 	clear(name) {
-		return this.add(
-			displayStep(() => clear()),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => clear(), name);
 	},
 	dataTable: dataTableFormStep,
 	datatable: datatableFormStep,
 	error(message, name) {
-		return this.add(
-			displayStep(() => error(message)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => error(message), name);
 	},
 	grid(items = [], maxWidth, name) {
-		return this.add(
-			displayStep(() => grid(items, maxWidth)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => grid(items, maxWidth), name);
 	},
 	info(message, name) {
-		return this.add(
-			displayStep(() => info(message)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => info(message), name);
 	},
 	intro(message, name) {
-		return this.add(
-			displayStep(() => intro(message)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => intro(message), name);
 	},
 	note(message, type = null, name) {
-		return this.add(
-			displayStep(() => note(message, type)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => note(message, type), name);
 	},
 	notify(message, body = '', subtitle = '', sound = '', icon = '', name) {
-		return this.add(
-			displayStep(() => notify(message, body, subtitle, sound, icon)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => notify(message, body, subtitle, sound, icon), name);
 	},
 	outro(message, name) {
-		return this.add(
-			displayStep(() => outro(message)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => outro(message), name);
 	},
 	table: tableFormStep,
 	title(value, name) {
-		return this.add(
-			displayStep(() => title(value)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => title(value), name);
 	},
 	warning(message, name) {
-		return this.add(
-			displayStep(() => warning(message)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => warning(message), name);
 	},
 };

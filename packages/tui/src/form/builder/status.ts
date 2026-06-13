@@ -1,5 +1,4 @@
 import { progress, spin, stream, task } from '#tui/status';
-import { sideEffectStep } from '#tui/form/builder/step';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MaybePromise } from '#tui/types';
 import type { Logger, Progress, Stream, TaskDefinition } from '#tui/status';
@@ -41,11 +40,7 @@ export const statusBuilderMethods: StatusBuilderMethods & ThisType<FormBuilder> 
 			return this.add(() => stream() as Stream);
 		}
 
-		return this.add(
-			sideEffectStep(() => stream(source)),
-			name,
-			true,
-		);
+		return this.addSideEffect(() => stream(source), name);
 	},
 	task<T>(definitionOrLabel: TaskDefinition<T> | string, callbackOrName?: ((logger: Logger) => MaybePromise<T>) | string, limit = 10, keepSummary = false, subLabel = '', name?: string) {
 		if (typeof definitionOrLabel === 'string') {

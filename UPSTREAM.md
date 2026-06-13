@@ -93,6 +93,7 @@ TypeScript and OpenTUI internals.
 | Form builder nested prompt revert short-circuiting | `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder first-step and conditional revert feature coverage | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder asynchronous condition lifecycle | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/src/form/types.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder side-effect step surface and revert skipping | `packages/tui/src/form/builder/index.ts`, `packages/tui/src/form/builder/step.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/status.ts` |
 | Notes and alert-style output | `packages/tui/src/output/notes.ts` |
 | Note multiline and typed theme rendering | `packages/tui/src/output/notes.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/output.test.ts` |
 | Note intro/outro visible-width padding | `packages/tui/src/output/notes.ts`, `packages/tui/tests/output.test.ts` |

@@ -1,5 +1,6 @@
 import { outputBuilderMethods } from '#tui/form/builder/output';
 import { promptBuilderMethods } from '#tui/form/builder/prompts';
+import { sideEffectStep } from '#tui/form/builder/step';
 import { statusBuilderMethods } from '#tui/form/builder/status';
 import { submitFormSteps } from '#tui/form/builder/submit';
 import type { OutputBuilderMethods } from '#tui/form/builder/output';
@@ -62,6 +63,14 @@ export class FormBuilder {
 		});
 
 		return this;
+	}
+
+	addSideEffect(step: () => MaybePromise<void>, name?: string): this {
+		return this.add(sideEffectStep(step), name, true);
+	}
+
+	addSideEffectIf(condition: FormStepCondition, step: () => MaybePromise<void>, name?: string): this {
+		return this.addIf(condition, sideEffectStep(step), name, true);
 	}
 
 	async submit(): Promise<FormResponses> {
