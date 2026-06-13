@@ -1,5 +1,5 @@
 import { visibleWidth } from '#tui/strings';
-import { dim, yellow } from '#tui/theme/styles';
+import { dim, red } from '#tui/theme/styles';
 import type { Choice } from '#tui/types';
 
 export const symbols = {
@@ -20,7 +20,7 @@ export const renderQuestion = (message: string, hint?: string): string => {
 	return `${symbols.question} ${message}${suffix} `;
 };
 
-export const renderError = (message: string): string => `${yellow(`  ⚠ ${message}`)}\n`;
+export const renderError = (message: string): string => `${red(`${symbols.error} ${message}`)}\n`;
 
 export const renderChoices = <T>(choices: Array<Choice<T>>): string => {
 	return choices
