@@ -21,8 +21,12 @@ const renderCancelledConfirmOptions = (options: ConfirmPromptOptions, confirmed:
 	return confirmed ? dim(`● ${yes} / ○ ${no}`) : dim(`○ ${yes} / ● ${no}`);
 };
 
-export const renderActiveConfirm = (options: ConfirmPromptOptions, confirmed: boolean): void => {
-	promptEnvironment().output.write(`${renderBox({ body: renderConfirmOptions(options, confirmed), borderStyle: cyan, info: options.hint, title: cyan(options.message) })}\n`);
+export const renderActiveConfirm = (options: ConfirmPromptOptions, confirmed: boolean): string => {
+	const frame = `${renderBox({ body: renderConfirmOptions(options, confirmed), borderStyle: cyan, info: options.hint, title: cyan(options.message) })}\n`;
+
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedConfirm = (options: ConfirmPromptOptions, confirmed: boolean): void => {

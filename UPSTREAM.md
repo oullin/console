@@ -47,6 +47,7 @@ TypeScript and OpenTUI internals.
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Confirm active, submitted, cancelled, custom-label, fallback, and non-interactive behavior | `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts`, `packages/tui/tests/choices.test.ts` |
 | Confirm submitted frame renders only after validation passes | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/choices.test.ts` |
+| Confirm active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts` |
 | Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Select and multi-select label-first helper argument surface with info | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
@@ -105,6 +106,7 @@ TypeScript and OpenTUI internals.
 | Data table viewing-info rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table submitted and cancelled final frames | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/tests/table.test.ts` |
 | Data table submitted frame renders only after validation passes | `packages/tui/src/output/data-table.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/src/output/data-table/types.ts`, `packages/tui/tests/table.test.ts` |
+| Data table active-frame redraw and cursor-aware search rendering | `packages/tui/src/output/data-table.ts`, `packages/tui/src/output/data-table/read.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/types.ts` |
 | Data table themed cancellation warning | `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table multiline cell rendering | `packages/tui/src/output/data-table/multiline.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |
 | Data table scrollbar rendering | `packages/tui/src/output/data-table/scrollbar.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/tests/table.test.ts` |

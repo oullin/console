@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
 import { renderCancelledDataTableFrame, renderDataTableFrame } from '#tui/output/data-table/render';
@@ -32,13 +33,26 @@ const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>, defau
 	return Math.max(0, selected);
 };
 
-const dataTableSelectionResult = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number, submitted: boolean, cancelled = false): DataTableSelectionReadResult<T> => ({
+const dataTableSelectionResult = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number, submitted: boolean, cancelled = false, frame?: string): DataTableSelectionReadResult<T> => ({
 	cancelled,
+	frame,
 	rows,
 	selected,
 	submitted,
 	value: selectedDataTableValue(rows, selected),
 });
+
+const assertSelectedDataTableRow = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number, frame: string): void => {
+	if (rows[selected]) {
+		return;
+	}
+
+	if (frame.length > 0) {
+		eraseRenderedFrame(frame);
+	}
+
+	throw invalidRow();
+};
 
 export const readDataTableSelection = async <T>(options: DataTablePromptOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
 	const environment = promptEnvironment();
@@ -48,10 +62,16 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 	const visibleRows = () => visibleDataTableRows(options, headers, search.query.value);
 
 	let selected = initialDataTableSelection(visibleRows(), options.default);
+	let frame = '';
 
 	const render = (): void => {
-		selected = renderDataTableFrame({
+		if (frame.length > 0) {
+			eraseRenderedFrame(frame);
+		}
+
+		const rendered = renderDataTableFrame({
 			allRows: options.rows,
+			cursor: search.query.cursor,
 			headers,
 			message: options.message,
 			mode: search.mode,
@@ -60,6 +80,9 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 			scroll: options.scroll,
 			selected,
 		});
+
+		frame = rendered.frame;
+		selected = rendered.selected;
 	};
 
 	if (!environment.input.readKey) {
@@ -72,12 +95,18 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return dataTableSelectionResult(visibleRows(), selected, false);
+			const currentRows = visibleRows();
+
+			assertSelectedDataTableRow(currentRows, selected, frame);
+
+			return dataTableSelectionResult(currentRows, selected, false, false, frame);
 		}
 
 		const rows = visibleRows();
 
 		if (key === Key.ctrlC) {
+			assertSelectedDataTableRow(rows, selected, frame);
+			eraseRenderedFrame(frame);
 			renderCancelledDataTableFrame(options.message, headers, rows, selected);
 
 			return {
@@ -114,7 +143,9 @@ export const readDataTableSelection = async <T>(options: DataTablePromptOptions<
 		}
 
 		if (key === Key.enter) {
-			return dataTableSelectionResult(rows, selected, true);
+			assertSelectedDataTableRow(rows, selected, frame);
+
+			return dataTableSelectionResult(rows, selected, true, false, frame);
 		}
 	}
 };

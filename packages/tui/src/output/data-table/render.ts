@@ -7,11 +7,13 @@ import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-ta
 import { fixedVisualDataTableRows } from '#tui/output/data-table/visual-window';
 import { fitDataTableColumns } from '#tui/output/data-table/widths';
 import { dim, red, strikethrough } from '#tui/theme/styles';
+import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { DataTableRow } from '#tui/types';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
 type RenderDataTableFrameOptions<T> = {
 	allRows: Array<DataTableRow<T>>;
+	cursor: number;
 	headers: string[];
 	message: string;
 	mode: 'browse' | 'search';
@@ -21,20 +23,28 @@ type RenderDataTableFrameOptions<T> = {
 	selected: number;
 };
 
+export type RenderedDataTableFrame = {
+	frame: string;
+	selected: number;
+};
+
 const renderHeaders = (headers: string[]): string[] => (headers.length > 0 ? ['', ...headers] : []);
 
-export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>): number => {
+export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>): RenderedDataTableFrame => {
 	const environment = promptEnvironment();
 	const selected = clampDataTableSelection(options.selected, options.rows);
 	const window = dataTableRowWindow(options.rows.length, selected, options.scroll);
-	const querySuffix = options.mode === 'search' || options.query.length > 0 ? ` ${options.query}` : '';
-
-	environment.output.write(`${options.message}${querySuffix}\n`);
+	const querySuffix = options.mode === 'search' || options.query.length > 0 ? ` / ${valueWithCursor(options.query, options.cursor)}` : '';
+	const lines = [`${options.message}${querySuffix}`];
 
 	if (options.rows.length === 0) {
-		environment.output.write(`${renderTable([], [['No results found.']])}\n`);
+		lines.push(renderTable([], [['No results found.']]));
 
-		return selected;
+		const frame = `${lines.join('\n')}\n`;
+
+		environment.output.write(frame);
+
+		return { frame, selected };
 	}
 
 	const visibleCells = options.rows.slice(window.start, window.end).map(({ row }) => dataTableRowCells(options.headers, row));
@@ -49,15 +59,19 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 
 	const visualRows = fixedVisualDataTableRows(expandMultilineDataTableRows(renderedRows), options.scroll);
 
-	environment.output.write(`${renderScrollableDataTable(renderHeaders(fitted.headers), visualRows, window.start, window.end - window.start, options.rows.length)}\n`);
+	lines.push(renderScrollableDataTable(renderHeaders(fitted.headers), visualRows, window.start, window.end - window.start, options.rows.length));
 
 	if (window.end - window.start < options.rows.length) {
 		const suffix = options.query.length > 0 ? ' results' : '';
 
-		environment.output.write(`  Viewing ${window.start + 1}-${window.end} of ${options.rows.length}${suffix}\n`);
+		lines.push(`  Viewing ${window.start + 1}-${window.end} of ${options.rows.length}${suffix}`);
 	}
 
-	return selected;
+	const frame = `${lines.join('\n')}\n`;
+
+	environment.output.write(frame);
+
+	return { frame, selected };
 };
 
 export const renderSubmittedDataTableFrame = <T>(message: string, headers: string[], rows: Array<VisibleDataTableRow<T>>, selected: number): void => {

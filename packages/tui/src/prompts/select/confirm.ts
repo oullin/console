@@ -1,4 +1,5 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { readConfirm } from '#tui/prompts/select/read-confirm';
 import { renderSubmittedConfirm } from '#tui/prompts/select/render-confirm';
 import type { ConfirmPromptOptions } from '#tui/types';
@@ -30,6 +31,7 @@ export async function confirm(
 		typeof message === 'string' ? { message, label: message, default: defaultValue, yes, no, required, validate, hint, transform } : { ...message, default: message.default ?? true };
 
 	let shouldRenderSubmittedFrame = false;
+	let activeFrame: string | undefined;
 
 	return promptWithFallback('confirm', options, () =>
 		promptUntilValid(
@@ -37,12 +39,17 @@ export async function confirm(
 			async () => {
 				const answer = await readConfirm(options);
 
+				activeFrame = answer.frame;
 				shouldRenderSubmittedFrame = answer.submitted && !answer.cancelled;
 
 				return options.transform ? options.transform(answer.value) : answer.value;
 			},
 			(value) => {
 				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
 					renderSubmittedConfirm(options, value);
 				}
 			},

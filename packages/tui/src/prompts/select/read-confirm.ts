@@ -2,6 +2,7 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
 import { rejectPromptRevert } from '#tui/prompt/revert';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderActiveConfirm, renderCancelledConfirm } from '#tui/prompts/select/render-confirm';
 import type { ConfirmPromptOptions } from '#tui/types';
 
@@ -9,6 +10,7 @@ const toggleKeys = new Set([Key.tab, Key.up, Key.upArrow, Key.down, Key.downArro
 
 export type ConfirmReadResult = {
 	cancelled: boolean;
+	frame?: string;
 	submitted: boolean;
 	value: boolean;
 };
@@ -30,40 +32,44 @@ export const readConfirm = async (options: ConfirmPromptOptions): Promise<Confir
 
 	let confirmed = options.default ?? true;
 
-	renderActiveConfirm(options, confirmed);
+	let frame = renderActiveConfirm(options, confirmed);
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return { cancelled: false, submitted: true, value: confirmed };
+			return { cancelled: false, frame, submitted: true, value: confirmed };
 		}
 
 		const normalizedKey = key.toLowerCase();
 
 		if (normalizedKey === 'y') {
 			confirmed = true;
-			renderActiveConfirm(options, confirmed);
+			eraseRenderedFrame(frame);
+			frame = renderActiveConfirm(options, confirmed);
 			continue;
 		}
 
 		if (normalizedKey === 'n') {
 			confirmed = false;
-			renderActiveConfirm(options, confirmed);
+			eraseRenderedFrame(frame);
+			frame = renderActiveConfirm(options, confirmed);
 			continue;
 		}
 
 		if (toggleKeys.has(key)) {
 			confirmed = !confirmed;
-			renderActiveConfirm(options, confirmed);
+			eraseRenderedFrame(frame);
+			frame = renderActiveConfirm(options, confirmed);
 			continue;
 		}
 
 		if (key === Key.enter) {
-			return { cancelled: false, submitted: true, value: confirmed };
+			return { cancelled: false, frame, submitted: true, value: confirmed };
 		}
 
 		if (key === Key.ctrlC) {
+			eraseRenderedFrame(frame);
 			renderCancelledConfirm(options, confirmed);
 
 			return { cancelled: true, submitted: false, value: await cancelPrompt(confirmed) };
