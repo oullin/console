@@ -1,4 +1,5 @@
-import { promptUntilValid } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { readAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete';
 import { readSuggestionValue } from '#tui/prompts/suggest/read';
 import { renderSubmittedAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
@@ -39,23 +40,31 @@ export async function suggest(
 	const options = suggestOptions(message, source, placeholder, defaultValue, scroll, required, validate, hint, transform, info);
 
 	let shouldRenderSubmittedFrame = false;
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		options,
-		async () => {
-			const answer = await readSuggestionValue(options);
+	return promptWithFallback('suggest', options, () =>
+		promptUntilValid(
+			options,
+			async () => {
+				const answer = await readSuggestionValue(options);
 
-			const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
-			shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
+				activeFrame = answer.frame;
+				shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
 
-			return options.transform ? options.transform(value) : value;
-		},
-		(value) => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedSuggestion(options.message, value);
-			}
-		},
+				return options.transform ? options.transform(value) : value;
+			},
+			(value) => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedSuggestion(options.message, value);
+				}
+			},
+		),
 	);
 }
 
@@ -90,22 +99,30 @@ export async function autocomplete(
 			: suggestOptions(message);
 
 	let shouldRenderSubmittedFrame = false;
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		options,
-		async () => {
-			const answer = await readAutocompleteValue(options);
+	return promptWithFallback('autocomplete', options, () =>
+		promptUntilValid(
+			options,
+			async () => {
+				const answer = await readAutocompleteValue(options);
 
-			const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
-			shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
+				activeFrame = answer.frame;
+				shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
 
-			return options.transform ? options.transform(value) : value;
-		},
-		(value) => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedAutocomplete(options.message, value);
-			}
-		},
+				return options.transform ? options.transform(value) : value;
+			},
+			(value) => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedAutocomplete(options.message, value);
+				}
+			},
+		),
 	);
 }

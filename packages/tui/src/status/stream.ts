@@ -1,4 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
+import { StatusSignalCleanup } from '#tui/status/signals';
 import { StreamBuffer } from '#tui/status/stream/buffer';
 import { streamFadeStyles } from '#tui/status/stream/fade';
 import { renderStreamFrame, streamLines } from '#tui/status/stream/render';
@@ -8,9 +9,13 @@ export class Stream {
 	#closed = false;
 	readonly #buffer = new StreamBuffer(10);
 	readonly #fadeStyles = streamFadeStyles();
+	readonly #signalCleanup = new StatusSignalCleanup(() => {
+		this.close();
+	});
 
 	constructor() {
 		hideCursor();
+		this.#signalCleanup.attach();
 	}
 
 	write(content: string): this {
@@ -38,6 +43,7 @@ export class Stream {
 		}
 
 		this.#closed = true;
+		this.#signalCleanup.detach();
 		showCursor();
 	}
 

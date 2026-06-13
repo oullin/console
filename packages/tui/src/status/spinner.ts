@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { eraseRenderedFrame } from '#tui/status/frame';
+import { StatusSignalCleanup } from '#tui/status/signals';
 import { renderSpinnerFrame } from '#tui/status/spinner/render';
 import { hideCursor, showCursor } from '#tui/terminal';
 import type { MaybePromise, StatusOptions } from '#tui/types';
@@ -20,13 +21,18 @@ export async function spin<T>(callbackOrMessage: (() => MaybePromise<T>) | strin
 	const output = promptEnvironment().output;
 	const frame = renderSpinnerFrame(message);
 
+	const cleanup = new StatusSignalCleanup(() => {
+		eraseRenderedFrame(frame);
+		showCursor();
+	});
+
 	hideCursor();
+	cleanup.attach();
 	output.write(frame);
 
 	try {
 		return await callback();
 	} finally {
-		eraseRenderedFrame(frame);
-		showCursor();
+		cleanup.restore();
 	}
 }

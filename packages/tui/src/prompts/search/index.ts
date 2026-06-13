@@ -1,4 +1,5 @@
-import { promptUntilValid, PromptValidationError } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { readMultiSearchChoices } from '#tui/prompts/search/read-multi';
 import { readSearchChoice } from '#tui/prompts/search/read-single';
 import { renderSubmittedSearchChoice, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
@@ -39,26 +40,34 @@ export async function search<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabel = '';
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		options,
-		async (attempt) => {
-			const selected = await readSearchChoice(options, attempt);
+	return promptWithFallback('search', options, () =>
+		promptUntilValid(
+			options,
+			async (attempt) => {
+				const selected = await readSearchChoice(options, attempt);
 
-			if (selected.value === undefined) {
-				throw new PromptValidationError('Please select a valid option.');
-			}
+				if (selected.value === undefined) {
+					throw new PromptValidationError('Please select a valid option.');
+				}
 
-			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-			submittedLabel = selected.submittedLabel;
+				activeFrame = selected.frame;
+				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+				submittedLabel = selected.submittedLabel;
 
-			return options.transform ? options.transform(selected.value) : selected.value;
-		},
-		() => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedSearchChoice(options.message, submittedLabel);
-			}
-		},
+				return options.transform ? options.transform(selected.value) : selected.value;
+			},
+			() => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedSearchChoice(options.message, submittedLabel);
+				}
+			},
+		),
 	);
 }
 
@@ -96,21 +105,29 @@ export async function multisearch<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabels: string[] = [];
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		promptOptions,
-		async () => {
-			const selected = await readMultiSearchChoices(promptOptions);
+	return promptWithFallback('multisearch', promptOptions, () =>
+		promptUntilValid(
+			promptOptions,
+			async () => {
+				const selected = await readMultiSearchChoices(promptOptions);
 
-			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-			submittedLabels = selected.submittedLabels;
+				activeFrame = selected.frame;
+				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+				submittedLabels = selected.submittedLabels;
 
-			return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
-		},
-		() => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedSearchChoices(promptOptions.message, submittedLabels);
-			}
-		},
+				return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+			},
+			() => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedSearchChoices(promptOptions.message, submittedLabels);
+				}
+			},
+		),
 	);
 }

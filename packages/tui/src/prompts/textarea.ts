@@ -1,4 +1,5 @@
-import { promptUntilValid } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { readTypedValue } from '#tui/typed-value';
 import { renderSubmittedTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TextareaPromptOptions } from '#tui/types';
@@ -32,28 +33,36 @@ export async function textarea(
 			: { ...message, default: message.default ?? '', rows: message.rows ?? rows };
 
 	let shouldRenderSubmittedFrame = false;
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		options,
-		async () => {
-			const answer = await readTypedValue(options.message, {
-				default: options.default,
-				hint: options.hint,
-				allowNewLine: true,
-				placeholder: options.placeholder,
-				rows: options.rows ?? rows,
-			});
+	return promptWithFallback('textarea', options, () =>
+		promptUntilValid(
+			options,
+			async () => {
+				const answer = await readTypedValue(options.message, {
+					default: options.default,
+					hint: options.hint,
+					allowNewLine: true,
+					placeholder: options.placeholder,
+					rows: options.rows ?? rows,
+				});
 
-			const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
-			shouldRenderSubmittedFrame = !answer.cancelled;
+				activeFrame = answer.frame;
+				shouldRenderSubmittedFrame = !answer.cancelled;
 
-			return options.transform ? options.transform(value) : value;
-		},
-		(value) => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedTextareaFrame(options.message, value);
-			}
-		},
+				return options.transform ? options.transform(value) : value;
+			},
+			(value) => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedTextareaFrame(options.message, value);
+				}
+			},
+		),
 	);
 }

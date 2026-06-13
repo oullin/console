@@ -29,8 +29,8 @@ export {
 	warning,
 } from '#tui/output';
 export type { NoteType, NotificationCommand, NotificationPlatform, NotificationRuntime } from '#tui/output';
-export { cancelUsing, PromptValidationError } from '#tui/prompt';
-export type { PromptCancelHandler } from '#tui/prompt';
+export { cancelUsing, fallbackUsing, fallbackWhen, PromptValidationError, validateUsing } from '#tui/prompt';
+export type { PromptCancelHandler, PromptFallbackCondition, PromptFallbackHandler, PromptFallbackKind, PromptGlobalValidator } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
 export type { TaskDefinition } from '#tui/status';
 export {

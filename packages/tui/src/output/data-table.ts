@@ -1,4 +1,4 @@
-import { promptUntilValid } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { readDataTableSelection } from '#tui/output/data-table/read';
 import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
 import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
@@ -37,19 +37,21 @@ export async function datatable<T = unknown>(
 
 	let submittedSelection: DataTableSelectionReadResult<T> | null = null;
 
-	return promptUntilValid(
-		options,
-		async () => {
-			const selected = await readDataTableSelection(options, headers);
+	return promptWithFallback('datatable', options, () =>
+		promptUntilValid(
+			options,
+			async () => {
+				const selected = await readDataTableSelection(options, headers);
 
-			submittedSelection = selected.submitted && !selected.cancelled ? selected : null;
+				submittedSelection = selected.submitted && !selected.cancelled ? selected : null;
 
-			return options.transform ? options.transform(selected.value) : selected.value;
-		},
-		() => {
-			if (submittedSelection) {
-				renderSubmittedDataTableFrame(options.message, headers, submittedSelection.rows, submittedSelection.selected);
-			}
-		},
+				return options.transform ? options.transform(selected.value) : selected.value;
+			},
+			() => {
+				if (submittedSelection) {
+					renderSubmittedDataTableFrame(options.message, headers, submittedSelection.rows, submittedSelection.selected);
+				}
+			},
+		),
 	);
 }

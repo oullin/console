@@ -1,5 +1,6 @@
 import { textOptions } from '#tui/concerns/text-options';
-import { promptUntilValid } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { readPasswordValue } from '#tui/prompts/password/input';
 import { renderSubmittedPasswordValue } from '#tui/prompts/password/render';
 import type { TextPromptOptions } from '#tui/types';
@@ -26,24 +27,32 @@ export async function password(
 	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, required, validate, hint, transform }) : textOptions(message);
 
 	let shouldRenderSubmittedFrame = false;
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		options,
-		async () => {
-			const answer = await readPasswordValue(options.message, {
-				default: options.default,
-				hint: options.hint,
-				placeholder: options.placeholder,
-			});
+	return promptWithFallback('password', options, () =>
+		promptUntilValid(
+			options,
+			async () => {
+				const answer = await readPasswordValue(options.message, {
+					default: options.default,
+					hint: options.hint,
+					placeholder: options.placeholder,
+				});
 
-			shouldRenderSubmittedFrame = !answer.cancelled;
+				activeFrame = answer.frame;
+				shouldRenderSubmittedFrame = !answer.cancelled;
 
-			return options.transform ? options.transform(answer.value) : answer.value;
-		},
-		(value) => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedPasswordValue(options.message, value);
-			}
-		},
+				return options.transform ? options.transform(answer.value) : answer.value;
+			},
+			(value) => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedPasswordValue(options.message, value);
+				}
+			},
+		),
 	);
 }

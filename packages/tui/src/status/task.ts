@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { eraseRenderedFrame } from '#tui/status/frame';
+import { StatusSignalCleanup } from '#tui/status/signals';
 import { Logger } from '#tui/status/task/logger';
 import { captureTaskProcessOutput } from '#tui/status/task/process-output';
 import { renderTaskFrame } from '#tui/status/task/render';
@@ -48,6 +49,12 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 	const processOutput = captureTaskProcessOutput(logger);
 
+	const cleanup = new StatusSignalCleanup(() => {
+		processOutput.stop();
+		eraseRenderedFrame(frame);
+		showCursor();
+	}).attach();
+
 	try {
 		const result = await run(logger);
 
@@ -79,6 +86,7 @@ export async function task<T>(definitionOrLabel: TaskDefinition<T> | string, cal
 
 		throw error;
 	} finally {
+		cleanup.detach();
 		showCursor();
 	}
 }

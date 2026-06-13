@@ -1,10 +1,13 @@
 import { promptEnvironment } from '#tui/environment';
+import { visibleWidth } from '#tui/strings';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
+import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
 import type { NumberInputOptions } from '#tui/prompts/number/types';
 
 const UP_ARROW = '▲';
 const DOWN_ARROW = '▼';
+const NUMBER_BODY_WIDTH = 60;
 
 const renderNumberArrows = (value: string, options: NumberInputOptions, style: (text: string) => string = (text) => text): string => {
 	const numeric = value !== '' && !Number.isNaN(Number(value));
@@ -19,14 +22,20 @@ const renderNumberArrows = (value: string, options: NumberInputOptions, style: (
 	return `${up}${down}`;
 };
 
-const renderNumberBody = (value: string, options: NumberInputOptions, style?: (text: string) => string): string => {
-	const displayValue = value.length > 0 ? value : dim(options.placeholder ?? '');
+const renderNumberBody = (value: string, cursor: number, options: NumberInputOptions, style?: (text: string) => string): string => {
+	const displayValue = value.length > 0 ? valueWithCursor(value, cursor) : placeholderWithCursor(options.placeholder);
+	const arrows = renderNumberArrows(value, options, style);
+	const padding = Math.max(0, NUMBER_BODY_WIDTH - visibleWidth(displayValue) - visibleWidth(arrows));
 
-	return `${displayValue}  ${renderNumberArrows(value, options, style)}`;
+	return `${displayValue}${' '.repeat(padding)}${arrows}`;
 };
 
-export const renderNumberValue = (message: string, value: string, options: NumberInputOptions): void => {
-	promptEnvironment().output.write(`${renderBox({ body: renderNumberBody(value, options), borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`);
+export const renderNumberValue = (message: string, value: string, cursor: number, options: NumberInputOptions): string => {
+	const frame = `${renderBox({ body: renderNumberBody(value, cursor, options), borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`;
+
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedNumberValue = (message: string, value: number | string): void => {

@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt, PromptValidationError } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderChoices } from '#tui/theme';
 import { findChoice, firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
@@ -10,6 +11,7 @@ import type { Choice, SelectPromptOptions } from '#tui/types';
 
 export type SelectedChoiceReadResult<T> = {
 	cancelled: boolean;
+	frame?: string;
 	submitted: boolean;
 	submittedLabel: string;
 	value: T;
@@ -59,7 +61,7 @@ export const readSelectedChoice = async <T>(
 
 	let selected = defaultChoiceIndex(choices, defaultValue);
 
-	renderSelectedChoice(message, choices, selected, scroll, info);
+	let frame = renderSelectedChoice(message, choices, selected, scroll, info);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -77,6 +79,7 @@ export const readSelectedChoice = async <T>(
 		}
 
 		if (key === Key.ctrlC) {
+			eraseRenderedFrame(frame);
 			renderCancelledChoice(message, choices, selected, scroll);
 
 			const choice = choices[selected];
@@ -93,14 +96,15 @@ export const readSelectedChoice = async <T>(
 		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
 			const choice = choices[numeric - 1];
 
-			return { cancelled: false, submitted: true, submittedLabel: choice.label, value: choice.value };
+			return { cancelled: false, frame, submitted: true, submittedLabel: choice.label, value: choice.value };
 		}
 
 		const action = selectNavigationAction(key, { lineControls: true });
 
 		if (action !== null) {
 			selected = moveSelectHighlight(choices, selected, action, scroll);
-			renderSelectedChoice(message, choices, selected, scroll, info);
+			eraseRenderedFrame(frame);
+			frame = renderSelectedChoice(message, choices, selected, scroll, info);
 			continue;
 		}
 
@@ -111,7 +115,7 @@ export const readSelectedChoice = async <T>(
 				throw new PromptValidationError('Please select a valid option.');
 			}
 
-			return { cancelled: false, submitted: true, submittedLabel: choice.label, value: choice.value };
+			return { cancelled: false, frame, submitted: true, submittedLabel: choice.label, value: choice.value };
 		}
 	}
 };

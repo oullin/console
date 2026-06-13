@@ -4,11 +4,13 @@ import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
+import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
 export const renderSearchChoices = <T>(
 	message: string,
 	query: string,
+	cursor: number,
 	choices: Array<Choice<T>>,
 	highlighted: number | null,
 	marked: Set<number> = new Set(),
@@ -17,14 +19,15 @@ export const renderSearchChoices = <T>(
 	info?: SearchPromptOptions<T>['info'] | MultiSearchPromptOptions<T>['info'],
 	showSelectedSummary = false,
 	placeholder = '',
-): void => {
+): string => {
 	const text = resolveInfo(info, highlighted === null ? null : (choices[highlighted]?.value ?? null));
 	const summary = showSelectedSummary ? selectedSummary(selectedLabels.length, selectedLabels.length - marked.size) : '';
 	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
+	const frame = `${renderBox({ body: renderSearchBody(query, cursor, placeholder, choices, highlighted, marked, scroll, showSelectedSummary), borderStyle: cyan, info: details, title: cyan(message) })}\n`;
 
-	promptEnvironment().output.write(
-		`${renderBox({ body: renderSearchBody(query, placeholder, choices, highlighted, marked, scroll, showSelectedSummary), borderStyle: cyan, info: details, title: cyan(message) })}\n`,
-	);
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedSearchChoice = (message: string, label: string): void => {
@@ -44,8 +47,17 @@ export const renderCancelledSearch = (message: string, query: string, placeholde
 	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
 };
 
-const renderSearchBody = <T>(query: string, placeholder: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): string => {
-	const value = query.length > 0 ? query : dim(placeholder);
+const renderSearchBody = <T>(
+	query: string,
+	cursor: number,
+	placeholder: string,
+	choices: Array<Choice<T>>,
+	highlighted: number | null,
+	marked: Set<number>,
+	scroll: number | undefined,
+	multiple: boolean,
+): string => {
+	const value = query.length > 0 ? valueWithCursor(query, cursor) : placeholderWithCursor(placeholder);
 	const rows = renderSearchRows(choices, highlighted, marked, scroll, multiple);
 
 	if (query.length > 0 && choices.length === 0) {

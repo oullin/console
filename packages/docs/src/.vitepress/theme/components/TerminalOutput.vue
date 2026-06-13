@@ -33,6 +33,7 @@ const props = withDefaults(
 );
 
 const viewport = ref<HTMLDivElement | null>(null);
+
 let terminal: Terminal | null = null;
 let observer: IntersectionObserver | null = null;
 let timers: ReturnType<typeof setTimeout>[] = [];
@@ -230,21 +231,9 @@ watch(output, () => {
 <template>
 	<Card class="my-4 gap-0 overflow-hidden border-border bg-card py-0 shadow-sm">
 		<CardHeader class="flex flex-row items-center gap-2 bg-muted/40 px-3 py-2">
-			<Badge
-				as="span"
-				aria-hidden="true"
-				class="size-2.5 rounded-full border-0 bg-[var(--terminal-danger)] p-0 shadow-none"
-			/>
-			<Badge
-				as="span"
-				aria-hidden="true"
-				class="size-2.5 rounded-full border-0 bg-[var(--terminal-warning)] p-0 shadow-none"
-			/>
-			<Badge
-				as="span"
-				aria-hidden="true"
-				class="size-2.5 rounded-full border-0 bg-[var(--terminal-success)] p-0 shadow-none"
-			/>
+			<Badge as="span" aria-hidden="true" class="size-2.5 rounded-full border-0 bg-[var(--terminal-danger)] p-0 shadow-none" />
+			<Badge as="span" aria-hidden="true" class="size-2.5 rounded-full border-0 bg-[var(--terminal-warning)] p-0 shadow-none" />
+			<Badge as="span" aria-hidden="true" class="size-2.5 rounded-full border-0 bg-[var(--terminal-success)] p-0 shadow-none" />
 			<CardTitle class="ml-1 font-mono text-xs font-medium text-muted-foreground">{{ title }}</CardTitle>
 		</CardHeader>
 		<Separator />

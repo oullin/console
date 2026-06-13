@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderChoices } from '#tui/theme';
 import { firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
@@ -11,6 +12,7 @@ import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
 export type MultipleChoicesReadResult<T> = {
 	cancelled: boolean;
+	frame?: string;
 	submitted: boolean;
 	submittedLabels: string[];
 	value: T[];
@@ -47,16 +49,17 @@ export const readMultipleChoices = async <T>(
 
 	let marked = markedChoiceIndexes(choices, defaults);
 
-	renderMultipleChoices(message, choices, selected, marked, scroll, info);
+	let frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return { cancelled: false, submitted: true, submittedLabels: markedChoiceLabels(choices, marked), value: markedChoiceValues(choices, marked) };
+			return { cancelled: false, frame, submitted: true, submittedLabels: markedChoiceLabels(choices, marked), value: markedChoiceValues(choices, marked) };
 		}
 
 		if (key === Key.ctrlC) {
+			eraseRenderedFrame(frame);
 			renderCancelledChoices(message, choices, selected, marked, scroll);
 
 			return { cancelled: true, submitted: false, submittedLabels: markedChoiceLabels(choices, marked), value: await cancelPrompt(markedChoiceValues(choices, marked)) };
@@ -77,7 +80,8 @@ export const readMultipleChoices = async <T>(
 				marked.add(index);
 			}
 
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			eraseRenderedFrame(frame);
+			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;
 		}
 
@@ -85,26 +89,29 @@ export const readMultipleChoices = async <T>(
 
 		if (action !== null) {
 			selected = moveSelectHighlight(choices, selected, action, scroll);
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			eraseRenderedFrame(frame);
+			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;
 		}
 
 		if (key === Key.ctrlA) {
 			marked = toggleAllEnabledChoices(choices, marked);
 
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			eraseRenderedFrame(frame);
+			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;
 		}
 
 		if (key === Key.space) {
 			marked = toggleMarkedChoice(choices, marked, selected);
 
-			renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			eraseRenderedFrame(frame);
+			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
 			continue;
 		}
 
 		if (key === Key.enter) {
-			return { cancelled: false, submitted: true, submittedLabels: markedChoiceLabels(choices, marked), value: markedChoiceValues(choices, marked) };
+			return { cancelled: false, frame, submitted: true, submittedLabels: markedChoiceLabels(choices, marked), value: markedChoiceValues(choices, marked) };
 		}
 	}
 };

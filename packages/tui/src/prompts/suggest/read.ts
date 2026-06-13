@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { clearsSuggestionHighlight, moveSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
 import { renderCancelledSuggestion, renderSuggestions } from '#tui/prompts/suggest/render';
@@ -10,6 +11,7 @@ import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export type SuggestReadResult = {
 	cancelled: boolean;
+	frame?: string;
 	rendered: boolean;
 	value: string;
 };
@@ -33,7 +35,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 
 	let matches: string[] = await resolveSuggestions(options.options, state.value);
 
-	renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
+	let frame = renderSuggestions(options.message, state.value, state.cursor, matches, highlighted, options.scroll, options.info, options.placeholder);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -41,6 +43,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 		if (key === null) {
 			return {
 				cancelled: false,
+				frame,
 				rendered: true,
 				value: state.value,
 			};
@@ -52,13 +55,15 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = moveSuggestionHighlight(matches, highlighted, action, options.scroll);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
+			eraseRenderedFrame(frame);
+			frame = renderSuggestions(options.message, state.value, state.cursor, matches, highlighted, options.scroll, options.info, options.placeholder);
 			continue;
 		}
 
 		if (clearsSuggestionHighlight(key) && highlighted !== null) {
 			highlighted = null;
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
+			eraseRenderedFrame(frame);
+			frame = renderSuggestions(options.message, state.value, state.cursor, matches, highlighted, options.scroll, options.info, options.placeholder);
 			continue;
 		}
 
@@ -66,6 +71,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 			if (highlighted !== null && matches[highlighted] !== undefined) {
 				return {
 					cancelled: false,
+					frame,
 					rendered: true,
 					value: matches[highlighted],
 				};
@@ -73,6 +79,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 
 			return {
 				cancelled: false,
+				frame,
 				rendered: true,
 				value: state.value,
 			};
@@ -83,12 +90,14 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 		if (next.submitted) {
 			return {
 				cancelled: false,
+				frame,
 				rendered: true,
 				value: state.value,
 			};
 		}
 
 		if (next.cancelled) {
+			eraseRenderedFrame(frame);
 			renderCancelledSuggestion(options.message, state.value, options.placeholder);
 
 			return {
@@ -103,6 +112,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
+		eraseRenderedFrame(frame);
+		frame = renderSuggestions(options.message, state.value, state.cursor, matches, highlighted, options.scroll, options.info, options.placeholder);
 	}
 };

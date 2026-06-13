@@ -8,7 +8,7 @@ export type TableOptions = {
 };
 
 export type DataTablePromptOptions<T = unknown> = BasePromptOptions<T | number> & {
-	filter?: (query: string, row: DataTableRow<T>) => boolean;
+	filter?: (row: DataTableRow<T>, query: string) => boolean;
 	headers?: string[];
 	rows: Array<DataTableRow<T>>;
 	scroll?: number;

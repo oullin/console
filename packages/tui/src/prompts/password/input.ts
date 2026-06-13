@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey } from '#tui/typed-value';
 import { passwordLength, renderCancelledPasswordValue, renderPasswordValue } from '#tui/prompts/password/render';
@@ -26,7 +27,7 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		value: options.default ?? '',
 	};
 
-	renderPasswordValue(message, state.value, options);
+	let frame = renderPasswordValue(message, state.value, state.cursor, options);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -34,6 +35,7 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		if (key === null) {
 			return {
 				cancelled: false,
+				frame,
 				value: state.value,
 			};
 		}
@@ -41,6 +43,7 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		const next = applyTypedKey(state, key);
 
 		if (next.cancelled) {
+			eraseRenderedFrame(frame);
 			renderCancelledPasswordValue(message, state.value, options);
 
 			return {
@@ -57,10 +60,12 @@ export const readPasswordValue = async (message: string, options: PasswordInputO
 		if (next.submitted) {
 			return {
 				cancelled: false,
+				frame,
 				value: state.value,
 			};
 		}
 
-		renderPasswordValue(message, state.value, options);
+		eraseRenderedFrame(frame);
+		frame = renderPasswordValue(message, state.value, state.cursor, options);
 	}
 };

@@ -8,7 +8,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
-    "tsBuildInfoFile": "tsconfig.build.tsbuildinfo"
+    "tsBuildInfoFile": "../../provision/.cache/tsbuild/tui-build.tsbuildinfo"
   },
   "exclude": ["dist", "tests", "vitest.config.ts"],
   "include": ["src/**/*.ts"]

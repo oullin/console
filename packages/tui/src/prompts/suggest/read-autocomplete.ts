@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { acceptAutocompleteMatch, autocompleteNavigationDirection, canAcceptAutocomplete, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
 import { renderAutocomplete, renderCancelledAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
@@ -10,6 +11,7 @@ import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export type AutocompleteReadResult = {
 	cancelled: boolean;
+	frame?: string;
 	rendered: boolean;
 	value: string;
 };
@@ -33,7 +35,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+	let frame = renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -41,6 +43,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 		if (key === null) {
 			return {
 				cancelled: false,
+				frame,
 				rendered: true,
 				value: state.value,
 			};
@@ -52,7 +55,8 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 			matches = await resolveSuggestions(options.options, state.value);
 
 			highlighted = moveAutocompleteHighlight(matches, highlighted, direction);
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+			eraseRenderedFrame(frame);
+			frame = renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
@@ -69,7 +73,8 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 				highlighted = 0;
 			}
 
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+			eraseRenderedFrame(frame);
+			frame = renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
@@ -78,7 +83,8 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 
 			state = acceptAutocompleteMatch(state, matches[highlighted], false) ?? state;
 
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+			eraseRenderedFrame(frame);
+			frame = renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
@@ -87,12 +93,14 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 		if (next.submitted) {
 			return {
 				cancelled: false,
+				frame,
 				rendered: true,
 				value: state.value,
 			};
 		}
 
 		if (next.cancelled) {
+			eraseRenderedFrame(frame);
 			renderCancelledAutocomplete(options.message, state.value, options.placeholder);
 
 			return {
@@ -107,6 +115,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 
 		matches = await resolveSuggestions(options.options, state.value);
 
-		renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+		eraseRenderedFrame(frame);
+		frame = renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 	}
 };

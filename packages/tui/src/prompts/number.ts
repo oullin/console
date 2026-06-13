@@ -1,7 +1,8 @@
-import { promptUntilValid, PromptValidationError } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import type { NumberPromptOptions } from '#tui/types';
 
 export function number(options: NumberPromptOptions): Promise<number | string>;
@@ -37,41 +38,49 @@ export async function number(
 			: { ...message, default: message.default ?? '' };
 
 	let shouldRenderSubmittedFrame = false;
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		options,
-		async () => {
-			const answer = await readNumberValue(options.message, {
-				default: options.default,
-				hint: options.hint,
-				max: options.max,
-				min: options.min,
-				placeholder: options.placeholder,
-				step: options.step,
-			});
+	return promptWithFallback('number', options, () =>
+		promptUntilValid(
+			options,
+			async () => {
+				const answer = await readNumberValue(options.message, {
+					default: options.default,
+					hint: options.hint,
+					max: options.max,
+					min: options.min,
+					placeholder: options.placeholder,
+					step: options.step,
+				});
 
-			const value = answer.value;
+				const value = answer.value;
 
-			shouldRenderSubmittedFrame = !answer.cancelled;
+				activeFrame = answer.frame;
+				shouldRenderSubmittedFrame = !answer.cancelled;
 
-			if (value === '' && options.default !== undefined) {
-				return options.default;
-			}
+				if (value === '' && options.default !== undefined) {
+					return options.default;
+				}
 
-			const result = parseNumberInput(value, options);
+				const result = parseNumberInput(value, options);
 
-			if (result.error !== undefined) {
-				throw new PromptValidationError(result.error);
-			}
+				if (result.error !== undefined) {
+					throw new PromptValidationError(result.error);
+				}
 
-			const parsedValue = result.value ?? '';
+				const parsedValue = result.value ?? '';
 
-			return options.transform ? options.transform(parsedValue) : parsedValue;
-		},
-		(value) => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedNumberValue(options.message, value);
-			}
-		},
+				return options.transform ? options.transform(parsedValue) : parsedValue;
+			},
+			(value) => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedNumberValue(options.message, value);
+				}
+			},
+		),
 	);
 }

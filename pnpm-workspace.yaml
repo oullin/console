@@ -1,6 +1,11 @@
 packages:
   - "packages/*"
-  - "console/shell"
+  - "provision/go"
+  - "provision/ts"
+
+allowBuilds:
+  esbuild: true
+  vue-demi: true
 
 onlyBuiltDependencies:
   - "@opentui/core"

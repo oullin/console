@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { cancelPrompt } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
@@ -22,7 +23,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 	let highlighted: number | null = null;
 
-	renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+	let frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -32,6 +33,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 		}
 
 		if (key === Key.ctrlC) {
+			eraseRenderedFrame(frame);
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
 			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(choices, highlighted, options.default)) };
@@ -43,13 +45,15 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			choices = await resolveSearchChoices(options.options, state.value);
 
 			highlighted = moveSearchHighlight(choices, highlighted, action, { attempt, retryFirst: true, scroll: options.scroll });
-			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+			eraseRenderedFrame(frame);
+			frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
 		if (clearsSearchHighlight(key) && highlighted !== null) {
 			highlighted = null;
-			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+			eraseRenderedFrame(frame);
+			frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
@@ -58,7 +62,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 				const choice = choices[highlighted];
 				const value = selectedSearchValue(choices, highlighted);
 
-				return { cancelled: false, submitted: choice !== undefined && value !== undefined, submittedLabel: choice?.label ?? '', value };
+				return { cancelled: false, frame, submitted: choice !== undefined && value !== undefined, submittedLabel: choice?.label ?? '', value };
 			}
 
 			choices = await resolveSearchChoices(options.options, state.value);
@@ -66,17 +70,19 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 			if (state.value === '' && options.default !== undefined) {
 				const choice = defaultSearchChoice(choices, options.default);
 
-				return { cancelled: false, submitted: choice !== undefined, submittedLabel: choice?.label ?? '', value: choice?.value ?? options.default };
+				return { cancelled: false, frame, submitted: choice !== undefined, submittedLabel: choice?.label ?? '', value: choice?.value ?? options.default };
 			}
 
 			highlighted = null;
-			renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+			eraseRenderedFrame(frame);
+			frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
 		const next = applyTypedKey(state, key);
 
 		if (next.cancelled) {
+			eraseRenderedFrame(frame);
 			renderCancelledSearch(options.message, state.value, options.placeholder);
 
 			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(options.default) };
@@ -87,6 +93,7 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 		choices = await resolveSearchChoices(options.options, state.value);
 
-		renderSearchChoices(options.message, state.value, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+		eraseRenderedFrame(frame);
+		frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 	}
 };

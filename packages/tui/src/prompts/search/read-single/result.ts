@@ -4,6 +4,7 @@ import type { Choice, SearchPromptOptions } from '#tui/types';
 
 export type SearchChoiceReadResult<T> = {
 	cancelled: boolean;
+	frame?: string;
 	submitted: boolean;
 	submittedLabel: string;
 	value: T | undefined;

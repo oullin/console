@@ -1,7 +1,8 @@
 export { confirm } from '#tui/prompts/select/confirm';
 
-import { promptUntilValid } from '#tui/prompt';
+import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { normalizeChoices } from '#tui/concerns/choices';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
 import { renderSubmittedChoice, renderSubmittedChoices } from '#tui/prompts/select/render';
@@ -45,22 +46,30 @@ export async function select<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabel = '';
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		promptOptions,
-		async () => {
-			const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
+	return promptWithFallback('select', promptOptions, () =>
+		promptUntilValid(
+			promptOptions,
+			async () => {
+				const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 
-			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-			submittedLabel = selected.submittedLabel;
+				activeFrame = selected.frame;
+				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+				submittedLabel = selected.submittedLabel;
 
-			return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
-		},
-		() => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedChoice(promptOptions.message, submittedLabel);
-			}
-		},
+				return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+			},
+			() => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedChoice(promptOptions.message, submittedLabel);
+				}
+			},
+		),
 	);
 }
 
@@ -99,21 +108,29 @@ export async function multiselect<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabels: string[] = [];
+	let activeFrame: string | undefined;
 
-	return promptUntilValid(
-		promptOptions,
-		async () => {
-			const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
+	return promptWithFallback('multiselect', promptOptions, () =>
+		promptUntilValid(
+			promptOptions,
+			async () => {
+				const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 
-			shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-			submittedLabels = selected.submittedLabels;
+				activeFrame = selected.frame;
+				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
+				submittedLabels = selected.submittedLabels;
 
-			return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
-		},
-		() => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedChoices(promptOptions.message, submittedLabels);
-			}
-		},
+				return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+			},
+			() => {
+				if (shouldRenderSubmittedFrame) {
+					if (activeFrame) {
+						eraseRenderedFrame(activeFrame);
+					}
+
+					renderSubmittedChoices(promptOptions.message, submittedLabels);
+				}
+			},
+		),
 	);
 }

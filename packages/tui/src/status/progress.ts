@@ -43,7 +43,12 @@ export class Progress {
 
 	advance(step = 1): void {
 		this.#state = 'active';
-		this.#current = Math.max(0, Math.min(this.total, this.#current + parseProgressStep(step)));
+		this.#current = this.#current + parseProgressStep(step);
+
+		if (this.#current > this.total) {
+			this.#current = this.total;
+		}
+
 		this.render();
 	}
 
@@ -81,6 +86,10 @@ export class Progress {
 
 	value(): boolean {
 		return true;
+	}
+
+	prompt(): never {
+		throw new Error('Progress Bar cannot be prompted.');
 	}
 
 	render(): void {

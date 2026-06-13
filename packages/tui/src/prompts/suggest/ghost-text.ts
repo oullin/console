@@ -1,5 +1,6 @@
 import { dim, inverse } from '#tui/theme/styles';
 import { characterLength, characters, fromCharacters } from '#tui/typed-value/characters';
+import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { TypedValueState } from '#tui/typed-value/types';
 
 const startsWithInput = (match: string, value: string): boolean => match.toLowerCase().startsWith(value.toLowerCase());
@@ -18,10 +19,15 @@ export const autocompleteDisplayValue = (state: TypedValueState, match: string |
 	}
 
 	if (state.cursor < characterLength(state.value)) {
-		return state.value;
+		return valueWithCursor(state.value, state.cursor);
 	}
 
 	const ghostText = autocompleteGhostText(state.value, match);
+
+	if (ghostText.length === 0) {
+		return valueWithCursor(state.value, state.cursor);
+	}
+
 	const [cursorCharacter = '', ...remainingGhost] = characters(ghostText);
 
 	return `${state.value}${inverse(cursorCharacter)}${dim(fromCharacters(remainingGhost))}`;

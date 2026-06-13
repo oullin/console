@@ -2,31 +2,21 @@ import { promptEnvironment } from '#tui/environment';
 import { PromptValidationError } from '#tui/prompt/error';
 import { ensureRequired, validationMessage } from '#tui/prompt/validation';
 import { renderError } from '#tui/theme';
-import type { BasePromptOptions, MaybePromise } from '#tui/types';
+import type { BasePromptOptions } from '#tui/types';
 
 type PromptReader<T> = (attempt: number) => Promise<T>;
 
 type PromptValidHandler<T> = (value: T) => void | Promise<void>;
 
-type TransformablePromptOptions<T> = BasePromptOptions<T> & {
-	transform?: (value: T) => MaybePromise<T>;
-};
-
-const defaultPromptValue = async <T>(options: TransformablePromptOptions<T>): Promise<T> => {
-	const value = options.default as T;
-
-	return options.transform ? options.transform(value) : value;
-};
-
 const validatedPromptValue = async <T>(options: BasePromptOptions<T>, value: T): Promise<string | undefined> => {
-	return ensureRequired(value, options.required) ?? (await validationMessage(value, options.validate));
+	return ensureRequired(value, options.required) ?? (await validationMessage(value, options.validate, options));
 };
 
 export const promptUntilValid = async <T>(options: BasePromptOptions<T>, read: PromptReader<T>, onValid?: PromptValidHandler<T>): Promise<T> => {
 	const environment = promptEnvironment();
 
 	if (!environment.interactive) {
-		const value = await defaultPromptValue(options);
+		const value = options.default as T;
 
 		const validation = await validatedPromptValue(options, value);
 

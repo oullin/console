@@ -4,12 +4,25 @@ import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
+import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export const renderSuggestions = (message: string, value: string, matches: string[], highlighted: number | null, scroll?: number, info?: SuggestOptions['info'], placeholder = ''): void => {
+export const renderSuggestions = (
+	message: string,
+	value: string,
+	cursor: number,
+	matches: string[],
+	highlighted: number | null,
+	scroll?: number,
+	info?: SuggestOptions['info'],
+	placeholder = '',
+): string => {
 	const text = resolveInfo(info, highlighted === null ? null : (matches[highlighted] ?? null));
+	const frame = `${renderBox({ body: renderSuggestBody(value, cursor, placeholder, matches, highlighted, scroll), borderStyle: cyan, info: text, title: cyan(message) })}\n`;
 
-	promptEnvironment().output.write(`${renderBox({ body: renderSuggestBody(value, placeholder, matches, highlighted, scroll), borderStyle: cyan, info: text, title: cyan(message) })}\n`);
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedSuggestion = (message: string, value: string): void => {
@@ -23,8 +36,8 @@ export const renderCancelledSuggestion = (message: string, value: string, placeh
 	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
 };
 
-const renderSuggestBody = (value: string, placeholder: string, matches: string[], highlighted: number | null, scroll?: number): string => {
-	const query = value.length > 0 ? value : dim(placeholder);
+const renderSuggestBody = (value: string, cursor: number, placeholder: string, matches: string[], highlighted: number | null, scroll?: number): string => {
+	const query = value.length > 0 ? valueWithCursor(value, cursor) : placeholderWithCursor(placeholder);
 	const rows = renderSuggestRows(matches, highlighted, scroll);
 
 	if (value.length > 0 && matches.length === 0) {

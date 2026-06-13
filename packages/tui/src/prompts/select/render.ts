@@ -6,10 +6,13 @@ import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import type { Choice, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
-export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll: number | undefined, info: SelectPromptOptions<T>['info']): void => {
+export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll: number | undefined, info: SelectPromptOptions<T>['info']): string => {
 	const text = resolveInfo(info, choices[selected]?.value ?? null);
+	const frame = `${renderBox({ body: renderActiveChoiceRows(choices, selected, scroll), borderStyle: cyan, info: text, title: cyan(message) })}\n`;
 
-	promptEnvironment().output.write(`${renderBox({ body: renderActiveChoiceRows(choices, selected, scroll), borderStyle: cyan, info: text, title: cyan(message) })}\n`);
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedChoice = (message: string, label: string): void => {
@@ -32,12 +35,15 @@ export const renderCancelledChoices = <T>(message: string, choices: Array<Choice
 	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
 };
 
-export const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): void => {
+export const renderMultipleChoices = <T>(message: string, choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number, info?: MultiSelectPromptOptions<T>['info']): string => {
 	const text = resolveInfo(info, choices[selected]?.value ?? null);
 	const summary = scroll !== undefined && choices.length > scroll ? `${marked.size} selected` : '';
 	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
+	const frame = `${renderBox({ body: renderActiveChecklistRows(choices, selected, marked, scroll), borderStyle: cyan, info: details, title: cyan(message) })}\n`;
 
-	promptEnvironment().output.write(`${renderBox({ body: renderActiveChecklistRows(choices, selected, marked, scroll), borderStyle: cyan, info: details, title: cyan(message) })}\n`);
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 const choiceLabel = <T>(choice: Choice<T>): string => {

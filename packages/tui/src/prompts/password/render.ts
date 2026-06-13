@@ -1,18 +1,23 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
+import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
 import type { PasswordInputOptions } from '#tui/prompts/password/types';
 
 export const maskPassword = (value: string): string => '•'.repeat([...value].length);
 
 export const passwordLength = (value: string): number => [...value].length;
 
-const passwordDisplay = (value: string, options: PasswordInputOptions): string => {
-	return value.length > 0 ? maskPassword(value) : dim(options.placeholder ?? '');
+const passwordDisplay = (value: string, cursor: number, options: PasswordInputOptions): string => {
+	return value.length > 0 ? valueWithCursor(maskPassword(value), cursor) : placeholderWithCursor(options.placeholder);
 };
 
-export const renderPasswordValue = (message: string, value: string, options: PasswordInputOptions): void => {
-	promptEnvironment().output.write(`${renderBox({ body: passwordDisplay(value, options), borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`);
+export const renderPasswordValue = (message: string, value: string, cursor: number, options: PasswordInputOptions): string => {
+	const frame = `${renderBox({ body: passwordDisplay(value, cursor, options), borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`;
+
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedPasswordValue = (message: string, value: string): void => {

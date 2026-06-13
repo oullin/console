@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
+import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderQuestion } from '#tui/theme';
 import { applyTypedKey, initialTypedValueState } from '#tui/typed-value/edit';
 import { renderCancelledTypedValue, renderTypedValue } from '#tui/typed-value/render';
@@ -12,6 +13,7 @@ export type { TypedValueOptions, TypedValueState };
 
 export type TypedValueReadResult = {
 	cancelled: boolean;
+	frame?: string;
 	value: string;
 };
 
@@ -33,7 +35,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 
 	let state: TypedValueState = initialTypedValueState(options.default ?? '');
 
-	renderTypedValue(message, state, options);
+	let frame = renderTypedValue(message, state, options);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -41,6 +43,7 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		if (key === null) {
 			return {
 				cancelled: false,
+				frame,
 				value: state.value,
 			};
 		}
@@ -48,6 +51,8 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		const next = applyTypedKey(state, key, options.allowNewLine, options.allowNewLine ? TEXTAREA_CONTENT_WIDTH : undefined);
 
 		if (next.cancelled) {
+			eraseRenderedFrame(frame);
+
 			if (!options.allowNewLine) {
 				renderCancelledTypedValue(message, state.value, options);
 			} else {
@@ -68,10 +73,12 @@ export const readTypedValue = async (message: string, options: TypedValueOptions
 		if (next.submitted) {
 			return {
 				cancelled: false,
+				frame,
 				value: state.value,
 			};
 		}
 
-		renderTypedValue(message, state, options);
+		eraseRenderedFrame(frame);
+		frame = renderTypedValue(message, state, options);
 	}
 };

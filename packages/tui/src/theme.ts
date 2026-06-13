@@ -1,5 +1,5 @@
 import { visibleWidth } from '#tui/strings';
-import { red } from '#tui/theme/styles';
+import { dim, yellow } from '#tui/theme/styles';
 import type { Choice } from '#tui/types';
 
 export const symbols = {
@@ -20,7 +20,7 @@ export const renderQuestion = (message: string, hint?: string): string => {
 	return `${symbols.question} ${message}${suffix} `;
 };
 
-export const renderError = (message: string): string => `${red(`${symbols.error} ${message}`)}\n`;
+export const renderError = (message: string): string => `${yellow(`  ⚠ ${message}`)}\n`;
 
 export const renderChoices = <T>(choices: Array<Choice<T>>): string => {
 	return choices
@@ -36,6 +36,10 @@ export const renderChoices = <T>(choices: Array<Choice<T>>): string => {
 export const renderTable = (headers: string[], rows: string[][]): string => {
 	const columnCount = Math.max(headers.length, ...rows.map((row) => row.length));
 
+	if (!Number.isFinite(columnCount) || columnCount <= 0) {
+		return '';
+	}
+
 	const widths = Array.from({ length: columnCount }, (_, index) => {
 		return Math.max(visibleWidth(headers[index] ?? ''), ...rows.map((row) => visibleWidth(row[index] ?? '')));
 	});
@@ -43,10 +47,20 @@ export const renderTable = (headers: string[], rows: string[][]): string => {
 	const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
 
 	const renderRow = (columns: string[]): string => {
-		return `| ${widths.map((width, index) => padVisible(columns[index] ?? '', width)).join(' | ')} |`;
+		return ` │ ${widths.map((width, index) => padVisible(columns[index] ?? '', width)).join(' │ ')} │`;
 	};
 
-	const divider = `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`;
+	const renderBorder = (left: string, middle: string, right: string): string => {
+		return ` ${left}${widths.map((width) => '─'.repeat(width + 2)).join(middle)}${right}`;
+	};
 
-	return headers.length > 0 ? [renderRow(headers), divider, ...rows.map(renderRow)].join('\n') : rows.map(renderRow).join('\n');
+	const top = renderBorder('┌', '┬', '┐');
+	const divider = renderBorder('├', '┼', '┤');
+	const bottom = renderBorder('└', '┴', '┘');
+
+	if (headers.length === 0) {
+		return [top, ...rows.map(renderRow), bottom].join('\n');
+	}
+
+	return [top, renderRow(headers.map(dim)), divider, ...rows.map(renderRow), bottom].join('\n');
 };

@@ -13,20 +13,24 @@ TypeScript and OpenTUI internals.
 | --- | --- |
 | Helper functions | `packages/tui/src/index.ts` |
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts`, `packages/tui/src/environment/*` |
+| Prompt fallback reset and predicate condition lifecycle | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt.ts`, `packages/tui/src/index.ts` |
 | Prompt cancellation callback lifecycle | `packages/tui/src/prompt/cancel.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt revert rejection lifecycle | `packages/tui/src/prompt/revert.ts`, `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/form.test.ts` |
 | Prompt validation retry default lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/text.test.ts` |
 | Prompt post-validation submitted-frame lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts` |
-| Prompt non-interactive transform lifecycle before validation | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts`, `packages/tui/tests/choices.test.ts`, `packages/tui/tests/search.test.ts` |
+| Prompt non-interactive raw-default validation lifecycle | `packages/tui/src/prompt/lifecycle.ts` |
 | Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
+| Prompt validation warning line styling | `packages/tui/src/theme.ts`, `packages/tui/src/prompt/lifecycle.ts` |
 | Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
 | Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/text.test.ts` |
 | Text active, submitted, cancelled, placeholder, and validation-safe rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/render.ts`, `packages/tui/tests/text.test.ts` |
+| Text active-frame redraw and submitted-frame replacement | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/render.ts`, `packages/tui/src/prompts/text.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
 | Textarea defaults, transforms, validation, editing keys, line navigation, and non-interactive behavior | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea active, submitted, cancelled, scrollbar, placeholder, and validation-safe rendering | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
+| Textarea active-frame redraw and cursor-aware visible window rendering | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/prompts/textarea.ts` |
 | Textarea control-key line navigation and empty-line movement | `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea boxed renderer and placeholder styling | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea scrollbar rendering | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts` |
@@ -35,8 +39,11 @@ TypeScript and OpenTUI internals.
 | Password input | `packages/tui/src/prompts/password.ts`, `packages/tui/src/typed-value.ts` |
 | Password input transforms, validation retry, editing keys, cancellation, masking, and non-interactive behavior | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/password.test.ts` |
 | Password active, submitted, cancelled, placeholder, masked, and validation-safe rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompts/password/render.ts`, `packages/tui/tests/password.test.ts` |
+| Password active-frame redraw and masked cursor rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompts/password/render.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Number active, submitted, cancelled, arrow, placeholder, default, and validation-safe rendering | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/prompts/number/render.ts`, `packages/tui/tests/number.test.ts` |
+| Number default renderer right-aligned arrows | `packages/tui/src/prompts/number/render.ts` |
+| Number active-frame redraw and cursor rendering | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/prompts/number/render.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Confirm active, submitted, cancelled, custom-label, fallback, and non-interactive behavior | `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts`, `packages/tui/tests/choices.test.ts` |
 | Confirm submitted frame renders only after validation passes | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/choices.test.ts` |
@@ -47,19 +54,24 @@ TypeScript and OpenTUI internals.
 | Select line-mode and exhausted-input default fallback with validation retry | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
+| Select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Suggest active, submitted, cancelled, placeholder, info, scrolling, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/tests/suggest.test.ts` |
+| Suggest active-frame redraw and cursor rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts` |
 | Suggest and autocomplete label-first info rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/options.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete active, submitted, cancelled, placeholder, ghost-text, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
+| Autocomplete active-frame redraw and cursor fallback rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/src/prompts/suggest/ghost-text.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
 | Search and multi-search label-first helper argument surface with info | `packages/tui/src/prompts/search/index.ts`, `packages/tui/tests/search.test.ts` |
 | Search active boxed layout and row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
+| Search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
@@ -68,6 +80,7 @@ TypeScript and OpenTUI internals.
 | Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/src/prompts/search/read-multi/result.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Multi-search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Pause themed key-driven frame | `packages/tui/src/prompts/pause.ts`, `packages/tui/src/prompts/pause/render.ts`, `packages/tui/tests/pause.test.ts` |
@@ -131,26 +144,33 @@ TypeScript and OpenTUI internals.
 | Stream frame rendering, wrapping, fade styles, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/*` |
 | Form builder root-aligned manual stream overload | `packages/tui/src/form/builder/status.ts`, `packages/tui/tests/form.test.ts` |
 | Status cursor visibility cleanup | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
+| Status signal cleanup for cursor and rendered-frame restoration | `packages/tui/src/status/signals.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
 | Status rendered-frame cleanup | `packages/tui/src/status/frame.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/task.ts` |
 | Progress cursor visibility and rendered-frame redraw cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/frame.ts` |
 | Progress signal cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/tests/progress.test.ts` |
+| Progress prompt-disable and manual advance semantics | `packages/tui/src/status/progress.ts` |
 | Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
 | Terminal clear/title and notification helper return values | `packages/tui/src/output/terminal.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/tests/terminal.test.ts`, `packages/tui/tests/notify.test.ts` |
 | Terminal raw key alias normalization | `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | Terminal split escape-sequence buffering | `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | Red, strikethrough, and border-styled frames | `packages/tui/src/theme/styles.ts`, `packages/tui/src/theme/box.ts` |
+| Default box renderer terminal-width cap | `packages/tui/src/theme/box.ts` |
 | ANSI segment parsing, ANSI-aware wrapping, truncation, Unicode width | `packages/tui/src/strings.ts`, `packages/tui/tests/strings.test.ts` |
 | ANSI truncation style cleanup and visible-width markers | `packages/tui/src/strings.ts`, `packages/tui/tests/strings.test.ts` |
 | Key-mode search default submission | `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
 | Public ESM package runtime and type-consumption surface | `packages/tui/src/index.ts`, `packages/tui/src/form/builder/index.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*`, `packages/acceptance/tests/package.test.ts` |
+| Provision workspace and tool cache isolation | `provision/go`, `provision/ts`, `provision/.cache`, `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.npmrc` |
 | Data table prompt argument validation layer | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table.ts`, `packages/tui/tests/table.test.ts` |
+| Data table filter callback lifecycle | `packages/tui/src/contracts/output.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/src/output/data-table.ts` |
 | Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
 | Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
 | Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/tests/form.test.ts` |
+| Prompt fallback and global validation lifecycle hooks | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validate-using.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/*`, `packages/tui/src/output/data-table.ts` |
+| Boxed default table rendering | `packages/tui/src/theme.ts`, `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table/render.ts` |
 
 ## Remaining Exact-Parity Work
 

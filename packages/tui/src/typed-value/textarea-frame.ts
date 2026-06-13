@@ -2,7 +2,8 @@ import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { visibleLineWindow } from '#tui/typed-value/lines';
+import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
+import { visibleTextWindow } from '#tui/typed-value/lines';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
@@ -29,19 +30,20 @@ const textareaBody = (state: TypedValueState, options: TypedValueOptions): strin
 		return placeholderBody(options, rows);
 	}
 
-	const window = visibleLineWindow(state.value, state.cursor, rows, TEXTAREA_CONTENT_WIDTH);
+	const window = visibleTextWindow(state.value, state.cursor, rows, TEXTAREA_CONTENT_WIDTH);
 
 	if (rows === undefined) {
-		return window.lines.join('\n');
+		return valueWithCursor(window.text, window.cursor);
 	}
 
-	const padded = [...window.lines.slice(0, rows), ...Array.from({ length: Math.max(0, rows - window.lines.length) }, () => '')];
+	const visibleLines = valueWithCursor(window.text, window.cursor).split('\n');
+	const padded = [...visibleLines.slice(0, rows), ...Array.from({ length: Math.max(0, rows - visibleLines.length) }, () => '')];
 
 	return renderScrollbarRows(padded, window.start, rows, window.total).join('\n');
 };
 
 const placeholderBody = (options: TypedValueOptions, rows: number | undefined): string => {
-	const lines = [dim(options.placeholder ?? '')];
+	const lines = [placeholderWithCursor(options.placeholder)];
 
 	if (rows === undefined) {
 		return lines.join('\n');
