@@ -1,5 +1,9 @@
 package environment
 
+import "errors"
+
+var ErrKeyInputUnsupported = errors.New("key input is unsupported")
+
 type PromptValidationError struct {
 	Message string
 }
