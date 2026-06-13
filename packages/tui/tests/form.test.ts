@@ -140,6 +140,23 @@ describe('form builder', () => {
 		expect(responses.count).toBe(8);
 	});
 
+	it('preserves empty number defaults in form steps', async () => {
+		const output = createMemoryOutput();
+
+		const responses = await withPromptEnvironment(
+			{
+				input: createScriptedInput([Key.enter, Key.enter]),
+				output,
+				error: output,
+				interactive: true,
+			},
+			() => form().number('Count', '', undefined, false, undefined, '', undefined, undefined, undefined, 'labelCount').number({ message: 'Size' }, 'objectCount').submit(),
+		);
+
+		expect(responses.labelCount).toBe('');
+		expect(responses.objectCount).toBe('');
+	});
+
 	it('runs object-option basic prompt form steps', async () => {
 		const output = createMemoryOutput();
 

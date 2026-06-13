@@ -25,7 +25,7 @@ function numberFormStep(
 	this: FormBuilder,
 	optionsOrLabel: NumberPromptOptions | string,
 	placeholder = '',
-	defaultValue: number | string = 0,
+	defaultValue: number | string = '',
 	required: NumberPromptOptions['required'] = false,
 	validate: NumberPromptOptions['validate'] = undefined,
 	hint = '',
@@ -36,7 +36,7 @@ function numberFormStep(
 	transform: NumberPromptOptions['transform'] = undefined,
 ): FormBuilder {
 	if (!isBasicPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => number({ ...optionsOrLabel, default: previousNumber(previous, optionsOrLabel.default ?? 0) }), placeholder);
+		return this.add((_, previous) => number({ ...optionsOrLabel, default: previousNumber(previous, optionsOrLabel.default ?? '') }), placeholder);
 	}
 
 	return this.add((_, previous) => number(optionsOrLabel, placeholder, previousNumber(previous, defaultValue), required, validate, hint, min, max, step, transform), name);

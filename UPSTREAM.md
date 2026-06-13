@@ -150,6 +150,7 @@ TypeScript and OpenTUI internals.
 | Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
+| Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/tests/form.test.ts` |
 
 ## Remaining Exact-Parity Work
 
