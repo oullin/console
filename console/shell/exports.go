@@ -19,12 +19,16 @@ type Output = environment.Output
 type Patch = environment.Patch
 type MemoryOutput = environment.MemoryOutput
 type ScriptedInput = environment.ScriptedInput
+type StdioInput = environment.StdioInput
+type WriterOutput = environment.WriterOutput
 
 var CurrentEnvironment = environment.Current
 var Configure = environment.Configure
 var WithEnvironment = environment.With
 var NewMemoryOutput = environment.NewMemoryOutput
 var NewScriptedInput = environment.NewScriptedInput
+var NewStdioInput = environment.NewStdioInput
+var NewWriterOutput = environment.NewWriterOutput
 var CancelUsing = environment.CancelUsing
 var CancelPrompt = environment.CancelPrompt
 
