@@ -1,8 +1,8 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
+import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import type { NumberPromptOptions } from '#tui/types';
 
 export function number(options: NumberPromptOptions): Promise<number | string>;
@@ -38,7 +38,8 @@ export async function number(
 			: { ...message, default: message.default ?? '' };
 
 	let shouldRenderSubmittedFrame = false;
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('number', options, () =>
 		promptUntilValid(
@@ -55,7 +56,7 @@ export async function number(
 
 				const value = answer.value;
 
-				activeFrame = answer.frame;
+				activeFrame.set(answer.frame);
 				shouldRenderSubmittedFrame = !answer.cancelled;
 
 				if (value === '' && options.default !== undefined) {
@@ -74,13 +75,11 @@ export async function number(
 			},
 			(value) => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedNumberValue(options.message, value);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }

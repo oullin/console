@@ -1,8 +1,8 @@
 export { confirm } from '#tui/prompts/select/confirm';
 
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
+import { activePromptFrame } from '#tui/prompt/active-frame';
 import { normalizeChoices } from '#tui/concerns/choices';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
 import { renderSubmittedChoice, renderSubmittedChoices } from '#tui/prompts/select/render';
@@ -46,7 +46,8 @@ export async function select<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabel = '';
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('select', promptOptions, () =>
 		promptUntilValid(
@@ -54,7 +55,7 @@ export async function select<T>(
 			async () => {
 				const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 
-				activeFrame = selected.frame;
+				activeFrame.set(selected.frame);
 				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 				submittedLabel = selected.submittedLabel;
 
@@ -62,13 +63,11 @@ export async function select<T>(
 			},
 			() => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedChoice(promptOptions.message, submittedLabel);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }
@@ -108,7 +107,8 @@ export async function multiselect<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabels: string[] = [];
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('multiselect', promptOptions, () =>
 		promptUntilValid(
@@ -116,7 +116,7 @@ export async function multiselect<T>(
 			async () => {
 				const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 
-				activeFrame = selected.frame;
+				activeFrame.set(selected.frame);
 				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 				submittedLabels = selected.submittedLabels;
 
@@ -124,13 +124,11 @@ export async function multiselect<T>(
 			},
 			() => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedChoices(promptOptions.message, submittedLabels);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }

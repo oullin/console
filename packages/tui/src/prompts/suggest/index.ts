@@ -1,5 +1,5 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
+import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete';
 import { readSuggestionValue } from '#tui/prompts/suggest/read';
 import { renderSubmittedAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
@@ -40,7 +40,8 @@ export async function suggest(
 	const options = suggestOptions(message, source, placeholder, defaultValue, scroll, required, validate, hint, transform, info);
 
 	let shouldRenderSubmittedFrame = false;
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('suggest', options, () =>
 		promptUntilValid(
@@ -50,20 +51,18 @@ export async function suggest(
 
 				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
-				activeFrame = answer.frame;
+				activeFrame.set(answer.frame);
 				shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
 
 				return options.transform ? options.transform(value) : value;
 			},
 			(value) => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedSuggestion(options.message, value);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }
@@ -99,7 +98,8 @@ export async function autocomplete(
 			: suggestOptions(message);
 
 	let shouldRenderSubmittedFrame = false;
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('autocomplete', options, () =>
 		promptUntilValid(
@@ -109,20 +109,18 @@ export async function autocomplete(
 
 				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
-				activeFrame = answer.frame;
+				activeFrame.set(answer.frame);
 				shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
 
 				return options.transform ? options.transform(value) : value;
 			},
 			(value) => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedAutocomplete(options.message, value);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }

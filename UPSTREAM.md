@@ -18,6 +18,7 @@ TypeScript and OpenTUI internals.
 | Prompt revert rejection lifecycle | `packages/tui/src/prompt/revert.ts`, `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/form.test.ts` |
 | Prompt validation retry default lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/text.test.ts` |
 | Prompt post-validation submitted-frame lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts` |
+| Prompt invalid-attempt active-frame cleanup lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/active-frame.ts`, `packages/tui/src/prompts/*`, `packages/tui/src/output/data-table.ts` |
 | Prompt non-interactive raw-default validation lifecycle | `packages/tui/src/prompt/lifecycle.ts` |
 | Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt validation warning line styling | `packages/tui/src/theme.ts`, `packages/tui/src/prompt/lifecycle.ts` |

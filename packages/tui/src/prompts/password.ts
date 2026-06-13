@@ -1,6 +1,6 @@
 import { textOptions } from '#tui/concerns/text-options';
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
+import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readPasswordValue } from '#tui/prompts/password/input';
 import { renderSubmittedPasswordValue } from '#tui/prompts/password/render';
 import type { TextPromptOptions } from '#tui/types';
@@ -27,7 +27,8 @@ export async function password(
 	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, required, validate, hint, transform }) : textOptions(message);
 
 	let shouldRenderSubmittedFrame = false;
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('password', options, () =>
 		promptUntilValid(
@@ -39,20 +40,18 @@ export async function password(
 					placeholder: options.placeholder,
 				});
 
-				activeFrame = answer.frame;
+				activeFrame.set(answer.frame);
 				shouldRenderSubmittedFrame = !answer.cancelled;
 
 				return options.transform ? options.transform(answer.value) : answer.value;
 			},
 			(value) => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedPasswordValue(options.message, value);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }

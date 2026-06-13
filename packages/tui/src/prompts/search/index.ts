@@ -1,5 +1,5 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
+import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readMultiSearchChoices } from '#tui/prompts/search/read-multi';
 import { readSearchChoice } from '#tui/prompts/search/read-single';
 import { renderSubmittedSearchChoice, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
@@ -40,7 +40,8 @@ export async function search<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabel = '';
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('search', options, () =>
 		promptUntilValid(
@@ -52,7 +53,7 @@ export async function search<T>(
 					throw new PromptValidationError('Please select a valid option.');
 				}
 
-				activeFrame = selected.frame;
+				activeFrame.set(selected.frame);
 				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 				submittedLabel = selected.submittedLabel;
 
@@ -60,13 +61,11 @@ export async function search<T>(
 			},
 			() => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedSearchChoice(options.message, submittedLabel);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }
@@ -105,7 +104,8 @@ export async function multisearch<T>(
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabels: string[] = [];
-	let activeFrame: string | undefined;
+
+	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('multisearch', promptOptions, () =>
 		promptUntilValid(
@@ -113,7 +113,7 @@ export async function multisearch<T>(
 			async () => {
 				const selected = await readMultiSearchChoices(promptOptions);
 
-				activeFrame = selected.frame;
+				activeFrame.set(selected.frame);
 				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 				submittedLabels = selected.submittedLabels;
 
@@ -121,13 +121,11 @@ export async function multisearch<T>(
 			},
 			() => {
 				if (shouldRenderSubmittedFrame) {
-					if (activeFrame) {
-						eraseRenderedFrame(activeFrame);
-					}
-
+					activeFrame.clear();
 					renderSubmittedSearchChoices(promptOptions.message, submittedLabels);
 				}
 			},
+			activeFrame.clear,
 		),
 	);
 }
