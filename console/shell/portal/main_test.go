@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -33,12 +35,65 @@ func TestPortalFormCommandUsesRealStdio(t *testing.T) {
 	}
 }
 
+func TestPortalBindsViperFlagsIntoFormDefaults(t *testing.T) {
+	output := runPortal(t, []byte("\n\n\n"), "form", "--project", "Flag App", "--runtime", "TypeScript", "--create=false")
+
+	for _, want := range []string{"Flag App", "TypeScript", "false"} {
+		if !strings.Contains(output, want) {
+			t.Fatalf("flag-backed form output missing %q:\n%s", want, output)
+		}
+	}
+}
+
+func TestPortalBindsViperEnvIntoCommandAndDefaults(t *testing.T) {
+	output := runPortalWithEnv(t, []byte("\n\n\n"), []string{
+		"OLLIN_SHELL_COMMAND=form",
+		"OLLIN_SHELL_FORM_PROJECT=Env App",
+		"OLLIN_SHELL_FORM_RUNTIME=TypeScript",
+		"OLLIN_SHELL_FORM_CREATE=false",
+	})
+
+	for _, want := range []string{"Env App", "TypeScript", "false"} {
+		if !strings.Contains(output, want) {
+			t.Fatalf("env-backed form output missing %q:\n%s", want, output)
+		}
+	}
+}
+
+func TestPortalReadsViperConfigFile(t *testing.T) {
+	configPath := filepath.Join(t.TempDir(), "shell")
+	err := os.WriteFile(configPath, []byte(strings.Join([]string{
+		"command: form",
+		"form:",
+		"  project: Config App",
+		"  runtime: TypeScript",
+		"  create: false",
+		"",
+	}, "\n")), 0o600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output := runPortal(t, []byte("\n\n\n"), "--config", configPath)
+
+	for _, want := range []string{"Config App", "TypeScript", "false"} {
+		if !strings.Contains(output, want) {
+			t.Fatalf("config-backed form output missing %q:\n%s", want, output)
+		}
+	}
+}
+
 func runPortal(t *testing.T, stdin []byte, args ...string) string {
+	return runPortalWithEnv(t, stdin, nil, args...)
+}
+
+func runPortalWithEnv(t *testing.T, stdin []byte, env []string, args ...string) string {
 	t.Helper()
 
 	commandArgs := append([]string{"run", "."}, args...)
 	command := exec.Command("go", commandArgs...)
 	command.Stdin = bytes.NewReader(stdin)
+	command.Env = append(os.Environ(), env...)
 
 	output, err := command.CombinedOutput()
 	if err != nil {

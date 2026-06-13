@@ -16,15 +16,20 @@ func main() {
 }
 
 func run(args []string) error {
-	if len(args) > 0 && args[0] == "version" {
+	config, err := loadPortalConfig(args)
+	if err != nil {
+		return err
+	}
+
+	if config.Command == versionCommand {
 		fmt.Println("@ollin/shell 0.1.0")
 		return nil
 	}
 
-	configureStdioEnvironment()
+	configureStdioEnvironment(config)
 
-	if len(args) > 0 && args[0] == "form" {
-		return runFormCommand()
+	if config.Command == formCommand {
+		return runFormCommand(config)
 	}
 
 	tui.Intro("Oullin TUI shell")
@@ -32,8 +37,8 @@ func run(args []string) error {
 	return nil
 }
 
-func configureStdioEnvironment() {
-	interactive := true
+func configureStdioEnvironment(config portalConfig) {
+	interactive := config.Interactive
 	tui.Configure(tui.Patch{
 		Input:       tui.NewStdioInput(os.Stdin, os.Stdout),
 		Output:      tui.NewWriterOutput(os.Stdout),
@@ -42,7 +47,7 @@ func configureStdioEnvironment() {
 	})
 }
 
-func runFormCommand() error {
+func runFormCommand(config portalConfig) error {
 	restore, err := enableRawInput()
 	if err != nil {
 		return err
@@ -50,9 +55,9 @@ func runFormCommand() error {
 	defer restore()
 
 	responses, err := tui.Form().
-		Text(tui.TextOptions{Message: "Project name", Required: tui.Required{Enabled: true}}).
-		Select(tui.ChoiceOptions{Message: "Runtime", Choices: tui.NewStringChoices("Go", "TypeScript"), Default: "Go", HasDefault: true}).
-		Confirm(tui.ConfirmOptions{Message: "Create project?", Default: true, HasDefault: true}).
+		Text(tui.TextOptions{Message: "Project name", Default: config.ProjectDefault, Required: tui.Required{Enabled: true}}).
+		Select(tui.ChoiceOptions{Message: "Runtime", Choices: tui.NewStringChoices("Go", "TypeScript"), Default: config.RuntimeDefault, HasDefault: true}).
+		Confirm(tui.ConfirmOptions{Message: "Create project?", Default: config.CreateDefault, HasDefault: true}).
 		Submit()
 	if err != nil {
 		return err
