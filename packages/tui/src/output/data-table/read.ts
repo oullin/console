@@ -1,5 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
+import { ask } from '#tui/prompt/ask';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
@@ -89,7 +90,17 @@ export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>
 	};
 
 	if (!environment.input.readKey) {
-		return dataTableSelectionResult(visibleRows(), selected, false);
+		if (!environment.input.readLine) {
+			return dataTableSelectionResult(visibleRows(), selected, false);
+		}
+
+		const answer = await ask(options.message);
+
+		const rows = visibleDataTableRows(options, headers, answer);
+
+		assertSelectedDataTableRow(rows, 0, '');
+
+		return dataTableSelectionResult(rows, 0, false);
 	}
 
 	render();
