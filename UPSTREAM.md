@@ -171,6 +171,7 @@ TypeScript and OpenTUI internals.
 | Progress cursor visibility and rendered-frame redraw cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/frame.ts` |
 | Progress signal cleanup | `packages/tui/src/status/progress.ts`, `packages/tui/tests/progress.test.ts` |
 | Progress prompt-disable and manual advance semantics | `packages/tui/src/status/progress.ts` |
+| Progress integer step parsing and clamped manual advance range | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/validators/progress.ts` |
 | Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
 | Terminal clear/title and notification helper return values | `packages/tui/src/output/terminal.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/tests/terminal.test.ts`, `packages/tui/tests/notify.test.ts` |
 | Terminal raw key alias normalization | `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |

@@ -16,5 +16,5 @@ export const parseProgressTotal = (total: unknown): number => {
 export const parseProgressStep = (step: unknown): number => {
 	const parsed = progressNumberSchema.safeParse(step);
 
-	return parsed.success ? parsed.data : 0;
+	return parsed.success ? Math.trunc(parsed.data) : 0;
 };

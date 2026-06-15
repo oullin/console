@@ -45,6 +45,10 @@ export class Progress {
 		this.#state = 'active';
 		this.#current = this.#current + parseProgressStep(step);
 
+		if (this.#current < 0) {
+			this.#current = 0;
+		}
+
 		if (this.#current > this.total) {
 			this.#current = this.total;
 		}
