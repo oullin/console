@@ -60,12 +60,14 @@ TypeScript and OpenTUI internals.
 | Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
+| Select cancelled frame row styling | `packages/tui/src/prompts/select/render.ts` |
 | Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select empty submitted final frame | `packages/tui/src/prompts/select/render.ts` |
 | Multi-select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select cancelled frame row styling | `packages/tui/src/prompts/select/render.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Suggest active, submitted, cancelled, placeholder, info, scrolling, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/tests/suggest.test.ts` |
 | Suggest active-frame redraw and cursor rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts` |

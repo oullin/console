@@ -3,7 +3,7 @@ import { choiceWindow } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { renderBox } from '#tui/theme/box';
-import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
+import { cyan, dim, red } from '#tui/theme/styles';
 import type { Choice, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll: number | undefined, info: SelectPromptOptions<T>['info']): string => {
@@ -95,21 +95,21 @@ const renderActiveChecklistRows = <T>(choices: Array<Choice<T>>, selected: numbe
 	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');
 };
 
-const cancelledChoiceLabel = <T>(choice: Choice<T>): string => {
-	return strikethrough(choiceLabel(choice));
-};
-
 const renderCancelledChoiceRows = <T>(choices: Array<Choice<T>>, selected: number, scroll?: number): string => {
 	const window = choiceWindow(choices.length, selected, scroll);
 
 	const rows = choices.slice(window.start, window.end).map((choice, offset) => {
 		const index = window.start + offset;
-		const marker = index === selected ? '› ●' : '  ○';
+		const label = choiceLabel(choice);
 
-		return dim(`${marker} ${cancelledChoiceLabel(choice)}  `);
+		if (index === selected) {
+			return `${cyan('› ●')} ${label}  `;
+		}
+
+		return `  ○ ${label}  `;
 	});
 
-	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length, dim).join('\n');
+	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');
 };
 
 const renderCancelledChecklistRows = <T>(choices: Array<Choice<T>>, selected: number, marked: Set<number>, scroll?: number): string => {
@@ -119,9 +119,14 @@ const renderCancelledChecklistRows = <T>(choices: Array<Choice<T>>, selected: nu
 		const index = window.start + offset;
 		const pointer = index === selected ? '›' : ' ';
 		const marker = marked.has(index) ? '◼' : '◻';
+		const label = choiceLabel(choice);
 
-		return dim(`${pointer} ${marker} ${cancelledChoiceLabel(choice)}  `);
+		if (index === selected) {
+			return `${cyan(`${pointer} ${marker}`)} ${label}  `;
+		}
+
+		return `${pointer} ${marker} ${label}  `;
 	});
 
-	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length, dim).join('\n');
+	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');
 };
