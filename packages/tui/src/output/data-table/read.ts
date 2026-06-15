@@ -11,6 +11,10 @@ import type { DataTableSearchState } from '#tui/output/data-table/search';
 import type { DataTableSelectionReadResult, VisibleDataTableRow } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions } from '#tui/types';
 
+type DataTableReadOptions<T> = DataTablePromptOptions<T> & {
+	hasDefault?: boolean;
+};
+
 const invalidRow = (): PromptValidationError => new PromptValidationError('Please select a valid row.');
 
 const selectedDataTableValue = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number): T | number => {
@@ -23,12 +27,12 @@ const selectedDataTableValue = <T>(rows: Array<VisibleDataTableRow<T>>, selected
 	return dataTableRowValue(selectedRow.row, selectedRow.index);
 };
 
-const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>, defaultValue: T | number | undefined): number => {
-	if (defaultValue === undefined) {
+const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>, defaultValue: T | number | undefined, hasDefault = false): number => {
+	if (!hasDefault) {
 		return 0;
 	}
 
-	const selected = rows.findIndex(({ index, row }) => Object.is(dataTableRowValue(row, index), defaultValue));
+	const selected = rows.findIndex(({ index, row }) => String(dataTableRowValue(row, index)) === String(defaultValue));
 
 	return Math.max(0, selected);
 };
@@ -54,14 +58,14 @@ const assertSelectedDataTableRow = <T>(rows: Array<VisibleDataTableRow<T>>, sele
 	throw invalidRow();
 };
 
-export const readDataTableSelection = async <T>(options: DataTablePromptOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
+export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	let search: DataTableSearchState = initialDataTableSearchState();
 
 	const visibleRows = () => visibleDataTableRows(options, headers, search.query.value);
 
-	let selected = initialDataTableSelection(visibleRows(), options.default);
+	let selected = initialDataTableSelection(visibleRows(), options.default, options.hasDefault);
 	let frame = '';
 
 	const render = (): void => {
