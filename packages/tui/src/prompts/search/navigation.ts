@@ -7,6 +7,10 @@ export const firstSearchHighlight = <T>(choices: Array<Choice<T>>): number | nul
 	return choices.length === 0 ? null : firstEnabledIndex(choices);
 };
 
+export const initialRetriedSearchHighlight = <T>(choices: Array<Choice<T>>, attempt: number): number | null => {
+	return attempt > 0 && choices.length > 0 ? 0 : null;
+};
+
 export const lastSearchHighlight = <T>(choices: Array<Choice<T>>): number | null => {
 	return choices.length === 0 ? null : lastEnabledIndex(choices);
 };

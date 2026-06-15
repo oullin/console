@@ -5,6 +5,7 @@ import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
+import { initialRetriedSearchHighlight } from '#tui/prompts/search/navigation';
 import { renderCancelledSearch, renderSearchChoices } from '#tui/prompts/search/render';
 import { cancelledSearchValue, defaultSearchChoice, lineSearchValue, selectedSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
@@ -25,7 +26,7 @@ export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt
 
 	let choices = await resolveSearchChoices(options.options, state.value);
 
-	let highlighted: number | null = null;
+	let highlighted: number | null = initialRetriedSearchHighlight(choices, attempt);
 
 	let frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 
