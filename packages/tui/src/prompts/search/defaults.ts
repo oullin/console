@@ -1,0 +1,31 @@
+import type { MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
+
+export type NormalizedSearchPromptOptions<T> = SearchPromptOptions<T> & {
+	hasDefault: boolean;
+};
+
+export const transformSearchValue = async <T>(options: Pick<SearchPromptOptions<T>, 'transform'>, value: T): Promise<T> => {
+	return options.transform ? options.transform(value) : value;
+};
+
+export const transformedSearchDefault = async <T>(options: NormalizedSearchPromptOptions<T>): Promise<T | undefined> => {
+	if (!options.hasDefault) {
+		return undefined;
+	}
+
+	const rawDefault = options.default as T;
+
+	try {
+		return await transformSearchValue(options, rawDefault);
+	} catch {
+		return rawDefault;
+	}
+};
+
+export const transformedMultiSearchDefault = async <T>(options: MultiSearchPromptOptions<T> & { default: T[] }): Promise<T[]> => {
+	try {
+		return options.transform ? await options.transform(options.default) : options.default;
+	} catch {
+		return options.default;
+	}
+};
