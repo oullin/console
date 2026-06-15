@@ -47,7 +47,7 @@ TypeScript and OpenTUI internals.
 | Password transformed fallback value, invalid retry default preservation, and plain placeholder rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/text-default.ts`, `packages/tui/src/prompts/password/render.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Number active, submitted, cancelled, arrow, placeholder, default, and validation-safe rendering | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/prompts/number/render.ts`, `packages/tui/tests/number.test.ts` |
-| Number default renderer right-aligned arrows | `packages/tui/src/prompts/number/render.ts` |
+| Number default renderer inline arrow controls | `packages/tui/src/prompts/number/render.ts` |
 | Number active-frame redraw and cursor rendering | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/prompts/number/render.ts` |
 | Number explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/validators/default.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
@@ -199,7 +199,7 @@ TypeScript and OpenTUI internals.
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
 | Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/basic/*`, `packages/tui/tests/form.test.ts` |
 | Prompt fallback and global validation lifecycle hooks | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validate-using.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/*`, `packages/tui/src/output/data-table.ts` |
-| Boxed default table rendering | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*`, `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table/render.ts` |
+| Pipe-style default table rendering | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*`, `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table/render.ts` |
 | Default theme symbol, prompt, validation, choice, and table rendering concerns | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*` |
 
 ## Remaining Exact-Parity Work

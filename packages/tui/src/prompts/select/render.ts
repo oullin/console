@@ -3,7 +3,7 @@ import { choiceWindow } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { renderBox } from '#tui/theme/box';
-import { cyan, dim, red } from '#tui/theme/styles';
+import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import type { Choice, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 export const renderSelectedChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll: number | undefined, info: SelectPromptOptions<T>['info']): string => {
@@ -103,10 +103,10 @@ const renderCancelledChoiceRows = <T>(choices: Array<Choice<T>>, selected: numbe
 		const label = choiceLabel(choice);
 
 		if (index === selected) {
-			return `${cyan('› ●')} ${label}  `;
+			return `${dim(`› ● ${strikethrough(label)}`)}  `;
 		}
 
-		return `  ○ ${label}  `;
+		return `${dim(`  ○ ${strikethrough(label)}`)}  `;
 	});
 
 	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');
@@ -121,11 +121,7 @@ const renderCancelledChecklistRows = <T>(choices: Array<Choice<T>>, selected: nu
 		const marker = marked.has(index) ? '◼' : '◻';
 		const label = choiceLabel(choice);
 
-		if (index === selected) {
-			return `${cyan(`${pointer} ${marker}`)} ${label}  `;
-		}
-
-		return `${pointer} ${marker} ${label}  `;
+		return `${dim(`${pointer} ${marker} ${strikethrough(label)}`)}  `;
 	});
 
 	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');

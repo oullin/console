@@ -1,5 +1,4 @@
 import { promptEnvironment } from '#tui/environment';
-import { visibleWidth } from '#tui/strings';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
@@ -7,7 +6,6 @@ import type { NumberInputOptions } from '#tui/prompts/number/types';
 
 const UP_ARROW = '▲';
 const DOWN_ARROW = '▼';
-const NUMBER_BODY_WIDTH = 60;
 
 const renderNumberArrows = (value: string, options: NumberInputOptions, style: (text: string) => string = (text) => text): string => {
 	const numeric = value !== '' && !Number.isNaN(Number(value));
@@ -25,9 +23,9 @@ const renderNumberArrows = (value: string, options: NumberInputOptions, style: (
 const renderNumberBody = (value: string, cursor: number, options: NumberInputOptions, style?: (text: string) => string): string => {
 	const displayValue = value.length > 0 ? valueWithCursor(value, cursor) : placeholderWithCursor(options.placeholder);
 	const arrows = renderNumberArrows(value, options, style);
-	const padding = Math.max(0, NUMBER_BODY_WIDTH - visibleWidth(displayValue) - visibleWidth(arrows));
+	const separator = value.length > 0 ? ' ' : '  ';
 
-	return `${displayValue}${' '.repeat(padding)}${arrows}`;
+	return `${displayValue}${separator}${arrows}`;
 };
 
 export const renderNumberValue = (message: string, value: string, cursor: number, options: NumberInputOptions): string => {

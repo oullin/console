@@ -1,5 +1,4 @@
 import { visibleWidth } from '#tui/strings';
-import { dim } from '#tui/theme/styles';
 
 const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
 
@@ -19,20 +18,12 @@ export const renderTable = (headers: string[], rows: string[][]): string => {
 	});
 
 	const renderRow = (columns: string[]): string => {
-		return ` │ ${widths.map((width, index) => padVisible(columns[index] ?? '', width)).join(' │ ')} │`;
+		return `| ${widths.map((width, index) => padVisible(columns[index] ?? '', width)).join(' | ')} |`;
 	};
-
-	const renderBorder = (left: string, middle: string, right: string): string => {
-		return ` ${left}${widths.map((width) => '─'.repeat(width + 2)).join(middle)}${right}`;
-	};
-
-	const top = renderBorder('┌', '┬', '┐');
-	const divider = renderBorder('├', '┼', '┤');
-	const bottom = renderBorder('└', '┴', '┘');
 
 	if (headers.length === 0) {
-		return [top, ...rows.map(renderRow), bottom].join('\n');
+		return rows.map(renderRow).join('\n');
 	}
 
-	return [top, renderRow(headers.map(dim)), divider, ...rows.map(renderRow), bottom].join('\n');
+	return [renderRow(headers), renderRow(widths.map((width) => '-'.repeat(width))), ...rows.map(renderRow)].join('\n');
 };
