@@ -46,8 +46,8 @@ describe('task helper', () => {
 		});
 
 		expect(output.text()).toContain('Running...');
-		expect(output.text()).not.toContain('line one');
-		expect(output.text()).not.toContain('line two');
+		expect(output.text()).toContain('line one');
+		expect(output.text()).toContain('line two');
 		expect(output.text()).toContain(' ⠶ Running...');
 	});
 
