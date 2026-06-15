@@ -1,9 +1,24 @@
 import { number, password, text, textarea } from '#tui/prompts/basic';
 import { previousNumber, previousString } from '#tui/form/builder/previous';
 import { isBasicPromptLabel } from '#tui/form/builder/prompts/validators/basic';
+import { hasPromptDefault } from '#tui/validators/default';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { BasicPromptBuilderMethods } from '#tui/form/builder/prompts/types';
 import type { NumberPromptOptions, TextareaPromptOptions, TextPromptOptions } from '#tui/types';
+
+const hasPreviousResponse = (previous: unknown): boolean => previous !== undefined && previous !== null;
+
+const numberOptionsWithPreviousDefault = (options: NumberPromptOptions, previous: unknown): NumberPromptOptions => {
+	if (hasPreviousResponse(previous)) {
+		return { ...options, default: previousNumber(previous, options.default ?? '') };
+	}
+
+	if (hasPromptDefault(options)) {
+		return { ...options, default: previousNumber(previous, options.default ?? '') };
+	}
+
+	return options;
+};
 
 function numberFormStep(this: FormBuilder, options: NumberPromptOptions, name?: string): FormBuilder;
 function numberFormStep(
@@ -35,11 +50,32 @@ function numberFormStep(
 	name?: string,
 	transform: NumberPromptOptions['transform'] = undefined,
 ): FormBuilder {
+	const hasLabelDefault = isBasicPromptLabel(optionsOrLabel) && arguments.length >= 3 && defaultValue !== undefined;
+
 	if (!isBasicPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => number({ ...optionsOrLabel, default: previousNumber(previous, optionsOrLabel.default ?? '') }), placeholder);
+		return this.add((_, previous) => number(numberOptionsWithPreviousDefault(optionsOrLabel, previous)), placeholder);
 	}
 
-	return this.add((_, previous) => number(optionsOrLabel, placeholder, previousNumber(previous, defaultValue), required, validate, hint, min, max, step, transform), name);
+	return this.add((_, previous) => {
+		const promptOptions: NumberPromptOptions = {
+			message: optionsOrLabel,
+			label: optionsOrLabel,
+			placeholder,
+			required,
+			validate,
+			hint,
+			min,
+			max,
+			step,
+			transform,
+		};
+
+		if (hasPreviousResponse(previous) || hasLabelDefault) {
+			promptOptions.default = previousNumber(previous, hasLabelDefault ? defaultValue : '');
+		}
+
+		return number(promptOptions);
+	}, name);
 }
 
 function passwordFormStep(this: FormBuilder, options: TextPromptOptions, name?: string): FormBuilder;

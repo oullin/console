@@ -3,7 +3,31 @@ import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
+import { hasPromptDefault } from '#tui/validators/default';
 import type { NumberPromptOptions } from '#tui/types';
+
+type NormalizedNumberPromptOptions = NumberPromptOptions & {
+	default: number | string;
+	hasDefault: boolean;
+};
+
+const transformNumberValue = async (options: Pick<NumberPromptOptions, 'transform'>, value: number | string): Promise<number | string> => {
+	return options.transform ? options.transform(value) : value;
+};
+
+const numberDefault = async (options: NormalizedNumberPromptOptions): Promise<number | string> => {
+	if (!options.hasDefault) {
+		return '';
+	}
+
+	const result = parseNumberInput(String(options.default), options);
+
+	if (result.error !== undefined) {
+		throw new PromptValidationError(result.error);
+	}
+
+	return transformNumberValue(options, result.value ?? '');
+};
 
 export function number(options: NumberPromptOptions): Promise<number | string>;
 
@@ -32,10 +56,17 @@ export async function number(
 	step: number | undefined = undefined,
 	transform: NumberPromptOptions['transform'] = undefined,
 ): Promise<number | string> {
-	const options: NumberPromptOptions =
+	const hasDefault = typeof message === 'string' ? arguments.length >= 3 && defaultValue !== undefined : hasPromptDefault(message);
+
+	const options: NormalizedNumberPromptOptions =
 		typeof message === 'string'
-			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, min, max, step, transform }
-			: { ...message, default: message.default ?? '' };
+			? { message, label: message, placeholder, default: hasDefault ? defaultValue : '', hasDefault, required, validate, hint, min, max, step, transform }
+			: { ...message, default: hasDefault ? (message.default as number | string) : '', hasDefault };
+
+	const validationOptions: NumberPromptOptions = {
+		...options,
+		default: await numberDefault(options),
+	};
 
 	let shouldRenderSubmittedFrame = false;
 
@@ -43,10 +74,11 @@ export async function number(
 
 	return promptWithFallback('number', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async () => {
 				const answer = await readNumberValue(options.message, {
 					default: options.default,
+					hasDefault: options.hasDefault,
 					hint: options.hint,
 					max: options.max,
 					min: options.min,
@@ -59,8 +91,8 @@ export async function number(
 				activeFrame.set(answer.frame);
 				shouldRenderSubmittedFrame = !answer.cancelled;
 
-				if (value === '' && options.default !== undefined) {
-					return options.default;
+				if (value === '' && options.hasDefault) {
+					return numberDefault(options);
 				}
 
 				const result = parseNumberInput(value, options);
@@ -71,7 +103,7 @@ export async function number(
 
 				const parsedValue = result.value ?? '';
 
-				return options.transform ? options.transform(parsedValue) : parsedValue;
+				return transformNumberValue(options, parsedValue);
 			},
 			(value) => {
 				if (shouldRenderSubmittedFrame) {

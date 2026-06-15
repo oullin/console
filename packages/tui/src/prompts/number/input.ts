@@ -26,13 +26,13 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 
 		return {
 			cancelled: false,
-			value: answer === '' && options.default !== undefined ? String(options.default) : answer,
+			value: answer === '' && options.hasDefault ? String(options.default) : answer,
 		};
 	}
 
 	let state = {
-		cursor: options.default === undefined ? 0 : String(options.default).length,
-		value: options.default === undefined ? '' : String(options.default),
+		cursor: options.hasDefault ? String(options.default).length : 0,
+		value: options.hasDefault ? String(options.default) : '',
 	};
 
 	let frame = renderNumberValue(message, state.value, state.cursor, options);
