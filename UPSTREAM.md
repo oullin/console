@@ -202,15 +202,32 @@ TypeScript and OpenTUI internals.
 | Pipe-style default table rendering | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*`, `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table/render.ts` |
 | Default theme symbol, prompt, validation, choice, and table rendering concerns | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*` |
 
-## Remaining Exact-Parity Work
+## Completion Audit
 
-The following reference areas still need full line-by-line behavioral mapping in
-later phases:
+Current implementation evidence:
 
-- Form builder remaining method-surface and validation parity
-- Prompt lifecycle
-- Default theme
-- Feature parity tests
+- Public runtime helpers are exported from `packages/tui/src/index.ts` and
+  verified by `packages/acceptance/tests/package.test.ts`.
+- Prompt, form, output, status, terminal, string, key, typed-value, and package
+  consumption behavior is covered by the local test suites under
+  `packages/tui/tests` and `packages/acceptance/tests`.
+- Form builder method-surface and validation concerns are split under
+  `packages/tui/src/form/builder/*` with validator layers under
+  `packages/tui/src/form/builder/**/validators/*`.
+- Prompt implementations are split by concern under `packages/tui/src/prompts/*`
+  and shared validation layers live under local `validators/*` directories.
+- Source imports use package aliases instead of relative paths.
+- The package is ESM-only through `packages/tui/package.json` `type` and
+  `exports`.
+- CI is configured in `.github/workflows/ci.yml` to run build, typecheck, and
+  tests only when a draft pull request is marked ready for review.
+
+Latest local verification:
+
+- `pnpm test`
+- `pnpm typecheck`
+- `pnpm build`
+- `make format-all`
 
 ## Documented Deviations
 
