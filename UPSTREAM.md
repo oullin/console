@@ -199,7 +199,8 @@ TypeScript and OpenTUI internals.
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
 | Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/basic/*`, `packages/tui/tests/form.test.ts` |
 | Prompt fallback and global validation lifecycle hooks | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validate-using.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/*`, `packages/tui/src/output/data-table.ts` |
-| Boxed default table rendering | `packages/tui/src/theme.ts`, `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table/render.ts` |
+| Boxed default table rendering | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*`, `packages/tui/src/output/table.ts`, `packages/tui/src/output/data-table/render.ts` |
+| Default theme symbol, prompt, validation, choice, and table rendering concerns | `packages/tui/src/theme.ts`, `packages/tui/src/theme/*` |
 
 ## Remaining Exact-Parity Work
 

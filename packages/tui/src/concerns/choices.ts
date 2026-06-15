@@ -4,6 +4,7 @@ import { parseChoiceAnswerIndex, parseChoiceRecordKey } from '#tui/concerns/vali
 import { parseChoice, parseChoiceOptions } from '#tui/concerns/validators/choice';
 import { parseOptionalScrollSize } from '#tui/concerns/validators/scroll';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
+import { choiceDisabledSuffix } from '#tui/theme/choice-disabled';
 import { cyan, dim } from '#tui/theme/styles';
 import type { Choice, ChoiceOptions } from '#tui/types';
 
@@ -95,7 +96,7 @@ export const renderInteractiveChoices = <T>(message: string, choices: Array<Choi
 		const index = window.start + offset;
 		const pointer = index === selected ? '›' : ' ';
 		const checked = marked.size > 0 ? (marked.has(index) ? '[x]' : '[ ]') : '  ';
-		const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
+		const disabled = choiceDisabledSuffix(choice.disabled);
 		const hint = choice.hint ? ` ${choice.hint}` : '';
 
 		return `${pointer} ${checked} ${choice.label}${hint}${disabled}`;
@@ -118,7 +119,7 @@ export const renderInteractiveChecklist = <T>(message: string, choices: Array<Ch
 		const checked = marked.has(index);
 		const pointer = active ? '›' : ' ';
 		const marker = checked ? '◼' : '◻';
-		const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
+		const disabled = choiceDisabledSuffix(choice.disabled);
 		const hint = choice.hint ? ` ${choice.hint}` : '';
 		const label = `${choice.label}${hint}${disabled}`;
 
