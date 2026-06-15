@@ -1,0 +1,31 @@
+import type { MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
+
+export type NormalizedSelectPromptOptions<T> = SelectPromptOptions<T> & {
+	hasDefault: boolean;
+};
+
+export const transformSelectValue = async <T>(options: Pick<SelectPromptOptions<T>, 'transform'>, value: T): Promise<T> => {
+	return options.transform ? options.transform(value) : value;
+};
+
+export const transformedSelectDefault = async <T>(options: NormalizedSelectPromptOptions<T>): Promise<T | undefined> => {
+	if (!options.hasDefault) {
+		return undefined;
+	}
+
+	const rawDefault = options.default as T;
+
+	try {
+		return await transformSelectValue(options, rawDefault);
+	} catch {
+		return rawDefault;
+	}
+};
+
+export const transformedMultiSelectDefault = async <T>(options: MultiSelectPromptOptions<T> & { default: T[] }): Promise<T[]> => {
+	try {
+		return options.transform ? await options.transform(options.default) : options.default;
+	} catch {
+		return options.default;
+	}
+};

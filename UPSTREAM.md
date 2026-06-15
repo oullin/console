@@ -58,21 +58,21 @@ TypeScript and OpenTUI internals.
 | Confirm active and cancelled body styling | `packages/tui/src/prompts/select/render-confirm.ts` |
 | Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Select and multi-select label-first helper argument surface with info | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
-| Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
-| Select non-interactive default validation | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
-| Select explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/validators/default.ts` |
-| Select line-mode and exhausted-input default fallback with validation retry | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
+| Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/tests/choices.test.ts` |
+| Select non-interactive default validation | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/tests/choices.test.ts` |
+| Select explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/defaults.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/validators/default.ts` |
+| Select line-mode and exhausted-input default fallback with validation retry | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
-| Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
-| Select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/prompts/select/render.ts` |
+| Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
+| Select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select cancelled frame row styling | `packages/tui/src/prompts/select/render.ts` |
 | Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
-| Multi-select transformed fallback value | `packages/tui/src/prompts/select/index.ts` |
+| Multi-select transformed fallback value | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/multiselect.ts`, `packages/tui/src/prompts/select/defaults.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select empty submitted final frame | `packages/tui/src/prompts/select/render.ts` |
-| Multi-select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
-| Multi-select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/src/prompts/select/render.ts` |
+| Multi-select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/multiselect.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/multiselect.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select cancelled frame row styling | `packages/tui/src/prompts/select/render.ts` |
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
