@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
-import { cyan, dim, green, red, strikethrough } from '#tui/theme/styles';
+import { cyan, dim, green, red } from '#tui/theme/styles';
 import type { ConfirmPromptOptions } from '#tui/types';
 
 const confirmLabel = (options: ConfirmPromptOptions, confirmed: boolean): string => {
@@ -11,14 +11,14 @@ const renderConfirmOptions = (options: ConfirmPromptOptions, confirmed: boolean)
 	const yes = options.yes ?? 'Yes';
 	const no = options.no ?? 'No';
 
-	return confirmed ? `${green('●')} ${yes} ${dim(`/ ○ ${no}`)}` : `${dim(`○ ${yes} /`)} ${green('●')} ${no}`;
+	return confirmed ? `${green('●')} ${yes} / ○ ${no}` : `○ ${yes} / ${green('●')} ${no}`;
 };
 
 const renderCancelledConfirmOptions = (options: ConfirmPromptOptions, confirmed: boolean): string => {
-	const yes = strikethrough(options.yes ?? 'Yes');
-	const no = strikethrough(options.no ?? 'No');
+	const yes = options.yes ?? 'Yes';
+	const no = options.no ?? 'No';
 
-	return confirmed ? dim(`● ${yes} / ○ ${no}`) : dim(`○ ${yes} / ● ${no}`);
+	return confirmed ? `● ${yes} / ○ ${no}` : `○ ${yes} / ● ${no}`;
 };
 
 export const renderActiveConfirm = (options: ConfirmPromptOptions, confirmed: boolean): string => {
