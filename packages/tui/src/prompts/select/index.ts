@@ -7,7 +7,38 @@ import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
 import { renderSubmittedChoice, renderSubmittedChoices } from '#tui/prompts/select/render';
 import { assertSelectOptions } from '#tui/prompts/select/validators/options';
+import { hasPromptDefault } from '#tui/validators/default';
 import type { ChoiceOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
+
+type NormalizedSelectPromptOptions<T> = SelectPromptOptions<T> & {
+	hasDefault: boolean;
+};
+
+const transformSelectValue = async <T>(options: Pick<SelectPromptOptions<T>, 'transform'>, value: T): Promise<T> => {
+	return options.transform ? options.transform(value) : value;
+};
+
+const transformedSelectDefault = async <T>(options: NormalizedSelectPromptOptions<T>): Promise<T | undefined> => {
+	if (!options.hasDefault) {
+		return undefined;
+	}
+
+	const rawDefault = options.default as T;
+
+	try {
+		return await transformSelectValue(options, rawDefault);
+	} catch {
+		return rawDefault;
+	}
+};
+
+const transformedMultiSelectDefault = async <T>(options: MultiSelectPromptOptions<T> & { default: T[] }): Promise<T[]> => {
+	try {
+		return options.transform ? await options.transform(options.default) : options.default;
+	} catch {
+		return options.default;
+	}
+};
 
 export function select<T>(options: SelectPromptOptions<T>): Promise<T>;
 
@@ -34,14 +65,22 @@ export async function select<T>(
 	transform: SelectPromptOptions<T>['transform'] = undefined,
 	info: SelectPromptOptions<T>['info'] = '',
 ): Promise<T> {
-	const options =
+	const hasDefault = typeof optionsOrLabel === 'string' ? arguments.length >= 3 && defaultValue !== undefined : hasPromptDefault(optionsOrLabel);
+
+	const options: NormalizedSelectPromptOptions<T> =
 		typeof optionsOrLabel === 'string'
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as ChoiceOptions<T>, default: defaultValue, scroll, validate, hint, required, transform, info }
-			: optionsOrLabel;
+			? { message: optionsOrLabel, label: optionsOrLabel, options: source as ChoiceOptions<T>, default: defaultValue, hasDefault, scroll, validate, hint, required, transform, info }
+			: { ...optionsOrLabel, hasDefault };
 
 	assertSelectOptions(options);
 
-	const promptOptions = { ...options, required: options.required ?? true };
+	const promptOptions: NormalizedSelectPromptOptions<T> = { ...options, required: options.required ?? true };
+
+	const validationOptions: SelectPromptOptions<T> = {
+		...promptOptions,
+		default: await transformedSelectDefault(promptOptions),
+	};
+
 	const choices = normalizeChoices(options.options);
 
 	let shouldRenderSubmittedFrame = false;
@@ -51,15 +90,23 @@ export async function select<T>(
 
 	return promptWithFallback('select', promptOptions, () =>
 		promptUntilValid(
-			promptOptions,
+			validationOptions,
 			async () => {
-				const selected = await readSelectedChoice(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
+				const selected = await readSelectedChoice(
+					promptOptions.message,
+					choices,
+					promptOptions.default,
+					promptOptions.hasDefault,
+					promptOptions.hint,
+					promptOptions.scroll,
+					promptOptions.info,
+				);
 
 				activeFrame.set(selected.frame);
 				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 				submittedLabel = selected.submittedLabel;
 
-				return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
+				return transformSelectValue(promptOptions, selected.value);
 			},
 			() => {
 				if (shouldRenderSubmittedFrame) {
@@ -103,6 +150,12 @@ export async function multiselect<T>(
 			: optionsOrLabel;
 
 	const promptOptions = { ...options, default: options.default ?? [] };
+
+	const validationOptions: MultiSelectPromptOptions<T> = {
+		...promptOptions,
+		default: await transformedMultiSelectDefault(promptOptions),
+	};
+
 	const choices = normalizeChoices(options.options);
 
 	let shouldRenderSubmittedFrame = false;
@@ -112,7 +165,7 @@ export async function multiselect<T>(
 
 	return promptWithFallback('multiselect', promptOptions, () =>
 		promptUntilValid(
-			promptOptions,
+			validationOptions,
 			async () => {
 				const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
 

@@ -6,6 +6,10 @@ import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderActiveConfirm, renderCancelledConfirm } from '#tui/prompts/select/render-confirm';
 import type { ConfirmPromptOptions } from '#tui/types';
 
+type ConfirmReadOptions = ConfirmPromptOptions & {
+	hasDefault?: boolean;
+};
+
 const toggleKeys = new Set([Key.tab, Key.up, Key.upArrow, Key.down, Key.downArrow, Key.left, Key.leftArrow, Key.right, Key.rightArrow, Key.ctrlP, Key.ctrlF, Key.ctrlN, Key.ctrlB, 'h', 'j', 'k', 'l']);
 
 export type ConfirmReadResult = {
@@ -15,16 +19,16 @@ export type ConfirmReadResult = {
 	value: boolean;
 };
 
-export const readConfirm = async (options: ConfirmPromptOptions): Promise<ConfirmReadResult> => {
+export const readConfirm = async (options: ConfirmReadOptions): Promise<ConfirmReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const suffix = options.default === false ? ' [y/N]' : ' [Y/n]';
+		const suffix = options.hasDefault === true && options.default === false ? ' [y/N]' : ' [Y/n]';
 
 		const answer = (await ask(`${options.message}${suffix}`, options.hint)).trim().toLowerCase();
 
-		if (answer === '' && options.default !== undefined) {
-			return { cancelled: false, submitted: false, value: options.default };
+		if (answer === '' && options.hasDefault === true) {
+			return { cancelled: false, submitted: false, value: options.default ?? true };
 		}
 
 		return { cancelled: false, submitted: false, value: ['y', 'yes', options.yes?.toLowerCase()].includes(answer) };

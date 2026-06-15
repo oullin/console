@@ -10,7 +10,11 @@ import { cancelledSearchValue, defaultSearchChoice, lineSearchValue, selectedSea
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import type { SearchPromptOptions } from '#tui/types';
 
-export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attempt = 0): Promise<SearchChoiceReadResult<T>> => {
+type SearchReadOptions<T> = SearchPromptOptions<T> & {
+	hasDefault?: boolean;
+};
+
+export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt = 0): Promise<SearchChoiceReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -67,8 +71,8 @@ export const readSearchChoice = async <T>(options: SearchPromptOptions<T>, attem
 
 			choices = await resolveSearchChoices(options.options, state.value);
 
-			if (state.value === '' && options.default !== undefined) {
-				const choice = defaultSearchChoice(choices, options.default);
+			if (state.value === '' && options.hasDefault === true) {
+				const choice = defaultSearchChoice(choices, options.default, options.hasDefault);
 
 				return { cancelled: false, frame, submitted: choice !== undefined, submittedLabel: choice?.label ?? '', value: choice?.value ?? options.default };
 			}

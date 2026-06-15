@@ -3,7 +3,7 @@ import { Key } from '#tui/key';
 import { ask, cancelPrompt, PromptValidationError } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderChoices } from '#tui/theme';
-import { findChoice, firstEnabledIndex } from '#tui/concerns/choices';
+import { choiceByValue, choiceValueEquals, findChoice, firstEnabledIndex } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
 import { renderCancelledChoice, renderSelectedChoice } from '#tui/prompts/select/render';
@@ -17,12 +17,12 @@ export type SelectedChoiceReadResult<T> = {
 	value: T;
 };
 
-const defaultChoiceIndex = <T>(choices: Array<Choice<T>>, defaultValue: T | undefined): number => {
-	if (defaultValue === undefined) {
+const defaultChoiceIndex = <T>(choices: Array<Choice<T>>, defaultValue: T | undefined, hasDefault = false): number => {
+	if (!hasDefault) {
 		return firstEnabledIndex(choices);
 	}
 
-	const index = choices.findIndex((choice) => !choice.disabled && Object.is(choice.value, defaultValue));
+	const index = choices.findIndex((choice) => !choice.disabled && choiceValueEquals(choice.value, defaultValue));
 
 	return index === -1 ? firstEnabledIndex(choices) : index;
 };
@@ -31,6 +31,7 @@ export const readSelectedChoice = async <T>(
 	message: string,
 	choices: Array<Choice<T>>,
 	defaultValue?: T,
+	hasDefault = false,
 	hint?: string,
 	scroll?: number,
 	info?: SelectPromptOptions<T>['info'],
@@ -42,8 +43,8 @@ export const readSelectedChoice = async <T>(
 
 		const answer = await ask(`${message}\n${rendered}\n`, hint);
 
-		if (answer.trim() === '' && defaultValue !== undefined) {
-			const choice = choices.find((candidate) => !candidate.disabled && Object.is(candidate.value, defaultValue));
+		if (answer.trim() === '' && hasDefault) {
+			const choice = choiceByValue(choices, defaultValue);
 
 			if (choice) {
 				return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
@@ -59,7 +60,7 @@ export const readSelectedChoice = async <T>(
 		return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
 	}
 
-	let selected = defaultChoiceIndex(choices, defaultValue);
+	let selected = defaultChoiceIndex(choices, defaultValue, hasDefault);
 
 	let frame = renderSelectedChoice(message, choices, selected, scroll, info);
 
@@ -67,8 +68,8 @@ export const readSelectedChoice = async <T>(
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			if (defaultValue !== undefined) {
-				const choice = choices.find((candidate) => !candidate.disabled && Object.is(candidate.value, defaultValue));
+			if (hasDefault) {
+				const choice = choiceByValue(choices, defaultValue);
 
 				if (choice) {
 					return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };

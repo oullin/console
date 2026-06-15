@@ -3,10 +3,14 @@ import { PromptValidationError } from '#tui/prompt';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
-export const resolveLineSearchChoice = async <T>(options: SearchPromptOptions<T>, query: string): Promise<T | undefined> => {
+type SearchLineOptions<T> = SearchPromptOptions<T> & {
+	hasDefault?: boolean;
+};
+
+export const resolveLineSearchChoice = async <T>(options: SearchLineOptions<T>, query: string): Promise<T | undefined> => {
 	const choices = await resolveSearchChoices(options.options, query);
 
-	if (query === '' && options.default !== undefined) {
+	if (query === '' && options.hasDefault === true) {
 		return options.default;
 	}
 

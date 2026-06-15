@@ -4,7 +4,38 @@ import { readMultiSearchChoices } from '#tui/prompts/search/read-multi';
 import { readSearchChoice } from '#tui/prompts/search/read-single';
 import { renderSubmittedSearchChoice, renderSubmittedSearchChoices } from '#tui/prompts/search/render';
 import { assertSearchOptions } from '#tui/prompts/search/validators/options';
+import { hasPromptDefault } from '#tui/validators/default';
 import type { ChoiceOptions, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
+
+type NormalizedSearchPromptOptions<T> = SearchPromptOptions<T> & {
+	hasDefault: boolean;
+};
+
+const transformSearchValue = async <T>(options: Pick<SearchPromptOptions<T>, 'transform'>, value: T): Promise<T> => {
+	return options.transform ? options.transform(value) : value;
+};
+
+const transformedSearchDefault = async <T>(options: NormalizedSearchPromptOptions<T>): Promise<T | undefined> => {
+	if (!options.hasDefault) {
+		return undefined;
+	}
+
+	const rawDefault = options.default as T;
+
+	try {
+		return await transformSearchValue(options, rawDefault);
+	} catch {
+		return rawDefault;
+	}
+};
+
+const transformedMultiSearchDefault = async <T>(options: MultiSearchPromptOptions<T> & { default: T[] }): Promise<T[]> => {
+	try {
+		return options.transform ? await options.transform(options.default) : options.default;
+	} catch {
+		return options.default;
+	}
+};
 
 export function search<T>(options: SearchPromptOptions<T>): Promise<T>;
 
@@ -31,12 +62,19 @@ export async function search<T>(
 	transform: SearchPromptOptions<T>['transform'] = undefined,
 	info: SearchPromptOptions<T>['info'] = '',
 ): Promise<T> {
-	const options =
+	const hasDefault = typeof optionsOrLabel === 'string' ? false : hasPromptDefault(optionsOrLabel);
+
+	const options: NormalizedSearchPromptOptions<T> =
 		typeof optionsOrLabel === 'string'
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as SearchPromptOptions<T>['options'], placeholder, scroll, validate, hint, required, transform, info }
-			: optionsOrLabel;
+			? { message: optionsOrLabel, label: optionsOrLabel, options: source as SearchPromptOptions<T>['options'], hasDefault, placeholder, scroll, validate, hint, required, transform, info }
+			: { ...optionsOrLabel, hasDefault };
 
 	assertSearchOptions(options);
+
+	const validationOptions: SearchPromptOptions<T> = {
+		...options,
+		default: await transformedSearchDefault(options),
+	};
 
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabel = '';
@@ -45,7 +83,7 @@ export async function search<T>(
 
 	return promptWithFallback('search', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async (attempt) => {
 				const selected = await readSearchChoice(options, attempt);
 
@@ -57,7 +95,7 @@ export async function search<T>(
 				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
 				submittedLabel = selected.submittedLabel;
 
-				return options.transform ? options.transform(selected.value) : selected.value;
+				return transformSearchValue(options, selected.value);
 			},
 			() => {
 				if (shouldRenderSubmittedFrame) {
@@ -102,6 +140,11 @@ export async function multisearch<T>(
 
 	const promptOptions = { ...options, default: options.default ?? [] };
 
+	const validationOptions: MultiSearchPromptOptions<T> = {
+		...promptOptions,
+		default: await transformedMultiSearchDefault(promptOptions),
+	};
+
 	let shouldRenderSubmittedFrame = false;
 	let submittedLabels: string[] = [];
 
@@ -109,7 +152,7 @@ export async function multisearch<T>(
 
 	return promptWithFallback('multisearch', promptOptions, () =>
 		promptUntilValid(
-			promptOptions,
+			validationOptions,
 			async () => {
 				const selected = await readMultiSearchChoices(promptOptions);
 

@@ -50,12 +50,14 @@ TypeScript and OpenTUI internals.
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Confirm active, submitted, cancelled, custom-label, fallback, and non-interactive behavior | `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts`, `packages/tui/tests/choices.test.ts` |
 | Confirm submitted frame renders only after validation passes | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/choices.test.ts` |
+| Confirm explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/validators/default.ts` |
 | Confirm active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts` |
 | Confirm active and cancelled body styling | `packages/tui/src/prompts/select/render-confirm.ts` |
 | Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Select and multi-select label-first helper argument surface with info | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select non-interactive default validation | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
+| Select explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/validators/default.ts` |
 | Select line-mode and exhausted-input default fallback with validation retry | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
@@ -63,6 +65,7 @@ TypeScript and OpenTUI internals.
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select cancelled frame row styling | `packages/tui/src/prompts/select/render.ts` |
 | Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select transformed fallback value | `packages/tui/src/prompts/select/index.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select empty submitted final frame | `packages/tui/src/prompts/select/render.ts` |
 | Multi-select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
@@ -83,10 +86,12 @@ TypeScript and OpenTUI internals.
 | Search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
+| Search explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/src/prompts/search/line-mode.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/validators/default.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search transformed fallback value | `packages/tui/src/prompts/search/index.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search empty submitted final frame | `packages/tui/src/prompts/search/render.ts` |
 | Multi-search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/src/prompts/search/read-multi/result.ts`, `packages/tui/tests/search.test.ts` |

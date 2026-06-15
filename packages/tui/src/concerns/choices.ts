@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util';
 import { promptEnvironment } from '#tui/environment';
 import { parseChoiceAnswerIndex, parseChoiceRecordKey } from '#tui/concerns/validators/choice-answer';
 import { parseChoice, parseChoiceOptions } from '#tui/concerns/validators/choice';
@@ -31,6 +32,10 @@ export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>>
 };
 
 export const normalizeSearchChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => normalizeChoices(options);
+
+export const choiceValueEquals = (left: unknown, right: unknown): boolean => Object.is(left, right) || isDeepStrictEqual(left, right);
+
+export const choiceByValue = <T>(choices: Array<Choice<T>>, value: unknown): Choice<T> | undefined => choices.find((choice) => !choice.disabled && choiceValueEquals(choice.value, value));
 
 export const findChoice = <T>(choices: Array<Choice<T>>, answer: string): Choice<T> | undefined => {
 	const normalizedAnswer = answer.trim();
