@@ -61,6 +61,7 @@ TypeScript and OpenTUI internals.
 | Select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
+| Multi-select empty submitted final frame | `packages/tui/src/prompts/select/render.ts` |
 | Multi-select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
 | Multi-select active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/src/prompts/select/render.ts` |
 | Multi-select cancel final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-multiple.ts`, `packages/tui/tests/choices.test.ts` |
@@ -82,6 +83,7 @@ TypeScript and OpenTUI internals.
 | Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search empty submitted final frame | `packages/tui/src/prompts/search/render.ts` |
 | Multi-search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/src/prompts/search/read-multi/result.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Multi-search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |

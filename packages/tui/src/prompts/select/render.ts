@@ -20,9 +20,7 @@ export const renderSubmittedChoice = (message: string, label: string): void => {
 };
 
 export const renderSubmittedChoices = (message: string, labels: string[]): void => {
-	const body = labels.length === 0 ? dim('None') : labels.join('\n');
-
-	promptEnvironment().output.write(`${renderBox({ body, title: dim(message) })}\n`);
+	promptEnvironment().output.write(`${renderBox({ body: labels.join('\n'), title: dim(message) })}\n`);
 };
 
 export const renderCancelledChoice = <T>(message: string, choices: Array<Choice<T>>, selected: number, scroll?: number): void => {

@@ -35,9 +35,7 @@ export const renderSubmittedSearchChoice = (message: string, label: string): voi
 };
 
 export const renderSubmittedSearchChoices = (message: string, labels: string[]): void => {
-	const body = labels.length === 0 ? dim('None') : labels.join('\n');
-
-	promptEnvironment().output.write(`${renderBox({ body, title: dim(message) })}\n`);
+	promptEnvironment().output.write(`${renderBox({ body: labels.join('\n'), title: dim(message) })}\n`);
 };
 
 export const renderCancelledSearch = (message: string, query: string, placeholder = ''): void => {
