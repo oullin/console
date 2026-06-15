@@ -1,5 +1,6 @@
 import { alert, clear, dataTable, datatable, error, grid, info, intro, note, notify, outro, table, title, warning } from '#tui/output';
 import { previousValue } from '#tui/form/builder/previous';
+import { parseOutputScroll, parseOutputStepName } from '#tui/form/builder/validators/output';
 import { dataTableStepName, isDataTablePromptOptions } from '#tui/output/validators/data-table';
 import { isTableOptions, tableStepName } from '#tui/output/validators/table';
 import type { FormBuilder } from '#tui/form/builder/index';
@@ -91,8 +92,8 @@ function datatableFormStep<T = unknown>(
 		return this.add((_, previous) => datatable<T>({ ...optionsOrHeaders, default: previousValue(previous, optionsOrHeaders.default) }), dataTableStepName(rowsOrName));
 	}
 
-	const stepName = typeof scrollOrName === 'string' ? scrollOrName : name;
-	const scroll = typeof scrollOrName === 'number' ? scrollOrName : 10;
+	const stepName = parseOutputStepName(scrollOrName) ?? name;
+	const scroll = parseOutputScroll(scrollOrName, 10);
 
 	return this.add(
 		(_, previous) =>

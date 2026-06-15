@@ -156,6 +156,7 @@ TypeScript and OpenTUI internals.
 | Form builder label-first data table method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder label-first data table previous-response defaults | `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder interactive data table object-option method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/output/validators/data-table.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder output overload validator layer | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/validators/output.ts` |
 | Form builder object-option table output method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/output/validators/table.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder output method surface for grid, display data table, terminal helpers, and notifications | `packages/tui/src/form/builder/index.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/form.test.ts` |
 | Display-only output helper return values and form responses | `packages/tui/src/output/notes.ts`, `packages/tui/src/output/table.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/tests/output.test.ts`, `packages/tui/tests/form.test.ts` |
