@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { transformedTextDefault } from '#tui/prompts/text-default';
 import { readTypedValue } from '#tui/typed-value';
 import { renderSubmittedTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TextareaPromptOptions } from '#tui/types';
@@ -32,13 +33,18 @@ export async function textarea(
 			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, rows, transform }
 			: { ...message, default: message.default ?? '', rows: message.rows ?? rows };
 
+	const validationOptions: TextareaPromptOptions = {
+		...options,
+		default: await transformedTextDefault(options),
+	};
+
 	let shouldRenderSubmittedFrame = false;
 
 	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('textarea', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async () => {
 				const answer = await readTypedValue(options.message, {
 					default: options.default,
@@ -61,7 +67,10 @@ export async function textarea(
 					renderSubmittedTextareaFrame(options.message, value);
 				}
 			},
-			activeFrame.clear,
+			(value) => {
+				options.default = value;
+				activeFrame.clear();
+			},
 		),
 	);
 }

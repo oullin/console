@@ -1,7 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
+import { valueWithCursor } from '#tui/typed-value/cursor';
 import { visibleTextWindow } from '#tui/typed-value/lines';
 import { renderTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
@@ -20,7 +20,7 @@ export const renderTypedValue = (message: string, state: TypedValueState, option
 	}
 
 	const visible = visibleTextWindow(state.value, state.cursor, options.rows);
-	const displayValue = state.value.length > 0 ? valueWithCursor(visible.text, visible.cursor) : placeholderWithCursor(options.placeholder);
+	const displayValue = state.value.length > 0 ? valueWithCursor(visible.text, visible.cursor) : dim(options.placeholder ?? '');
 
 	const frame = `${renderBox({ body: displayValue, borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`;
 

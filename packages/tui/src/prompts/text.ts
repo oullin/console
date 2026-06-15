@@ -1,6 +1,7 @@
 import { textOptions } from '#tui/concerns/text-options';
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { transformedTextDefault } from '#tui/prompts/text-default';
 import { readTypedValue } from '#tui/typed-value';
 import { renderSubmittedTypedValue } from '#tui/typed-value/render';
 import type { TextPromptOptions } from '#tui/types';
@@ -28,13 +29,18 @@ export async function text(
 ): Promise<string> {
 	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, default: defaultValue, required, validate, hint, transform }) : textOptions(message);
 
+	const validationOptions: TextPromptOptions = {
+		...options,
+		default: await transformedTextDefault(options),
+	};
+
 	let shouldRenderSubmittedFrame = false;
 
 	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('text', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async () => {
 				const answer = await readTypedValue(options.message, {
 					default: options.default,
@@ -55,7 +61,10 @@ export async function text(
 					renderSubmittedTypedValue(options.message, value);
 				}
 			},
-			activeFrame.clear,
+			(value) => {
+				options.default = value;
+				activeFrame.clear();
+			},
 		),
 	);
 }

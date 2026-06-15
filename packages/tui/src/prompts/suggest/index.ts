@@ -5,6 +5,7 @@ import { readSuggestionValue } from '#tui/prompts/suggest/read';
 import { renderSubmittedAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { renderSubmittedSuggestion } from '#tui/prompts/suggest/render';
 import { suggestOptions } from '#tui/prompts/suggest/options';
+import { transformedTextDefault } from '#tui/prompts/text-default';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { MaybePromise, TextPromptOptions } from '#tui/types';
 
@@ -39,13 +40,18 @@ export async function suggest(
 ): Promise<string> {
 	const options = suggestOptions(message, source, placeholder, defaultValue, scroll, required, validate, hint, transform, info);
 
+	const validationOptions: SuggestOptions = {
+		...options,
+		default: await transformedTextDefault(options),
+	};
+
 	let shouldRenderSubmittedFrame = false;
 
 	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('suggest', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async () => {
 				const answer = await readSuggestionValue(options);
 
@@ -62,7 +68,10 @@ export async function suggest(
 					renderSubmittedSuggestion(options.message, value);
 				}
 			},
-			activeFrame.clear,
+			(value) => {
+				options.default = value;
+				activeFrame.clear();
+			},
 		),
 	);
 }
@@ -97,13 +106,18 @@ export async function autocomplete(
 			? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform, info })
 			: suggestOptions(message);
 
+	const validationOptions: SuggestOptions = {
+		...options,
+		default: await transformedTextDefault(options),
+	};
+
 	let shouldRenderSubmittedFrame = false;
 
 	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('autocomplete', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async () => {
 				const answer = await readAutocompleteValue(options);
 
@@ -120,7 +134,10 @@ export async function autocomplete(
 					renderSubmittedAutocomplete(options.message, value);
 				}
 			},
-			activeFrame.clear,
+			(value) => {
+				options.default = value;
+				activeFrame.clear();
+			},
 		),
 	);
 }

@@ -2,7 +2,7 @@ import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
+import { valueWithCursor } from '#tui/typed-value/cursor';
 import { visibleTextWindow } from '#tui/typed-value/lines';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
@@ -43,7 +43,7 @@ const textareaBody = (state: TypedValueState, options: TypedValueOptions): strin
 };
 
 const placeholderBody = (options: TypedValueOptions, rows: number | undefined): string => {
-	const lines = [placeholderWithCursor(options.placeholder)];
+	const lines = [dim(options.placeholder ?? '')];
 
 	if (rows === undefined) {
 		return lines.join('\n');

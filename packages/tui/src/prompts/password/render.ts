@@ -1,7 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
+import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { PasswordInputOptions } from '#tui/prompts/password/types';
 
 export const maskPassword = (value: string): string => '•'.repeat([...value].length);
@@ -9,7 +9,7 @@ export const maskPassword = (value: string): string => '•'.repeat([...value].l
 export const passwordLength = (value: string): number => [...value].length;
 
 const passwordDisplay = (value: string, cursor: number, options: PasswordInputOptions): string => {
-	return value.length > 0 ? valueWithCursor(maskPassword(value), cursor) : placeholderWithCursor(options.placeholder);
+	return value.length > 0 ? valueWithCursor(maskPassword(value), cursor) : dim(options.placeholder ?? '');
 };
 
 export const renderPasswordValue = (message: string, value: string, cursor: number, options: PasswordInputOptions): string => {

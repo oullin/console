@@ -3,6 +3,7 @@ import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readPasswordValue } from '#tui/prompts/password/input';
 import { renderSubmittedPasswordValue } from '#tui/prompts/password/render';
+import { transformedTextDefault } from '#tui/prompts/text-default';
 import type { TextPromptOptions } from '#tui/types';
 
 export function password(options: TextPromptOptions): Promise<string>;
@@ -26,13 +27,18 @@ export async function password(
 ): Promise<string> {
 	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, required, validate, hint, transform }) : textOptions(message);
 
+	const validationOptions: TextPromptOptions = {
+		...options,
+		default: await transformedTextDefault(options),
+	};
+
 	let shouldRenderSubmittedFrame = false;
 
 	const activeFrame = activePromptFrame();
 
 	return promptWithFallback('password', options, () =>
 		promptUntilValid(
-			options,
+			validationOptions,
 			async () => {
 				const answer = await readPasswordValue(options.message, {
 					default: options.default,
@@ -51,7 +57,10 @@ export async function password(
 					renderSubmittedPasswordValue(options.message, value);
 				}
 			},
-			activeFrame.clear,
+			(value) => {
+				options.default = value;
+				activeFrame.clear();
+			},
 		),
 	);
 }

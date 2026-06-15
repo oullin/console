@@ -29,10 +29,12 @@ TypeScript and OpenTUI internals.
 | Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/text.test.ts` |
 | Text active, submitted, cancelled, placeholder, and validation-safe rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/render.ts`, `packages/tui/tests/text.test.ts` |
 | Text active-frame redraw and submitted-frame replacement | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/render.ts`, `packages/tui/src/prompts/text.ts` |
+| Text transformed fallback value, invalid retry default preservation, and plain placeholder rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text-default.ts`, `packages/tui/src/typed-value/render.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
 | Textarea defaults, transforms, validation, editing keys, line navigation, and non-interactive behavior | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea active, submitted, cancelled, scrollbar, placeholder, and validation-safe rendering | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea active-frame redraw and cursor-aware visible window rendering | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/prompts/textarea.ts` |
+| Textarea transformed fallback value, invalid retry default preservation, and plain placeholder rendering | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/prompts/text-default.ts`, `packages/tui/src/typed-value/textarea-frame.ts` |
 | Textarea control-key line navigation and empty-line movement | `packages/tui/src/typed-value/edit/navigation.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea boxed renderer and placeholder styling | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |
 | Textarea scrollbar rendering | `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/src/typed-value/lines.ts`, `packages/tui/tests/textarea.test.ts` |
@@ -42,6 +44,7 @@ TypeScript and OpenTUI internals.
 | Password input transforms, validation retry, editing keys, cancellation, masking, and non-interactive behavior | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/tests/password.test.ts` |
 | Password active, submitted, cancelled, placeholder, masked, and validation-safe rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompts/password/render.ts`, `packages/tui/tests/password.test.ts` |
 | Password active-frame redraw and masked cursor rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/password/input.ts`, `packages/tui/src/prompts/password/render.ts` |
+| Password transformed fallback value, invalid retry default preservation, and plain placeholder rendering | `packages/tui/src/prompts/password.ts`, `packages/tui/src/prompts/text-default.ts`, `packages/tui/src/prompts/password/render.ts` |
 | Number input | `packages/tui/src/prompts/number.ts`, `packages/tui/src/typed-value.ts` |
 | Number active, submitted, cancelled, arrow, placeholder, default, and validation-safe rendering | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/prompts/number/render.ts`, `packages/tui/tests/number.test.ts` |
 | Number default renderer right-aligned arrows | `packages/tui/src/prompts/number/render.ts` |
@@ -75,6 +78,7 @@ TypeScript and OpenTUI internals.
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Suggest active, submitted, cancelled, placeholder, info, scrolling, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/tests/suggest.test.ts` |
 | Suggest active-frame redraw and cursor rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts` |
+| Suggest and autocomplete transformed fallback value and invalid retry default preservation | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/text-default.ts` |
 | Suggest and autocomplete plain placeholder rendering | `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts` |
 | Suggest and autocomplete label-first info rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/options.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
