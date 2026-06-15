@@ -40,7 +40,7 @@ const renderSuggestBody = (value: string, cursor: number, placeholder: string, m
 	const query = value.length > 0 ? valueWithCursor(value, cursor) : dim(placeholder);
 	const rows = renderSuggestRows(matches, highlighted, scroll);
 
-	if (value.length > 0 && matches.length === 0) {
+	if (matches.length === 0) {
 		return [query, dim('  No results.')].join('\n');
 	}
 

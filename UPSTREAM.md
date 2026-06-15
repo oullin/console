@@ -78,6 +78,7 @@ TypeScript and OpenTUI internals.
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Suggest active, submitted, cancelled, placeholder, info, scrolling, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/tests/suggest.test.ts` |
 | Suggest active-frame redraw and cursor rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts` |
+| Suggest empty-result rendering for empty and typed queries | `packages/tui/src/prompts/suggest/render.ts` |
 | Suggest and autocomplete transformed fallback value and invalid retry default preservation | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/text-default.ts` |
 | Suggest and autocomplete plain placeholder rendering | `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts` |
 | Suggest and autocomplete label-first info rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/options.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
