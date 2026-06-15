@@ -4,7 +4,7 @@ import { resolveInfo } from '#tui/concerns/info';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
+import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const renderSuggestions = (
@@ -37,7 +37,7 @@ export const renderCancelledSuggestion = (message: string, value: string, placeh
 };
 
 const renderSuggestBody = (value: string, cursor: number, placeholder: string, matches: string[], highlighted: number | null, scroll?: number): string => {
-	const query = value.length > 0 ? valueWithCursor(value, cursor) : placeholderWithCursor(placeholder);
+	const query = value.length > 0 ? valueWithCursor(value, cursor) : dim(placeholder);
 	const rows = renderSuggestRows(matches, highlighted, scroll);
 
 	if (value.length > 0 && matches.length === 0) {

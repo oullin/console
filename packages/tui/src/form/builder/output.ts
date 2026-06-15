@@ -78,7 +78,7 @@ function datatableFormStep<T = unknown>(
 	this: FormBuilder,
 	optionsOrHeaders: DataTablePromptOptions<T> | string[] = [],
 	rowsOrName: Array<DataTableRow<T>> | null | string = null,
-	scroll = 10,
+	scrollOrName: number | string = 10,
 	label = '',
 	hint = '',
 	required: DataTablePromptOptions<T>['required'] = false,
@@ -90,6 +90,9 @@ function datatableFormStep<T = unknown>(
 	if (isDataTablePromptOptions<T>(optionsOrHeaders)) {
 		return this.add((_, previous) => datatable<T>({ ...optionsOrHeaders, default: previousValue(previous, optionsOrHeaders.default) }), dataTableStepName(rowsOrName));
 	}
+
+	const stepName = typeof scrollOrName === 'string' ? scrollOrName : name;
+	const scroll = typeof scrollOrName === 'number' ? scrollOrName : 10;
 
 	return this.add(
 		(_, previous) =>
@@ -105,7 +108,7 @@ function datatableFormStep<T = unknown>(
 				transform,
 				validate,
 			}),
-		name,
+		stepName,
 	);
 }
 

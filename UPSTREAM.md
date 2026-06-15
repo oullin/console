@@ -72,6 +72,7 @@ TypeScript and OpenTUI internals.
 | Suggest, autocomplete | `packages/tui/src/prompts/suggest/*` |
 | Suggest active, submitted, cancelled, placeholder, info, scrolling, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/tests/suggest.test.ts` |
 | Suggest active-frame redraw and cursor rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read.ts`, `packages/tui/src/prompts/suggest/render.ts` |
+| Suggest and autocomplete plain placeholder rendering | `packages/tui/src/prompts/suggest/render.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts` |
 | Suggest and autocomplete label-first info rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/options.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete styled cursor-aware ghost text and Unicode-safe completion acceptance | `packages/tui/src/prompts/suggest/ghost-text.ts`, `packages/tui/src/prompts/suggest/autocomplete.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/suggest.test.ts` |
 | Autocomplete active, submitted, cancelled, placeholder, ghost-text, and validation-safe rendering | `packages/tui/src/prompts/suggest/index.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/tests/suggest.test.ts` |
@@ -175,6 +176,7 @@ TypeScript and OpenTUI internals.
 | Provision workspace and tool cache isolation | `provision/go`, `provision/ts`, `provision/.cache`, `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.npmrc` |
 | Data table prompt argument validation layer | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table.ts`, `packages/tui/tests/table.test.ts` |
 | Data table filter callback lifecycle | `packages/tui/src/contracts/output.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/src/output/data-table.ts` |
+| Data table search title and non-empty query filter lifecycle | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/tests/form.test.ts` |
 | Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
 | Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |

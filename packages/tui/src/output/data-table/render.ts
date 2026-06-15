@@ -7,13 +7,11 @@ import { clampDataTableSelection, dataTableRowWindow } from '#tui/output/data-ta
 import { fixedVisualDataTableRows } from '#tui/output/data-table/visual-window';
 import { fitDataTableColumns } from '#tui/output/data-table/widths';
 import { dim, red, strikethrough } from '#tui/theme/styles';
-import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { DataTableRow } from '#tui/types';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
 type RenderDataTableFrameOptions<T> = {
 	allRows: Array<DataTableRow<T>>;
-	cursor: number;
 	headers: string[];
 	message: string;
 	mode: 'browse' | 'search';
@@ -34,7 +32,7 @@ export const renderDataTableFrame = <T>(options: RenderDataTableFrameOptions<T>)
 	const environment = promptEnvironment();
 	const selected = clampDataTableSelection(options.selected, options.rows);
 	const window = dataTableRowWindow(options.rows.length, selected, options.scroll);
-	const querySuffix = options.mode === 'search' || options.query.length > 0 ? ` / ${valueWithCursor(options.query, options.cursor)}` : '';
+	const querySuffix = options.mode === 'search' || options.query.length > 0 ? ` ${options.query}` : '';
 	const lines = [`${options.message}${querySuffix}`];
 
 	if (options.rows.length === 0) {

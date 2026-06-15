@@ -65,5 +65,9 @@ export const dataTableRowValue = <T>(row: DataTableRow<T>, index: number): T | n
 export const dataTableRowLabel = <T>(headers: string[], row: DataTableRow<T>): string => dataTableRowCells(headers, row).join(' ');
 
 export const visibleDataTableRows = <T>(options: DataTablePromptOptions<T>, headers: string[], query: string): Array<VisibleDataTableRow<T>> => {
-	return options.rows.map((row, index) => ({ index, row })).filter(({ row }) => options.filter?.(row, query) ?? dataTableRowLabel(headers, row).toLowerCase().includes(query.toLowerCase()));
+	if (query === '') {
+		return options.rows.map((row, index) => ({ index, row }));
+	}
+
+	return options.rows.map((row, index) => ({ index, row })).filter(({ row }) => options.filter?.(query, row) ?? dataTableRowLabel(headers, row).toLowerCase().includes(query.toLowerCase()));
 };
