@@ -1,8 +1,7 @@
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { moveSuggestionHighlight } from '#tui/prompts/suggest/keys';
+import { createSuggestFrameRenderer } from '#tui/prompts/suggest/read/frame';
 import { initialSuggestionState } from '#tui/prompts/suggest/read-result';
-import { renderSuggestions } from '#tui/prompts/suggest/render';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import type { SuggestNavigationAction } from '#tui/prompts/suggest/keys';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
@@ -25,18 +24,14 @@ export const createSuggestReaderSession = async (options: SuggestOptions): Promi
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	let frame = '';
+	const frame = createSuggestFrameRenderer(options);
 
 	const resolveMatches = async (): Promise<void> => {
 		matches = await resolveSuggestions(options.options, state.value);
 	};
 
 	function render(): void {
-		if (frame.length > 0) {
-			eraseRenderedFrame(frame);
-		}
-
-		frame = renderSuggestions(options.message, state.value, state.cursor, matches, highlighted, options.scroll, options.info, options.placeholder);
+		frame.render({ highlighted, matches, state });
 	}
 
 	return {
@@ -61,7 +56,7 @@ export const createSuggestReaderSession = async (options: SuggestOptions): Promi
 			render();
 		},
 		frame() {
-			return frame;
+			return frame.current();
 		},
 		highlighted() {
 			return highlighted;
