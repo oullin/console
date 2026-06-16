@@ -1,4 +1,4 @@
-import { parseDataTableRowShape, parseDataTableRowValue } from '#tui/output/validators/data-table';
+import { parseDataTableArrayRowFields, parseDataTableRowShape, parseDataTableRowValue } from '#tui/output/validators/data-table';
 import { stringifyDataTableCell } from '#tui/output/data-table/rows/cells';
 import type { DataTableRow, TableCell } from '#tui/types';
 
@@ -6,7 +6,7 @@ export const dataTableRowFields = <T>(row: DataTableRow<T>): Record<string, Tabl
 	const shape = parseDataTableRowShape(row);
 
 	if (shape.kind === 'array') {
-		return Object.fromEntries(shape.row.map((value, index) => [String(index), value]));
+		return parseDataTableArrayRowFields(shape.row);
 	}
 
 	if (shape.kind === 'object') {

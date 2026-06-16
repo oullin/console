@@ -42,3 +42,15 @@ export const parseDataTableRowShape = <T>(row: DataTableRow<T>): DataTableRowSha
 export const parseDataTableRowValue = <T>(value: unknown): T => {
 	return dataTableRowValueSchema<T>().parse(value);
 };
+
+export const parseDataTableArrayRowFields = (row: TableCell[]): Record<string, TableCell> => {
+	return Object.fromEntries(row.map((value, index) => [String(index), value]));
+};
+
+export const parseDataTableArrayHeaders = (row: TableCell[]): string[] => {
+	return row.map((_, index) => String(index + 1));
+};
+
+export const parseDataTableRecordHeaders = (row: Record<string, TableCell>): string[] => {
+	return Object.keys(row).filter((key) => key !== 'value');
+};
