@@ -11,3 +11,7 @@ export const parseBasicStepName = (value: unknown): string | undefined => {
 
 	return parsed.success ? parsed.data : undefined;
 };
+
+export const isBasicPromptOptions = <TOptions>(value: TOptions | string): value is TOptions => {
+	return !isBasicPromptLabel(value);
+};
