@@ -1,8 +1,7 @@
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
-import { moveSearchHighlight } from '#tui/prompts/search/keys';
-import { initialRetriedSearchHighlight } from '#tui/prompts/search/navigation';
 import { createSingleSearchChoiceQuery } from '#tui/prompts/search/read-single/choice-query';
-import { defaultSearchChoice, selectedSearchValue } from '#tui/prompts/search/read-single/result';
+import { createSingleSearchHighlightState } from '#tui/prompts/search/read-single/state/highlight';
+import { defaultSingleSearchSelection, selectedSingleSearchSelection } from '#tui/prompts/search/read-single/state/selection';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchReaderSelection, SearchReadOptions } from '#tui/prompts/search/read-single/types';
 import type { TypedValueState } from '#tui/typed-value/types';
@@ -23,14 +22,13 @@ export const createSingleSearchReaderState = async <T>(options: SearchReadOption
 	const initialChoices = await resolveSearchChoices(options.options, '');
 
 	const query = createSingleSearchChoiceQuery(options, initialChoices);
-
-	let highlighted: number | null = initialRetriedSearchHighlight(initialChoices, attempt);
+	const highlighted = createSingleSearchHighlightState(initialChoices, attempt, options.scroll);
 
 	return {
 		async applyTypedInput(key) {
 			const next = await query.applyTypedInput(key);
 
-			highlighted = null;
+			highlighted.clear();
 
 			return next;
 		},
@@ -38,36 +36,24 @@ export const createSingleSearchReaderState = async <T>(options: SearchReadOption
 			return query.choices();
 		},
 		clearHighlight() {
-			highlighted = null;
+			highlighted.clear();
 		},
 		async defaultSelection() {
-			await query.resolveChoices();
-
-			if (query.value().value !== '' || options.hasDefault !== true) {
-				return { label: '', submitted: false, value: undefined };
-			}
-
-			const choice = defaultSearchChoice(query.choices(), options.default, options.hasDefault);
-
-			return { label: choice?.label ?? '', submitted: choice !== undefined, value: choice?.value ?? options.default };
+			return defaultSingleSearchSelection(options, query);
 		},
 		highlighted() {
-			return highlighted;
+			return highlighted.value();
 		},
 		async move(action) {
 			await query.resolveChoices();
 
-			highlighted = moveSearchHighlight(query.choices(), highlighted, action, { attempt, retryFirst: true, scroll: options.scroll });
+			highlighted.move(query.choices(), action);
 		},
 		query() {
 			return query.value();
 		},
 		selectedSelection() {
-			const choices = query.choices();
-			const choice = highlighted === null ? undefined : choices[highlighted];
-			const value = selectedSearchValue(choices, highlighted);
-
-			return { label: choice?.label ?? '', submitted: choice !== undefined && value !== undefined, value };
+			return selectedSingleSearchSelection(query.choices(), highlighted.value());
 		},
 	};
 };

@@ -4,7 +4,7 @@ import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
 import type { TypedValueState } from '#tui/typed-value/types';
 import type { Choice } from '#tui/types';
 
-type SingleSearchChoiceQuery<T> = {
+export type SingleSearchChoiceQuery<T> = {
 	applyTypedInput(key: string): Promise<{ cancelled: boolean }>;
 	choices(): Array<Choice<T>>;
 	resolveChoices(): Promise<void>;
