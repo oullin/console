@@ -4,7 +4,7 @@ import type { RawKeyInputMode } from '#tui/environment/raw-key/mode';
 import type { RawKeyInput } from '#tui/environment/raw-key/types';
 
 type RawKeySessionHandlers = {
-	onData(chunk: Buffer | string): void;
+	onData(chunk: unknown): void;
 	onEnd(): void;
 	onError(error: Error): void;
 };
@@ -12,6 +12,7 @@ type RawKeySessionHandlers = {
 export const createRawKeySession = (input: RawKeyInput, mode: RawKeyInputMode, resolve: (value: null | string) => void, reject: (reason?: unknown) => void): RawKeySessionHandlers => {
 	let buffer = '';
 	let escapeTimer: NodeJS.Timeout | undefined;
+	let settled = false;
 
 	const cleanup = (): void => {
 		clearTimeout(escapeTimer);
@@ -21,14 +22,55 @@ export const createRawKeySession = (input: RawKeyInput, mode: RawKeyInputMode, r
 		mode.restore();
 	};
 
+	const resolveWithCleanup = (value: null | string): void => {
+		if (settled) {
+			return;
+		}
+
+		settled = true;
+
+		try {
+			cleanup();
+		} catch (error) {
+			reject(error);
+
+			return;
+		}
+
+		resolve(value);
+	};
+
+	const rejectWithCleanup = (error: unknown): void => {
+		if (settled) {
+			return;
+		}
+
+		settled = true;
+
+		try {
+			cleanup();
+		} catch (cleanupError) {
+			reject(cleanupError);
+
+			return;
+		}
+
+		reject(error);
+	};
+
 	const resolveBufferedKey = (): void => {
-		cleanup();
-		resolve(normalizeRawKey(buffer));
+		resolveWithCleanup(normalizeRawKey(buffer));
 	};
 
 	const handlers: RawKeySessionHandlers = {
 		onData(chunk) {
-			buffer += parseRawKeyChunkText(chunk);
+			try {
+				buffer += parseRawKeyChunkText(chunk);
+			} catch (error) {
+				rejectWithCleanup(error);
+
+				return;
+			}
 
 			if (isCompleteRawKey(buffer)) {
 				resolveBufferedKey();
@@ -40,12 +82,10 @@ export const createRawKeySession = (input: RawKeyInput, mode: RawKeyInputMode, r
 			escapeTimer = setTimeout(resolveBufferedKey, 25);
 		},
 		onEnd() {
-			cleanup();
-			resolve(buffer.length > 0 ? normalizeRawKey(buffer) : null);
+			resolveWithCleanup(buffer.length > 0 ? normalizeRawKey(buffer) : null);
 		},
 		onError(error) {
-			cleanup();
-			reject(error);
+			rejectWithCleanup(error);
 		},
 	};
 
