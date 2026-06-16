@@ -9,6 +9,10 @@ export const createInitialSearchSelection = <T>(choices: Array<Choice<T>>, defau
 	for (const value of defaults) {
 		const choice = choices.find((candidate) => choiceValueEquals(candidate.value, value));
 
+		if (choice?.disabled) {
+			continue;
+		}
+
 		selected.set(choice?.value ?? value, choice?.label ?? String(value));
 	}
 
@@ -28,7 +32,7 @@ export const displayedSearchChoices = <T>(choices: Array<Choice<T>>, selected: S
 export const selectableSearchChoices = <T>(choices: Array<Choice<T>>): Array<Choice<T>> => choices.filter((choice) => !choice.disabled);
 
 export const markedSearchChoiceIndexes = <T>(choices: Array<Choice<T>>, selected: SearchSelection<T>): Set<number> => {
-	return new Set(choices.flatMap((choice, index) => ([...selected.keys()].some((value) => choiceValueEquals(choice.value, value)) ? [index] : [])));
+	return new Set(choices.flatMap((choice, index) => (!choice.disabled && [...selected.keys()].some((value) => choiceValueEquals(choice.value, value)) ? [index] : [])));
 };
 
 export const toggleSearchChoice = <T>(selected: SearchSelection<T>, choice: Choice<T>): void => {

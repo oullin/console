@@ -16,7 +16,7 @@ export const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: 
 };
 
 export const markedChoiceIndexes = <T>(choices: Array<Choice<T>>, defaults: T[] = []): Set<number> => {
-	return new Set(choices.flatMap((choice, index) => (defaults.some((value) => choiceValueEquals(choice.value, value)) ? [index] : [])));
+	return new Set(choices.flatMap((choice, index) => (!choice.disabled && defaults.some((value) => choiceValueEquals(choice.value, value)) ? [index] : [])));
 };
 
 export const markedChoiceValues = <T>(choices: Array<Choice<T>>, marked: Set<number>): T[] => {
@@ -24,7 +24,15 @@ export const markedChoiceValues = <T>(choices: Array<Choice<T>>, marked: Set<num
 };
 
 export const defaultChoiceValues = <T>(choices: Array<Choice<T>>, defaults: T[] = []): T[] => {
-	return defaults.map((value) => choices.find((choice) => choiceValueEquals(choice.value, value))?.value ?? value);
+	return defaults.flatMap((value) => {
+		const choice = choices.find((candidate) => choiceValueEquals(candidate.value, value));
+
+		if (choice?.disabled) {
+			return [];
+		}
+
+		return [choice?.value ?? value];
+	});
 };
 
 export const toggleMarkedChoice = <T>(choices: Array<Choice<T>>, marked: Set<number>, index: number): Set<number> => {

@@ -12,9 +12,10 @@ export const resolveLineSearchChoice = async <T>(options: SearchLineOptions<T>, 
 	const choices = await resolveSearchChoices(options.options, query);
 
 	if (query === '' && options.hasDefault === true) {
+		const disabledChoice = choices.find((candidate) => candidate.disabled && choiceValueEquals(candidate.value, options.default));
 		const choice = choiceByValue(choices, options.default);
 
-		return choice?.value ?? options.default;
+		return disabledChoice ? undefined : (choice?.value ?? options.default);
 	}
 
 	const matched = findChoice(choices, query);
@@ -32,7 +33,15 @@ export const resolveLineMultiSearchChoices = async <T>(options: MultiSearchPromp
 	const choices = await resolveSearchChoices(options.options, query);
 
 	if (query === '' && options.default !== undefined) {
-		return options.default.map((value) => choices.find((choice) => choiceValueEquals(choice.value, value))?.value ?? value);
+		return options.default.flatMap((value) => {
+			const choice = choices.find((candidate) => choiceValueEquals(candidate.value, value));
+
+			if (choice?.disabled) {
+				return [];
+			}
+
+			return [choice?.value ?? value];
+		});
 	}
 
 	const parts = parseChoiceAnswerList(query);
