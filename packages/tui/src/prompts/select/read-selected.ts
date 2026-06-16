@@ -1,11 +1,12 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt, PromptValidationError } from '#tui/prompt';
+import { ask, cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderChoices } from '#tui/theme';
-import { choiceByValue, choiceValueEquals, findChoice, firstEnabledIndex } from '#tui/concerns/choices';
+import { findChoice } from '#tui/concerns/choices';
 import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
+import { defaultChoiceIndex, invalidSelectedChoice, selectedChoiceAt, selectedChoiceByDefault, selectedChoiceResult } from '#tui/prompts/select/read-selected/result';
 import { renderCancelledChoice, renderSelectedChoice } from '#tui/prompts/select/render';
 import type { Choice, SelectPromptOptions } from '#tui/types';
 
@@ -15,16 +16,6 @@ export type SelectedChoiceReadResult<T> = {
 	submitted: boolean;
 	submittedLabel: string;
 	value: T;
-};
-
-const defaultChoiceIndex = <T>(choices: Array<Choice<T>>, defaultValue: T | undefined, hasDefault = false): number => {
-	if (!hasDefault) {
-		return firstEnabledIndex(choices);
-	}
-
-	const index = choices.findIndex((choice) => !choice.disabled && choiceValueEquals(choice.value, defaultValue));
-
-	return index === -1 ? firstEnabledIndex(choices) : index;
 };
 
 export const readSelectedChoice = async <T>(
@@ -44,20 +35,20 @@ export const readSelectedChoice = async <T>(
 		const answer = await ask(`${message}\n${rendered}\n`, hint);
 
 		if (answer.trim() === '' && hasDefault) {
-			const choice = choiceByValue(choices, defaultValue);
+			const choice = selectedChoiceByDefault(choices, defaultValue, hasDefault);
 
 			if (choice) {
-				return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
+				return selectedChoiceResult(choice, false);
 			}
 		}
 
 		const choice = findChoice(choices, answer);
 
 		if (!choice || choice.disabled) {
-			throw new PromptValidationError('Please select a valid option.');
+			throw invalidSelectedChoice();
 		}
 
-		return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
+		return selectedChoiceResult(choice, false);
 	}
 
 	let selected = defaultChoiceIndex(choices, defaultValue, hasDefault);
@@ -68,36 +59,30 @@ export const readSelectedChoice = async <T>(
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			if (hasDefault) {
-				const choice = choiceByValue(choices, defaultValue);
+			const choice = selectedChoiceByDefault(choices, defaultValue, hasDefault);
 
-				if (choice) {
-					return { cancelled: false, submitted: false, submittedLabel: choice.label, value: choice.value };
-				}
+			if (choice) {
+				return selectedChoiceResult(choice, false);
 			}
 
-			throw new PromptValidationError('Please select a valid option.');
+			throw invalidSelectedChoice();
 		}
 
 		if (key === Key.ctrlC) {
 			eraseRenderedFrame(frame);
 			renderCancelledChoice(message, choices, selected, scroll);
 
-			const choice = choices[selected];
+			const choice = selectedChoiceAt(choices, selected);
 
-			if (!choice || choice.disabled) {
-				throw new PromptValidationError('Please select a valid option.');
-			}
-
-			return { cancelled: true, submitted: false, submittedLabel: choice.label, value: await cancelPrompt(choice.value) };
+			return selectedChoiceResult({ ...choice, value: await cancelPrompt(choice.value) }, false, true);
 		}
 
 		const numeric = parseChoiceIndex(key);
 
 		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
-			const choice = choices[numeric - 1];
+			const choice = selectedChoiceAt(choices, numeric - 1);
 
-			return { cancelled: false, frame, submitted: true, submittedLabel: choice.label, value: choice.value };
+			return selectedChoiceResult(choice, true, false, frame);
 		}
 
 		const action = selectNavigationAction(key, { lineControls: true });
@@ -110,13 +95,9 @@ export const readSelectedChoice = async <T>(
 		}
 
 		if (key === Key.enter) {
-			const choice = choices[selected];
+			const choice = selectedChoiceAt(choices, selected);
 
-			if (!choice || choice.disabled) {
-				throw new PromptValidationError('Please select a valid option.');
-			}
-
-			return { cancelled: false, frame, submitted: true, submittedLabel: choice.label, value: choice.value };
+			return selectedChoiceResult(choice, true, false, frame);
 		}
 	}
 };
