@@ -1,3 +1,4 @@
+import { parseStringWidth } from '#tui/string-utils/validators/width';
 import { visibleWidth } from '#tui/string-utils/width';
 
 const wrappedWideWord = (word: string, width: number): string[] => {
@@ -26,7 +27,9 @@ const wrappedWideWord = (word: string, width: number): string[] => {
 };
 
 export const plainWrap = (value: string, width: number): string[] => {
-	if (width <= 0) {
+	const parsedWidth = parseStringWidth(width);
+
+	if (parsedWidth === undefined) {
 		return [value];
 	}
 
@@ -39,7 +42,7 @@ export const plainWrap = (value: string, width: number): string[] => {
 		for (const word of originalLine.split(/(\s+)/u)) {
 			const wordWidth = visibleWidth(word);
 
-			if (lineWidth + wordWidth <= width) {
+			if (lineWidth + wordWidth <= parsedWidth) {
 				line += word;
 				lineWidth += wordWidth;
 				continue;
@@ -51,8 +54,8 @@ export const plainWrap = (value: string, width: number): string[] => {
 				lineWidth = 0;
 			}
 
-			if (wordWidth > width) {
-				const chunks = wrappedWideWord(word, width);
+			if (wordWidth > parsedWidth) {
+				const chunks = wrappedWideWord(word, parsedWidth);
 
 				lines.push(...chunks.slice(0, -1));
 				line = chunks.at(-1) ?? '';

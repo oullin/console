@@ -1,25 +1,28 @@
 import { ansiCloseSequence, parseAnsiSegments } from '#tui/string-utils/ansi';
+import { parseStringWidth } from '#tui/string-utils/validators/width';
 import { visibleWidth } from '#tui/string-utils/width';
 
 export const truncate = (value: string, width: number, marker = '...'): string => {
-	if (width <= 0) {
+	const parsedWidth = parseStringWidth(width);
+
+	if (parsedWidth === undefined) {
 		return '';
 	}
 
 	const markerWidth = visibleWidth(marker);
 
-	if (visibleWidth(value) <= width) {
+	if (visibleWidth(value) <= parsedWidth) {
 		return value;
 	}
 
-	if (width <= markerWidth) {
+	if (parsedWidth <= markerWidth) {
 		let clippedMarker = '';
 		let clippedWidth = 0;
 
 		for (const char of marker) {
 			const charWidth = visibleWidth(char);
 
-			if (clippedWidth + charWidth > width) {
+			if (clippedWidth + charWidth > parsedWidth) {
 				break;
 			}
 
@@ -50,7 +53,7 @@ export const truncate = (value: string, width: number, marker = '...'): string =
 		for (const char of segment.text) {
 			const charWidth = visibleWidth(char);
 
-			if (resultWidth + charWidth + markerWidth > width) {
+			if (resultWidth + charWidth + markerWidth > parsedWidth) {
 				return `${result}${activeCodes === '' ? '' : ansiCloseSequence(activeCodes)}${marker}`;
 			}
 
