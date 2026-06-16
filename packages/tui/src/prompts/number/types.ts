@@ -7,3 +7,9 @@ export type NumberInputOptions = {
 	placeholder?: string;
 	step?: number;
 };
+
+export type NumberReadResult = {
+	cancelled: boolean;
+	frame?: string;
+	value: string;
+};
