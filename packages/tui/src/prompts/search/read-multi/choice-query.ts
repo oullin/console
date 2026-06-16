@@ -5,7 +5,7 @@ import type { SearchSelection } from '#tui/prompts/search/selection';
 import type { TypedValueState } from '#tui/typed-value/types';
 import type { Choice, MultiSearchPromptOptions } from '#tui/types';
 
-type MultiSearchChoiceQuery<T> = {
+export type MultiSearchChoiceQuery<T> = {
 	applyTypedInput(key: string): Promise<{ cancelled: boolean }>;
 	displayedChoices(): Array<Choice<T>>;
 	resolveChoices(): Promise<void>;
