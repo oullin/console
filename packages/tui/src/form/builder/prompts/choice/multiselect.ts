@@ -1,6 +1,6 @@
 import { multiselect } from '#tui/prompts/choices';
 import { previousArray } from '#tui/form/builder/previous';
-import { isSelectPromptOptions, parseSelectChoiceOptions, parseSelectStepName } from '#tui/form/builder/prompts/validators/select';
+import { resolveMultiSelectFormArguments } from '#tui/form/builder/prompts/validators/select';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ChoiceOptions, MultiSelectPromptOptions } from '#tui/types';
 
@@ -33,23 +33,7 @@ export function multiselectFormStep<T>(
 	transform: MultiSelectPromptOptions<T>['transform'] = undefined,
 	info: MultiSelectPromptOptions<T>['info'] = '',
 ): FormBuilder {
-	if (isSelectPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => multiselect<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), parseSelectStepName(optionsOrName));
-	}
+	const resolved = resolveMultiSelectFormArguments(optionsOrLabel, optionsOrName, defaultValue, scroll, required, validate, hint, name, transform, info);
 
-	return this.add(
-		(_, previous) =>
-			multiselect<T>({
-				message: optionsOrLabel,
-				options: parseSelectChoiceOptions<T>(optionsOrName),
-				default: previousArray(previous, defaultValue),
-				scroll,
-				required,
-				validate,
-				hint,
-				transform,
-				info,
-			}),
-		name,
-	);
+	return this.add((_, previous) => multiselect<T>({ ...resolved.options, default: previousArray(previous, resolved.options.default ?? []) }), resolved.name);
 }

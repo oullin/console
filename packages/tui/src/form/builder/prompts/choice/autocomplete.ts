@@ -1,6 +1,6 @@
 import { autocomplete } from '#tui/prompts/choices';
 import { previousString } from '#tui/form/builder/previous';
-import { isSuggestPromptOptions, parseSuggestSource, parseSuggestStepName } from '#tui/form/builder/prompts/validators/suggest';
+import { resolveAutocompleteFormArguments } from '#tui/form/builder/prompts/validators/suggest';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SuggestOptions } from '#tui/prompts/choices';
 import type { TextPromptOptions } from '#tui/types';
@@ -34,24 +34,7 @@ export function autocompleteFormStep(
 	transform: TextPromptOptions['transform'] = undefined,
 	info: SuggestOptions['info'] = '',
 ): FormBuilder {
-	if (isSuggestPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => autocomplete({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), parseSuggestStepName(options));
-	}
+	const resolved = resolveAutocompleteFormArguments(optionsOrLabel, options, placeholder, defaultValue, required, validate, hint, name, transform, info);
 
-	return this.add(
-		(_, previous) =>
-			autocomplete({
-				message: optionsOrLabel,
-				label: optionsOrLabel,
-				options: parseSuggestSource(options),
-				placeholder,
-				default: previousString(previous, defaultValue),
-				required,
-				validate,
-				hint,
-				transform,
-				info,
-			}),
-		name,
-	);
+	return this.add((_, previous) => autocomplete({ ...resolved.options, default: previousString(previous, resolved.options.default ?? '') }), resolved.name);
 }

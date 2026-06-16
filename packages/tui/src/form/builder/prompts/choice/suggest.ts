@@ -1,6 +1,6 @@
 import { suggest } from '#tui/prompts/choices';
 import { previousString } from '#tui/form/builder/previous';
-import { isSuggestPromptOptions, parseSuggestSource, parseSuggestStepName } from '#tui/form/builder/prompts/validators/suggest';
+import { resolveSuggestFormArguments } from '#tui/form/builder/prompts/validators/suggest';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SuggestOptions } from '#tui/prompts/choices';
 import type { TextPromptOptions } from '#tui/types';
@@ -36,25 +36,7 @@ export function suggestFormStep(
 	transform: TextPromptOptions['transform'] = undefined,
 	info: SuggestOptions['info'] = '',
 ): FormBuilder {
-	if (isSuggestPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => suggest({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), parseSuggestStepName(options));
-	}
+	const resolved = resolveSuggestFormArguments(optionsOrLabel, options, placeholder, defaultValue, scroll, required, validate, hint, name, transform, info);
 
-	return this.add(
-		(_, previous) =>
-			suggest({
-				message: optionsOrLabel,
-				label: optionsOrLabel,
-				options: parseSuggestSource(options),
-				placeholder,
-				default: previousString(previous, defaultValue),
-				scroll,
-				required,
-				validate,
-				hint,
-				transform,
-				info,
-			}),
-		name,
-	);
+	return this.add((_, previous) => suggest({ ...resolved.options, default: previousString(previous, resolved.options.default ?? '') }), resolved.name);
 }

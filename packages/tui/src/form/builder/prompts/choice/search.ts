@@ -1,6 +1,6 @@
 import { search } from '#tui/prompts/choices';
 import { previousValue } from '#tui/form/builder/previous';
-import { isSearchPromptOptions, parseSearchChoiceSource, parseSearchStepName } from '#tui/form/builder/prompts/validators/search';
+import { resolveSearchFormArguments } from '#tui/form/builder/prompts/validators/search';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SearchPromptOptions } from '#tui/types';
 
@@ -33,22 +33,7 @@ export function searchFormStep<T>(
 	transform: SearchPromptOptions<T>['transform'] = undefined,
 	info: SearchPromptOptions<T>['info'] = '',
 ): FormBuilder {
-	if (isSearchPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => search<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), parseSearchStepName(options));
-	}
+	const resolved = resolveSearchFormArguments(optionsOrLabel, options, placeholder, scroll, validate, hint, required, name, transform, info);
 
-	const promptOptions: SearchPromptOptions<T> = {
-		message: optionsOrLabel,
-		label: optionsOrLabel,
-		options: parseSearchChoiceSource<T>(options),
-		placeholder,
-		scroll,
-		validate,
-		hint,
-		required,
-		transform,
-		info,
-	};
-
-	return this.add((_, previous) => search<T>({ ...promptOptions, default: previousValue(previous, promptOptions.default) }), name);
+	return this.add((_, previous) => search<T>({ ...resolved.options, default: previousValue(previous, resolved.options.default) }), resolved.name);
 }

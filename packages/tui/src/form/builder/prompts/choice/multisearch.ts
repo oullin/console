@@ -1,6 +1,6 @@
 import { multisearch } from '#tui/prompts/choices';
 import { previousArray } from '#tui/form/builder/previous';
-import { isSearchPromptOptions, parseSearchChoiceSource, parseSearchStepName } from '#tui/form/builder/prompts/validators/search';
+import { resolveMultiSearchFormArguments } from '#tui/form/builder/prompts/validators/search';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MultiSearchPromptOptions } from '#tui/types';
 
@@ -33,22 +33,7 @@ export function multisearchFormStep<T>(
 	transform: MultiSearchPromptOptions<T>['transform'] = undefined,
 	info: MultiSearchPromptOptions<T>['info'] = '',
 ): FormBuilder {
-	if (isSearchPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => multisearch<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), parseSearchStepName(options));
-	}
+	const resolved = resolveMultiSearchFormArguments(optionsOrLabel, options, placeholder, scroll, required, validate, hint, name, transform, info);
 
-	const promptOptions: MultiSearchPromptOptions<T> = {
-		message: optionsOrLabel,
-		label: optionsOrLabel,
-		options: parseSearchChoiceSource<T>(options),
-		placeholder,
-		scroll,
-		required,
-		validate,
-		hint,
-		transform,
-		info,
-	};
-
-	return this.add((_, previous) => multisearch<T>({ ...promptOptions, default: previousArray(previous, promptOptions.default ?? []) }), name);
+	return this.add((_, previous) => multisearch<T>({ ...resolved.options, default: previousArray(previous, resolved.options.default ?? []) }), resolved.name);
 }
