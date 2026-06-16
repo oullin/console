@@ -1,6 +1,6 @@
 import { backgroundColor, foregroundColor, supportsTrueColor } from '#tui/terminal';
 import { dim, foregroundRgb } from '#tui/theme/styles';
-import { parseStreamFadeSteps } from '#tui/status/stream/validators/fade';
+import { parseStreamFadeColor, parseStreamFadeSteps, parseStreamFadeTrueColor } from '#tui/status/stream/validators/fade';
 import type { TerminalColor } from '#tui/terminal/capabilities';
 
 export type StreamFadeOptions = {
@@ -21,15 +21,15 @@ const interpolate = (foreground: TerminalColor, background: TerminalColor, facto
 };
 
 export const streamFadeStyles = (options: StreamFadeOptions = {}): StreamFadeStyle[] => {
-	const trueColor = options.trueColor ?? supportsTrueColor();
+	const trueColor = parseStreamFadeTrueColor(options.trueColor, supportsTrueColor());
 
 	if (!trueColor) {
 		return [(value) => value, dim];
 	}
 
 	const steps = parseStreamFadeSteps(options.steps, 10);
-	const foreground = options.foreground ?? foregroundColor();
-	const background = options.background ?? backgroundColor();
+	const foreground = parseStreamFadeColor(options.foreground, foregroundColor());
+	const background = parseStreamFadeColor(options.background, backgroundColor());
 
 	return Array.from({ length: steps }, (_, step) => {
 		const [red, green, blue] = interpolate(foreground, background, 1 - step / steps);
