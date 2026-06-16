@@ -1,10 +1,5 @@
 import { fromCharacters } from '#tui/typed-value/characters';
-import { visibleWidth } from '#tui/strings';
-
-type LineRange = {
-	end: number;
-	start: number;
-};
+import { currentLine, lineRanges } from '#tui/typed-value/line-ranges';
 
 export type VisibleLineWindow = {
 	lines: string[];
@@ -15,56 +10,6 @@ export type VisibleLineWindow = {
 export type VisibleTextWindow = VisibleLineWindow & {
 	cursor: number;
 	text: string;
-};
-
-const lineRanges = (value: string[], width?: number): LineRange[] => {
-	const ranges: LineRange[] = [];
-
-	let start = 0;
-
-	for (const [index, character] of value.entries()) {
-		if (character === '\n') {
-			ranges.push(...wrappedRanges(value, start, index, width));
-			start = index + 1;
-		}
-	}
-
-	ranges.push(...wrappedRanges(value, start, value.length, width));
-
-	return ranges;
-};
-
-const wrappedRanges = (value: string[], start: number, end: number, width?: number): LineRange[] => {
-	if (width === undefined || width <= 0 || start === end) {
-		return [{ end, start }];
-	}
-
-	const ranges: LineRange[] = [];
-
-	let rangeStart = start;
-	let rangeWidth = 0;
-
-	for (let index = start; index < end; index += 1) {
-		const characterWidth = visibleWidth(value[index] ?? '');
-
-		if (rangeWidth > 0 && rangeWidth + characterWidth > width) {
-			ranges.push({ end: index, start: rangeStart });
-			rangeStart = index;
-			rangeWidth = 0;
-		}
-
-		rangeWidth += characterWidth;
-	}
-
-	ranges.push({ end, start: rangeStart });
-
-	return ranges;
-};
-
-const currentLine = (ranges: LineRange[], cursor: number): number => {
-	const index = ranges.findIndex((range) => cursor <= range.end);
-
-	return index === -1 ? ranges.length - 1 : index;
 };
 
 export const visibleLines = (value: string, cursor: number, rows: number | undefined): string => {
