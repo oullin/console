@@ -1,9 +1,7 @@
-import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { activePromptFrame } from '#tui/prompt/active-frame';
+import { runTextSuggestionPrompt } from '#tui/prompts/suggest/lifecycle';
 import { readAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete';
 import { renderSubmittedAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { suggestOptions } from '#tui/prompts/suggest/options';
-import { transformedTextDefault } from '#tui/prompts/text-default';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { MaybePromise, TextPromptOptions } from '#tui/types';
 
@@ -37,38 +35,5 @@ export async function autocomplete(
 			? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform, info })
 			: suggestOptions(message);
 
-	const validationOptions: SuggestOptions = {
-		...options,
-		default: await transformedTextDefault(options),
-	};
-
-	let shouldRenderSubmittedFrame = false;
-
-	const activeFrame = activePromptFrame();
-
-	return promptWithFallback('autocomplete', options, () =>
-		promptUntilValid(
-			validationOptions,
-			async () => {
-				const answer = await readAutocompleteValue(options);
-
-				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
-
-				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
-
-				return options.transform ? options.transform(value) : value;
-			},
-			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedAutocomplete(options.message, value);
-				}
-			},
-			(value) => {
-				options.default = value;
-				activeFrame.clear();
-			},
-		),
-	);
+	return runTextSuggestionPrompt('autocomplete', options, readAutocompleteValue, renderSubmittedAutocomplete);
 }
