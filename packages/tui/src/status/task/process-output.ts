@@ -29,9 +29,9 @@ export const captureTaskProcessOutput = (logger: Logger): TaskProcessOutputCaptu
 			}
 
 			stopped = true;
-			buffer.flush();
 			stdout.write = originalStdoutWrite;
 			stderr.write = originalStderrWrite;
+			buffer.flush();
 		},
 	};
 };
