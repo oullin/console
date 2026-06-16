@@ -1,11 +1,8 @@
 import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
-import { markedChoiceValues } from '#tui/prompts/select/multiple';
+import { cancelMultipleChoices } from '#tui/prompts/select/read-multiple/cancel';
 import { applyMultipleChoicesKey } from '#tui/prompts/select/read-multiple/keys';
-import { cancelledMultipleChoicesResult, multipleChoicesResult } from '#tui/prompts/select/read-multiple/result';
+import { multipleChoicesResult } from '#tui/prompts/select/read-multiple/result';
 import { createMultipleChoicesReaderSession } from '#tui/prompts/select/read-multiple/session';
-import { renderCancelledChoices } from '#tui/prompts/select/render';
 import type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple/types';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
@@ -29,10 +26,7 @@ export const readMultipleChoicesInteractive = async <T>(
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledChoices(message, choices, session.selected(), session.marked(), scroll);
-
-			return cancelledMultipleChoicesResult(choices, session.marked(), await cancelPrompt(markedChoiceValues(choices, session.marked())));
+			return cancelMultipleChoices(message, choices, session, scroll);
 		}
 
 		const applied = applyMultipleChoicesKey(key, choices, session);
