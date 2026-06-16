@@ -18,10 +18,10 @@ export const executeNotificationCommand = (command: NotificationCommand): boolea
 	return result.status === 0;
 };
 
-export const availableNotificationCommand = (targetPlatform: NotificationPlatform, commands: NotificationCommand[], exists: (bin: string) => boolean = commandExists): NotificationCommand | null => {
+export const availableNotificationCommands = (targetPlatform: NotificationPlatform, commands: NotificationCommand[], exists: (bin: string) => boolean = commandExists): NotificationCommand[] => {
 	if (targetPlatform !== 'linux') {
-		return commands.at(0) ?? null;
+		return commands.slice(0, 1);
 	}
 
-	return commands.find((command) => exists(command.bin)) ?? null;
+	return commands.filter((command) => exists(command.bin));
 };

@@ -1,7 +1,7 @@
 import { platform } from 'node:process';
 import { note } from '#tui/output/notes';
 import { notificationCommands } from '#tui/output/notify/commands';
-import { availableNotificationCommand, commandExists, executeNotificationCommand } from '#tui/output/notify/executor';
+import { availableNotificationCommands, commandExists, executeNotificationCommand } from '#tui/output/notify/executor';
 import { parseNotificationPlatform } from '#tui/output/notify/validators/platform';
 import type { NotificationCommand, NotificationPlatform } from '#tui/output/notify/commands';
 import type { NotificationRuntime } from '#tui/output/notify/executor';
@@ -18,10 +18,13 @@ export const notificationCommand = (targetPlatform: NotificationPlatform, title:
 
 export const notifyForPlatform = (targetPlatform: NotificationPlatform, title: string, body = '', subtitle = '', sound = '', icon = '', runtime: NotificationRuntime = {}): boolean => {
 	const commands = notificationCommands(targetPlatform, { body, icon, sound, subtitle, title });
-	const command = availableNotificationCommand(targetPlatform, commands, runtime.commandExists ?? commandExists);
+	const availableCommands = availableNotificationCommands(targetPlatform, commands, runtime.commandExists ?? commandExists);
+	const execute = runtime.execute ?? executeNotificationCommand;
 
-	if (command) {
-		return (runtime.execute ?? executeNotificationCommand)(command);
+	for (const command of availableCommands) {
+		if (execute(command)) {
+			return true;
+		}
 	}
 
 	note(body ? `${title}: ${body}` : title, 'info');
