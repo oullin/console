@@ -1,10 +1,12 @@
+import type { MaybePromise } from '#tui/contracts/base';
+
 export type PromptOutput = {
 	write(content: string): void;
 };
 
 export type PromptInput = {
-	readKey?(): Promise<string | null>;
-	readLine?(message: string): Promise<string>;
+	readKey?(): MaybePromise<string | null>;
+	readLine?(message: string): MaybePromise<string>;
 };
 
 export type PromptEnvironment = {
