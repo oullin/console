@@ -5,6 +5,11 @@ export type WritableProcessStream = {
 	write: NodeJS.WriteStream['write'];
 };
 
+export type ResolvedProcessOutputWrite = {
+	callback?: ProcessOutputCallback;
+	content: string;
+};
+
 const processOutputStringSchema = z.string();
 const processOutputEncodingSchema = z.string() as z.ZodType<BufferEncoding>;
 const processOutputCallbackSchema = z.function() as z.ZodType<ProcessOutputCallback>;
@@ -37,6 +42,19 @@ export const parseProcessOutputChunk = (chunk: string | Uint8Array, encoding?: B
 	const parsed = processOutputStringSchema.safeParse(chunk);
 
 	return parsed.success ? parsed.data : Buffer.from(chunk).toString(encoding);
+};
+
+export const resolveProcessOutputWrite = (
+	chunk: string | Uint8Array,
+	encodingOrCallback?: BufferEncoding | ProcessOutputCallback,
+	callback?: ProcessOutputCallback,
+): ResolvedProcessOutputWrite => {
+	const encoding = parseProcessOutputEncoding(encodingOrCallback);
+
+	return {
+		callback: parseProcessOutputCallback(encodingOrCallback, callback),
+		content: parseProcessOutputChunk(chunk, encoding),
+	};
 };
 
 export const parseProcessOutputWrite = (value: unknown): NodeJS.WriteStream['write'] => {
