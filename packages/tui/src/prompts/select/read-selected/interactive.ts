@@ -24,7 +24,7 @@ export const readSelectedChoiceInteractive = async <T>(
 		const key = await readKey();
 
 		if (key === null) {
-			return exhaustedSelectedChoice(choices, defaultValue, hasDefault);
+			return exhaustedSelectedChoice(choices, session.selected());
 		}
 
 		if (key === Key.ctrlC) {
