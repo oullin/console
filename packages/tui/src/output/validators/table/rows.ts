@@ -1,11 +1,10 @@
-import { z } from 'zod';
-import { tableCellSchema } from '#tui/output/validators/table/schemas';
+import { tableCellArraySchema, tableCellRecordSchema } from '#tui/output/validators/cells';
 import type { TableCell, TableOptions } from '#tui/types';
 
 export const inferredTableHeaders = (rows: TableOptions['rows']): string[] => {
 	const firstRow = rows[0];
 
-	const arrayRow = z.array(tableCellSchema).safeParse(firstRow);
+	const arrayRow = tableCellArraySchema.safeParse(firstRow);
 
 	if (arrayRow.success || firstRow === undefined) {
 		return [];
@@ -19,13 +18,13 @@ export const stringifyTableCell = (value: TableCell): string => {
 };
 
 export const tableRowCells = (row: TableOptions['rows'][number], headers: string[]): string[] => {
-	const arrayRow = z.array(tableCellSchema).safeParse(row);
+	const arrayRow = tableCellArraySchema.safeParse(row);
 
 	if (arrayRow.success) {
 		return arrayRow.data.map(stringifyTableCell);
 	}
 
-	const recordRow = z.record(z.string(), tableCellSchema).parse(row);
+	const recordRow = tableCellRecordSchema.parse(row);
 
 	return headers.map((header) => stringifyTableCell(recordRow[header]));
 };

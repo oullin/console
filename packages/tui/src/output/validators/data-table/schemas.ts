@@ -1,17 +1,16 @@
 import { z } from 'zod';
-import type { DataTableObjectRow, TableCell } from '#tui/types';
+import { tableCellArraySchema, tableCellRecordSchema } from '#tui/output/validators/cells';
+import type { DataTableObjectRow } from '#tui/types';
 
-export const tableCellSchema: z.ZodType<TableCell> = z.union([z.string(), z.number(), z.boolean(), z.null(), z.undefined()]);
+export const dataTableArrayRowSchema = tableCellArraySchema;
 
-export const dataTableArrayRowSchema = z.array(tableCellSchema);
-
-export const dataTableRecordRowSchema = z.record(z.string(), tableCellSchema);
+export const dataTableRecordRowSchema = tableCellRecordSchema;
 
 export const dataTableStepNameSchema = z.string();
 
 export const dataObjectRowSchema: z.ZodType<DataTableObjectRow<unknown>> = z
 	.object({
-		cells: z.record(z.string(), tableCellSchema),
+		cells: tableCellRecordSchema,
 		value: z.unknown().optional(),
 	})
 	.passthrough();
