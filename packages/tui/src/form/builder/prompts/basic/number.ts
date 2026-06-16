@@ -1,6 +1,6 @@
 import { labelNumberOptions } from '#tui/form/builder/prompts/basic/number/options';
 import { runLabelNumberFormStep, runObjectNumberFormStep } from '#tui/form/builder/prompts/basic/number/step';
-import { isBasicPromptLabel, isBasicPromptOptions, parseBasicStepName } from '#tui/form/builder/prompts/validators/basic';
+import { resolveNumberFormArguments } from '#tui/form/builder/prompts/validators/basic';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { NumberPromptOptions } from '#tui/types';
 
@@ -35,28 +35,28 @@ export function numberFormStep(
 	name?: string,
 	transform: NumberPromptOptions['transform'] = undefined,
 ): FormBuilder {
-	const hasLabelDefault = isBasicPromptLabel(optionsOrLabel) && arguments.length >= 3 && defaultValue !== undefined;
+	const resolved = resolveNumberFormArguments(optionsOrLabel, placeholder, defaultValue, required, validate, hint, min, max, step, name, transform, arguments.length);
 
-	if (isBasicPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => runObjectNumberFormStep(optionsOrLabel, previous), parseBasicStepName(placeholder));
+	if (resolved.kind === 'options') {
+		return this.add((_, previous) => runObjectNumberFormStep(resolved.options, previous), resolved.name);
 	}
 
 	return this.add((_, previous) => {
 		const promptOptions = labelNumberOptions({
-			defaultValue,
-			hasLabelDefault,
-			hint,
-			label: optionsOrLabel,
-			max,
-			min,
-			placeholder,
+			defaultValue: resolved.defaultValue,
+			hasLabelDefault: resolved.hasLabelDefault,
+			hint: resolved.hint,
+			label: resolved.label,
+			max: resolved.max,
+			min: resolved.min,
+			placeholder: resolved.placeholder,
 			previous,
-			required,
-			step,
-			transform,
-			validate,
+			required: resolved.required,
+			step: resolved.step,
+			transform: resolved.transform,
+			validate: resolved.validate,
 		});
 
 		return runLabelNumberFormStep(promptOptions);
-	}, name);
+	}, resolved.name);
 }

@@ -1,6 +1,6 @@
 import { textarea } from '#tui/prompts/basic';
 import { previousString } from '#tui/form/builder/previous';
-import { isBasicPromptOptions, parseBasicStepName } from '#tui/form/builder/prompts/validators/basic';
+import { resolveTextareaFormArguments } from '#tui/form/builder/prompts/validators/basic';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { TextareaPromptOptions } from '#tui/types';
 
@@ -31,9 +31,7 @@ export function textareaFormStep(
 	name?: string,
 	transform: TextareaPromptOptions['transform'] = undefined,
 ): FormBuilder {
-	if (isBasicPromptOptions(optionsOrLabel)) {
-		return this.add((_, previous) => textarea({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), parseBasicStepName(placeholder));
-	}
+	const resolved = resolveTextareaFormArguments(optionsOrLabel, placeholder, defaultValue, required, validate, hint, rows, name, transform);
 
-	return this.add((_, previous) => textarea(optionsOrLabel, placeholder, previousString(previous, defaultValue), required, validate, hint, rows, transform), name);
+	return this.add((_, previous) => textarea({ ...resolved.options, default: previousString(previous, resolved.options.default ?? '') }), resolved.name);
 }
