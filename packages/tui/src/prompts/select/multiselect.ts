@@ -1,9 +1,5 @@
-import { normalizeChoices } from '#tui/concerns/choices';
-import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { activePromptFrame } from '#tui/prompt/active-frame';
-import { transformedMultiSelectDefault } from '#tui/prompts/select/defaults';
-import { readMultipleChoices } from '#tui/prompts/select/read-multiple';
-import { renderSubmittedChoices } from '#tui/prompts/select/render';
+import { normalizeMultiSelectPromptOptions } from '#tui/prompts/select/multiselect/options';
+import { runMultiSelectPrompt } from '#tui/prompts/select/multiselect/run';
 import type { ChoiceOptions, MultiSelectPromptOptions } from '#tui/types';
 
 export function multiselect<T>(options: MultiSelectPromptOptions<T>): Promise<T[]>;
@@ -31,44 +27,5 @@ export async function multiselect<T>(
 	transform: MultiSelectPromptOptions<T>['transform'] = undefined,
 	info: MultiSelectPromptOptions<T>['info'] = '',
 ): Promise<T[]> {
-	const options =
-		typeof optionsOrLabel === 'string'
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as ChoiceOptions<T>, default: defaultValue, scroll, required, validate, hint, transform, info }
-			: optionsOrLabel;
-
-	const promptOptions = { ...options, default: options.default ?? [] };
-
-	const validationOptions: MultiSelectPromptOptions<T> = {
-		...promptOptions,
-		default: await transformedMultiSelectDefault(promptOptions),
-	};
-
-	const choices = normalizeChoices(options.options);
-
-	let shouldRenderSubmittedFrame = false;
-	let submittedLabels: string[] = [];
-
-	const activeFrame = activePromptFrame();
-
-	return promptWithFallback('multiselect', promptOptions, () =>
-		promptUntilValid(
-			validationOptions,
-			async () => {
-				const selected = await readMultipleChoices(promptOptions.message, choices, promptOptions.default, promptOptions.hint, promptOptions.scroll, promptOptions.info);
-
-				activeFrame.set(selected.frame);
-				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-				submittedLabels = selected.submittedLabels;
-
-				return promptOptions.transform ? promptOptions.transform(selected.value) : selected.value;
-			},
-			() => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedChoices(promptOptions.message, submittedLabels);
-				}
-			},
-			activeFrame.clear,
-		),
-	);
+	return runMultiSelectPrompt(normalizeMultiSelectPromptOptions(optionsOrLabel, source, defaultValue, scroll, required, validate, hint, transform, info));
 }
