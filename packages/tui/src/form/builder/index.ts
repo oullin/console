@@ -1,5 +1,6 @@
 import { outputBuilderMethods } from '#tui/form/builder/output';
 import { promptBuilderMethods } from '#tui/form/builder/prompts';
+import { createFormResponses } from '#tui/form/builder/responses';
 import { sideEffectStep } from '#tui/form/builder/step';
 import { statusBuilderMethods } from '#tui/form/builder/status';
 import { submitFormSteps } from '#tui/form/builder/submit';
@@ -11,7 +12,7 @@ import type { MaybePromise } from '#tui/types';
 
 export class FormBuilder {
 	readonly #steps: FormStep[] = [];
-	readonly #responses: FormResponses = [] as unknown as FormResponses;
+	readonly #responses: FormResponses = createFormResponses();
 	readonly alert: OutputBuilderMethods['alert'] = outputBuilderMethods.alert;
 	readonly autocomplete: PromptBuilderMethods['autocomplete'] = promptBuilderMethods.autocomplete;
 	readonly confirm: PromptBuilderMethods['confirm'] = promptBuilderMethods.confirm;

@@ -1,6 +1,8 @@
 import type { MaybePromise } from '#tui/types';
 
-export type FormResponses = unknown[] & Record<string, unknown>;
+export interface FormResponses extends Array<unknown> {
+	[name: string]: unknown;
+}
 
 export type FormStepCondition = boolean | ((responses: FormResponses) => MaybePromise<boolean>);
 

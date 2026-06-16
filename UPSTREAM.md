@@ -108,7 +108,7 @@ TypeScript and OpenTUI internals.
 | Pause non-interactive no-render behavior | `packages/tui/src/prompts/pause.ts`, `packages/tui/tests/pause.test.ts` |
 | Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts`, `packages/tui/src/concerns/choice-normalize.ts`, `packages/tui/src/concerns/choice-match.ts`, `packages/tui/src/concerns/choice-navigation.ts`, `packages/tui/src/concerns/choice-render.ts` |
 | Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choice-navigation.ts`, `packages/tui/src/concerns/choice-render.ts`, `packages/tui/src/prompts/search/render.ts` |
-| Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
+| Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*`, `packages/tui/src/form/builder/responses.ts` |
 | Form builder nested prompt revert short-circuiting | `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder first-step and conditional revert feature coverage | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder asynchronous condition lifecycle | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/src/form/types.ts`, `packages/tui/tests/form.test.ts` |
