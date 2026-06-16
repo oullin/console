@@ -7,6 +7,7 @@ const themePath = fileURLToPath(new URL('theme', import.meta.url));
 const themeComponentsPath = fileURLToPath(new URL('theme/components', import.meta.url));
 const themeLibPath = fileURLToPath(new URL('theme/lib', import.meta.url));
 const themeUiPath = fileURLToPath(new URL('theme/components/ui', import.meta.url));
+const viteCachePath = fileURLToPath(new URL('../../../../provision/.cache/vitepress/docs', import.meta.url));
 const tailwindPlugin = tailwindcss() as never;
 
 export const guideSections = [
@@ -46,6 +47,7 @@ export default defineConfig({
 	cleanUrls: true,
 	lastUpdated: true,
 	vite: {
+		cacheDir: viteCachePath,
 		plugins: [tailwindPlugin],
 		resolve: {
 			alias: [

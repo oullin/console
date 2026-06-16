@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
+const cachePath = fileURLToPath(new URL('../../provision/.cache/vitest/docs', import.meta.url));
 const tuiSourcePath = fileURLToPath(new URL('../tui/src/index.ts', import.meta.url));
 const internalSourcePath = fileURLToPath(new URL('../tui/src/$1', import.meta.url));
 const docsSourcePath = fileURLToPath(new URL('src', import.meta.url));
@@ -12,6 +13,7 @@ const docsThemePath = fileURLToPath(new URL('src/.vitepress/theme', import.meta.
 const docsUiPath = fileURLToPath(new URL('src/.vitepress/theme/components/ui', import.meta.url));
 
 export default defineConfig({
+	cacheDir: cachePath,
 	resolve: {
 		alias: [
 			{

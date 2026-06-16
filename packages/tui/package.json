@@ -27,10 +27,10 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "XDG_CACHE_HOME=../../provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../provision/.cache/playwright tsc -p tsconfig.build.json",
     "prepack": "pnpm build",
-    "test": "vitest run --config vitest.config.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "test": "XDG_CACHE_HOME=../../provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../provision/.cache/playwright vitest run --config vitest.config.ts",
+    "typecheck": "XDG_CACHE_HOME=../../provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../provision/.cache/playwright tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@opentui/core": "^0.4.0",
