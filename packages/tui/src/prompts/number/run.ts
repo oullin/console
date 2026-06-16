@@ -45,7 +45,7 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 				const result = parseNumberInput(value, options);
 
 				if (result.error !== undefined) {
-					throw new PromptValidationError(result.error);
+					throw new PromptValidationError(result.error, value);
 				}
 
 				const parsedValue = result.value ?? '';

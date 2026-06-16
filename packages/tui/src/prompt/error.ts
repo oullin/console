@@ -1,6 +1,9 @@
 export class PromptValidationError extends Error {
-	constructor(message: string) {
+	readonly value: unknown;
+
+	constructor(message: string, value?: unknown) {
 		super(message);
 		this.name = 'PromptValidationError';
+		this.value = value;
 	}
 }

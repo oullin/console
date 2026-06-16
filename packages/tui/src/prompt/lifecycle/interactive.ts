@@ -17,7 +17,7 @@ export const resolveInteractivePrompt = async <T>(options: BasePromptOptions<T>,
 			value = await read(attempt);
 		} catch (error) {
 			if (error instanceof PromptValidationError) {
-				await onInvalid?.();
+				await onInvalid?.(error.value as T | undefined);
 
 				environment.error.write(renderError(error.message));
 				attempt += 1;
