@@ -1,12 +1,12 @@
 import { parseChoiceAnswerIndex, parseChoiceRecordValue } from '#tui/concerns/validators/choice-answer';
-import { parseChoice, parseChoiceOptions, parseChoiceValue } from '#tui/concerns/validators/choice';
+import { parseChoice, parseChoiceOptions, parseChoiceRecordEntries, parseChoiceValue } from '#tui/concerns/validators/choice';
 import type { Choice, ChoiceOptions } from '#tui/types';
 
 export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => {
 	const parsed = parseChoiceOptions(options);
 
 	if (parsed.kind === 'record') {
-		return Object.entries(parsed.options).map(([value, label]) => ({
+		return parseChoiceRecordEntries(parsed.options).map(({ label, value }) => ({
 			label,
 			value: parseChoiceRecordValue<T>(value),
 		}));

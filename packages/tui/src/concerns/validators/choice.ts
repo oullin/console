@@ -16,6 +16,11 @@ const typedChoiceSchema = <T>(): z.ZodType<Choice<T>> => choiceSchema as z.ZodTy
 const typedChoiceOptionsListSchema = <T>(): z.ZodType<Array<Choice<T> | T>> => choiceOptionsListSchema as z.ZodType<Array<Choice<T> | T>>;
 const choiceValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
 
+export type ChoiceRecordEntry = {
+	label: string;
+	value: string;
+};
+
 export type ParsedChoiceOptions<T> =
 	| {
 			kind: 'list';
@@ -36,6 +41,12 @@ export const parseChoiceRecord = (value: unknown): Record<string, string> | null
 	const parsed = choiceRecordSchema.safeParse(value);
 
 	return parsed.success ? parsed.data : null;
+};
+
+export const parseChoiceRecordEntries = (value: unknown): ChoiceRecordEntry[] => {
+	const parsed = choiceRecordSchema.parse(value);
+
+	return Object.entries(parsed).map(([value, label]) => ({ label, value }));
 };
 
 export const parseChoiceOptions = <T>(value: ChoiceOptions<T>): ParsedChoiceOptions<T> => {
