@@ -13,12 +13,18 @@ export const runTaskLifecycle = async <T>(definition: ResolvedTaskDefinition<T>)
 		renderer?.render();
 	});
 
-	hideCursor();
+	let processOutput: ReturnType<typeof captureTaskProcessOutput>;
 
-	renderer = createTaskLifecycleRenderer(logger);
-	renderer.render();
+	try {
+		hideCursor();
+		renderer = createTaskLifecycleRenderer(logger);
+		renderer.render();
+		processOutput = captureTaskProcessOutput(logger);
+	} catch (error) {
+		showCursor();
 
-	const processOutput = captureTaskProcessOutput(logger);
+		throw error;
+	}
 
 	const cleanup = new StatusSignalCleanup(() => {
 		try {
