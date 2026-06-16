@@ -20,7 +20,13 @@ export const parseSelectStepName = (value: unknown): string | undefined => {
 };
 
 export const parseSelectChoiceOptions = <T>(value: unknown): ChoiceOptions<T> => {
-	return choiceOptionsSchema<T>().parse(value);
+	const parsed = choiceOptionsSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Choice options must be an array or record.');
+	}
+
+	return parsed.data;
 };
 
 export const parseConfirmDefault = (value: unknown, fallback: boolean): boolean => {

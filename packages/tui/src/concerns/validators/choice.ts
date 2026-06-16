@@ -46,9 +46,13 @@ export const parseChoiceRecord = (value: unknown): Record<string, string> | null
 };
 
 export const parseChoiceRecordEntries = (value: unknown): ChoiceRecordEntry[] => {
-	const parsed = choiceRecordSchema.parse(value);
+	const parsed = choiceRecordSchema.safeParse(value);
 
-	return Object.entries(parsed).map(([value, label]) => ({ label, value }));
+	if (!parsed.success) {
+		throw new TypeError('Choice records must map string values to string labels.');
+	}
+
+	return Object.entries(parsed.data).map(([value, label]) => ({ label, value }));
 };
 
 export const parseChoiceOptions = <T>(value: ChoiceOptions<T>): ParsedChoiceOptions<T> => {
@@ -58,9 +62,21 @@ export const parseChoiceOptions = <T>(value: ChoiceOptions<T>): ParsedChoiceOpti
 		return { kind: 'record', options: record.data };
 	}
 
-	return { kind: 'list', options: typedChoiceOptionsListSchema<T>().parse(value) };
+	const list = typedChoiceOptionsListSchema<T>().safeParse(value);
+
+	if (!list.success) {
+		throw new TypeError('Choice options must be an array or record.');
+	}
+
+	return { kind: 'list', options: list.data };
 };
 
 export const parseChoiceValue = <T>(value: unknown): T => {
-	return choiceValueSchema<T>().parse(value);
+	const parsed = choiceValueSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Choice values must resolve to a typed value.');
+	}
+
+	return parsed.data;
 };

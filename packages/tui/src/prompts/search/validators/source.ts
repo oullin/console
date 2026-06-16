@@ -13,11 +13,27 @@ export const isSearchChoiceSourceCallback = <T>(source: SearchPromptOptions<T>['
 };
 
 export const parseSearchChoiceSource = <T>(source: unknown): ChoiceOptions<T> | SearchChoiceSourceCallback<T> => {
-	return searchChoiceSourceSchema<T>().parse(source);
+	const parsed = searchChoiceSourceSchema<T>().safeParse(source);
+
+	if (!parsed.success) {
+		throw new TypeError('Search choices must be an array, record, or callback.');
+	}
+
+	return parsed.data;
 };
 
 export const resolveSearchChoiceSourceOptions = async <T>(source: SearchPromptOptions<T>['options'], query: string): Promise<ChoiceOptions<T>> => {
 	const parsed = parseSearchChoiceSource<T>(source);
 
-	return isSearchChoiceSourceCallback(parsed) ? choiceOptionsSchema<T>().parse(await parsed(query)) : parsed;
+	if (!isSearchChoiceSourceCallback(parsed)) {
+		return parsed;
+	}
+
+	const options = choiceOptionsSchema<T>().safeParse(await parsed(query));
+
+	if (!options.success) {
+		throw new TypeError('Search callbacks must return choice options.');
+	}
+
+	return options.data;
 };

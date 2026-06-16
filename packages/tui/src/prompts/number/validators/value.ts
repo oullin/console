@@ -22,7 +22,13 @@ export const parseNumericValue = (value: unknown): number | null => {
 };
 
 export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptions, 'integer' | 'max' | 'min'> = {}): NumberValidationResult => {
-	const raw = numericInputSchema.parse(input);
+	const rawInput = numericInputSchema.safeParse(input);
+
+	if (!rawInput.success) {
+		return { error: 'Must be a number' };
+	}
+
+	const raw = rawInput.data;
 	const normalized = raw.trim();
 
 	if (normalized === '') {

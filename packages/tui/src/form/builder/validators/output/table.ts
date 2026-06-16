@@ -21,7 +21,13 @@ export const parseOutputTableRows = (value: unknown): TableOptions['rows'] | nul
 		return null;
 	}
 
-	return tableRowsSchema.parse(value);
+	const parsed = tableRowsSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Table rows must be an array.');
+	}
+
+	return parsed.data;
 };
 
 export const resolveTableFormArguments = (

@@ -7,5 +7,11 @@ const rawKeyChunkTextSchema = z.union([
 ]);
 
 export const parseRawKeyChunkText = (chunk: unknown): string => {
-	return rawKeyChunkTextSchema.parse(chunk);
+	const parsed = rawKeyChunkTextSchema.safeParse(chunk);
+
+	if (!parsed.success) {
+		throw new Error('Raw key chunks must be strings or buffers.');
+	}
+
+	return parsed.data;
 };

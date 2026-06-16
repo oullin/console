@@ -27,7 +27,13 @@ export const parseChoiceAnswerIndex = (answer: string): number | null => {
 };
 
 export const parseChoiceAnswerList = (answer: unknown): string[] => {
-	return choiceAnswerListSchema.parse(answer);
+	const parsed = choiceAnswerListSchema.safeParse(answer);
+
+	if (!parsed.success) {
+		throw new TypeError('Choice answers must be a comma-separated string.');
+	}
+
+	return parsed.data;
 };
 
 export const parseChoiceRecordKey = (key: string): string | number => {
@@ -37,5 +43,11 @@ export const parseChoiceRecordKey = (key: string): string | number => {
 };
 
 export const parseChoiceRecordValue = <T>(key: string): T => {
-	return choiceRecordValueSchema<T>().parse(parseChoiceRecordKey(key));
+	const parsed = choiceRecordValueSchema<T>().safeParse(parseChoiceRecordKey(key));
+
+	if (!parsed.success) {
+		throw new TypeError('Choice record keys must resolve to a choice value.');
+	}
+
+	return parsed.data;
 };

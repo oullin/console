@@ -17,14 +17,26 @@ export const isSuggestionSourceCallback = (source: string[] | SuggestionSourceCa
 };
 
 export const parseSuggestionSource = (source: unknown): string[] | SuggestionSourceCallback => {
-	return suggestionSourceSchema.parse(source);
+	const parsed = suggestionSourceSchema.safeParse(source);
+
+	if (!parsed.success) {
+		throw new TypeError('Suggestion source must be an array of strings or callback.');
+	}
+
+	return parsed.data;
 };
 
 export const resolveSuggestionSource = async (source: string[] | SuggestionSourceCallback, query: string): Promise<ResolvedSuggestionSource> => {
 	const parsed = parseSuggestionSource(source);
 
 	if (isSuggestionSourceCallback(parsed)) {
-		return { filter: false, options: suggestionOptionsSchema.parse(await parsed(query)) };
+		const options = suggestionOptionsSchema.safeParse(await parsed(query));
+
+		if (!options.success) {
+			throw new TypeError('Suggestion source callbacks must return an array of strings.');
+		}
+
+		return { filter: false, options: options.data };
 	}
 
 	return { filter: true, options: parsed };

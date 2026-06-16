@@ -13,10 +13,16 @@ export type ResolvedDataTableFormArguments<T> = {
 
 export const parseOutputDataTableRows = <T>(value: unknown): Array<DataTableRow<T>> => {
 	if (isNullOutputRows(value)) {
-		return outputDataTableRowsSchema<T>().parse([]);
+		return [];
 	}
 
-	return outputDataTableRowsSchema<T>().parse(value);
+	const parsed = outputDataTableRowsSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Data table rows must be an array.');
+	}
+
+	return parsed.data;
 };
 
 export const resolveDataTableFormArguments = <T>(

@@ -22,5 +22,11 @@ export const parseSuggestStepName = (value: unknown): string | undefined => {
 };
 
 export const parseSuggestSource = (value: unknown): string[] | SuggestSourceCallback => {
-	return suggestSourceSchema.parse(value);
+	const parsed = suggestSourceSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Suggestion source must be an array of strings or callback.');
+	}
+
+	return parsed.data;
 };

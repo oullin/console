@@ -24,5 +24,11 @@ export const parseSearchStepName = (value: unknown): string | undefined => {
 };
 
 export const parseSearchChoiceSource = <T>(value: unknown): ChoiceOptions<T> | SearchChoiceSourceCallback<T> => {
-	return searchChoiceSourceSchema<T>().parse(value);
+	const parsed = searchChoiceSourceSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Search choices must be an array, record, or callback.');
+	}
+
+	return parsed.data;
 };
