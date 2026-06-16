@@ -1,4 +1,4 @@
-import { isFallbackConditionCallback } from '#tui/prompt/validators/fallback';
+import { isFallbackConditionCallback, parseFallbackHandler } from '#tui/prompt/validators/fallback';
 import type { MaybePromise } from '#tui/types';
 
 export type PromptFallbackKind = 'autocomplete' | 'confirm' | 'datatable' | 'multisearch' | 'multiselect' | 'number' | 'password' | 'pause' | 'search' | 'select' | 'suggest' | 'text' | 'textarea';
@@ -22,7 +22,7 @@ export const fallbackUsing = <TOptions, TResult>(kind: PromptFallbackKind, handl
 		return;
 	}
 
-	fallbackHandlers.set(kind, handler as PromptFallbackHandler);
+	fallbackHandlers.set(kind, parseFallbackHandler<unknown, unknown>(handler));
 };
 
 export const shouldFallback = (kind: PromptFallbackKind): boolean => {
@@ -36,7 +36,9 @@ export const promptWithFallback = async <TOptions, TResult>(kind: PromptFallback
 		return run();
 	}
 
-	const fallback = fallbackHandlers.get(kind) as PromptFallbackHandler<TOptions, TResult> | undefined;
+	const fallback = fallbackHandlers.has(kind)
+		? parseFallbackHandler<TOptions, TResult>(fallbackHandlers.get(kind))
+		: undefined;
 
 	if (!fallback) {
 		return run();

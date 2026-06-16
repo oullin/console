@@ -1,3 +1,4 @@
+import { parseGlobalValidationOptions } from '#tui/prompt/validators/global-validation';
 import type { BasePromptOptions, MaybePromise, ValidationResult } from '#tui/types';
 
 export type PromptGlobalValidator<T> = (value: T, options: BasePromptOptions<T>) => MaybePromise<ValidationResult>;
@@ -13,5 +14,5 @@ export const globalValidationMessage = async <T>(value: T, options: BasePromptOp
 		return undefined;
 	}
 
-	return globalValidator(value, options as BasePromptOptions<unknown>);
+	return globalValidator(value, parseGlobalValidationOptions(options));
 };
