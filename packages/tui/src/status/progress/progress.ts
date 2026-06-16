@@ -1,4 +1,5 @@
 import { ProgressController } from '#tui/status/progress/controller';
+import { setProgressHint, setProgressLabel } from '#tui/status/progress/labels';
 import { progressPromptError } from '#tui/status/progress/prompt';
 import { progressCurrent, progressPercentageValue, progressValue } from '#tui/status/progress/readback';
 import type { ProgressSignalTarget } from '#tui/status/progress/terminal';
@@ -34,13 +35,13 @@ export class Progress {
 	}
 
 	label(value: string): this {
-		this.#controller.state.label(value);
+		setProgressLabel(this.#controller, value);
 
 		return this;
 	}
 
 	hint(value: string): this {
-		this.#controller.state.hint(value);
+		setProgressHint(this.#controller, value);
 
 		return this;
 	}
