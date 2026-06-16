@@ -21,10 +21,13 @@ export class StreamLifecycle {
 			return;
 		}
 
-		this.#flush();
-		this.#closed = true;
-		this.#signalCleanup.detach();
-		showCursor();
+		try {
+			this.#flush();
+		} finally {
+			this.#closed = true;
+			this.#signalCleanup.detach();
+			showCursor();
+		}
 	}
 
 	closed(): boolean {
