@@ -23,6 +23,7 @@ export class ProgressTerminalLifecycle {
 
 		if (this.#renderedFrame) {
 			eraseRenderedFrame(this.#renderedFrame);
+			this.#renderedFrame = null;
 		}
 	}
 
