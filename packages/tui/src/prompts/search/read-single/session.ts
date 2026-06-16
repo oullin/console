@@ -1,3 +1,8 @@
+import {
+	applySearchSessionTypedInput,
+	clearSearchSessionHighlight,
+	moveSearchSessionHighlight,
+} from '#tui/prompts/search/read-single/session/actions';
 import { createSearchReaderSessionFrame } from '#tui/prompts/search/read-single/session/frame';
 import { createSingleSearchReaderState } from '#tui/prompts/search/read-single/state';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
@@ -25,20 +30,13 @@ export const createSearchReaderSession = async <T>(options: SearchReadOptions<T>
 
 	return {
 		async applyTypedInput(key: string) {
-			const next = await state.applyTypedInput(key);
-
-			if (!next.cancelled) {
-				frame.render();
-			}
-
-			return next;
+			return applySearchSessionTypedInput(state, frame, key);
 		},
 		choices() {
 			return state.choices();
 		},
 		clearHighlight() {
-			state.clearHighlight();
-			frame.render();
+			clearSearchSessionHighlight(state, frame);
 		},
 		async defaultSelection() {
 			return state.defaultSelection();
@@ -50,9 +48,7 @@ export const createSearchReaderSession = async <T>(options: SearchReadOptions<T>
 			return state.highlighted();
 		},
 		async move(action) {
-			await state.move(action);
-
-			frame.render();
+			await moveSearchSessionHighlight(state, frame, action);
 		},
 		query() {
 			return state.query();
