@@ -60,7 +60,7 @@ TypeScript and OpenTUI internals.
 | Select and multi-select label-first helper argument surface with info | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
 | Select required-option validation | `packages/tui/src/prompts/select/validators/options.ts`, `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/tests/choices.test.ts` |
 | Select non-interactive default validation | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/tests/choices.test.ts` |
-| Select explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/defaults.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/validators/default.ts` |
+| Select explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/defaults.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/concerns/choice-match.ts`, `packages/tui/src/validators/default.ts` |
 | Select line-mode and exhausted-input default fallback with validation retry | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted final frame | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
 | Select submitted frame renders only after validation passes | `packages/tui/src/prompts/select/index.ts`, `packages/tui/src/prompts/select/select.ts`, `packages/tui/src/prompts/select/read-selected.ts`, `packages/tui/tests/choices.test.ts` |
@@ -92,7 +92,7 @@ TypeScript and OpenTUI internals.
 | Search retry initial highlight lifecycle | `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/navigation.ts` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
-| Search explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/defaults.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/src/prompts/search/line-mode.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/validators/default.ts` |
+| Search explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/defaults.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/src/prompts/search/line-mode.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/concerns/choice-match.ts`, `packages/tui/src/validators/default.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
@@ -106,8 +106,8 @@ TypeScript and OpenTUI internals.
 | Pause | `packages/tui/src/prompts/pause.ts` |
 | Pause themed key-driven frame | `packages/tui/src/prompts/pause.ts`, `packages/tui/src/prompts/pause/render.ts`, `packages/tui/tests/pause.test.ts` |
 | Pause non-interactive no-render behavior | `packages/tui/src/prompts/pause.ts`, `packages/tui/tests/pause.test.ts` |
-| Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts` |
-| Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/prompts/search/render.ts` |
+| Choice normalization, matching, navigation, and list rendering concerns | `packages/tui/src/concerns/choices.ts`, `packages/tui/src/concerns/choice-normalize.ts`, `packages/tui/src/concerns/choice-match.ts`, `packages/tui/src/concerns/choice-navigation.ts`, `packages/tui/src/concerns/choice-render.ts` |
+| Choice and search scrollbar rendering | `packages/tui/src/concerns/scrollbar.ts`, `packages/tui/src/concerns/choice-navigation.ts`, `packages/tui/src/concerns/choice-render.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Form builder | `packages/tui/src/form.ts`, `packages/tui/src/form/builder/*` |
 | Form builder nested prompt revert short-circuiting | `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder first-step and conditional revert feature coverage | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
@@ -194,7 +194,7 @@ TypeScript and OpenTUI internals.
 | Data table filter callback lifecycle | `packages/tui/src/contracts/output.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/src/output/data-table.ts` |
 | Data table search title and non-empty query filter lifecycle | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/tests/form.test.ts` |
 | Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
-| Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
+| Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choice-normalize.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
 | Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/basic/*`, `packages/tui/tests/form.test.ts` |
