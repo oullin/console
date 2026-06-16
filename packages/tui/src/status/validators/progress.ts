@@ -31,5 +31,11 @@ export const parseProgressValuesInput = <T>(steps: Iterable<T> | number): Progre
 		return { kind: 'total', total: parseProgressTotal(total.data) };
 	}
 
-	return { kind: 'steps', steps: iterableSchema<T>().parse(steps) };
+	const parsedSteps = iterableSchema<T>().safeParse(steps);
+
+	if (!parsedSteps.success) {
+		throw new Error('Progress steps must be an iterable or a number.');
+	}
+
+	return { kind: 'steps', steps: parsedSteps.data };
 };
