@@ -1,5 +1,6 @@
 import { renderBox } from '#tui/theme/box';
 import { clampedProgressCurrent, progressRatio } from '#tui/status/progress/state/value';
+import { progressFrameWidth } from '#tui/status/progress/validators/frame';
 
 export type ProgressFrameState = 'active' | 'cancel' | 'error' | 'submit';
 
@@ -23,10 +24,10 @@ export const formatProgressFraction = (current: number, total: number): string =
 };
 
 export const renderProgressFrame = ({ current, hint, label, state = 'active', total, width = 60 }: ProgressFrameOptions): string => {
-	const fillWidth = Math.max(0, Math.trunc(width));
+	const fillWidth = progressFrameWidth(width);
 	const filled = Math.ceil(fillWidth * progressPercentage(current, total));
 	const body = '█'.repeat(filled);
-	const lines = [renderBox({ body, info: formatProgressFraction(current, total), title: label, width })];
+	const lines = [renderBox({ body, info: formatProgressFraction(current, total), title: label, width: fillWidth })];
 
 	if (state === 'active') {
 		lines.push(hint ? `  ${hint}` : '');
