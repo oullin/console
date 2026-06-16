@@ -1,7 +1,5 @@
-import { applyTypedKey } from '#tui/typed-value';
-import { moveSuggestionHighlight } from '#tui/prompts/suggest/keys';
-import { initialSuggestionState } from '#tui/prompts/suggest/read-result';
-import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
+import { createSuggestHighlightState } from '#tui/prompts/suggest/read/state/highlight';
+import { createSuggestQueryState } from '#tui/prompts/suggest/state/query';
 import type { SuggestNavigationAction } from '#tui/prompts/suggest/keys';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { TypedValueState } from '#tui/typed-value/types';
@@ -16,46 +14,39 @@ export type SuggestReaderState = {
 };
 
 export const createSuggestReaderState = async (options: SuggestOptions): Promise<SuggestReaderState> => {
-	let value = initialSuggestionState(options.default ?? '');
-	let highlighted: number | null = null;
-
-	let matches = await resolveSuggestions(options.options, value.value);
-
-	const resolveMatches = async (): Promise<void> => {
-		matches = await resolveSuggestions(options.options, value.value);
-	};
+	const query = await createSuggestQueryState(options);
+	const highlighted = createSuggestHighlightState();
 
 	return {
 		async applyTypedInput(key) {
-			const next = applyTypedKey(value, key);
+			const next = await query.applyTypedInput(key);
 
 			if (next.submitted || next.cancelled) {
 				return { cancelled: next.cancelled, submitted: next.submitted };
 			}
 
-			value = { cursor: next.cursor, value: next.value };
-			highlighted = null;
-
-			await resolveMatches();
+			if (next.changed) {
+				highlighted.clear();
+			}
 
 			return { cancelled: false, submitted: false };
 		},
 		clearHighlight() {
-			highlighted = null;
+			highlighted.clear();
 		},
 		highlighted() {
-			return highlighted;
+			return highlighted.value();
 		},
 		matches() {
-			return matches;
+			return query.matches();
 		},
 		async move(action) {
-			await resolveMatches();
+			await query.resolve();
 
-			highlighted = moveSuggestionHighlight(matches, highlighted, action, options.scroll);
+			highlighted.move(query.matches(), action, options.scroll);
 		},
 		value() {
-			return value;
+			return query.value();
 		},
 	};
 };
