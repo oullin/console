@@ -2,7 +2,7 @@ import { normalizeChoices } from '#tui/concerns/choices';
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
-import { transformSelectValue, transformedSelectDefault } from '#tui/prompts/select/defaults';
+import { preserveSelectRetryDefault, transformSelectValue, transformedSelectDefault } from '#tui/prompts/select/defaults';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
 import { renderSubmittedChoice } from '#tui/prompts/select/render';
 import { assertSelectOptions } from '#tui/prompts/select/validators/options';
@@ -42,6 +42,7 @@ export const runSelectPrompt = async <T>(options: NormalizedSelectPromptOptions<
 
 				activeFrame.set(selected.frame);
 				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabel);
+				preserveSelectRetryDefault(promptOptions, selected.value);
 
 				return transformSelectValue(promptOptions, selected.value);
 			},

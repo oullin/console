@@ -8,6 +8,15 @@ export const transformSearchValue = async <T>(options: Pick<SearchPromptOptions<
 	return options.transform ? options.transform(value) : value;
 };
 
+export const preserveSearchRetryDefault = <T>(options: NormalizedSearchPromptOptions<T>, value: T): void => {
+	options.default = value;
+	options.hasDefault = true;
+};
+
+export const preserveMultiSearchRetryDefault = <T>(options: MultiSearchPromptOptions<T> & { default: T[] }, value: T[]): void => {
+	options.default = value;
+};
+
 export const transformedSearchDefault = async <T>(options: NormalizedSearchPromptOptions<T>): Promise<T | undefined> => {
 	if (!options.hasDefault) {
 		return undefined;

@@ -1,7 +1,7 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
-import { transformSearchValue, transformedSearchDefault } from '#tui/prompts/search/defaults';
+import { preserveSearchRetryDefault, transformSearchValue, transformedSearchDefault } from '#tui/prompts/search/defaults';
 import { readSearchChoice } from '#tui/prompts/search/read-single';
 import { renderSubmittedSearchChoice } from '#tui/prompts/search/render';
 import type { NormalizedSearchPromptOptions } from '#tui/prompts/search/defaults';
@@ -30,6 +30,7 @@ export const runSearchPrompt = async <T>(options: NormalizedSearchPromptOptions<
 
 				activeFrame.set(selected.frame);
 				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabel);
+				preserveSearchRetryDefault(options, selected.value);
 
 				return transformSearchValue(options, selected.value);
 			},

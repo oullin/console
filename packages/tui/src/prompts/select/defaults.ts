@@ -8,6 +8,15 @@ export const transformSelectValue = async <T>(options: Pick<SelectPromptOptions<
 	return options.transform ? options.transform(value) : value;
 };
 
+export const preserveSelectRetryDefault = <T>(options: NormalizedSelectPromptOptions<T>, value: T): void => {
+	options.default = value;
+	options.hasDefault = true;
+};
+
+export const preserveMultiSelectRetryDefault = <T>(options: MultiSelectPromptOptions<T> & { default: T[] }, value: T[]): void => {
+	options.default = value;
+};
+
 export const transformedSelectDefault = async <T>(options: NormalizedSelectPromptOptions<T>): Promise<T | undefined> => {
 	if (!options.hasDefault) {
 		return undefined;

@@ -14,6 +14,11 @@ export const transformDataTableValue = async <T>(options: Pick<DataTablePromptOp
 	return options.transform ? options.transform(value) : value;
 };
 
+export const preserveDataTableRetryDefault = <T>(options: NormalizedDataTablePromptOptions<T>, value: T | number): void => {
+	options.default = value;
+	options.hasDefault = true;
+};
+
 export const dataTableValidationOptions = async <T>(options: NormalizedDataTablePromptOptions<T>): Promise<DataTablePromptOptions<T>> => ({
 	...options,
 	default: options.hasDefault ? await transformDataTableValue(options, options.default as T | number) : undefined,

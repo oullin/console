@@ -1,7 +1,7 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
-import { dataTableValidationOptions, transformDataTableValue } from '#tui/output/data-table/options';
+import { dataTableValidationOptions, preserveDataTableRetryDefault, transformDataTableValue } from '#tui/output/data-table/options';
 import { readDataTableSelection } from '#tui/output/data-table/read';
 import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
 import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
@@ -25,6 +25,7 @@ export const runDataTablePrompt = async <T>(options: NormalizedDataTablePromptOp
 
 				activeFrame.set(selected.frame);
 				submission.capture(selected.submitted, selected.cancelled, selected);
+				preserveDataTableRetryDefault(options, selected.value);
 
 				return transformDataTableValue(options, selected.value);
 			},

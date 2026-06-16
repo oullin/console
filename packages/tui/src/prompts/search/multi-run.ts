@@ -1,7 +1,7 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
-import { transformedMultiSearchDefault } from '#tui/prompts/search/defaults';
+import { preserveMultiSearchRetryDefault, transformedMultiSearchDefault } from '#tui/prompts/search/defaults';
 import { readMultiSearchChoices } from '#tui/prompts/search/read-multi';
 import { renderSubmittedSearchChoices } from '#tui/prompts/search/render';
 import type { NormalizedMultiSearchPromptOptions } from '#tui/prompts/search/multi-options';
@@ -26,6 +26,7 @@ export const runMultiSearchPrompt = async <T>(options: NormalizedMultiSearchProm
 
 				activeFrame.set(selected.frame);
 				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabels);
+				preserveMultiSearchRetryDefault(options, selected.value);
 
 				return options.transform ? options.transform(selected.value) : selected.value;
 			},
