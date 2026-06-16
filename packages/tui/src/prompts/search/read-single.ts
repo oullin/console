@@ -7,7 +7,7 @@ import { renderCancelledSearch } from '#tui/prompts/search/render';
 import { cancelledSearchValue, lineSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import { createSearchReaderSession } from '#tui/prompts/search/read-single/session';
-import type { SearchReadOptions } from '#tui/prompts/search/read-single/session';
+import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
 
 export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt = 0): Promise<SearchChoiceReadResult<T>> => {
 	const environment = promptEnvironment();

@@ -1,14 +1,10 @@
 import { eraseRenderedFrame } from '#tui/status/frame';
-import { applyTypedKey } from '#tui/typed-value';
-import { resolveSearchChoices } from '#tui/prompts/search/choices';
-import { moveSearchHighlight } from '#tui/prompts/search/keys';
 import { renderSearchChoices } from '#tui/prompts/search/render';
-import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
-import { toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
+import { createMultiSearchReaderState } from '#tui/prompts/search/read-multi/state';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
 import type { TypedValueState } from '#tui/typed-value/types';
-import type { Choice, MultiSearchPromptOptions } from '#tui/types';
+import type { MultiSearchPromptOptions } from '#tui/types';
 
 export type MultiSearchReaderSession<T> = {
 	applyTypedInput(key: string): Promise<{ cancelled: boolean }>;
@@ -24,76 +20,69 @@ export type MultiSearchReaderSession<T> = {
 };
 
 export const createMultiSearchReaderSession = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchReaderSession<T>> => {
-	let query: TypedValueState = { cursor: 0, value: '' };
+	const state = await createMultiSearchReaderState(options);
 
-	let choices: Array<Choice<T>> = await resolveSearchChoices(options.options, query.value);
-
-	let highlighted: number | null = null;
 	let frame = '';
 
-	const selected = createInitialSearchSelection(choices, options.default);
-	const currentChoices = (): Array<Choice<T>> => displayedSearchChoices(choices, selected, query.value);
-
-	const resolveChoices = async (): Promise<void> => {
-		choices = await resolveSearchChoices(options.options, query.value);
-	};
-
 	function render(): void {
-		const displayed = currentChoices();
-		const marked = markedSearchChoiceIndexes(displayed, selected);
-
 		if (frame.length > 0) {
 			eraseRenderedFrame(frame);
 		}
 
-		frame = renderSearchChoices(options.message, query.value, query.cursor, displayed, highlighted, marked, [...selected.values()], options.scroll, options.info, true, options.placeholder);
+		const query = state.query();
+
+		frame = renderSearchChoices(
+			options.message,
+			query.value,
+			query.cursor,
+			state.displayedChoices(),
+			state.highlighted(),
+			state.markedChoiceIndexes(),
+			state.selectedLabels(),
+			options.scroll,
+			options.info,
+			true,
+			options.placeholder,
+		);
 	}
 
 	return {
-		async applyTypedInput(key) {
-			const next = applyTypedKey(query, key);
+		async applyTypedInput(key: string) {
+			const next = await state.applyTypedInput(key);
 
-			if (next.cancelled) {
-				return { cancelled: true };
+			if (!next.cancelled) {
+				render();
 			}
 
-			query = { cursor: next.cursor, value: next.value };
-
-			await resolveChoices();
-
-			highlighted = null;
-			render();
-
-			return { cancelled: false };
+			return next;
 		},
 		frame() {
 			return frame;
 		},
 		highlighted() {
-			return highlighted;
+			return state.highlighted();
 		},
 		async move(action) {
-			await resolveChoices();
+			await state.move(action);
 
-			highlighted = moveSearchHighlight(currentChoices(), highlighted, action, { scroll: options.scroll });
 			render();
 		},
 		query() {
-			return query;
+			return state.query();
 		},
 		render,
 		selected() {
-			return selected;
+			return state.selected();
 		},
 		selectedLabels() {
-			return [...selected.values()];
+			return state.selectedLabels();
 		},
 		toggleAllDisplayed() {
-			toggleSearchChoices(selected, currentChoices());
+			state.toggleAllDisplayed();
 			render();
 		},
 		toggleHighlighted() {
-			toggleHighlightedSearchChoice(selected, currentChoices(), highlighted);
+			state.toggleHighlighted();
 			render();
 		},
 	};
