@@ -39,14 +39,14 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 				activeFrame.set(answer.frame);
 				submission.capture(!answer.cancelled, answer.cancelled, undefined);
 
-				if (value === '' && options.hasDefault) {
-					return numberDefault(options);
-				}
-
 				const result = parseNumberInput(value, options);
 
 				if (result.error !== undefined) {
 					throw new PromptValidationError(result.error, value);
+				}
+
+				if (result.value === '' && options.hasDefault) {
+					return numberDefault(options);
 				}
 
 				const parsedValue = result.value ?? '';
