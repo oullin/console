@@ -24,5 +24,11 @@ const promptEnvironmentPatchSchema = z
 	.passthrough() as z.ZodType<Partial<PromptEnvironment>>;
 
 export const parsePromptEnvironmentPatch = (environment: Partial<PromptEnvironment>): Partial<PromptEnvironment> => {
-	return promptEnvironmentPatchSchema.parse(environment);
+	const parsed = promptEnvironmentPatchSchema.safeParse(environment);
+
+	if (!parsed.success) {
+		throw new Error('Prompt environment patches must include valid input, output, error, or interactive values.');
+	}
+
+	return parsed.data;
 };
