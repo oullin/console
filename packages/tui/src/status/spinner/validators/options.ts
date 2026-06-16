@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { MaybePromise, StatusOptions } from '#tui/types';
+import type { MaybePromise } from '#tui/types';
 
 const spinnerCallbackSchema = <T>(): z.ZodType<() => MaybePromise<T>> => z.function() as z.ZodType<() => MaybePromise<T>>;
 const spinnerMessageSchema = z.string();
@@ -9,6 +9,8 @@ const spinnerOptionsSchema = z
 	})
 	.passthrough()
 	.default({ message: '' });
+
+export type ResolvedStatusOptions = z.output<typeof spinnerOptionsSchema>;
 
 export const isSpinnerCallback = <T>(value: unknown): value is () => MaybePromise<T> => {
 	return spinnerCallbackSchema<T>().safeParse(value).success;
@@ -28,6 +30,6 @@ export const parseSpinnerCallback = <T>(value: unknown): (() => MaybePromise<T>)
 	return parsed.data;
 };
 
-export const parseSpinnerOptions = (value: unknown): StatusOptions => {
+export const parseSpinnerOptions = (value: unknown): ResolvedStatusOptions => {
 	return spinnerOptionsSchema.parse(value);
 };
