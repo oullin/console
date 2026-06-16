@@ -1,9 +1,14 @@
 import { z } from 'zod';
 import type { NotificationCommand } from '#tui/output/notify/commands';
 
+const notificationCommandBinSchema = z
+	.string()
+	.min(1)
+	.regex(/^(?!-)[A-Za-z0-9_./-]+$/u);
+
 const notificationCommandSchema = z.object({
 	args: z.array(z.string()).default([]),
-	bin: z.string().min(1),
+	bin: notificationCommandBinSchema,
 });
 
 const notificationCommandListSchema = z.array(notificationCommandSchema);
@@ -21,7 +26,7 @@ export const parseNotificationCommands = (commands: unknown): NotificationComman
 };
 
 export const parseNotificationCommandBin = (bin: unknown): string | undefined => {
-	const parsed = notificationCommandSchema.shape.bin.safeParse(bin);
+	const parsed = notificationCommandBinSchema.safeParse(bin);
 
 	return parsed.success ? parsed.data : undefined;
 };

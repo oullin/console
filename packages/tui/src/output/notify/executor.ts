@@ -14,7 +14,7 @@ export const commandExists = (bin: string): boolean => {
 		return false;
 	}
 
-	const result = spawnSync('command', ['-v', parsedBin], { shell: true, stdio: 'ignore' });
+	const result = spawnSync('sh', ['-c', 'command -v "$1"', 'sh', parsedBin], { stdio: 'ignore' });
 
 	return result.status === 0;
 };
