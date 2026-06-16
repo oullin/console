@@ -26,8 +26,10 @@ export const createTaskLifecycleRenderer = (logger: Logger): TaskLifecycleRender
 				eraseRenderedFrame(frame);
 			}
 
-			frame = renderLoggerTaskFrame(logger, options);
-			output.write(frame);
+			const nextFrame = renderLoggerTaskFrame(logger, options);
+
+			output.write(nextFrame);
+			frame = nextFrame;
 		},
 	};
 };
