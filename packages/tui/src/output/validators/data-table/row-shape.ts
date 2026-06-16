@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { dataObjectRowSchema, dataTableArrayRowSchema, dataTableRecordRowSchema } from '#tui/output/validators/data-table/schemas';
 import type { DataTableObjectRow, DataTableRow, TableCell } from '#tui/types';
 
+const typedDataObjectRowSchema = <T>(): z.ZodType<DataTableObjectRow<T>> => dataObjectRowSchema as z.ZodType<DataTableObjectRow<T>>;
 const dataTableRowValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
 
 export type DataTableRowShape<T> =
@@ -23,10 +24,10 @@ export const isDataObjectRow = <T>(row: DataTableRow<T>): row is DataTableObject
 };
 
 export const parseDataTableRowShape = <T>(row: DataTableRow<T>): DataTableRowShape<T> => {
-	const objectRow = dataObjectRowSchema.safeParse(row);
+	const objectRow = typedDataObjectRowSchema<T>().safeParse(row);
 
 	if (objectRow.success) {
-		return { kind: 'object', row: objectRow.data as DataTableObjectRow<T> };
+		return { kind: 'object', row: objectRow.data };
 	}
 
 	const arrayRow = dataTableArrayRowSchema.safeParse(row);
