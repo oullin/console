@@ -24,7 +24,7 @@ export const readConfirm = async (options: ConfirmReadOptions): Promise<ConfirmR
 		if (key === null) {
 			const submitted = session.submission();
 
-			return { cancelled: false, frame: submitted.frame, submitted: true, value: submitted.value };
+			return { cancelled: false, frame: submitted.frame, submitted: false, value: submitted.value };
 		}
 
 		const directValue = confirmDirectValue(key);
