@@ -1,13 +1,10 @@
-import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/progress';
+import { progressStateSnapshot } from '#tui/status/progress/state/snapshot';
+import { nextProgressCurrent } from '#tui/status/progress/state/value';
+import { parseProgressTotal } from '#tui/status/validators/progress';
 import type { ProgressFrameState } from '#tui/status/progress/render';
+import type { ProgressStateSnapshot } from '#tui/status/progress/state/snapshot';
 
-export type ProgressStateSnapshot = {
-	current: number;
-	hint: string;
-	label: string;
-	state: ProgressFrameState;
-	total: number;
-};
+export type { ProgressStateSnapshot } from '#tui/status/progress/state/snapshot';
 
 export class ProgressState {
 	#current = 0;
@@ -28,8 +25,7 @@ export class ProgressState {
 
 	advance(step: number): void {
 		this.#state = 'active';
-		this.#current = this.#current + parseProgressStep(step);
-		this.#current = Math.max(0, Math.min(this.#current, this.total));
+		this.#current = nextProgressCurrent(this.#current, this.total, step);
 	}
 
 	fail(): void {
@@ -57,12 +53,12 @@ export class ProgressState {
 	}
 
 	snapshot(): ProgressStateSnapshot {
-		return {
-			current: this.#current,
-			hint: this.#hint,
-			label: this.#label,
-			state: this.#state,
-			total: this.total,
-		};
+		return progressStateSnapshot(
+			this.#current,
+			this.total,
+			this.#label,
+			this.#hint,
+			this.#state,
+		);
 	}
 }
