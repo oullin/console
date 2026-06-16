@@ -7,6 +7,7 @@ export type RawKeyInputMode = {
 
 export const createRawKeyInputMode = (input: RawKeyInput): RawKeyInputMode => {
 	const wasRaw = Boolean(input.isRaw);
+	const wasPaused = input.isPaused?.() ?? true;
 
 	return {
 		activate() {
@@ -25,7 +26,11 @@ export const createRawKeyInputMode = (input: RawKeyInput): RawKeyInputMode => {
 			try {
 				input.setRawMode?.(wasRaw);
 			} finally {
-				input.pause();
+				if (wasPaused) {
+					input.pause();
+				} else {
+					input.resume();
+				}
 			}
 		},
 	};
