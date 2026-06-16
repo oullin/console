@@ -31,5 +31,11 @@ export const parseSpinnerCallback = <T>(value: unknown): (() => MaybePromise<T>)
 };
 
 export const parseSpinnerOptions = (value: unknown): ResolvedStatusOptions => {
-	return spinnerOptionsSchema.parse(value);
+	const parsed = spinnerOptionsSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new Error('Spinner options must include a string message.');
+	}
+
+	return parsed.data;
 };
