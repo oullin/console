@@ -9,12 +9,11 @@ export type NumberValidationResult = {
 };
 
 const numericInputSchema = z.string();
-
-const isNumeric = (value: string): boolean => value.trim() !== '' && Number.isFinite(Number(value));
 const numericValueSchema = numericInputSchema
 	.trim()
-	.refine(isNumeric)
-	.transform((value) => Number(value));
+	.min(1)
+	.transform(Number)
+	.pipe(z.number().finite());
 
 export const parseNumericValue = (value: unknown): number | null => {
 	const parsed = numericValueSchema.safeParse(value);
@@ -30,11 +29,13 @@ export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptio
 		return { value: '' };
 	}
 
-	if (!isNumeric(normalized)) {
+	const parsed = numericValueSchema.safeParse(raw);
+
+	if (!parsed.success) {
 		return { error: 'Must be a number' };
 	}
 
-	const numeric = Number(normalized);
+	const numeric = parsed.data;
 
 	if (options.min !== undefined && numeric < options.min) {
 		return { error: `Must be at least ${options.min}` };
