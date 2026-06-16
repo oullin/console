@@ -1,9 +1,7 @@
 import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { clearsSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderCancelledSearch } from '#tui/prompts/search/render';
-import { cancelledSearchValue } from '#tui/prompts/search/read-single/result';
+import { cancelInteractiveSearchChoice, cancelInteractiveSearchInput } from '#tui/prompts/search/read-single/interactive/cancel';
+import { defaultInteractiveSearchChoice, exhaustedInteractiveSearchChoice, highlightedInteractiveSearchChoice } from '#tui/prompts/search/read-single/interactive/result';
 import { createSearchReaderSession } from '#tui/prompts/search/read-single/session';
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
@@ -18,14 +16,11 @@ export const readSearchChoiceInteractive = async <T>(readKey: NonNullable<Prompt
 		const key = await readKey();
 
 		if (key === null) {
-			return { cancelled: false, submitted: false, submittedLabel: '', value: options.default };
+			return exhaustedInteractiveSearchChoice(options);
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(session.choices(), session.highlighted(), options.default)) };
+			return cancelInteractiveSearchChoice(session, options);
 		}
 
 		const action = searchNavigationAction(key, { controlNavigation: true, lineControls: true });
@@ -43,15 +38,11 @@ export const readSearchChoiceInteractive = async <T>(readKey: NonNullable<Prompt
 
 		if (key === Key.enter) {
 			if (session.highlighted() !== null) {
-				const selected = session.selectedSelection();
-
-				return { cancelled: false, frame: session.frame(), submitted: selected.submitted, submittedLabel: selected.label, value: selected.value };
+				return highlightedInteractiveSearchChoice(session);
 			}
 
-			const selected = await session.defaultSelection();
-
 			if (session.query().value === '' && options.hasDefault === true) {
-				return { cancelled: false, frame: session.frame(), submitted: selected.submitted, submittedLabel: selected.label, value: selected.value };
+				return defaultInteractiveSearchChoice(session);
 			}
 
 			session.clearHighlight();
@@ -61,10 +52,7 @@ export const readSearchChoiceInteractive = async <T>(readKey: NonNullable<Prompt
 		const next = await session.applyTypedInput(key);
 
 		if (next.cancelled) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(options.default) };
+			return cancelInteractiveSearchInput(session, options);
 		}
 	}
 };
