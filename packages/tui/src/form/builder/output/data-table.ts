@@ -1,6 +1,6 @@
 import { datatable } from '#tui/output';
 import { previousValue } from '#tui/form/builder/previous';
-import { parseOutputScroll, parseOutputStepName } from '#tui/form/builder/validators/output';
+import { parseOutputDataTableRows, parseOutputScroll, parseOutputStepName } from '#tui/form/builder/validators/output';
 import { dataTableStepName, isDataTablePromptOptions } from '#tui/output/validators/data-table';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
@@ -50,7 +50,7 @@ export function datatableFormStep<T = unknown>(
 				hint,
 				message: label,
 				required,
-				rows: (rowsOrName as Array<DataTableRow<T>> | null) ?? [],
+				rows: parseOutputDataTableRows<T>(rowsOrName) ?? [],
 				scroll,
 				transform,
 				validate,
