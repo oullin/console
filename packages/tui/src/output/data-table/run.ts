@@ -1,4 +1,5 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
+import { promptEnvironment } from '#tui/environment';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { dataTableValidationOptions, preserveDataTableRetryDefault, transformDataTableValue } from '#tui/output/data-table/options';
@@ -9,7 +10,7 @@ import type { DataTableSelectionReadResult } from '#tui/output/data-table/types'
 import type { NormalizedDataTablePromptOptions } from '#tui/output/data-table/options';
 
 export const runDataTablePrompt = async <T>(options: NormalizedDataTablePromptOptions<T>): Promise<T | number> => {
-	const validationOptions = await dataTableValidationOptions(options);
+	const validationOptions = await dataTableValidationOptions(options, !promptEnvironment().interactive);
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
 	const activeFrame = activePromptFrame();

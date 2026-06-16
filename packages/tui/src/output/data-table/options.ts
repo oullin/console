@@ -31,7 +31,14 @@ export const initialDataTableDefault = <T>(rows: Array<DataTableRow<T>>): T | nu
 	return dataTableRowValue(firstRow, 0);
 };
 
-export const dataTableValidationOptions = async <T>(options: NormalizedDataTablePromptOptions<T>): Promise<DataTablePromptOptions<T>> => ({
-	...options,
-	default: await transformDataTableValue(options, options.hasDefault ? parseDataTableDefault<T>(options.default) : initialDataTableDefault(options.rows)),
-});
+export const dataTableValidationOptions = async <T>(
+	options: NormalizedDataTablePromptOptions<T>,
+	useInitialDefault = false,
+): Promise<DataTablePromptOptions<T>> => {
+	const defaultValue = options.hasDefault ? parseDataTableDefault<T>(options.default) : useInitialDefault ? initialDataTableDefault(options.rows) : undefined;
+
+	return {
+		...options,
+		default: defaultValue === undefined ? undefined : await transformDataTableValue(options, defaultValue),
+	};
+};
