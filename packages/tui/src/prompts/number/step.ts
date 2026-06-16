@@ -1,3 +1,4 @@
+import { parseNumberStep } from '#tui/prompts/number/validators/step';
 import { parseNumericValue } from '#tui/prompts/number/validators/value';
 import type { NumberInputOptions } from '#tui/prompts/number/types';
 
@@ -8,7 +9,7 @@ const clamp = (value: number, min?: number, max?: number): number => {
 };
 
 export const numberStep = (step?: number): number => {
-	return step !== undefined && Number.isFinite(step) && step > 0 ? step : 1;
+	return parseNumberStep(step);
 };
 
 export const steppedNumberValue = (value: string, direction: 1 | -1, options: NumberInputOptions): string => {
