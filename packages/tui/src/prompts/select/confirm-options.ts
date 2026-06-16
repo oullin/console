@@ -1,4 +1,4 @@
-import { hasConfirmDefaultArgument, isSelectPromptLabel } from '#tui/prompts/select/validators/overload';
+import { hasConfirmDefaultArgument, isSelectPromptLabel, parseConfirmDefault } from '#tui/prompts/select/validators/overload';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { ConfirmPromptOptions } from '#tui/types';
 
@@ -34,7 +34,7 @@ export const normalizeConfirmPromptOptions = (
 	if (!isSelectPromptLabel(messageOrOptions)) {
 		return {
 			...messageOrOptions,
-			default: hasDefault ? (messageOrOptions.default as boolean) : true,
+			default: hasDefault ? parseConfirmDefault(messageOrOptions.default, true) : true,
 			hasDefault,
 		};
 	}

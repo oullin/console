@@ -1,4 +1,4 @@
-import { isSelectPromptLabel } from '#tui/prompts/select/validators/overload';
+import { isSelectPromptLabel, parseSelectChoiceOptions } from '#tui/prompts/select/validators/overload';
 import type { ChoiceOptions, MultiSelectPromptOptions } from '#tui/types';
 
 export type NormalizedMultiSelectPromptOptions<T> = MultiSelectPromptOptions<T> & {
@@ -18,7 +18,7 @@ export const normalizeMultiSelectPromptOptions = <T>(
 ): NormalizedMultiSelectPromptOptions<T> => {
 	const options =
 		isSelectPromptLabel(optionsOrLabel)
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as ChoiceOptions<T>, default: defaultValue, scroll, required, validate, hint, transform, info }
+			? { message: optionsOrLabel, label: optionsOrLabel, options: parseSelectChoiceOptions<T>(source), default: defaultValue, scroll, required, validate, hint, transform, info }
 			: optionsOrLabel;
 
 	return { ...options, default: options.default ?? [] };

@@ -1,4 +1,4 @@
-import { hasSelectDefaultArgument, isSelectPromptLabel } from '#tui/prompts/select/validators/overload';
+import { hasSelectDefaultArgument, isSelectPromptLabel, parseSelectChoiceOptions } from '#tui/prompts/select/validators/overload';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { NormalizedSelectPromptOptions } from '#tui/prompts/select/defaults';
 import type { ChoiceOptions, SelectPromptOptions } from '#tui/types';
@@ -32,7 +32,7 @@ export const normalizeSelectPromptOptions = <T>(
 		info,
 		label: optionsOrLabel,
 		message: optionsOrLabel,
-		options: source as ChoiceOptions<T>,
+		options: parseSelectChoiceOptions<T>(source),
 		required,
 		scroll,
 		transform,

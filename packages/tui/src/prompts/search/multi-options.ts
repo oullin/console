@@ -1,4 +1,5 @@
 import { isSearchPromptLabel } from '#tui/prompts/search/validators/overload';
+import { parseSearchChoiceSource } from '#tui/prompts/search/validators/source';
 import type { ChoiceOptions, MultiSearchPromptOptions } from '#tui/types';
 
 export type NormalizedMultiSearchPromptOptions<T> = MultiSearchPromptOptions<T> & {
@@ -18,7 +19,7 @@ export const normalizeMultiSearchPromptOptions = <T>(
 ): NormalizedMultiSearchPromptOptions<T> => {
 	const options: MultiSearchPromptOptions<T> =
 		isSearchPromptLabel(optionsOrLabel)
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as MultiSearchPromptOptions<T>['options'], placeholder, scroll, required, validate, hint, transform, info }
+			? { message: optionsOrLabel, label: optionsOrLabel, options: parseSearchChoiceSource<T>(source), placeholder, scroll, required, validate, hint, transform, info }
 			: optionsOrLabel;
 
 	return {

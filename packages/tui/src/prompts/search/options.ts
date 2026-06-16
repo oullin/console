@@ -1,5 +1,6 @@
 import { assertSearchOptions } from '#tui/prompts/search/validators/options';
 import { isSearchPromptLabel } from '#tui/prompts/search/validators/overload';
+import { parseSearchChoiceSource } from '#tui/prompts/search/validators/source';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { NormalizedSearchPromptOptions } from '#tui/prompts/search/defaults';
 import type { ChoiceOptions, SearchPromptOptions } from '#tui/types';
@@ -20,7 +21,7 @@ export const normalizeSearchPromptOptions = <T>(
 
 	const options: NormalizedSearchPromptOptions<T> =
 		isLabel
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as SearchPromptOptions<T>['options'], hasDefault, placeholder, scroll, validate, hint, required, transform, info }
+			? { message: optionsOrLabel, label: optionsOrLabel, options: parseSearchChoiceSource<T>(source), hasDefault, placeholder, scroll, validate, hint, required, transform, info }
 			: { ...optionsOrLabel, hasDefault };
 
 	assertSearchOptions(options);
