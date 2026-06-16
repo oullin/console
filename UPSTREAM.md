@@ -52,9 +52,9 @@ TypeScript and OpenTUI internals.
 | Number explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/number.ts`, `packages/tui/src/prompts/number/defaults.ts`, `packages/tui/src/prompts/number/input.ts`, `packages/tui/src/validators/default.ts` |
 | Confirm, select, multiselect | `packages/tui/src/prompts/select/*` |
 | Confirm active, submitted, cancelled, custom-label, fallback, and non-interactive behavior | `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts`, `packages/tui/tests/choices.test.ts` |
-| Confirm submitted frame renders only after validation passes | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/choices.test.ts` |
-| Confirm explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/validators/default.ts` |
-| Confirm active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts` |
+| Confirm submitted frame renders only after validation passes | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/confirm-run.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/choices.test.ts` |
+| Confirm explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/confirm-options.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/validators/default.ts` |
+| Confirm active-frame redraw and submitted-frame replacement | `packages/tui/src/prompts/select/confirm.ts`, `packages/tui/src/prompts/select/confirm-run.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/src/prompts/select/render-confirm.ts` |
 | Confirm active and cancelled body styling | `packages/tui/src/prompts/select/render-confirm.ts` |
 | Select active boxed layout and row styling | `packages/tui/src/prompts/select/render.ts`, `packages/tui/src/prompts/select/render-rows.ts`, `packages/tui/tests/choices.test.ts` |
 | Select and multi-select label-first helper argument surface with info | `packages/tui/src/prompts/select/index.ts`, `packages/tui/tests/choices.test.ts` |
