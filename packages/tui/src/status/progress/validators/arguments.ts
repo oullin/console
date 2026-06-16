@@ -1,16 +1,10 @@
 import { z } from 'zod';
+import { iterableSchema } from '#tui/validators/iterable';
 
 const progressTotalArgumentSchema = z.number();
 const progressMessageArgumentSchema = z.string();
 
-const progressIterableStepsSchema = <T>() =>
-	z.custom<Iterable<T>>((value) => {
-		const iterator = (value as { [Symbol.iterator]?: unknown } | null | undefined)?.[Symbol.iterator];
-
-		return typeof iterator === 'function';
-	});
-
-const progressStepsArgumentSchema = <T>() => z.union([z.number(), progressIterableStepsSchema<T>()]);
+const progressStepsArgumentSchema = <T>() => z.union([z.number(), iterableSchema<T>()]);
 
 export const isProgressTotalArgument = (value: unknown): value is number => {
 	return progressTotalArgumentSchema.safeParse(value).success;

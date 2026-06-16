@@ -1,12 +1,10 @@
 import { z } from 'zod';
+import { asyncIterableSchema, iterableSchema } from '#tui/validators/iterable';
 
 const progressTotalSchema = z.number();
 const statusLabelSchema = z.string();
 
-const streamSourceSchema = z.union([
-	z.custom<AsyncIterable<string>>((value) => value !== null && value !== undefined && Symbol.asyncIterator in Object(value)),
-	z.custom<Iterable<string>>((value) => typeof value !== 'string' && value !== null && value !== undefined && Symbol.iterator in Object(value)),
-]);
+const streamSourceSchema = z.union([asyncIterableSchema<string>(), iterableSchema<string>()]);
 
 export const isProgressTotal = (value: unknown): value is number => {
 	return progressTotalSchema.safeParse(value).success;
