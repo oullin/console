@@ -1,7 +1,7 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
-import { transformedConfirmDefault, transformConfirmValue } from '#tui/prompts/select/confirm-options';
+import { preserveConfirmRetryDefault, transformedConfirmDefault, transformConfirmValue } from '#tui/prompts/select/confirm-options';
 import { readConfirm } from '#tui/prompts/select/read-confirm';
 import { renderSubmittedConfirm } from '#tui/prompts/select/render-confirm';
 import type { NormalizedConfirmPromptOptions } from '#tui/prompts/select/confirm-options';
@@ -35,7 +35,8 @@ export const runConfirmPrompt = async (options: NormalizedConfirmPromptOptions):
 					renderSubmittedConfirm(options, value);
 				});
 			},
-			() => {
+			(value) => {
+				preserveConfirmRetryDefault(options, value);
 				activeFrame.clear();
 				submission.reset();
 			},

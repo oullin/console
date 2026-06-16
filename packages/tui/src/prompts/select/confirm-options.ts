@@ -1,3 +1,4 @@
+import { hasConfirmDefaultArgument, isSelectPromptLabel } from '#tui/prompts/select/validators/overload';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { ConfirmPromptOptions } from '#tui/types';
 
@@ -7,7 +8,16 @@ export type NormalizedConfirmPromptOptions = ConfirmPromptOptions & {
 };
 
 export const confirmHasDefault = (messageOrOptions: string | ConfirmPromptOptions, argumentCount: number, defaultValue?: boolean): boolean => {
-	return typeof messageOrOptions === 'string' ? argumentCount >= 2 && defaultValue !== undefined : hasPromptDefault(messageOrOptions);
+	return isSelectPromptLabel(messageOrOptions) ? hasConfirmDefaultArgument(argumentCount, defaultValue) : hasPromptDefault(messageOrOptions);
+};
+
+export const preserveConfirmRetryDefault = (options: NormalizedConfirmPromptOptions, value: boolean | undefined): void => {
+	if (value === undefined) {
+		return;
+	}
+
+	options.default = value;
+	options.hasDefault = true;
 };
 
 export const normalizeConfirmPromptOptions = (
@@ -21,7 +31,7 @@ export const normalizeConfirmPromptOptions = (
 	transform: ConfirmPromptOptions['transform'],
 	hasDefault: boolean,
 ): NormalizedConfirmPromptOptions => {
-	if (typeof messageOrOptions !== 'string') {
+	if (!isSelectPromptLabel(messageOrOptions)) {
 		return {
 			...messageOrOptions,
 			default: hasDefault ? (messageOrOptions.default as boolean) : true,

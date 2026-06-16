@@ -1,9 +1,10 @@
+import { hasSelectDefaultArgument, isSelectPromptLabel } from '#tui/prompts/select/validators/overload';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { NormalizedSelectPromptOptions } from '#tui/prompts/select/defaults';
 import type { ChoiceOptions, SelectPromptOptions } from '#tui/types';
 
 export const selectHasDefault = <T>(optionsOrLabel: SelectPromptOptions<T> | string, argumentCount: number, defaultValue?: T): boolean => {
-	return typeof optionsOrLabel === 'string' ? argumentCount >= 3 && defaultValue !== undefined : hasPromptDefault(optionsOrLabel);
+	return isSelectPromptLabel(optionsOrLabel) ? hasSelectDefaultArgument(argumentCount, defaultValue) : hasPromptDefault(optionsOrLabel);
 };
 
 export const normalizeSelectPromptOptions = <T>(
@@ -18,7 +19,9 @@ export const normalizeSelectPromptOptions = <T>(
 	info: SelectPromptOptions<T>['info'],
 	hasDefault: boolean,
 ): NormalizedSelectPromptOptions<T> => {
-	if (typeof optionsOrLabel !== 'string') {
+	const isLabel = isSelectPromptLabel(optionsOrLabel);
+
+	if (!isLabel) {
 		return { ...optionsOrLabel, hasDefault };
 	}
 
