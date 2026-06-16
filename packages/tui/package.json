@@ -6,6 +6,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "license": "MIT",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -14,6 +15,71 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./environment": {
+      "types": "./dist/environment.d.ts",
+      "import": "./dist/environment.js",
+      "default": "./dist/environment.js"
+    },
+    "./form": {
+      "types": "./dist/form.d.ts",
+      "import": "./dist/form.js",
+      "default": "./dist/form.js"
+    },
+    "./key": {
+      "types": "./dist/key.d.ts",
+      "import": "./dist/key.js",
+      "default": "./dist/key.js"
+    },
+    "./opentui": {
+      "types": "./dist/opentui.d.ts",
+      "import": "./dist/opentui.js",
+      "default": "./dist/opentui.js"
+    },
+    "./output": {
+      "types": "./dist/output.d.ts",
+      "import": "./dist/output.js",
+      "default": "./dist/output.js"
+    },
+    "./prompt": {
+      "types": "./dist/prompt.d.ts",
+      "import": "./dist/prompt.js",
+      "default": "./dist/prompt.js"
+    },
+    "./prompts/basic": {
+      "types": "./dist/prompts/basic.d.ts",
+      "import": "./dist/prompts/basic.js",
+      "default": "./dist/prompts/basic.js"
+    },
+    "./prompts/choices": {
+      "types": "./dist/prompts/choices.d.ts",
+      "import": "./dist/prompts/choices.js",
+      "default": "./dist/prompts/choices.js"
+    },
+    "./status": {
+      "types": "./dist/status.d.ts",
+      "import": "./dist/status.js",
+      "default": "./dist/status.js"
+    },
+    "./strings": {
+      "types": "./dist/strings.d.ts",
+      "import": "./dist/strings.js",
+      "default": "./dist/strings.js"
+    },
+    "./terminal": {
+      "types": "./dist/terminal.d.ts",
+      "import": "./dist/terminal.js",
+      "default": "./dist/terminal.js"
+    },
+    "./typed-value": {
+      "types": "./dist/typed-value.d.ts",
+      "import": "./dist/typed-value.js",
+      "default": "./dist/typed-value.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
     }
   },
   "imports": {
