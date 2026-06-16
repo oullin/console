@@ -33,6 +33,7 @@ export class ProgressState {
 	}
 
 	finish(): void {
+		this.#current = this.total;
 		this.#state = 'submit';
 	}
 
