@@ -1,34 +1,7 @@
 import { Key } from '#tui/key/constants';
-import type { KeyboardEventLike, KeyName, KeyValue } from '#tui/key/types';
-
-const ctrlKeyMap: Record<string, KeyName> = {
-	a: Key.ctrlA,
-	b: Key.ctrlB,
-	c: Key.ctrlC,
-	d: Key.ctrlD,
-	e: Key.ctrlE,
-	f: Key.ctrlF,
-	h: Key.ctrlH,
-	n: Key.ctrlN,
-	p: Key.ctrlP,
-	u: Key.ctrlU,
-};
-
-const namedKeyMap: Record<string, KeyName> = {
-	pagedown: Key.pageDown,
-	pageup: Key.pageUp,
-	return: Key.enter,
-};
-
-const keyValueFromName = (name: string): KeyValue | undefined => {
-	if (!(name in Key)) {
-		return undefined;
-	}
-
-	return Key[name as keyof typeof Key];
-};
-
-const firstKeyValue = (key: KeyValue): string => (typeof key === 'string' ? key : key[0]);
+import { ctrlKeyMap, namedKeyMap } from '#tui/key/event/maps';
+import { firstKeyValue, keyValueFromName } from '#tui/key/event/value';
+import type { KeyboardEventLike, KeyName } from '#tui/key/types';
 
 export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
 	if (event.ctrl && event.name) {

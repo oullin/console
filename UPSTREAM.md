@@ -196,6 +196,7 @@ TypeScript and OpenTUI internals.
 | Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/validators/table/*`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
 | Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choice-normalize.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
+| Keyboard event normalization and key aliases | `packages/tui/src/key/event.ts`, `packages/tui/src/key/event/*`, `packages/tui/tests/key.test.ts` |
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
 | Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/basic/*`, `packages/tui/src/form/builder/prompts/basic/number/*`, `packages/tui/tests/form.test.ts` |
 | Prompt fallback and global validation lifecycle hooks | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validate-using.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompts/*`, `packages/tui/src/output/data-table.ts` |
