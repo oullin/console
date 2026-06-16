@@ -14,8 +14,11 @@ export const activePromptFrame = (): ActivePromptFrame => {
 				return;
 			}
 
-			eraseRenderedFrame(currentFrame);
-			currentFrame = undefined;
+			try {
+				eraseRenderedFrame(currentFrame);
+			} finally {
+				currentFrame = undefined;
+			}
 		},
 		set: (frame) => {
 			currentFrame = frame;
