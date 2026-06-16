@@ -1,5 +1,3 @@
-import { resolveSearchChoices } from '#tui/prompts/search/choices';
-import { createMultiSearchChoiceQuery } from '#tui/prompts/search/read-multi/choice-query';
 import {
 	displayedMultiSearchChoices,
 	markedDisplayedMultiSearchChoiceIndexes,
@@ -7,8 +5,8 @@ import {
 	toggleAllDisplayedMultiSearchSelection,
 	toggleHighlightedDisplayedMultiSearchSelection,
 } from '#tui/prompts/search/read-multi/state/displayed';
-import { createMultiSearchHighlightState } from '#tui/prompts/search/read-multi/state/highlight';
-import { createMultiSearchSelection, multiSearchSelectedLabels } from '#tui/prompts/search/read-multi/state/selection';
+import { createMultiSearchReaderStateContext } from '#tui/prompts/search/read-multi/state/context';
+import { multiSearchSelectedLabels } from '#tui/prompts/search/read-multi/state/selection';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
 import type { TypedValueState } from '#tui/typed-value/types';
@@ -28,11 +26,7 @@ export type MultiSearchReaderState<T> = {
 };
 
 export const createMultiSearchReaderState = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchReaderState<T>> => {
-	const initialChoices = await resolveSearchChoices(options.options, '');
-
-	const selected = createMultiSearchSelection(initialChoices, options.default);
-	const query = createMultiSearchChoiceQuery(options, selected, initialChoices);
-	const highlighted = createMultiSearchHighlightState(options.scroll);
+	const { highlighted, query, selected } = await createMultiSearchReaderStateContext(options);
 
 	return {
 		async applyTypedInput(key) {
