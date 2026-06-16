@@ -14,12 +14,12 @@ export const lineRanges = (value: string[], width?: number): LineRange[] => {
 
 	for (const [index, character] of value.entries()) {
 		if (character === '\n') {
-			ranges.push(...wrappedRanges(value, start, index, wrapWidth));
+			appendRanges(ranges, wrappedRanges(value, start, index, wrapWidth));
 			start = index + 1;
 		}
 	}
 
-	ranges.push(...wrappedRanges(value, start, value.length, wrapWidth));
+	appendRanges(ranges, wrappedRanges(value, start, value.length, wrapWidth));
 
 	return ranges;
 };
@@ -28,6 +28,12 @@ export const currentLine = (ranges: LineRange[], cursor: number): number => {
 	const index = ranges.findIndex((range) => cursor <= range.end);
 
 	return index === -1 ? ranges.length - 1 : index;
+};
+
+const appendRanges = (ranges: LineRange[], nextRanges: LineRange[]): void => {
+	for (const range of nextRanges) {
+		ranges.push(range);
+	}
 };
 
 const wrappedRanges = (value: string[], start: number, end: number, width?: number): LineRange[] => {

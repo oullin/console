@@ -57,7 +57,10 @@ export const plainWrap = (value: string, width: number): string[] => {
 			if (wordWidth > parsedWidth) {
 				const chunks = wrappedWideWord(word, parsedWidth);
 
-				lines.push(...chunks.slice(0, -1));
+				for (const chunk of chunks.slice(0, -1)) {
+					lines.push(chunk);
+				}
+
 				line = chunks.at(-1) ?? '';
 				lineWidth = visibleWidth(line);
 				continue;

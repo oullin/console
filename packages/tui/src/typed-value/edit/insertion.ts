@@ -6,8 +6,17 @@ export const insertPrintableKey = (value: string[], cursor: number, key: string)
 	}
 
 	const inserted = characters(key);
+	const tail = value.slice(cursor);
 
-	value.splice(cursor, 0, ...inserted);
+	value.length = cursor;
+
+	for (const character of inserted) {
+		value.push(character);
+	}
+
+	for (const character of tail) {
+		value.push(character);
+	}
 
 	return cursor + inserted.length;
 };
