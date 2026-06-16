@@ -1,3 +1,4 @@
+import { parsePromptDefault } from '#tui/validators/default';
 import type { MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 export type NormalizedSelectPromptOptions<T> = SelectPromptOptions<T> & {
@@ -22,7 +23,7 @@ export const transformedSelectDefault = async <T>(options: NormalizedSelectPromp
 		return undefined;
 	}
 
-	const rawDefault = options.default as T;
+	const rawDefault = parsePromptDefault<T>(options.default);
 
 	try {
 		return await transformSelectValue(options, rawDefault);

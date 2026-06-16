@@ -1,3 +1,4 @@
+import { parsePromptDefault } from '#tui/validators/default';
 import type { MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
 export type NormalizedSearchPromptOptions<T> = SearchPromptOptions<T> & {
@@ -22,7 +23,7 @@ export const transformedSearchDefault = async <T>(options: NormalizedSearchPromp
 		return undefined;
 	}
 
-	const rawDefault = options.default as T;
+	const rawDefault = parsePromptDefault<T>(options.default);
 
 	try {
 		return await transformSearchValue(options, rawDefault);
