@@ -26,7 +26,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return currentSuggestionValue(session);
+			return highlightedSuggestionValue(session);
 		}
 
 		const action = suggestNavigationAction(key);
