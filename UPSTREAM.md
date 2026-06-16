@@ -177,10 +177,10 @@ TypeScript and OpenTUI internals.
 | Progress signal cleanup | `packages/tui/src/status/progress/progress.ts`, `packages/tui/src/status/progress/terminal.ts`, `packages/tui/tests/progress.test.ts` |
 | Progress prompt-disable and manual advance semantics | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/progress/progress.ts` |
 | Progress integer step parsing and clamped manual advance range | `packages/tui/src/status/progress.ts`, `packages/tui/src/status/progress/progress.ts`, `packages/tui/src/status/progress/state.ts`, `packages/tui/src/status/validators/progress.ts` |
-| Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts` |
+| Terminal clear/title, cursor visibility, true-color detection, default colors, and raw input restoration | `packages/tui/src/terminal.ts`, `packages/tui/src/terminal/*`, `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/mode.ts`, `packages/tui/src/environment/raw-key/types.ts` |
 | Terminal clear/title and notification helper return values | `packages/tui/src/output/terminal.ts`, `packages/tui/src/output/notify.ts`, `packages/tui/tests/terminal.test.ts`, `packages/tui/tests/notify.test.ts` |
 | Terminal raw key alias normalization | `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
-| Terminal split escape-sequence buffering | `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
+| Terminal split escape-sequence buffering | `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/session.ts`, `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | Red, strikethrough, and border-styled frames | `packages/tui/src/theme/styles.ts`, `packages/tui/src/theme/box.ts` |
 | Default box renderer terminal-width cap | `packages/tui/src/theme/box.ts` |
 | ANSI segment parsing, ANSI-aware wrapping, truncation, Unicode width | `packages/tui/src/strings.ts`, `packages/tui/src/string-utils/*`, `packages/tui/src/string-utils/ansi/*`, `packages/tui/tests/strings.test.ts` |
