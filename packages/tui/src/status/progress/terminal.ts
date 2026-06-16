@@ -16,9 +16,15 @@ export class ProgressTerminalLifecycle {
 
 	beginRender(): void {
 		if (!this.#cursorHidden) {
-			hideCursor();
-			this.#cursorHidden = true;
-			this.#signals.attach();
+			try {
+				hideCursor();
+				this.#signals.attach();
+				this.#cursorHidden = true;
+			} catch (error) {
+				showCursor();
+
+				throw error;
+			}
 		}
 
 		if (this.#renderedFrame) {
