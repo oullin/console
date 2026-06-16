@@ -2,8 +2,9 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { cancelPrompt } from '#tui/prompt';
 import { rejectPromptRevert } from '#tui/prompt/revert';
+import { confirmDirectValue, isConfirmToggleKey } from '#tui/prompts/select/read-confirm/keys';
 import { readLineConfirm } from '#tui/prompts/select/read-confirm/line-mode';
-import { confirmDirectValue, createConfirmReaderSession, isConfirmToggleKey } from '#tui/prompts/select/read-confirm/session';
+import { createConfirmReaderSession } from '#tui/prompts/select/read-confirm/session';
 import type { ConfirmReadOptions, ConfirmReadResult } from '#tui/prompts/select/read-confirm/types';
 
 export type { ConfirmReadOptions, ConfirmReadResult } from '#tui/prompts/select/read-confirm/types';
