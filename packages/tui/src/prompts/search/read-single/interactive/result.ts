@@ -6,8 +6,18 @@ export const fallbackSearchDefault = <T>(options: SearchReadOptions<T>): T | und
 	return options.hasDefault === true ? options.default : undefined;
 };
 
-export const exhaustedInteractiveSearchChoice = <T>(options: SearchReadOptions<T>): SearchChoiceReadResult<T> => {
-	return { cancelled: false, submitted: false, submittedLabel: '', value: fallbackSearchDefault(options) };
+export const exhaustedInteractiveSearchChoice = async <T>(session: SearchReaderSession<T>, options: SearchReadOptions<T>): Promise<SearchChoiceReadResult<T>> => {
+	if (session.query().value === '' && options.hasDefault === true) {
+		const selected = await defaultInteractiveSearchChoice(session);
+
+		if (selected.value !== undefined) {
+			return selected;
+		}
+	}
+
+	const choice = session.choices().find((candidate) => !candidate.disabled);
+
+	return { cancelled: false, frame: session.frame(), submitted: choice !== undefined, submittedLabel: choice?.label ?? '', value: choice?.value ?? fallbackSearchDefault(options) };
 };
 
 export const highlightedInteractiveSearchChoice = <T>(session: SearchReaderSession<T>): SearchChoiceReadResult<T> => {

@@ -16,7 +16,7 @@ export const readSearchChoiceInteractive = async <T>(readKey: NonNullable<Prompt
 		const key = await readKey();
 
 		if (key === null) {
-			return exhaustedInteractiveSearchChoice(options);
+			return exhaustedInteractiveSearchChoice(session, options);
 		}
 
 		if (key === Key.ctrlC) {
