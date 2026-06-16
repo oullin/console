@@ -1,7 +1,6 @@
 import { datatable } from '#tui/output';
 import { previousValue } from '#tui/form/builder/previous';
-import { parseOutputDataTableRows, parseOutputScroll, parseOutputStepName } from '#tui/form/builder/validators/output';
-import { dataTableStepName, isDataTablePromptOptions } from '#tui/output/validators/data-table';
+import { resolveDataTableFormArguments } from '#tui/form/builder/validators/output';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
@@ -34,27 +33,14 @@ export function datatableFormStep<T = unknown>(
 	filter: DataTablePromptOptions<T>['filter'] = undefined,
 	name?: string,
 ): FormBuilder {
-	if (isDataTablePromptOptions<T>(optionsOrHeaders)) {
-		return this.add((_, previous) => datatable<T>({ ...optionsOrHeaders, default: previousValue(previous, optionsOrHeaders.default) }), dataTableStepName(rowsOrName));
-	}
-
-	const stepName = parseOutputStepName(scrollOrName) ?? name;
-	const scroll = parseOutputScroll(scrollOrName, 10);
+	const resolved = resolveDataTableFormArguments(optionsOrHeaders, rowsOrName, scrollOrName, label, hint, required, validate, transform, filter, name);
 
 	return this.add(
 		(_, previous) =>
 			datatable<T>({
-				default: previousValue<T | number | undefined>(previous, undefined),
-				filter,
-				headers: optionsOrHeaders,
-				hint,
-				message: label,
-				required,
-				rows: parseOutputDataTableRows<T>(rowsOrName) ?? [],
-				scroll,
-				transform,
-				validate,
+				...resolved.options,
+				default: previousValue(previous, resolved.options.default),
 			}),
-		stepName,
+		resolved.name,
 	);
 }
