@@ -4,17 +4,22 @@ const wrappedWideWord = (word: string, width: number): string[] => {
 	const chunks: string[] = [];
 
 	let chunk = '';
+	let chunkWidth = 0;
 
 	for (const char of word) {
-		if (visibleWidth(`${chunk}${char}`) > width) {
+		const charWidth = visibleWidth(char);
+
+		if (chunkWidth + charWidth > width) {
 			if (chunk.length > 0) {
 				chunks.push(chunk);
 			}
 
 			chunk = '';
+			chunkWidth = 0;
 		}
 
 		chunk += char;
+		chunkWidth += charWidth;
 	}
 
 	return [...chunks, chunk];
@@ -29,27 +34,34 @@ export const plainWrap = (value: string, width: number): string[] => {
 
 	for (const originalLine of value.split('\n')) {
 		let line = '';
+		let lineWidth = 0;
 
 		for (const word of originalLine.split(/(\s+)/u)) {
-			if (visibleWidth(`${line}${word}`) <= width) {
+			const wordWidth = visibleWidth(word);
+
+			if (lineWidth + wordWidth <= width) {
 				line += word;
+				lineWidth += wordWidth;
 				continue;
 			}
 
 			if (line.length > 0) {
 				lines.push(line.trimEnd());
 				line = '';
+				lineWidth = 0;
 			}
 
-			if (visibleWidth(word) > width) {
+			if (wordWidth > width) {
 				const chunks = wrappedWideWord(word, width);
 
 				lines.push(...chunks.slice(0, -1));
 				line = chunks.at(-1) ?? '';
+				lineWidth = visibleWidth(line);
 				continue;
 			}
 
 			line = word.trimStart();
+			lineWidth = visibleWidth(line);
 		}
 
 		lines.push(line.trimEnd());
