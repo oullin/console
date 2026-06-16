@@ -26,9 +26,12 @@ export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, 
 		return visibleDataTableRows(options, headers, search.query.value);
 	}
 
-	function resetSearchSelection(nextSearch: DataTableSearchState): void {
+	function applySearchChange(nextSearch: DataTableSearchState, resetSelection: boolean): void {
 		search = nextSearch;
-		selected.reset();
+
+		if (resetSelection) {
+			selected.reset();
+		}
 	}
 
 	return {
@@ -39,12 +42,12 @@ export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, 
 				return false;
 			}
 
-			resetSearchSelection(nextSearch.state);
+			applySearchChange(nextSearch.state, nextSearch.resetSelection);
 
 			return true;
 		},
 		beginSearch() {
-			resetSearchSelection(beginDataTableReaderSearch());
+			applySearchChange(beginDataTableReaderSearch(), false);
 		},
 		mode() {
 			return search.mode;

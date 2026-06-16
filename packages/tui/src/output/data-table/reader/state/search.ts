@@ -1,10 +1,7 @@
 import { applyDataTableSearchKey, startDataTableSearch } from '#tui/output/data-table/search';
-import type { DataTableSearchState } from '#tui/output/data-table/search';
+import type { DataTableSearchChange, DataTableSearchState } from '#tui/output/data-table/search';
 
-export type DataTableReaderSearchChange = {
-	changed: boolean;
-	state: DataTableSearchState;
-};
+export type DataTableReaderSearchChange = DataTableSearchChange;
 
 export const applyDataTableReaderSearchKey = (
 	state: DataTableSearchState,

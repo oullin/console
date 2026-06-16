@@ -9,6 +9,12 @@ export type DataTableSearchState = {
 	query: TypedValueState;
 };
 
+export type DataTableSearchChange = {
+	changed: boolean;
+	resetSelection: boolean;
+	state: DataTableSearchState;
+};
+
 export const initialDataTableSearchState = (): DataTableSearchState => ({
 	mode: 'browse',
 	query: { cursor: 0, value: '' },
@@ -29,27 +35,28 @@ export const clearDataTableSearch = (): DataTableSearchState => ({
 	query: { cursor: 0, value: '' },
 });
 
-export const applyDataTableSearchKey = (state: DataTableSearchState, key: string): { changed: boolean; state: DataTableSearchState } => {
+export const applyDataTableSearchKey = (state: DataTableSearchState, key: string): DataTableSearchChange => {
 	if (state.mode !== 'search') {
-		return { changed: false, state };
+		return { changed: false, resetSelection: false, state };
 	}
 
 	if (key === Key.enter) {
-		return { changed: true, state: confirmDataTableSearch(state) };
+		return { changed: true, resetSelection: false, state: confirmDataTableSearch(state) };
 	}
 
 	if (key === Key.escape) {
-		return { changed: true, state: clearDataTableSearch() };
+		return { changed: true, resetSelection: true, state: clearDataTableSearch() };
 	}
 
 	const next = applyTypedKey(state.query, key);
 
 	if (next.value === state.query.value && next.cursor === state.query.cursor) {
-		return { changed: false, state };
+		return { changed: false, resetSelection: false, state };
 	}
 
 	return {
 		changed: true,
+		resetSelection: true,
 		state: {
 			mode: 'search',
 			query: { cursor: next.cursor, value: next.value },
