@@ -1,4 +1,5 @@
 import { visibleWidth } from '#tui/strings';
+import { parseGridWidth } from '#tui/output/grid/validators/layout';
 
 export type GridLayout = {
 	rows: string[][];
@@ -38,8 +39,15 @@ const chunkGridItems = (items: string[], columnCount: number): string[][] => {
 };
 
 export const createGridLayout = (values: string[], availableWidth: number): GridLayout => {
+	if (values.length === 0) {
+		return {
+			rows: [],
+			widths: [],
+		};
+	}
+
 	const cellWidth = Math.max(...values.map(visibleWidth)) + 4;
-	const usableWidth = Math.max(1, availableWidth);
+	const usableWidth = parseGridWidth(availableWidth, 1);
 	const maxColumns = Math.max(1, Math.floor((usableWidth - 1) / (cellWidth + 1)));
 	const columnCount = Math.max(1, balancedColumnCount(values.length, maxColumns));
 	const rows = chunkGridItems(values, columnCount);
