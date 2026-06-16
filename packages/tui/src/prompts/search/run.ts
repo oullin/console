@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { transformSearchValue, transformedSearchDefault } from '#tui/prompts/search/defaults';
 import { readSearchChoice } from '#tui/prompts/search/read-single';
 import { renderSubmittedSearchChoice } from '#tui/prompts/search/render';
@@ -12,15 +13,15 @@ export const runSearchPrompt = async <T>(options: NormalizedSearchPromptOptions<
 		default: await transformedSearchDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-	let submittedLabel = '';
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState('');
 
 	return promptWithFallback('search', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async (attempt) => {
+				submission.reset();
+
 				const selected = await readSearchChoice(options, attempt);
 
 				if (selected.value === undefined) {
@@ -28,18 +29,20 @@ export const runSearchPrompt = async <T>(options: NormalizedSearchPromptOptions<
 				}
 
 				activeFrame.set(selected.frame);
-				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-				submittedLabel = selected.submittedLabel;
+				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabel);
 
 				return transformSearchValue(options, selected.value);
 			},
 			() => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedSearchChoice(options.message, submittedLabel);
-				}
+				activeFrame.clear();
+				submission.render((label) => {
+					renderSubmittedSearchChoice(options.message, label);
+				});
 			},
-			activeFrame.clear,
+			() => {
+				activeFrame.clear();
+				submission.reset();
+			},
 		),
 	);
 };

@@ -1,6 +1,7 @@
 import { normalizeChoices } from '#tui/concerns/choices';
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { transformSelectValue, transformedSelectDefault } from '#tui/prompts/select/defaults';
 import { readSelectedChoice } from '#tui/prompts/select/read-selected';
 import { renderSubmittedChoice } from '#tui/prompts/select/render';
@@ -20,15 +21,15 @@ export const runSelectPrompt = async <T>(options: NormalizedSelectPromptOptions<
 
 	const choices = normalizeChoices(options.options);
 
-	let shouldRenderSubmittedFrame = false;
-	let submittedLabel = '';
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState('');
 
 	return promptWithFallback('select', promptOptions, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const selected = await readSelectedChoice(
 					promptOptions.message,
 					choices,
@@ -40,18 +41,20 @@ export const runSelectPrompt = async <T>(options: NormalizedSelectPromptOptions<
 				);
 
 				activeFrame.set(selected.frame);
-				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-				submittedLabel = selected.submittedLabel;
+				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabel);
 
 				return transformSelectValue(promptOptions, selected.value);
 			},
 			() => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedChoice(promptOptions.message, submittedLabel);
-				}
+				activeFrame.clear();
+				submission.render((label) => {
+					renderSubmittedChoice(promptOptions.message, label);
+				});
 			},
-			activeFrame.clear,
+			() => {
+				activeFrame.clear();
+				submission.reset();
+			},
 		),
 	);
 };

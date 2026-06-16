@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { transformedMultiSearchDefault } from '#tui/prompts/search/defaults';
 import { readMultiSearchChoices } from '#tui/prompts/search/read-multi';
 import { renderSubmittedSearchChoices } from '#tui/prompts/search/render';
@@ -12,30 +13,32 @@ export const runMultiSearchPrompt = async <T>(options: NormalizedMultiSearchProm
 		default: await transformedMultiSearchDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-	let submittedLabels: string[] = [];
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<string[]>([]);
 
 	return promptWithFallback('multisearch', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const selected = await readMultiSearchChoices(options);
 
 				activeFrame.set(selected.frame);
-				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-				submittedLabels = selected.submittedLabels;
+				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabels);
 
 				return options.transform ? options.transform(selected.value) : selected.value;
 			},
 			() => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedSearchChoices(options.message, submittedLabels);
-				}
+				activeFrame.clear();
+				submission.render((labels) => {
+					renderSubmittedSearchChoices(options.message, labels);
+				});
 			},
-			activeFrame.clear,
+			() => {
+				activeFrame.clear();
+				submission.reset();
+			},
 		),
 	);
 };
