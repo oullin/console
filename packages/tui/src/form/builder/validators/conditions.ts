@@ -9,3 +9,7 @@ const formStepConditionCallbackSchema = z.function();
 export const isFormStepConditionCallback = (condition: FormStepCondition): condition is FormStepConditionCallback => {
 	return formStepConditionCallbackSchema.safeParse(condition).success;
 };
+
+export const resolveFormStepCondition = (condition: FormStepCondition, responses: FormResponses): MaybePromise<boolean> => {
+	return isFormStepConditionCallback(condition) ? condition(responses) : condition;
+};
