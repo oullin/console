@@ -30,7 +30,9 @@ export const runPasswordPrompt = async (options: TextPromptOptions): Promise<str
 				activeFrame.set(answer.frame);
 				submission.capture(!answer.cancelled, answer.cancelled, undefined);
 
-				return options.transform ? options.transform(answer.value) : answer.value;
+				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
+
+				return options.transform ? options.transform(value) : value;
 			},
 			(value) => {
 				activeFrame.clear();
