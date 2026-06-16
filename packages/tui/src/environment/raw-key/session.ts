@@ -1,4 +1,5 @@
 import { isCompleteRawKey, normalizeRawKey } from '#tui/environment/raw-key/normalize';
+import { parseRawKeyChunkText } from '#tui/environment/raw-key/validators/chunk';
 import type { RawKeyInputMode } from '#tui/environment/raw-key/mode';
 import type { RawKeyInput } from '#tui/environment/raw-key/types';
 
@@ -27,7 +28,7 @@ export const createRawKeySession = (input: RawKeyInput, mode: RawKeyInputMode, r
 
 	const handlers: RawKeySessionHandlers = {
 		onData(chunk) {
-			buffer += Buffer.isBuffer(chunk) ? chunk.toString('utf8') : chunk;
+			buffer += parseRawKeyChunkText(chunk);
 
 			if (isCompleteRawKey(buffer)) {
 				resolveBufferedKey();
