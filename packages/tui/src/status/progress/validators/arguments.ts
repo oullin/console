@@ -20,10 +20,11 @@ export const progressStepsArgument = <T>(
 	value: Iterable<T> | number | string | undefined,
 ): Iterable<T> | number => {
 	const steps = value ?? 0;
+	const parsed = progressStepsArgumentSchema<T>().safeParse(steps);
 
-	if (progressMessageArgumentSchema.safeParse(steps).success) {
+	if (!parsed.success || progressMessageArgumentSchema.safeParse(steps).success) {
 		throw new Error('Progress steps must be an iterable or a number.');
 	}
 
-	return progressStepsArgumentSchema<T>().parse(steps);
+	return parsed.data;
 };
