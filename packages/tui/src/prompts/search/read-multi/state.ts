@@ -1,18 +1,18 @@
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { createMultiSearchChoiceQuery } from '#tui/prompts/search/read-multi/choice-query';
+import {
+	displayedMultiSearchChoices,
+	markedDisplayedMultiSearchChoiceIndexes,
+	moveDisplayedMultiSearchHighlight,
+	toggleAllDisplayedMultiSearchSelection,
+	toggleHighlightedDisplayedMultiSearchSelection,
+} from '#tui/prompts/search/read-multi/state/displayed';
 import { createMultiSearchHighlightState } from '#tui/prompts/search/read-multi/state/highlight';
+import { createMultiSearchSelection, multiSearchSelectedLabels } from '#tui/prompts/search/read-multi/state/selection';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
 import type { TypedValueState } from '#tui/typed-value/types';
 import type { Choice, MultiSearchPromptOptions } from '#tui/types';
-
-import {
-	createMultiSearchSelection,
-	markedMultiSearchChoiceIndexes,
-	multiSearchSelectedLabels,
-	toggleAllDisplayedMultiSearchChoices,
-	toggleHighlightedMultiSearchChoice,
-} from '#tui/prompts/search/read-multi/state/selection';
 
 export type MultiSearchReaderState<T> = {
 	applyTypedInput(key: string): Promise<{ cancelled: boolean }>;
@@ -47,12 +47,10 @@ export const createMultiSearchReaderState = async <T>(options: MultiSearchPrompt
 			return highlighted.value();
 		},
 		markedChoiceIndexes() {
-			return markedMultiSearchChoiceIndexes(displayedChoices(), selected);
+			return markedDisplayedMultiSearchChoiceIndexes(query, selected);
 		},
 		async move(action) {
-			await query.resolveChoices();
-
-			highlighted.move(displayedChoices(), action);
+			await moveDisplayedMultiSearchHighlight(query, highlighted, action);
 		},
 		query() {
 			return query.value();
@@ -64,14 +62,14 @@ export const createMultiSearchReaderState = async <T>(options: MultiSearchPrompt
 			return multiSearchSelectedLabels(selected);
 		},
 		toggleAllDisplayed() {
-			toggleAllDisplayedMultiSearchChoices(selected, displayedChoices());
+			toggleAllDisplayedMultiSearchSelection(query, selected);
 		},
 		toggleHighlighted() {
-			toggleHighlightedMultiSearchChoice(selected, displayedChoices(), highlighted.value());
+			toggleHighlightedDisplayedMultiSearchSelection(query, selected, highlighted);
 		},
 	};
 
 	function displayedChoices(): Array<Choice<T>> {
-		return query.displayedChoices();
+		return displayedMultiSearchChoices(query);
 	}
 };
