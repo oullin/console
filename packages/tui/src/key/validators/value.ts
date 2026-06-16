@@ -15,6 +15,10 @@ export const parseKnownKeyValues = (): string[] => {
 	return Object.values(Key).flatMap((value) => (isKeyValueList(value) ? [...value] : [value]));
 };
 
+export const parseFirstKeyValue = (value: KeyValue): string => {
+	return isKeyValueList(value) ? value[0] : value;
+};
+
 export const parseKeyLookupName = (value: unknown): KeyLookupName | undefined => {
 	const parsed = keyLookupNameSchema.safeParse(value);
 
