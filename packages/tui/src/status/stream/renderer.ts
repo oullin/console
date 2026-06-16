@@ -24,14 +24,16 @@ export class StreamRenderer {
 	render(options: StreamRenderOptions): void {
 		if (this.#frame.length > 0) {
 			eraseRenderedFrame(this.#frame);
+			this.#frame = '';
 		}
 
-		this.#frame = renderStreamFrame({
+		const nextFrame = renderStreamFrame({
 			fading: options.fading,
 			fadeStyles: this.#fadeStyles,
 			value: options.value,
 		});
 
-		promptEnvironment().output.write(this.#frame);
+		promptEnvironment().output.write(nextFrame);
+		this.#frame = nextFrame;
 	}
 }

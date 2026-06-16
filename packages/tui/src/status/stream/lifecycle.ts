@@ -12,8 +12,14 @@ export class StreamLifecycle {
 			this.close();
 		});
 
-		hideCursor();
-		this.#signalCleanup.attach();
+		try {
+			hideCursor();
+			this.#signalCleanup.attach();
+		} catch (error) {
+			showCursor();
+
+			throw error;
+		}
 	}
 
 	close(): void {
