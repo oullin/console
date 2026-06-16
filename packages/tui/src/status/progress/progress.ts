@@ -1,4 +1,5 @@
 import { ProgressController } from '#tui/status/progress/controller';
+import { progressPromptError } from '#tui/status/progress/prompt';
 import type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
 export type { ProgressSignalTarget } from '#tui/status/progress/terminal';
@@ -56,7 +57,7 @@ export class Progress {
 	}
 
 	prompt(): never {
-		throw new Error('Progress Bar cannot be prompted.');
+		throw progressPromptError();
 	}
 
 	render(): void {
