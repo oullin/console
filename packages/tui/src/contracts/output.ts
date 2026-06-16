@@ -1,4 +1,5 @@
 import type { BasePromptOptions } from '#tui/contracts/options';
+import type { MaybePromise } from '#tui/contracts/base';
 
 export type TableCell = string | number | boolean | null | undefined;
 
@@ -12,7 +13,7 @@ export type DataTablePromptOptions<T = unknown> = BasePromptOptions<T | number> 
 	headers?: string[];
 	rows: Array<DataTableRow<T>>;
 	scroll?: number;
-	transform?: (value: T | number) => T | number | Promise<T | number>;
+	transform?: (value: T | number) => MaybePromise<T | number>;
 };
 
 export type DataTableObjectRow<T = unknown> = {

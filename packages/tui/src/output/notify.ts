@@ -9,6 +9,7 @@ import type { NotificationRuntime } from '#tui/output/notify/executor';
 export type { NotificationRuntime };
 export type { NotificationCommand };
 export type { NotificationPlatform };
+export type { NotificationOptions } from '#tui/output/notify/validators/options';
 export { commandExists, executeNotificationCommand, notificationCommands };
 
 export const notificationCommand = (targetPlatform: NotificationPlatform, title: string, body = '', subtitle = '', sound = '', icon = ''): NotificationCommand | null => {
