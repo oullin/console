@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt';
+import { ask, cancelPrompt } from '#tui/prompt';
 import { renderPause } from '#tui/prompts/pause/render';
 
 export const readPauseConfirmation = async (message: string): Promise<boolean> => {
@@ -25,6 +25,12 @@ export const readPauseConfirmation = async (message: string): Promise<boolean> =
 			environment.output.write('\n');
 
 			return true;
+		}
+
+		if (key === Key.ctrlC) {
+			environment.output.write('\n');
+
+			return cancelPrompt(false);
 		}
 	}
 };
