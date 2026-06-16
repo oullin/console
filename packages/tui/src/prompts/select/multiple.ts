@@ -1,4 +1,4 @@
-import { findChoice } from '#tui/concerns/choices';
+import { choiceValueEquals, findChoice } from '#tui/concerns/choices';
 import { parseChoiceAnswerList } from '#tui/concerns/validators/choice-answer';
 import { PromptValidationError } from '#tui/prompt';
 import type { Choice } from '#tui/types';
@@ -16,9 +16,7 @@ export const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: 
 };
 
 export const markedChoiceIndexes = <T>(choices: Array<Choice<T>>, defaults: T[] = []): Set<number> => {
-	const selectedValues = new Set(defaults);
-
-	return new Set(choices.flatMap((choice, index) => (selectedValues.has(choice.value) ? [index] : [])));
+	return new Set(choices.flatMap((choice, index) => (defaults.some((value) => choiceValueEquals(choice.value, value)) ? [index] : [])));
 };
 
 export const markedChoiceValues = <T>(choices: Array<Choice<T>>, marked: Set<number>): T[] => {
