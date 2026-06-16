@@ -1,8 +1,5 @@
-import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { activePromptFrame } from '#tui/prompt/active-frame';
-import { transformedTextDefault } from '#tui/prompts/text-default';
-import { readTypedValue } from '#tui/typed-value';
-import { renderSubmittedTextareaFrame } from '#tui/typed-value/textarea-frame';
+import { normalizeTextareaPromptOptions } from '#tui/prompts/textarea/options';
+import { runTextareaPrompt } from '#tui/prompts/textarea/run';
 import type { TextareaPromptOptions } from '#tui/types';
 
 export function textarea(options: TextareaPromptOptions): Promise<string>;
@@ -28,49 +25,16 @@ export async function textarea(
 	rows = 5,
 	transform: TextareaPromptOptions['transform'] = undefined,
 ): Promise<string> {
-	const options: TextareaPromptOptions =
-		typeof message === 'string'
-			? { message, label: message, placeholder, default: defaultValue, required, validate, hint, rows, transform }
-			: { ...message, default: message.default ?? '', rows: message.rows ?? rows };
+	const options = normalizeTextareaPromptOptions({
+		defaultValue,
+		hint,
+		message,
+		placeholder,
+		required,
+		rows,
+		transform,
+		validate,
+	});
 
-	const validationOptions: TextareaPromptOptions = {
-		...options,
-		default: await transformedTextDefault(options),
-	};
-
-	let shouldRenderSubmittedFrame = false;
-
-	const activeFrame = activePromptFrame();
-
-	return promptWithFallback('textarea', options, () =>
-		promptUntilValid(
-			validationOptions,
-			async () => {
-				const answer = await readTypedValue(options.message, {
-					default: options.default,
-					hint: options.hint,
-					allowNewLine: true,
-					placeholder: options.placeholder,
-					rows: options.rows ?? rows,
-				});
-
-				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
-
-				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = !answer.cancelled;
-
-				return options.transform ? options.transform(value) : value;
-			},
-			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedTextareaFrame(options.message, value);
-				}
-			},
-			(value) => {
-				options.default = value;
-				activeFrame.clear();
-			},
-		),
-	);
+	return runTextareaPrompt(options, rows);
 }
