@@ -1,4 +1,5 @@
 import { parseNotificationOptions } from '#tui/output/notify/validators/options';
+import type { NotificationPlatform } from '#tui/output/notify/validators/platform';
 import type { NotificationOptions } from '#tui/output/notify/validators/options';
 
 export type NotificationCommand = {
@@ -6,7 +7,7 @@ export type NotificationCommand = {
 	bin: string;
 };
 
-export type NotificationPlatform = 'aix' | 'android' | 'cygwin' | 'darwin' | 'freebsd' | 'haiku' | 'linux' | 'netbsd' | 'openbsd' | 'sunos' | 'win32';
+export type { NotificationPlatform } from '#tui/output/notify/validators/platform';
 
 const macOsNotificationCommand = (options: NotificationOptions): NotificationCommand => {
 	const script = [

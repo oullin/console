@@ -2,6 +2,7 @@ import { platform } from 'node:process';
 import { note } from '#tui/output/notes';
 import { notificationCommands } from '#tui/output/notify/commands';
 import { availableNotificationCommand, commandExists, executeNotificationCommand } from '#tui/output/notify/executor';
+import { parseNotificationPlatform } from '#tui/output/notify/validators/platform';
 import type { NotificationCommand, NotificationPlatform } from '#tui/output/notify/commands';
 import type { NotificationRuntime } from '#tui/output/notify/executor';
 
@@ -28,5 +29,5 @@ export const notifyForPlatform = (targetPlatform: NotificationPlatform, title: s
 };
 
 export const notify = (title: string, body = '', subtitle = '', sound = '', icon = ''): void => {
-	notifyForPlatform(platform as NotificationPlatform, title, body, subtitle, sound, icon);
+	notifyForPlatform(parseNotificationPlatform(platform), title, body, subtitle, sound, icon);
 };
