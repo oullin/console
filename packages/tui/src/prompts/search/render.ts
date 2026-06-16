@@ -1,5 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
-import { resolveInfo } from '#tui/concerns/info';
+import { joinedInfoDetails, resolveInfo } from '#tui/concerns/info';
 import { renderSearchBody } from '#tui/prompts/search/render-body';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
@@ -20,7 +20,7 @@ export const renderSearchChoices = <T>(
 ): string => {
 	const text = resolveInfo(info, highlighted === null ? null : (choices[highlighted]?.value ?? null));
 	const summary = showSelectedSummary ? selectedSummary(selectedLabels.length, selectedLabels.length - marked.size) : '';
-	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
+	const details = joinedInfoDetails(text, summary);
 	const frame = `${renderBox({ body: renderSearchBody(query, cursor, placeholder, choices, highlighted, marked, scroll, showSelectedSummary), borderStyle: cyan, info: details, title: cyan(message) })}\n`;
 
 	promptEnvironment().output.write(frame);

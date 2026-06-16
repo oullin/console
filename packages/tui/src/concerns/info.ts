@@ -9,3 +9,7 @@ export const resolveInfo = <T>(info: InfoResolver<T>, value: T | null): string =
 
 	return info ?? '';
 };
+
+export const joinedInfoDetails = (...parts: string[]): string => {
+	return parts.filter((part) => part.length > 0).join(' · ');
+};

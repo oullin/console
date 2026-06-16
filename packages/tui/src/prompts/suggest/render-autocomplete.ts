@@ -1,5 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
-import { resolveInfo } from '#tui/concerns/info';
+import { joinedInfoDetails, resolveInfo } from '#tui/concerns/info';
 import { autocompleteDisplayValue } from '#tui/prompts/suggest/ghost-text';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
@@ -8,7 +8,7 @@ import type { TypedValueState } from '#tui/typed-value/types';
 
 export const renderAutocomplete = (message: string, state: TypedValueState, matches: string[], highlighted: number, hint = '', placeholder = '', info?: SuggestOptions['info']): string => {
 	const value = state.value.length === 0 ? dim(placeholder) : autocompleteDisplayValue(state, matches[highlighted], placeholder);
-	const details = [hint, resolveInfo(info, matches[highlighted] ?? null)].filter((part) => part.length > 0).join(' · ');
+	const details = joinedInfoDetails(hint, resolveInfo(info, matches[highlighted] ?? null));
 	const frame = `${renderBox({ body: value, borderStyle: cyan, info: details, title: cyan(message) })}\n`;
 
 	promptEnvironment().output.write(frame);
