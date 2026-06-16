@@ -1,14 +1,16 @@
 import { z } from 'zod';
 
 const iteratorMethodSchema = z.function();
+const iteratorContainerSchema = z.object({ [Symbol.iterator]: iteratorMethodSchema }).passthrough();
+const asyncIteratorContainerSchema = z.object({ [Symbol.asyncIterator]: iteratorMethodSchema }).passthrough();
 const stringValueSchema = z.string();
 
-const hasIteratorMethod = <T>(value: unknown, key: typeof Symbol.iterator | typeof Symbol.asyncIterator): boolean => {
-	return iteratorMethodSchema.safeParse((value as Partial<AsyncIterable<T> & Iterable<T>> | null | undefined)?.[key]).success;
-};
+const hasIteratorMethod = (value: unknown): boolean => iteratorContainerSchema.safeParse(value).success;
+
+const hasAsyncIteratorMethod = (value: unknown): boolean => asyncIteratorContainerSchema.safeParse(value).success;
 
 export const iterableSchema = <T>(): z.ZodType<Iterable<T>> =>
-	z.custom<Iterable<T>>((value) => !stringValueSchema.safeParse(value).success && hasIteratorMethod<T>(value, Symbol.iterator));
+	z.custom<Iterable<T>>((value) => !stringValueSchema.safeParse(value).success && hasIteratorMethod(value));
 
 export const asyncIterableSchema = <T>(): z.ZodType<AsyncIterable<T>> =>
-	z.custom<AsyncIterable<T>>((value) => hasIteratorMethod<T>(value, Symbol.asyncIterator));
+	z.custom<AsyncIterable<T>>((value) => hasAsyncIteratorMethod(value));
