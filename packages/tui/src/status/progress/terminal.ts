@@ -1,30 +1,24 @@
 import { eraseRenderedFrame } from '#tui/status/frame';
+import { ProgressSignalHandlers } from '#tui/status/progress/terminal/signals';
 import { hideCursor, showCursor } from '#tui/terminal';
+import type { ProgressSignalTarget } from '#tui/status/progress/terminal/signals';
 
-const progressSignals = ['SIGINT', 'SIGTERM'] as const;
-
-export type ProgressSignalTarget = {
-	off(signal: string, listener: () => void): unknown;
-	on(signal: string, listener: () => void): unknown;
-};
+export type { ProgressSignalTarget } from '#tui/status/progress/terminal/signals';
 
 export class ProgressTerminalLifecycle {
 	#cursorHidden = false;
 	#renderedFrame: string | null = null;
-	#signalsAttached = false;
-	readonly #handleSignal: () => void;
-	readonly #signalTarget: ProgressSignalTarget;
+	readonly #signals: ProgressSignalHandlers;
 
 	constructor(signalTarget: ProgressSignalTarget, handleSignal: () => void) {
-		this.#signalTarget = signalTarget;
-		this.#handleSignal = handleSignal;
+		this.#signals = new ProgressSignalHandlers(signalTarget, handleSignal);
 	}
 
 	beginRender(): void {
 		if (!this.#cursorHidden) {
 			hideCursor();
 			this.#cursorHidden = true;
-			this.#attachSignalHandlers();
+			this.#signals.attach();
 		}
 
 		if (this.#renderedFrame) {
@@ -47,30 +41,6 @@ export class ProgressTerminalLifecycle {
 			this.#cursorHidden = false;
 		}
 
-		this.#detachSignalHandlers();
-	}
-
-	#attachSignalHandlers(): void {
-		if (this.#signalsAttached) {
-			return;
-		}
-
-		for (const signal of progressSignals) {
-			this.#signalTarget.on(signal, this.#handleSignal);
-		}
-
-		this.#signalsAttached = true;
-	}
-
-	#detachSignalHandlers(): void {
-		if (!this.#signalsAttached) {
-			return;
-		}
-
-		for (const signal of progressSignals) {
-			this.#signalTarget.off(signal, this.#handleSignal);
-		}
-
-		this.#signalsAttached = false;
+		this.#signals.detach();
 	}
 }
