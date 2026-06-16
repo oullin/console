@@ -1,4 +1,4 @@
-import { choiceValueEquals, findChoice } from '#tui/concerns/choices';
+import { choiceByValue, choiceValueEquals, findChoice } from '#tui/concerns/choices';
 import { parseChoiceAnswerList } from '#tui/concerns/validators/choice-answer';
 import { PromptValidationError } from '#tui/prompt';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
@@ -12,7 +12,9 @@ export const resolveLineSearchChoice = async <T>(options: SearchLineOptions<T>, 
 	const choices = await resolveSearchChoices(options.options, query);
 
 	if (query === '' && options.hasDefault === true) {
-		return options.default;
+		const choice = choiceByValue(choices, options.default);
+
+		return choice?.value ?? options.default;
 	}
 
 	const matched = findChoice(choices, query);
