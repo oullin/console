@@ -5,7 +5,16 @@ import { applyMultiSearchKey } from '#tui/prompts/search/read-multi/keys';
 import { lineMultiSearchValues, selectedSearchValues } from '#tui/prompts/search/read-multi/result';
 import type { MultiSearchChoicesReadResult } from '#tui/prompts/search/read-multi/result';
 import { createMultiSearchReaderSession } from '#tui/prompts/search/read-multi/session';
+import type { MultiSearchReaderSession } from '#tui/prompts/search/read-multi/session';
 import type { MultiSearchPromptOptions } from '#tui/types';
+
+const multiSearchSelectionResult = <T>(session: MultiSearchReaderSession<T>, submitted: boolean): MultiSearchChoicesReadResult<T> => ({
+	cancelled: false,
+	frame: session.frame(),
+	submitted,
+	submittedLabels: session.selectedLabels(),
+	value: selectedSearchValues(session.selected()),
+});
 
 export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchChoicesReadResult<T>> => {
 	const environment = promptEnvironment();
@@ -21,8 +30,12 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 	while (true) {
 		const key = await environment.input.readKey();
 
-		if (key === null || key === Key.enter) {
-			return { cancelled: false, frame: session.frame(), submitted: true, submittedLabels: session.selectedLabels(), value: selectedSearchValues(session.selected()) };
+		if (key === null) {
+			return multiSearchSelectionResult(session, false);
+		}
+
+		if (key === Key.enter) {
+			return multiSearchSelectionResult(session, true);
 		}
 
 		if (key === Key.ctrlC) {
