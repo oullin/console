@@ -1,4 +1,5 @@
 import { visibleWidth } from '#tui/strings';
+import { parseTypedValueWrapWidth } from '#tui/typed-value/validators/width';
 
 export type LineRange = {
 	end: number;
@@ -7,17 +8,18 @@ export type LineRange = {
 
 export const lineRanges = (value: string[], width?: number): LineRange[] => {
 	const ranges: LineRange[] = [];
+	const wrapWidth = parseTypedValueWrapWidth(width);
 
 	let start = 0;
 
 	for (const [index, character] of value.entries()) {
 		if (character === '\n') {
-			ranges.push(...wrappedRanges(value, start, index, width));
+			ranges.push(...wrappedRanges(value, start, index, wrapWidth));
 			start = index + 1;
 		}
 	}
 
-	ranges.push(...wrappedRanges(value, start, value.length, width));
+	ranges.push(...wrappedRanges(value, start, value.length, wrapWidth));
 
 	return ranges;
 };
