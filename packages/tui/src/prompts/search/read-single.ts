@@ -1,12 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
-import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
-import { clearsSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderCancelledSearch } from '#tui/prompts/search/render';
-import { cancelledSearchValue, lineSearchValue } from '#tui/prompts/search/read-single/result';
+import { readSearchChoiceInteractive } from '#tui/prompts/search/read-single/interactive';
+import { lineSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
-import { createSearchReaderSession } from '#tui/prompts/search/read-single/session';
 import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
 
 export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt = 0): Promise<SearchChoiceReadResult<T>> => {
@@ -16,61 +11,5 @@ export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt
 		return { cancelled: false, submitted: false, submittedLabel: '', value: await lineSearchValue(options) };
 	}
 
-	const session = await createSearchReaderSession(options, attempt);
-
-	session.render();
-
-	while (true) {
-		const key = await environment.input.readKey();
-
-		if (key === null) {
-			return { cancelled: false, submitted: false, submittedLabel: '', value: options.default };
-		}
-
-		if (key === Key.ctrlC) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(session.choices(), session.highlighted(), options.default)) };
-		}
-
-		const action = searchNavigationAction(key, { controlNavigation: true, lineControls: true });
-
-		if (action !== null && (action !== 'first' || session.highlighted() !== null) && (action !== 'last' || session.highlighted() !== null)) {
-			await session.move(action);
-
-			continue;
-		}
-
-		if (clearsSearchHighlight(key) && session.highlighted() !== null) {
-			session.clearHighlight();
-			continue;
-		}
-
-		if (key === Key.enter) {
-			if (session.highlighted() !== null) {
-				const selected = session.selectedSelection();
-
-				return { cancelled: false, frame: session.frame(), submitted: selected.submitted, submittedLabel: selected.label, value: selected.value };
-			}
-
-			const selected = await session.defaultSelection();
-
-			if (session.query().value === '' && options.hasDefault === true) {
-				return { cancelled: false, frame: session.frame(), submitted: selected.submitted, submittedLabel: selected.label, value: selected.value };
-			}
-
-			session.clearHighlight();
-			continue;
-		}
-
-		const next = await session.applyTypedInput(key);
-
-		if (next.cancelled) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(options.default) };
-		}
-	}
+	return readSearchChoiceInteractive(environment.input.readKey, options, attempt);
 };
