@@ -1,3 +1,4 @@
+import { parseCancelValue } from '#tui/prompt/validators/cancel';
 import type { MaybePromise } from '#tui/types';
 
 export type PromptCancelHandler = () => MaybePromise<unknown>;
@@ -13,5 +14,5 @@ export const cancelPrompt = async <T>(fallback: T): Promise<T> => {
 		return fallback;
 	}
 
-	return (await promptCancelHandler()) as T;
+	return parseCancelValue<T>(await promptCancelHandler());
 };
