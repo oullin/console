@@ -1,12 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
+import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
-import { renderChoices } from '#tui/theme';
-import { selectNavigationAction } from '#tui/prompts/select/keys';
-import { choicesFromCommaSeparated, markedChoiceValues } from '#tui/prompts/select/multiple';
-import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { cancelledMultipleChoicesResult, multipleChoicesResult, multipleChoicesValueResult } from '#tui/prompts/select/read-multiple/result';
+import { markedChoiceValues } from '#tui/prompts/select/multiple';
+import { applyMultipleChoicesKey } from '#tui/prompts/select/read-multiple/keys';
+import { readLineMultipleChoices } from '#tui/prompts/select/read-multiple/line-mode';
+import { cancelledMultipleChoicesResult, multipleChoicesResult } from '#tui/prompts/select/read-multiple/result';
 import { createMultipleChoicesReaderSession } from '#tui/prompts/select/read-multiple/session';
 import type { MultipleChoicesReadResult as MultipleChoicesReadResultType } from '#tui/prompts/select/read-multiple/types';
 import { renderCancelledChoices } from '#tui/prompts/select/render';
@@ -25,13 +24,7 @@ export const readMultipleChoices = async <T>(
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const rendered = renderChoices(choices);
-
-		const answer = await ask(`${message}\n${rendered}\n`, hint);
-
-		const value = answer.trim() === '' ? defaults : choicesFromCommaSeparated(choices, answer);
-
-		return multipleChoicesValueResult(value);
+		return readLineMultipleChoices(message, choices, defaults, hint);
 	}
 
 	const session = createMultipleChoicesReaderSession(message, choices, defaults, scroll, info);
@@ -52,30 +45,13 @@ export const readMultipleChoices = async <T>(
 			return cancelledMultipleChoicesResult(choices, session.marked(), await cancelPrompt(markedChoiceValues(choices, session.marked())));
 		}
 
-		if (key.includes(',')) {
-			return multipleChoicesValueResult(choicesFromCommaSeparated(choices, key));
-		}
+		const applied = applyMultipleChoicesKey(key, choices, session);
 
-		const numeric = parseChoiceIndex(key);
+		if (applied.handled) {
+			if (applied.result) {
+				return applied.result;
+			}
 
-		if (!Number.isNaN(numeric) && session.toggleIndex(numeric - 1)) {
-			continue;
-		}
-
-		const action = selectNavigationAction(key);
-
-		if (action !== null) {
-			session.move(action);
-			continue;
-		}
-
-		if (key === Key.ctrlA) {
-			session.toggleAll();
-			continue;
-		}
-
-		if (key === Key.space) {
-			session.toggleSelected();
 			continue;
 		}
 
