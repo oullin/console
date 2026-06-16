@@ -1,107 +1,64 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
-import { moveDataTableSelection } from '#tui/output/data-table/navigation';
 import { cancelDataTableSelection } from '#tui/output/data-table/reader/cancel';
 import { readDataTableFallbackSelection } from '#tui/output/data-table/reader/fallback';
-import { assertSelectedDataTableRow, dataTableSelectionResult, initialDataTableSelection } from '#tui/output/data-table/reader/result';
-import { renderDataTableFrame } from '#tui/output/data-table/render';
-import { visibleDataTableRows } from '#tui/output/data-table/rows';
-import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
-import type { DataTableSearchState } from '#tui/output/data-table/search';
+import { assertSelectedDataTableRow, dataTableSelectionResult } from '#tui/output/data-table/reader/result';
+import { createDataTableReaderSession } from '#tui/output/data-table/reader/session';
+import type { DataTableReadOptions } from '#tui/output/data-table/reader/session';
 import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
-import type { DataTablePromptOptions } from '#tui/types';
-
-type DataTableReadOptions<T> = DataTablePromptOptions<T> & {
-	hasDefault?: boolean;
-};
 
 export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
 	const environment = promptEnvironment();
-
-	let search: DataTableSearchState = initialDataTableSearchState();
-
-	const visibleRows = () => visibleDataTableRows(options, headers, search.query.value);
-
-	let selected = initialDataTableSelection(visibleRows(), options.default, options.hasDefault);
-	let frame = '';
-
-	const render = (): void => {
-		if (frame.length > 0) {
-			eraseRenderedFrame(frame);
-		}
-
-		const rendered = renderDataTableFrame({
-			allRows: options.rows,
-			headers,
-			message: options.message,
-			mode: search.mode,
-			query: search.query.value,
-			rows: visibleRows(),
-			scroll: options.scroll,
-			selected,
-		});
-
-		frame = rendered.frame;
-		selected = rendered.selected;
-	};
+	const session = createDataTableReaderSession(options, headers);
 
 	if (!environment.input.readKey) {
 		if (!environment.input.readLine) {
-			return dataTableSelectionResult(visibleRows(), selected, false);
+			return dataTableSelectionResult(session.rows(), session.selected(), false);
 		}
 
 		return readDataTableFallbackSelection(options, headers);
 	}
 
-	render();
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			const currentRows = visibleRows();
+			const currentRows = session.rows();
 
-			assertSelectedDataTableRow(currentRows, selected, frame);
+			assertSelectedDataTableRow(currentRows, session.selected(), session.frame());
 
-			return dataTableSelectionResult(currentRows, selected, false, false, frame);
+			return dataTableSelectionResult(currentRows, session.selected(), false, false, session.frame());
 		}
 
-		const rows = visibleRows();
+		const rows = session.rows();
 
 		if (key === Key.ctrlC) {
-			return cancelDataTableSelection(options.message, headers, rows, selected, frame);
+			return cancelDataTableSelection(options.message, headers, rows, session.selected(), session.frame());
 		}
 
-		const nextSearch = applyDataTableSearchKey(search, key);
-
-		if (nextSearch.changed) {
-			search = nextSearch.state;
-			selected = 0;
-			render();
+		if (session.applySearchKey(key)) {
 			continue;
 		}
 
 		if (startsDataTableSearch(key)) {
-			search = startDataTableSearch();
-			selected = 0;
-			render();
+			session.beginSearch();
 			continue;
 		}
 
 		const action = dataTableNavigationAction(key);
 
 		if (action !== null) {
-			selected = moveDataTableSelection(action, selected, rows.length, options.scroll);
-			render();
+			session.moveSelection(action);
 			continue;
 		}
 
 		if (key === Key.enter) {
-			assertSelectedDataTableRow(rows, selected, frame);
+			assertSelectedDataTableRow(rows, session.selected(), session.frame());
 
-			return dataTableSelectionResult(rows, selected, true, false, frame);
+			return dataTableSelectionResult(rows, session.selected(), true, false, session.frame());
 		}
 	}
 };
