@@ -1,4 +1,5 @@
 import { PromptValidationError } from '#tui/prompt';
+import { choiceValueEquals } from '#tui/concerns/choices';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableRowValue } from '#tui/output/data-table/rows';
 import type { DataTableSelectionReadResult, VisibleDataTableRow } from '#tui/output/data-table/types';
@@ -20,7 +21,7 @@ export const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>
 		return 0;
 	}
 
-	const selected = rows.findIndex(({ index, row }) => String(dataTableRowValue(row, index)) === String(defaultValue));
+	const selected = rows.findIndex(({ index, row }) => choiceValueEquals(dataTableRowValue(row, index), defaultValue));
 
 	return Math.max(0, selected);
 };
