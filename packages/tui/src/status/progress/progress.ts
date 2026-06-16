@@ -1,26 +1,18 @@
 import { promptEnvironment } from '#tui/environment';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderProgressFrame } from '#tui/status/progress/render';
+import { ProgressTerminalLifecycle } from '#tui/status/progress/terminal';
 import { parseProgressStep, parseProgressTotal } from '#tui/status/validators/progress';
-import { hideCursor, showCursor } from '#tui/terminal';
 import type { ProgressFrameState } from '#tui/status/progress/render';
+import type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
-const progressSignals = ['SIGINT', 'SIGTERM'] as const;
-
-export type ProgressSignalTarget = {
-	off(signal: string, listener: () => void): unknown;
-	on(signal: string, listener: () => void): unknown;
-};
+export type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
 export class Progress {
 	#current = 0;
 	#label: string;
 	#hint: string;
 	#state: ProgressFrameState = 'active';
-	#renderedFrame: string | null = null;
-	#cursorHidden = false;
-	#signalsAttached = false;
-	readonly #signalTarget: ProgressSignalTarget;
+	readonly #terminal: ProgressTerminalLifecycle;
 	readonly total: number;
 	#handleSignal = (): void => {
 		this.fail();
@@ -30,7 +22,7 @@ export class Progress {
 		this.total = parseProgressTotal(total);
 		this.#label = message;
 		this.#hint = hint;
-		this.#signalTarget = signalTarget;
+		this.#terminal = new ProgressTerminalLifecycle(signalTarget, this.#handleSignal);
 	}
 
 	start(): void {
@@ -56,13 +48,13 @@ export class Progress {
 	finish(): void {
 		this.#state = 'submit';
 		this.render();
-		this.#restoreTerminal();
+		this.#terminal.restore();
 	}
 
 	fail(): void {
 		this.#state = 'error';
 		this.render();
-		this.#restoreTerminal();
+		this.#terminal.restore();
 	}
 
 	label(value: string): this {
@@ -96,55 +88,8 @@ export class Progress {
 	render(): void {
 		const frame = renderProgressFrame({ current: this.#current, hint: this.#hint, label: this.#label, state: this.#state, total: this.total });
 
-		if (!this.#cursorHidden) {
-			hideCursor();
-			this.#cursorHidden = true;
-			this.#attachSignalHandlers();
-		}
-
-		if (this.#renderedFrame) {
-			eraseRenderedFrame(this.#renderedFrame);
-		}
-
+		this.#terminal.beginRender();
 		promptEnvironment().output.write(frame);
-		this.#renderedFrame = frame;
-	}
-
-	#restoreTerminal(): void {
-		if (this.#renderedFrame) {
-			eraseRenderedFrame(this.#renderedFrame);
-			this.#renderedFrame = null;
-		}
-
-		if (this.#cursorHidden) {
-			showCursor();
-			this.#cursorHidden = false;
-		}
-
-		this.#detachSignalHandlers();
-	}
-
-	#attachSignalHandlers(): void {
-		if (this.#signalsAttached) {
-			return;
-		}
-
-		for (const signal of progressSignals) {
-			this.#signalTarget.on(signal, this.#handleSignal);
-		}
-
-		this.#signalsAttached = true;
-	}
-
-	#detachSignalHandlers(): void {
-		if (!this.#signalsAttached) {
-			return;
-		}
-
-		for (const signal of progressSignals) {
-			this.#signalTarget.off(signal, this.#handleSignal);
-		}
-
-		this.#signalsAttached = false;
+		this.#terminal.commitFrame(frame);
 	}
 }
