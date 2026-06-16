@@ -1,64 +1,12 @@
-import { fromCharacters } from '#tui/typed-value/characters';
 import { currentLine, lineRanges } from '#tui/typed-value/line-ranges';
+import { visibleLineWindow } from '#tui/typed-value/lines/window';
 
-export type VisibleLineWindow = {
-	lines: string[];
-	start: number;
-	total: number;
-};
-
-export type VisibleTextWindow = VisibleLineWindow & {
-	cursor: number;
-	text: string;
-};
+export { visibleLineWindow } from '#tui/typed-value/lines/window';
+export { visibleTextWindow } from '#tui/typed-value/lines/text-window';
+export type { VisibleLineWindow, VisibleTextWindow } from '#tui/typed-value/lines/types';
 
 export const visibleLines = (value: string, cursor: number, rows: number | undefined): string => {
 	return visibleLineWindow(value, cursor, rows).lines.join('\n');
-};
-
-export const visibleTextWindow = (value: string, cursor: number, rows: number | undefined, width?: number): VisibleTextWindow => {
-	const valueCharacters = [...value];
-	const ranges = lineRanges(valueCharacters, width);
-	const window = visibleLineWindow(value, cursor, rows, width);
-	const visibleRanges = ranges.slice(window.start, window.start + window.lines.length);
-
-	const currentRangeIndex = Math.max(
-		0,
-		visibleRanges.findIndex((range) => cursor <= range.end),
-	);
-
-	const currentRange = visibleRanges[currentRangeIndex] ?? visibleRanges.at(-1);
-	const cursorInLine = currentRange === undefined ? 0 : Math.max(0, Math.min(cursor, currentRange.end) - currentRange.start);
-	const previousWidth = window.lines.slice(0, currentRangeIndex).reduce((width, line) => width + [...line].length + 1, 0);
-
-	return {
-		...window,
-		cursor: previousWidth + cursorInLine,
-		text: window.lines.join('\n'),
-	};
-};
-
-export const visibleLineWindow = (value: string, cursor: number, rows: number | undefined, width?: number): VisibleLineWindow => {
-	const valueCharacters = [...value];
-	const ranges = lineRanges(valueCharacters, width);
-
-	if (rows === undefined || rows <= 0) {
-		return {
-			lines: ranges.map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
-			start: 0,
-			total: ranges.length,
-		};
-	}
-
-	const line = currentLine(ranges, cursor);
-	const start = Math.max(0, line - rows + 1);
-	const end = start + rows;
-
-	return {
-		lines: ranges.slice(start, end).map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
-		start,
-		total: ranges.length,
-	};
 };
 
 export const moveLine = (value: string[], cursor: number, direction: 1 | -1, width?: number): number => {
