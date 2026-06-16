@@ -1,5 +1,6 @@
 import { progress } from '#tui/status';
-import { isProgressTotal, isStatusLabel } from '#tui/form/builder/validators/status';
+import { isProgressTotal, isStatusLabel, parseProgressCallback, parseStatusLabel } from '#tui/form/builder/validators/status';
+import { progressStepsArgument } from '#tui/status/progress/validators/arguments';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MaybePromise } from '#tui/types';
 import type { Progress } from '#tui/status';
@@ -33,9 +34,9 @@ export function progressFormStep<T, R>(
 				bar.start();
 				bar.finish();
 			},
-			callbackOrName as string | undefined,
+			parseStatusLabel(callbackOrName),
 		);
 	}
 
-	return this.add(() => progress(labelOrTotal, stepsOrMessage as Iterable<T> | number, callbackOrName as (step: T | number, bar: Progress) => MaybePromise<R>, hint), name, true);
+	return this.add(() => progress(labelOrTotal, progressStepsArgument<T>(stepsOrMessage), parseProgressCallback<T, R>(callbackOrName), hint), name, true);
 }
