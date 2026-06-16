@@ -6,6 +6,13 @@ const choiceAnswerIndexSchema = z
 	.regex(/^\d+$/u)
 	.transform((value) => Number.parseInt(value, 10));
 
+const choiceAnswerListSchema = z.string().transform((value) =>
+	value
+		.split(',')
+		.map((part) => part.trim())
+		.filter((part) => part.length > 0),
+);
+
 const choiceRecordKeySchema = z
 	.string()
 	.regex(/^-?\d+$/u)
@@ -17,6 +24,10 @@ export const parseChoiceAnswerIndex = (answer: string): number | null => {
 	const parsed = choiceAnswerIndexSchema.safeParse(answer);
 
 	return parsed.success ? parsed.data : null;
+};
+
+export const parseChoiceAnswerList = (answer: unknown): string[] => {
+	return choiceAnswerListSchema.parse(answer);
 };
 
 export const parseChoiceRecordKey = (key: string): string | number => {

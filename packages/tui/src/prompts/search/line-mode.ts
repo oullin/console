@@ -1,4 +1,5 @@
 import { findChoice } from '#tui/concerns/choices';
+import { parseChoiceAnswerList } from '#tui/concerns/validators/choice-answer';
 import { PromptValidationError } from '#tui/prompt';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
@@ -32,10 +33,7 @@ export const resolveLineMultiSearchChoices = async <T>(options: MultiSearchPromp
 		return options.default;
 	}
 
-	const parts = query
-		.split(',')
-		.map((part) => part.trim())
-		.filter((part) => part.length > 0);
+	const parts = parseChoiceAnswerList(query);
 
 	const selectedChoices = parts.map((part) => findChoice(choices, part)).filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
 
