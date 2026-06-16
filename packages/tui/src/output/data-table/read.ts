@@ -5,7 +5,7 @@ import { cancelDataTableSelection } from '#tui/output/data-table/reader/cancel';
 import { readDataTableFallbackSelection } from '#tui/output/data-table/reader/fallback';
 import { assertSelectedDataTableRow, dataTableSelectionResult } from '#tui/output/data-table/reader/result';
 import { createDataTableReaderSession } from '#tui/output/data-table/reader/session';
-import type { DataTableReadOptions } from '#tui/output/data-table/reader/session';
+import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
 import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 
 export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {

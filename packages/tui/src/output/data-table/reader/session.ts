@@ -1,17 +1,9 @@
 import { eraseRenderedFrame } from '#tui/status/frame';
-import { moveDataTableSelection } from '#tui/output/data-table/navigation';
-import { initialDataTableSelection } from '#tui/output/data-table/reader/result';
+import { createDataTableReaderState } from '#tui/output/data-table/reader/state';
 import { renderDataTableFrame } from '#tui/output/data-table/render';
-import { visibleDataTableRows } from '#tui/output/data-table/rows';
-import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTableNavigationAction } from '#tui/output/data-table/keys';
-import type { DataTableSearchState } from '#tui/output/data-table/search';
+import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
-import type { DataTablePromptOptions } from '#tui/types';
-
-export type DataTableReadOptions<T> = DataTablePromptOptions<T> & {
-	hasDefault?: boolean;
-};
 
 export type DataTableReaderSession<T> = {
 	applySearchKey(key: string): boolean;
@@ -24,13 +16,9 @@ export type DataTableReaderSession<T> = {
 };
 
 export const createDataTableReaderSession = <T>(options: DataTableReadOptions<T>, headers: string[]): DataTableReaderSession<T> => {
-	let search: DataTableSearchState = initialDataTableSearchState();
-	let selected = initialDataTableSelection(visibleRows(), options.default, options.hasDefault);
-	let frame = '';
+	const state = createDataTableReaderState(options, headers);
 
-	function visibleRows(): Array<VisibleDataTableRow<T>> {
-		return visibleDataTableRows(options, headers, search.query.value);
-	}
+	let frame = '';
 
 	function render(): void {
 		if (frame.length > 0) {
@@ -41,49 +29,42 @@ export const createDataTableReaderSession = <T>(options: DataTableReadOptions<T>
 			allRows: options.rows,
 			headers,
 			message: options.message,
-			mode: search.mode,
-			query: search.query.value,
-			rows: visibleRows(),
+			mode: state.mode(),
+			query: state.query(),
+			rows: state.rows(),
 			scroll: options.scroll,
-			selected,
+			selected: state.selected(),
 		});
 
 		frame = rendered.frame;
-		selected = rendered.selected;
-	}
-
-	function resetSearchSelection(nextSearch: DataTableSearchState): void {
-		search = nextSearch;
-		selected = 0;
-		render();
+		state.setSelected(rendered.selected);
 	}
 
 	return {
 		applySearchKey(key) {
-			const nextSearch = applyDataTableSearchKey(search, key);
-
-			if (!nextSearch.changed) {
+			if (!state.applySearchKey(key)) {
 				return false;
 			}
 
-			resetSearchSelection(nextSearch.state);
+			render();
 
 			return true;
 		},
 		beginSearch() {
-			resetSearchSelection(startDataTableSearch());
+			state.beginSearch();
+			render();
 		},
 		frame() {
 			return frame;
 		},
 		moveSelection(action) {
-			selected = moveDataTableSelection(action, selected, visibleRows().length, options.scroll);
+			state.moveSelection(action);
 			render();
 		},
 		render,
-		rows: visibleRows,
+		rows: state.rows,
 		selected() {
-			return selected;
+			return state.selected();
 		},
 	};
 };
