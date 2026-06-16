@@ -1,7 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { readMultipleChoicesInteractive } from '#tui/prompts/select/read-multiple/interactive';
 import { readLineMultipleChoices } from '#tui/prompts/select/read-multiple/line-mode';
-import type { MultipleChoicesReadResult as MultipleChoicesReadResultType } from '#tui/prompts/select/read-multiple/types';
+import type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple/types';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
 export type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple/types';
@@ -13,7 +13,7 @@ export const readMultipleChoices = async <T>(
 	hint?: string,
 	scroll?: number,
 	info?: MultiSelectPromptOptions<T>['info'],
-): Promise<MultipleChoicesReadResultType<T>> => {
+): Promise<MultipleChoicesReadResult<T>> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
