@@ -31,5 +31,17 @@ export const parseTaskCallback = <T>(value: unknown): ((logger: Logger) => Maybe
 };
 
 export const parseTaskDefinition = <T>(value: unknown): TaskDefinition<T> => {
-	return taskDefinitionSchema<T>().parse(value);
+	const parsed = taskDefinitionSchema<T>().safeParse(value);
+
+	if (parsed.success) {
+		return parsed.data;
+	}
+
+	const callback = z.object({ task: taskCallbackSchema<T>() }).passthrough().safeParse(value);
+
+	if (!callback.success) {
+		throw new Error('A task callback is required.');
+	}
+
+	throw new Error('A task title is required.');
 };
