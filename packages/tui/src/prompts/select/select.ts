@@ -1,12 +1,5 @@
-import { normalizeChoices } from '#tui/concerns/choices';
-import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { activePromptFrame } from '#tui/prompt/active-frame';
-import { transformSelectValue, transformedSelectDefault } from '#tui/prompts/select/defaults';
-import { readSelectedChoice } from '#tui/prompts/select/read-selected';
-import { renderSubmittedChoice } from '#tui/prompts/select/render';
-import { assertSelectOptions } from '#tui/prompts/select/validators/options';
-import { hasPromptDefault } from '#tui/validators/default';
-import type { NormalizedSelectPromptOptions } from '#tui/prompts/select/defaults';
+import { normalizeSelectPromptOptions, selectHasDefault } from '#tui/prompts/select/options';
+import { runSelectPrompt } from '#tui/prompts/select/run';
 import type { ChoiceOptions, SelectPromptOptions } from '#tui/types';
 
 export function select<T>(options: SelectPromptOptions<T>): Promise<T>;
@@ -34,56 +27,7 @@ export async function select<T>(
 	transform: SelectPromptOptions<T>['transform'] = undefined,
 	info: SelectPromptOptions<T>['info'] = '',
 ): Promise<T> {
-	const hasDefault = typeof optionsOrLabel === 'string' ? arguments.length >= 3 && defaultValue !== undefined : hasPromptDefault(optionsOrLabel);
-
-	const options: NormalizedSelectPromptOptions<T> =
-		typeof optionsOrLabel === 'string'
-			? { message: optionsOrLabel, label: optionsOrLabel, options: source as ChoiceOptions<T>, default: defaultValue, hasDefault, scroll, validate, hint, required, transform, info }
-			: { ...optionsOrLabel, hasDefault };
-
-	assertSelectOptions(options);
-
-	const promptOptions: NormalizedSelectPromptOptions<T> = { ...options, required: options.required ?? true };
-
-	const validationOptions: SelectPromptOptions<T> = {
-		...promptOptions,
-		default: await transformedSelectDefault(promptOptions),
-	};
-
-	const choices = normalizeChoices(options.options);
-
-	let shouldRenderSubmittedFrame = false;
-	let submittedLabel = '';
-
-	const activeFrame = activePromptFrame();
-
-	return promptWithFallback('select', promptOptions, () =>
-		promptUntilValid(
-			validationOptions,
-			async () => {
-				const selected = await readSelectedChoice(
-					promptOptions.message,
-					choices,
-					promptOptions.default,
-					promptOptions.hasDefault,
-					promptOptions.hint,
-					promptOptions.scroll,
-					promptOptions.info,
-				);
-
-				activeFrame.set(selected.frame);
-				shouldRenderSubmittedFrame = selected.submitted && !selected.cancelled;
-				submittedLabel = selected.submittedLabel;
-
-				return transformSelectValue(promptOptions, selected.value);
-			},
-			() => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedChoice(promptOptions.message, submittedLabel);
-				}
-			},
-			activeFrame.clear,
-		),
+	return runSelectPrompt(
+		normalizeSelectPromptOptions(optionsOrLabel, source, defaultValue, scroll, validate, hint, required, transform, info, selectHasDefault(optionsOrLabel, arguments.length, defaultValue)),
 	);
 }
