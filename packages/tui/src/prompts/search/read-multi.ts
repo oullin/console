@@ -1,8 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
-import { renderCancelledSearch } from '#tui/prompts/search/render';
+import { cancelMultiSearchChoices } from '#tui/prompts/search/read-multi/cancel';
 import { applyMultiSearchKey } from '#tui/prompts/search/read-multi/keys';
 import { lineMultiSearchValues, selectedSearchValues } from '#tui/prompts/search/read-multi/result';
 import type { MultiSearchChoicesReadResult } from '#tui/prompts/search/read-multi/result';
@@ -28,10 +26,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabels: session.selectedLabels(), value: await cancelPrompt(selectedSearchValues(session.selected())) };
+			return cancelMultiSearchChoices(options, session);
 		}
 
 		if (await applyMultiSearchKey(key, session)) {
@@ -41,10 +36,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const next = await session.applyTypedInput(key);
 
 		if (next.cancelled) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabels: [], value: await cancelPrompt(options.default ?? []) };
+			return cancelMultiSearchChoices(options, session);
 		}
 	}
 };
