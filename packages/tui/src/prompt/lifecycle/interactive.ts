@@ -25,6 +25,8 @@ export const resolveInteractivePrompt = async <T>(options: BasePromptOptions<T>,
 				continue;
 			}
 
+			await onInvalid?.();
+
 			throw error;
 		}
 
