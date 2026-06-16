@@ -1,9 +1,10 @@
 import { characters, fromCharacters } from '#tui/typed-value/characters';
 import { dim, inverse } from '#tui/theme/styles';
+import { parseTypedValueCursor } from '#tui/typed-value/validators/cursor';
 
 export const valueWithCursor = (value: string, cursor: number): string => {
 	const chars = characters(value);
-	const position = Math.max(0, Math.min(cursor, chars.length));
+	const position = parseTypedValueCursor(cursor, chars.length);
 	const before = fromCharacters(chars.slice(0, position));
 	const current = chars[position];
 
