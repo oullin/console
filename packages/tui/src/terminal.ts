@@ -1,6 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { defaultBackgroundColor, defaultForegroundColor, parseTerminalColor, terminalSupportsTrueColor } from '#tui/terminal/capabilities';
 import type { TerminalColor } from '#tui/terminal/capabilities';
+import { parseTerminalDimension } from '#tui/terminal/validators/size';
 
 export type TerminalSize = {
 	columns: number;
@@ -8,8 +9,8 @@ export type TerminalSize = {
 };
 
 export const terminalSize = (): TerminalSize => ({
-	columns: process.stdout.columns ?? 80,
-	rows: process.stdout.rows ?? 24,
+	columns: parseTerminalDimension(process.stdout.columns, 80),
+	rows: parseTerminalDimension(process.stdout.rows, 24),
 });
 
 export const clearTerminal = (): void => {
