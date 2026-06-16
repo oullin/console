@@ -2,6 +2,7 @@ export type NumberInputOptions = {
 	default?: number | string;
 	hasDefault?: boolean;
 	hint?: string;
+	integer?: boolean;
 	max?: number;
 	min?: number;
 	placeholder?: string;

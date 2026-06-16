@@ -27,6 +27,7 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 					default: options.default,
 					hasDefault: options.hasDefault,
 					hint: options.hint,
+					integer: options.integer,
 					max: options.max,
 					min: options.min,
 					placeholder: options.placeholder,

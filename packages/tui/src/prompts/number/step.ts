@@ -8,7 +8,7 @@ const clamp = (value: number, min?: number, max?: number): number => {
 };
 
 export const numberStep = (step?: number): number => {
-	return step !== undefined && step > 0 ? Math.max(1, Math.trunc(step)) : 1;
+	return step !== undefined && Number.isFinite(step) && step > 0 ? step : 1;
 };
 
 export const steppedNumberValue = (value: string, direction: 1 | -1, options: NumberInputOptions): string => {
@@ -23,5 +23,7 @@ export const steppedNumberValue = (value: string, direction: 1 | -1, options: Nu
 		return value;
 	}
 
-	return String(clamp(Math.trunc(numeric) + step * direction, options.min, options.max));
+	const value = clamp(numeric + step * direction, options.min, options.max);
+
+	return String(options.integer === true ? Math.trunc(value) : value);
 };
