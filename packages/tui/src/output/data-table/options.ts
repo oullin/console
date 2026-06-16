@@ -36,9 +36,18 @@ export const dataTableValidationOptions = async <T>(
 	useInitialDefault = false,
 ): Promise<DataTablePromptOptions<T>> => {
 	const defaultValue = options.hasDefault ? parseDataTableDefault<T>(options.default) : useInitialDefault ? initialDataTableDefault(options.rows) : undefined;
+	let transformedDefault = defaultValue;
+
+	if (defaultValue !== undefined) {
+		try {
+			transformedDefault = await transformDataTableValue(options, defaultValue);
+		} catch {
+			transformedDefault = defaultValue;
+		}
+	}
 
 	return {
 		...options,
-		default: defaultValue === undefined ? undefined : await transformDataTableValue(options, defaultValue),
+		default: transformedDefault,
 	};
 };
