@@ -2,8 +2,8 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
-import { searchNavigationAction } from '#tui/prompts/search/keys';
 import { renderCancelledSearch } from '#tui/prompts/search/render';
+import { applyMultiSearchKey } from '#tui/prompts/search/read-multi/keys';
 import { lineMultiSearchValues, selectedSearchValues } from '#tui/prompts/search/read-multi/result';
 import type { MultiSearchChoicesReadResult } from '#tui/prompts/search/read-multi/result';
 import { createMultiSearchReaderSession } from '#tui/prompts/search/read-multi/session';
@@ -34,25 +34,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 			return { cancelled: true, submitted: false, submittedLabels: session.selectedLabels(), value: await cancelPrompt(selectedSearchValues(session.selected())) };
 		}
 
-		const action = searchNavigationAction(key);
-
-		if (action !== null && (action !== 'first' || session.highlighted() !== null) && (action !== 'last' || session.highlighted() !== null)) {
-			await session.move(action);
-
-			continue;
-		}
-
-		if (key === Key.ctrlE && session.highlighted() !== null) {
-			continue;
-		}
-
-		if (key === Key.ctrlA && session.highlighted() !== null) {
-			session.toggleAllDisplayed();
-			continue;
-		}
-
-		if (key === Key.space && session.highlighted() !== null) {
-			session.toggleHighlighted();
+		if (await applyMultiSearchKey(key, session)) {
 			continue;
 		}
 
