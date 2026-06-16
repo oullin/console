@@ -80,6 +80,7 @@ export const createRawKeySession = (input: RawKeyInput, mode: RawKeyInputMode, r
 
 			clearTimeout(escapeTimer);
 			escapeTimer = setTimeout(resolveBufferedKey, 25);
+			escapeTimer.unref?.();
 		},
 		onEnd() {
 			resolveWithCleanup(buffer.length > 0 ? normalizeRawKey(buffer) : null);
