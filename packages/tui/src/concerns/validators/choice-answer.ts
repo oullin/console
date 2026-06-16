@@ -11,6 +11,8 @@ const choiceRecordKeySchema = z
 	.regex(/^-?\d+$/u)
 	.transform((value) => Number.parseInt(value, 10));
 
+const choiceRecordValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
+
 export const parseChoiceAnswerIndex = (answer: string): number => {
 	const parsed = choiceAnswerIndexSchema.safeParse(answer);
 
@@ -21,4 +23,8 @@ export const parseChoiceRecordKey = (key: string): string | number => {
 	const parsed = choiceRecordKeySchema.safeParse(key);
 
 	return parsed.success ? parsed.data : key;
+};
+
+export const parseChoiceRecordValue = <T>(key: string): T => {
+	return choiceRecordValueSchema<T>().parse(parseChoiceRecordKey(key));
 };

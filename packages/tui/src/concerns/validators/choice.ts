@@ -12,6 +12,7 @@ const choiceSchema = z
 
 const choiceRecordSchema = z.record(z.string(), z.string());
 const choiceOptionsListSchema = z.array(z.unknown());
+const choiceValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
 
 export type ParsedChoiceOptions<T> =
 	| {
@@ -43,4 +44,8 @@ export const parseChoiceOptions = <T>(value: ChoiceOptions<T>): ParsedChoiceOpti
 	}
 
 	return { kind: 'list', options: choiceOptionsListSchema.parse(value) as Array<Choice<T> | T> };
+};
+
+export const parseChoiceValue = <T>(value: unknown): T => {
+	return choiceValueSchema<T>().parse(value);
 };
