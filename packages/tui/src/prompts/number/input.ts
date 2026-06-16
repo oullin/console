@@ -1,11 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { cancelPrompt, PromptValidationError } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderQuestion } from '#tui/theme';
-import { applyTypedKey } from '#tui/typed-value';
-import { renderCancelledNumberValue, renderNumberValue } from '#tui/prompts/number/render';
-import { steppedNumberValue } from '#tui/prompts/number/step';
+import { createNumberReaderSession } from '#tui/prompts/number/session';
 import type { NumberInputOptions } from '#tui/prompts/number/types';
 
 export type NumberReadResult = {
@@ -30,12 +27,7 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		};
 	}
 
-	let state = {
-		cursor: options.hasDefault ? String(options.default).length : 0,
-		value: options.hasDefault ? String(options.default) : '',
-	};
-
-	let frame = renderNumberValue(message, state.value, state.cursor, options);
+	const session = createNumberReaderSession(message, options);
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -43,53 +35,38 @@ export const readNumberValue = async (message: string, options: NumberInputOptio
 		if (key === null) {
 			return {
 				cancelled: false,
-				frame,
-				value: state.value,
+				frame: session.frame(),
+				value: session.value(),
 			};
 		}
 
 		if (key === Key.up || key === Key.upArrow) {
-			state.value = steppedNumberValue(state.value, 1, options);
-			state.cursor = state.value.length;
-			eraseRenderedFrame(frame);
-			frame = renderNumberValue(message, state.value, state.cursor, options);
+			session.step(1);
 			continue;
 		}
 
 		if (key === Key.down || key === Key.downArrow) {
-			state.value = steppedNumberValue(state.value, -1, options);
-			state.cursor = state.value.length;
-			eraseRenderedFrame(frame);
-			frame = renderNumberValue(message, state.value, state.cursor, options);
+			session.step(-1);
 			continue;
 		}
 
-		const next = applyTypedKey(state, key);
+		const next = session.applyTypedInput(key);
 
 		if (next.cancelled) {
-			eraseRenderedFrame(frame);
-			renderCancelledNumberValue(message, state.value, options);
+			session.cancel();
 
 			return {
 				cancelled: true,
-				value: await cancelPrompt(state.value),
+				value: await cancelPrompt(session.value()),
 			};
 		}
-
-		state = {
-			cursor: next.cursor,
-			value: next.value,
-		};
 
 		if (next.submitted) {
 			return {
 				cancelled: false,
-				frame,
-				value: state.value,
+				frame: session.frame(),
+				value: session.value(),
 			};
 		}
-
-		eraseRenderedFrame(frame);
-		frame = renderNumberValue(message, state.value, state.cursor, options);
 	}
 };
