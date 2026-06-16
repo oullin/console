@@ -1,62 +1,20 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { ask } from '#tui/prompt/ask';
-import { cancelPrompt, PromptValidationError } from '#tui/prompt';
+import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
+import { assertSelectedDataTableRow, dataTableSelectionResult, initialDataTableSelection, selectedDataTableValue } from '#tui/output/data-table/reader/result';
 import { renderCancelledDataTableFrame, renderDataTableFrame } from '#tui/output/data-table/render';
-import { dataTableRowValue, visibleDataTableRows } from '#tui/output/data-table/rows';
+import { visibleDataTableRows } from '#tui/output/data-table/rows';
 import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTableSearchState } from '#tui/output/data-table/search';
-import type { DataTableSelectionReadResult, VisibleDataTableRow } from '#tui/output/data-table/types';
+import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions } from '#tui/types';
 
 type DataTableReadOptions<T> = DataTablePromptOptions<T> & {
 	hasDefault?: boolean;
-};
-
-const invalidRow = (): PromptValidationError => new PromptValidationError('Please select a valid row.');
-
-const selectedDataTableValue = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number): T | number => {
-	const selectedRow = rows[selected];
-
-	if (!selectedRow) {
-		throw invalidRow();
-	}
-
-	return dataTableRowValue(selectedRow.row, selectedRow.index);
-};
-
-const initialDataTableSelection = <T>(rows: Array<VisibleDataTableRow<T>>, defaultValue: T | number | undefined, hasDefault = false): number => {
-	if (!hasDefault) {
-		return 0;
-	}
-
-	const selected = rows.findIndex(({ index, row }) => String(dataTableRowValue(row, index)) === String(defaultValue));
-
-	return Math.max(0, selected);
-};
-
-const dataTableSelectionResult = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number, submitted: boolean, cancelled = false, frame?: string): DataTableSelectionReadResult<T> => ({
-	cancelled,
-	frame,
-	rows,
-	selected,
-	submitted,
-	value: selectedDataTableValue(rows, selected),
-});
-
-const assertSelectedDataTableRow = <T>(rows: Array<VisibleDataTableRow<T>>, selected: number, frame: string): void => {
-	if (rows[selected]) {
-		return;
-	}
-
-	if (frame.length > 0) {
-		eraseRenderedFrame(frame);
-	}
-
-	throw invalidRow();
 };
 
 export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
