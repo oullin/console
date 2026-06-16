@@ -183,8 +183,8 @@ TypeScript and OpenTUI internals.
 | Terminal split escape-sequence buffering | `packages/tui/src/environment/raw-key.ts`, `packages/tui/src/environment/raw-key/normalize.ts`, `packages/tui/tests/environment.test.ts` |
 | Red, strikethrough, and border-styled frames | `packages/tui/src/theme/styles.ts`, `packages/tui/src/theme/box.ts` |
 | Default box renderer terminal-width cap | `packages/tui/src/theme/box.ts` |
-| ANSI segment parsing, ANSI-aware wrapping, truncation, Unicode width | `packages/tui/src/strings.ts`, `packages/tui/tests/strings.test.ts` |
-| ANSI truncation style cleanup and visible-width markers | `packages/tui/src/strings.ts`, `packages/tui/tests/strings.test.ts` |
+| ANSI segment parsing, ANSI-aware wrapping, truncation, Unicode width | `packages/tui/src/strings.ts`, `packages/tui/src/string-utils/*`, `packages/tui/tests/strings.test.ts` |
+| ANSI truncation style cleanup and visible-width markers | `packages/tui/src/string-utils/truncate.ts`, `packages/tui/src/string-utils/width.ts`, `packages/tui/tests/strings.test.ts` |
 | Key-mode search default submission | `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | OpenTUI adapter | `packages/tui/src/opentui.ts` |
 | Type contracts | `packages/tui/src/types.ts`, `packages/tui/src/contracts/*` |
