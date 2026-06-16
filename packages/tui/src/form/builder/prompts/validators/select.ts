@@ -10,6 +10,10 @@ export const isSelectPromptLabel = (value: unknown): value is string => {
 	return selectPromptLabelSchema.safeParse(value).success;
 };
 
+export const isSelectPromptOptions = <TOptions>(value: TOptions | string): value is TOptions => {
+	return !isSelectPromptLabel(value);
+};
+
 export const parseSelectStepName = (value: unknown): string | undefined => {
 	const parsed = selectPromptLabelSchema.safeParse(value);
 

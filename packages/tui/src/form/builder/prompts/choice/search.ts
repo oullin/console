@@ -1,6 +1,6 @@
 import { search } from '#tui/prompts/choices';
 import { previousValue } from '#tui/form/builder/previous';
-import { isSearchPromptLabel, parseSearchChoiceSource, parseSearchStepName } from '#tui/form/builder/prompts/validators/search';
+import { isSearchPromptOptions, parseSearchChoiceSource, parseSearchStepName } from '#tui/form/builder/prompts/validators/search';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SearchPromptOptions } from '#tui/types';
 
@@ -33,7 +33,7 @@ export function searchFormStep<T>(
 	transform: SearchPromptOptions<T>['transform'] = undefined,
 	info: SearchPromptOptions<T>['info'] = '',
 ): FormBuilder {
-	if (!isSearchPromptLabel(optionsOrLabel)) {
+	if (isSearchPromptOptions(optionsOrLabel)) {
 		return this.add((_, previous) => search<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), parseSearchStepName(options));
 	}
 

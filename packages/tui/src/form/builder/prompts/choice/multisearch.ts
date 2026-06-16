@@ -1,6 +1,6 @@
 import { multisearch } from '#tui/prompts/choices';
 import { previousArray } from '#tui/form/builder/previous';
-import { isSearchPromptLabel, parseSearchChoiceSource, parseSearchStepName } from '#tui/form/builder/prompts/validators/search';
+import { isSearchPromptOptions, parseSearchChoiceSource, parseSearchStepName } from '#tui/form/builder/prompts/validators/search';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MultiSearchPromptOptions } from '#tui/types';
 
@@ -33,7 +33,7 @@ export function multisearchFormStep<T>(
 	transform: MultiSearchPromptOptions<T>['transform'] = undefined,
 	info: MultiSearchPromptOptions<T>['info'] = '',
 ): FormBuilder {
-	if (!isSearchPromptLabel(optionsOrLabel)) {
+	if (isSearchPromptOptions(optionsOrLabel)) {
 		return this.add((_, previous) => multisearch<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), parseSearchStepName(options));
 	}
 

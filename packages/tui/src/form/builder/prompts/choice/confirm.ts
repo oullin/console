@@ -1,6 +1,6 @@
 import { confirm } from '#tui/prompts/choices';
 import { previousBoolean } from '#tui/form/builder/previous';
-import { isSelectPromptLabel, parseConfirmDefault, parseSelectStepName } from '#tui/form/builder/prompts/validators/select';
+import { isSelectPromptOptions, parseConfirmDefault, parseSelectStepName } from '#tui/form/builder/prompts/validators/select';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ConfirmPromptOptions } from '#tui/types';
 
@@ -31,7 +31,7 @@ export function confirmFormStep(
 	name?: string,
 	transform: ConfirmPromptOptions['transform'] = undefined,
 ): FormBuilder {
-	if (!isSelectPromptLabel(optionsOrLabel)) {
+	if (isSelectPromptOptions(optionsOrLabel)) {
 		return this.add((_, previous) => confirm({ ...optionsOrLabel, default: previousBoolean(previous, optionsOrLabel.default ?? true) }), parseSelectStepName(defaultValueOrName));
 	}
 

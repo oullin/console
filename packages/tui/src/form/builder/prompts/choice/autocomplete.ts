@@ -1,6 +1,6 @@
 import { autocomplete } from '#tui/prompts/choices';
 import { previousString } from '#tui/form/builder/previous';
-import { isSuggestPromptLabel, parseSuggestSource, parseSuggestStepName } from '#tui/form/builder/prompts/validators/suggest';
+import { isSuggestPromptOptions, parseSuggestSource, parseSuggestStepName } from '#tui/form/builder/prompts/validators/suggest';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SuggestOptions } from '#tui/prompts/choices';
 import type { TextPromptOptions } from '#tui/types';
@@ -34,7 +34,7 @@ export function autocompleteFormStep(
 	transform: TextPromptOptions['transform'] = undefined,
 	info: SuggestOptions['info'] = '',
 ): FormBuilder {
-	if (!isSuggestPromptLabel(optionsOrLabel)) {
+	if (isSuggestPromptOptions(optionsOrLabel)) {
 		return this.add((_, previous) => autocomplete({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), parseSuggestStepName(options));
 	}
 

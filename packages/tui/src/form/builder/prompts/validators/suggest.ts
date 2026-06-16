@@ -11,6 +11,10 @@ export const isSuggestPromptLabel = (value: unknown): value is string => {
 	return suggestLabelSchema.safeParse(value).success;
 };
 
+export const isSuggestPromptOptions = <TOptions>(value: TOptions | string): value is TOptions => {
+	return !isSuggestPromptLabel(value);
+};
+
 export const parseSuggestStepName = (value: unknown): string | undefined => {
 	const parsed = suggestLabelSchema.safeParse(value);
 

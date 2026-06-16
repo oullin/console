@@ -13,6 +13,10 @@ export const isSearchPromptLabel = (value: unknown): value is string => {
 	return searchLabelSchema.safeParse(value).success;
 };
 
+export const isSearchPromptOptions = <TOptions>(value: TOptions | string): value is TOptions => {
+	return !isSearchPromptLabel(value);
+};
+
 export const parseSearchStepName = (value: unknown): string | undefined => {
 	const parsed = searchLabelSchema.safeParse(value);
 
