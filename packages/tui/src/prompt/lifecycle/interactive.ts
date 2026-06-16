@@ -1,6 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
-import { PromptValidationError } from '#tui/prompt/error';
 import { validatedPromptValue } from '#tui/prompt/lifecycle/validation';
+import { isPromptValidationError } from '#tui/prompt/validators/error';
 import { parseInvalidPromptValue } from '#tui/prompt/validators/invalid';
 import { renderError } from '#tui/theme';
 import type { PromptInvalidHandler, PromptReader, PromptValidHandler } from '#tui/prompt/lifecycle/types';
@@ -17,7 +17,7 @@ export const resolveInteractivePrompt = async <T>(options: BasePromptOptions<T>,
 		try {
 			value = await read(attempt);
 		} catch (error) {
-			if (error instanceof PromptValidationError) {
+			if (isPromptValidationError(error)) {
 				await onInvalid?.(parseInvalidPromptValue<T>(error.value));
 
 				environment.error.write(renderError(error.message));

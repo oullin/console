@@ -1,5 +1,6 @@
 import { shouldIgnoreStepWhenReverting, shouldRunStep } from '#tui/form/builder/conditions';
-import { FormRevertedError, runWithFormRevert } from '#tui/form/builder/revert';
+import { runWithFormRevert } from '#tui/form/builder/revert';
+import { isFormRevertedError } from '#tui/form/builder/validators/revert';
 import type { FormResponses, FormStep } from '#tui/form/types';
 
 export const submitFormSteps = async (steps: FormStep[], responses: FormResponses): Promise<FormResponses> => {
@@ -31,7 +32,7 @@ export const submitFormSteps = async (steps: FormStep[], responses: FormResponse
 		try {
 			responses[key] = await runWithFormRevert(index > 0, () => step.run(responses, responses[key], step.name));
 		} catch (error) {
-			if (!(error instanceof FormRevertedError)) {
+			if (!isFormRevertedError(error)) {
 				throw error;
 			}
 
