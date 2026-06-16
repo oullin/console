@@ -30,7 +30,7 @@ export const readDataTableSelectionInteractive = async <T>(
 		const rows = session.rows();
 
 		if (key === Key.ctrlC) {
-			return cancelDataTableSelection(options.message, headers, rows, session.selected(), session.frame());
+			return cancelDataTableSelection(options, headers, rows, session.selected(), session.frame());
 		}
 
 		if (session.applySearchKey(key)) {
