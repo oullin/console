@@ -22,7 +22,7 @@ export const readMultipleChoicesInteractive = async <T>(
 		const key = await readKey();
 
 		if (key === null) {
-			return multipleChoicesResult(choices, session.marked(), true, false, session.frame());
+			return multipleChoicesResult(choices, session.marked(), false, false, session.frame());
 		}
 
 		if (key === Key.ctrlC) {
