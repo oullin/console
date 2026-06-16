@@ -1,5 +1,6 @@
 import { backgroundColor, foregroundColor, supportsTrueColor } from '#tui/terminal';
 import { dim, foregroundRgb } from '#tui/theme/styles';
+import { parseStreamFadeSteps } from '#tui/status/stream/validators/fade';
 import type { TerminalColor } from '#tui/terminal/capabilities';
 
 export type StreamFadeOptions = {
@@ -26,7 +27,7 @@ export const streamFadeStyles = (options: StreamFadeOptions = {}): StreamFadeSty
 		return [(value) => value, dim];
 	}
 
-	const steps = options.steps ?? 10;
+	const steps = parseStreamFadeSteps(options.steps, 10);
 	const foreground = options.foreground ?? foregroundColor();
 	const background = options.background ?? backgroundColor();
 
