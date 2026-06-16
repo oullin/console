@@ -5,12 +5,18 @@ const ANSI_RESET_CODES = new Set(['0', '22', '23', '24', '27', '29', '39', '49']
 
 export const ansiCode = (sequence: string): string => sequence.slice(2, -1);
 
+export const ansiCodeParts = (code: string): string[] => code.split(';').filter((part) => part.length > 0);
+
 export const isAnsiStyleSequence = (sequence: string): boolean => ANSI_SEQUENCE.test(sequence);
 
-export const isAnsiResetCode = (code: string): boolean => ANSI_RESET_CODES.has(code);
+export const isAnsiResetCode = (code: string): boolean => ansiCodeParts(code).some((part) => ANSI_RESET_CODES.has(part));
 
 export const ansiCloseSequence = (codes: string): string => {
 	const code = ansiCode(codes);
+
+	if (!isAnsiStyleSequence(codes)) {
+		return `${ESC}[0m`;
+	}
 
 	if (code === '1' || code === '2') {
 		return `${ESC}[22m`;
