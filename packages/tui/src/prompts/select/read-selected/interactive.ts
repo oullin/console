@@ -1,11 +1,9 @@
 import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { selectNavigationAction } from '#tui/prompts/select/keys';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { invalidSelectedChoice, selectedChoiceAt, selectedChoiceByDefault, selectedChoiceResult } from '#tui/prompts/select/read-selected/result';
+import { cancelSelectedChoice } from '#tui/prompts/select/read-selected/interactive/cancel';
+import { exhaustedSelectedChoice, indexedSelectedChoice, submittedSelectedChoice } from '#tui/prompts/select/read-selected/interactive/result';
 import { createSelectedChoiceReaderSession } from '#tui/prompts/select/read-selected/session';
-import { renderCancelledChoice } from '#tui/prompts/select/render';
 import type { SelectedChoiceReadResult } from '#tui/prompts/select/read-selected/types';
 import type { Choice, PromptInput, SelectPromptOptions } from '#tui/types';
 
@@ -26,30 +24,17 @@ export const readSelectedChoiceInteractive = async <T>(
 		const key = await readKey();
 
 		if (key === null) {
-			const choice = selectedChoiceByDefault(choices, defaultValue, hasDefault);
-
-			if (choice) {
-				return selectedChoiceResult(choice, false);
-			}
-
-			throw invalidSelectedChoice();
+			return exhaustedSelectedChoice(choices, defaultValue, hasDefault);
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledChoice(message, choices, session.selected(), scroll);
-
-			const choice = selectedChoiceAt(choices, session.selected());
-
-			return selectedChoiceResult({ ...choice, value: await cancelPrompt(choice.value) }, false, true);
+			return cancelSelectedChoice(message, choices, session, scroll);
 		}
 
 		const numeric = parseChoiceIndex(key);
 
 		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
-			const choice = selectedChoiceAt(choices, numeric - 1);
-
-			return selectedChoiceResult(choice, true, false, session.frame());
+			return indexedSelectedChoice(choices, numeric - 1, session.frame());
 		}
 
 		const action = selectNavigationAction(key, { lineControls: true });
@@ -60,9 +45,7 @@ export const readSelectedChoiceInteractive = async <T>(
 		}
 
 		if (key === Key.enter) {
-			const choice = selectedChoiceAt(choices, session.selected());
-
-			return selectedChoiceResult(choice, true, false, session.frame());
+			return submittedSelectedChoice(choices, session);
 		}
 	}
 };
