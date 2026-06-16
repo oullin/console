@@ -1,6 +1,6 @@
 import { parseNotificationOptions } from '#tui/output/notify/validators/options';
 import type { NotificationPlatform } from '#tui/output/notify/validators/platform';
-import type { NotificationOptions } from '#tui/output/notify/validators/options';
+import type { ResolvedNotificationOptions } from '#tui/output/notify/validators/options';
 
 export type NotificationCommand = {
 	args: string[];
@@ -9,7 +9,7 @@ export type NotificationCommand = {
 
 export type { NotificationPlatform } from '#tui/output/notify/validators/platform';
 
-const macOsNotificationCommand = (options: NotificationOptions): NotificationCommand => {
+const macOsNotificationCommand = (options: ResolvedNotificationOptions): NotificationCommand => {
 	const script = [
 		'display notification',
 		JSON.stringify(options.body),
@@ -24,7 +24,7 @@ const macOsNotificationCommand = (options: NotificationOptions): NotificationCom
 	return { args: ['-e', script], bin: 'osascript' };
 };
 
-const notifySendCommand = (options: NotificationOptions): NotificationCommand => {
+const notifySendCommand = (options: ResolvedNotificationOptions): NotificationCommand => {
 	const args = options.icon ? ['--icon', options.icon, options.title] : [options.title];
 
 	if (options.body) {
@@ -34,7 +34,7 @@ const notifySendCommand = (options: NotificationOptions): NotificationCommand =>
 	return { args, bin: 'notify-send' };
 };
 
-const kdialogCommand = (options: NotificationOptions): NotificationCommand => {
+const kdialogCommand = (options: ResolvedNotificationOptions): NotificationCommand => {
 	const message = options.body ? `${options.title}: ${options.body}` : options.title;
 	const args = ['--passivepopup', message, '5', '--title', options.title];
 

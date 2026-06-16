@@ -1,13 +1,5 @@
 import { z } from 'zod';
 
-export type NotificationOptions = {
-	body: string;
-	icon: string;
-	sound: string;
-	subtitle: string;
-	title: string;
-};
-
 const notificationOptionsSchema = z.object({
 	body: z.string().default(''),
 	icon: z.string().default(''),
@@ -16,6 +8,10 @@ const notificationOptionsSchema = z.object({
 	title: z.string(),
 });
 
-export const parseNotificationOptions = (options: unknown): NotificationOptions => {
+export type NotificationOptions = z.input<typeof notificationOptionsSchema>;
+
+export type ResolvedNotificationOptions = z.output<typeof notificationOptionsSchema>;
+
+export const parseNotificationOptions = (options: unknown): ResolvedNotificationOptions => {
 	return notificationOptionsSchema.parse(options);
 };
