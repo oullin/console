@@ -7,5 +7,11 @@ const writableStreamSchema = z
 	.passthrough() as z.ZodType<NodeJS.WritableStream>;
 
 export const parseWritableOutputStream = (stream: unknown): NodeJS.WritableStream => {
-	return writableStreamSchema.parse(stream);
+	const parsed = writableStreamSchema.safeParse(stream);
+
+	if (!parsed.success) {
+		throw new Error('Prompt output streams must include a write function.');
+	}
+
+	return parsed.data;
 };
