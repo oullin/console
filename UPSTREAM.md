@@ -164,7 +164,7 @@ TypeScript and OpenTUI internals.
 | Spinner static and deterministic animated frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | Spinner empty default message | `packages/tui/src/status/spinner.ts`, `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/tests/spinner.test.ts`, `packages/tui/tests/form.test.ts` |
 | Task static and deterministic animated frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/definition.ts`, `packages/tui/src/status/task/lifecycle.ts`, `packages/tui/src/status/task/*` |
-| Task non-positive log limit defaulting | `packages/tui/src/status/validators/limit.ts`, `packages/tui/src/status/task/logger.ts`, `packages/tui/tests/task.test.ts` |
+| Task non-positive log limit defaulting | `packages/tui/src/status/validators/limit.ts`, `packages/tui/src/status/task/logger.ts`, `packages/tui/src/status/task/logger/*`, `packages/tui/tests/task.test.ts` |
 | Form builder root-aligned spinner and task overloads | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/tests/form.test.ts` |
 | Form builder root-aligned manual progress side-effect lifecycle | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/src/form/builder/validators/status.ts`, `packages/tui/tests/form.test.ts` |
 | Task process output capture | `packages/tui/src/status/task/process-output.ts`, `packages/tui/src/status/task/process-output/*`, `packages/tui/tests/task.test.ts` |
