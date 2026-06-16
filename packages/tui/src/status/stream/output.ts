@@ -1,14 +1,13 @@
-import { promptEnvironment } from '#tui/environment';
 import { StatusSignalCleanup } from '#tui/status/signals';
 import { StreamBuffer } from '#tui/status/stream/buffer';
-import { streamFadeStyles } from '#tui/status/stream/fade';
-import { renderStreamFrame, streamLines } from '#tui/status/stream/render';
+import { StreamRenderer } from '#tui/status/stream/renderer';
+import { streamLines } from '#tui/status/stream/render';
 import { hideCursor, showCursor } from '#tui/terminal';
 
 export class Stream {
 	#closed = false;
 	readonly #buffer = new StreamBuffer(10);
-	readonly #fadeStyles = streamFadeStyles();
+	readonly #renderer = new StreamRenderer();
 	readonly #signalCleanup = new StatusSignalCleanup(() => {
 		this.close();
 	});
@@ -74,12 +73,9 @@ export class Stream {
 	}
 
 	private render(): void {
-		promptEnvironment().output.write(
-			renderStreamFrame({
-				fading: this.#buffer.fading,
-				fadeStyles: this.#fadeStyles,
-				value: this.#buffer.stableValue(),
-			}),
-		);
+		this.#renderer.render({
+			fading: this.#buffer.fading,
+			value: this.#buffer.stableValue(),
+		});
 	}
 }

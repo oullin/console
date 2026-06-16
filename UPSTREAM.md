@@ -168,7 +168,7 @@ TypeScript and OpenTUI internals.
 | Form builder root-aligned spinner and task overloads | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/tests/form.test.ts` |
 | Form builder root-aligned manual progress side-effect lifecycle | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/src/form/builder/validators/status.ts`, `packages/tui/tests/form.test.ts` |
 | Task process output capture | `packages/tui/src/status/task/process-output.ts`, `packages/tui/tests/task.test.ts` |
-| Stream frame rendering, wrapping, fade styles, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/output.ts`, `packages/tui/src/status/stream/*` |
+| Stream frame rendering, wrapping, fade styles, and close flushing | `packages/tui/src/status/stream.ts`, `packages/tui/src/status/stream/output.ts`, `packages/tui/src/status/stream/renderer.ts`, `packages/tui/src/status/stream/*` |
 | Form builder root-aligned manual stream named-response overload | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/src/form/builder/validators/status.ts`, `packages/tui/tests/form.test.ts` |
 | Status cursor visibility cleanup | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
 | Status signal cleanup for cursor and rendered-frame restoration | `packages/tui/src/status/signals.ts`, `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/stream.ts`, `packages/tui/src/status/task.ts` |
