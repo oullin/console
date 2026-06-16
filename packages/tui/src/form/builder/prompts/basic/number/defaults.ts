@@ -1,11 +1,10 @@
 import { previousNumber } from '#tui/form/builder/previous';
 import { hasPromptDefault } from '#tui/validators/default';
+import { hasPreviousResponse } from '#tui/form/builder/validators/previous';
 import type { NumberPromptOptions } from '#tui/types';
 
-export const hasPreviousNumberResponse = (previous: unknown): boolean => previous !== undefined && previous !== null;
-
 export const numberOptionsWithPreviousDefault = (options: NumberPromptOptions, previous: unknown): NumberPromptOptions => {
-	if (hasPreviousNumberResponse(previous)) {
+	if (hasPreviousResponse(previous)) {
 		return { ...options, default: previousNumber(previous, options.default ?? '') };
 	}
 

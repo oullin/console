@@ -1,4 +1,5 @@
-import { hasPreviousNumberResponse, previousNumberDefault } from '#tui/form/builder/prompts/basic/number/defaults';
+import { previousNumberDefault } from '#tui/form/builder/prompts/basic/number/defaults';
+import { hasPreviousResponse } from '#tui/form/builder/validators/previous';
 import type { NumberPromptOptions } from '#tui/types';
 
 type LabelNumberOptionsInput = {
@@ -43,7 +44,7 @@ export const labelNumberOptions = ({
 		transform,
 	};
 
-	if (hasPreviousNumberResponse(previous)) {
+	if (hasPreviousResponse(previous)) {
 		options.default = previousNumberDefault(previous, hasLabelDefault ? defaultValue : '');
 	} else if (hasLabelDefault) {
 		options.default = previousNumberDefault(previous, defaultValue);
