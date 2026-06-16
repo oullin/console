@@ -1,4 +1,5 @@
 export { configurePrompts, createMemoryOutput, createScriptedInput, promptEnvironment, withPromptEnvironment } from '#tui/environment';
+export type { MemoryOutput, RawKeyInput } from '#tui/environment';
 export { FormBuilder, form } from '#tui/form';
 export type { FormResponses, FormStep, FormStepCondition } from '#tui/form';
 export { Key, keyFromEvent, oneOf } from '#tui/key';
