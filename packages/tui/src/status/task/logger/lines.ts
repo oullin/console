@@ -1,5 +1,6 @@
 import { sanitizeTaskLine } from '#tui/status/task/sanitize';
 import { parseTaskLogMessageLines } from '#tui/status/task/logger/validators/message';
+import { parseLogLimit } from '#tui/status/validators/limit';
 
 export type PartialTaskLogState = {
 	startIndex: number | null;
@@ -9,7 +10,8 @@ export type PartialTaskLogState = {
 const parsedTaskLogLines = (message: string): string[] => parseTaskLogMessageLines(message).map((line) => sanitizeTaskLine(line));
 
 const trimTaskLogLines = (lines: string[], limit: number): number => {
-	const removed = Math.max(0, lines.length - limit);
+	const visibleLimit = parseLogLimit(limit, 10);
+	const removed = Math.max(0, lines.length - visibleLimit);
 
 	if (removed > 0) {
 		lines.splice(0, removed);
