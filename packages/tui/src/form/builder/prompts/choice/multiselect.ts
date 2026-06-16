@@ -1,6 +1,6 @@
 import { multiselect } from '#tui/prompts/choices';
 import { previousArray } from '#tui/form/builder/previous';
-import { isSelectPromptLabel } from '#tui/form/builder/prompts/validators/select';
+import { isSelectPromptLabel, parseSelectChoiceOptions, parseSelectStepName } from '#tui/form/builder/prompts/validators/select';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ChoiceOptions, MultiSelectPromptOptions } from '#tui/types';
 
@@ -34,14 +34,14 @@ export function multiselectFormStep<T>(
 	info: MultiSelectPromptOptions<T>['info'] = '',
 ): FormBuilder {
 	if (!isSelectPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => multiselect<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), optionsOrName as string | undefined);
+		return this.add((_, previous) => multiselect<T>({ ...optionsOrLabel, default: previousArray(previous, optionsOrLabel.default ?? []) }), parseSelectStepName(optionsOrName));
 	}
 
 	return this.add(
 		(_, previous) =>
 			multiselect<T>({
 				message: optionsOrLabel,
-				options: optionsOrName as ChoiceOptions<T>,
+				options: parseSelectChoiceOptions<T>(optionsOrName),
 				default: previousArray(previous, defaultValue),
 				scroll,
 				required,

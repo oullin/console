@@ -1,6 +1,6 @@
 import { select } from '#tui/prompts/choices';
 import { previousValue } from '#tui/form/builder/previous';
-import { isSelectPromptLabel } from '#tui/form/builder/prompts/validators/select';
+import { isSelectPromptLabel, parseSelectChoiceOptions, parseSelectStepName } from '#tui/form/builder/prompts/validators/select';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { ChoiceOptions, SelectPromptOptions } from '#tui/types';
 
@@ -34,14 +34,14 @@ export function selectFormStep<T>(
 	info: SelectPromptOptions<T>['info'] = '',
 ): FormBuilder {
 	if (!isSelectPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => select<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), optionsOrName as string | undefined);
+		return this.add((_, previous) => select<T>({ ...optionsOrLabel, default: previousValue(previous, optionsOrLabel.default) }), parseSelectStepName(optionsOrName));
 	}
 
 	return this.add(
 		(_, previous) =>
 			select<T>({
 				message: optionsOrLabel,
-				options: optionsOrName as ChoiceOptions<T>,
+				options: parseSelectChoiceOptions<T>(optionsOrName),
 				default: previousValue(previous, defaultValue),
 				scroll,
 				validate,

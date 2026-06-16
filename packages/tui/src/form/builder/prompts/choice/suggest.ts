@@ -1,6 +1,6 @@
 import { suggest } from '#tui/prompts/choices';
 import { previousString } from '#tui/form/builder/previous';
-import { isSuggestPromptLabel } from '#tui/form/builder/prompts/validators/suggest';
+import { isSuggestPromptLabel, parseSuggestSource, parseSuggestStepName } from '#tui/form/builder/prompts/validators/suggest';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { SuggestOptions } from '#tui/prompts/choices';
 import type { TextPromptOptions } from '#tui/types';
@@ -37,7 +37,7 @@ export function suggestFormStep(
 	info: SuggestOptions['info'] = '',
 ): FormBuilder {
 	if (!isSuggestPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => suggest({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), options as string | undefined);
+		return this.add((_, previous) => suggest({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), parseSuggestStepName(options));
 	}
 
 	return this.add(
@@ -45,7 +45,7 @@ export function suggestFormStep(
 			suggest({
 				message: optionsOrLabel,
 				label: optionsOrLabel,
-				options: options as SuggestOptions['options'],
+				options: parseSuggestSource(options),
 				placeholder,
 				default: previousString(previous, defaultValue),
 				scroll,
