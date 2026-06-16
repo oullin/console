@@ -1,4 +1,5 @@
 import { visibleWidth } from '#tui/strings';
+import { isRenderableTableColumnCount } from '#tui/theme/validators/table';
 
 const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
 
@@ -9,7 +10,7 @@ const tableColumnCount = (headers: string[], rows: string[][]): number => {
 export const renderTable = (headers: string[], rows: string[][]): string => {
 	const columnCount = tableColumnCount(headers, rows);
 
-	if (!Number.isFinite(columnCount) || columnCount <= 0) {
+	if (!isRenderableTableColumnCount(columnCount)) {
 		return '';
 	}
 

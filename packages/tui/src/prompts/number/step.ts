@@ -1,6 +1,5 @@
+import { parseNumericValue } from '#tui/prompts/number/validators/value';
 import type { NumberInputOptions } from '#tui/prompts/number/types';
-
-const numeric = (value: string): boolean => value.trim() !== '' && Number.isFinite(Number(value));
 
 const clamp = (value: number, min?: number, max?: number): number => {
 	const clampedMin = min === undefined ? value : Math.max(min, value);
@@ -14,14 +13,15 @@ export const numberStep = (step?: number): number => {
 
 export const steppedNumberValue = (value: string, direction: 1 | -1, options: NumberInputOptions): string => {
 	const step = numberStep(options.step);
+	const numeric = parseNumericValue(value);
 
 	if (value === '') {
 		return String(direction === 1 ? (options.min ?? 1) : (options.max ?? 0));
 	}
 
-	if (!numeric(value)) {
+	if (numeric === null) {
 		return value;
 	}
 
-	return String(clamp(Math.trunc(Number(value)) + step * direction, options.min, options.max));
+	return String(clamp(Math.trunc(numeric) + step * direction, options.min, options.max));
 };

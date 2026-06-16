@@ -23,7 +23,7 @@ export const applyMultipleChoicesKey = <T>(key: string, choices: Array<Choice<T>
 
 	const numeric = parseChoiceIndex(key);
 
-	if (!Number.isNaN(numeric) && session.toggleIndex(numeric - 1)) {
+	if (numeric !== null && session.toggleIndex(numeric - 1)) {
 		return { handled: true };
 	}
 

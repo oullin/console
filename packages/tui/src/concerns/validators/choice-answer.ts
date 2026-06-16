@@ -13,10 +13,10 @@ const choiceRecordKeySchema = z
 
 const choiceRecordValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
 
-export const parseChoiceAnswerIndex = (answer: string): number => {
+export const parseChoiceAnswerIndex = (answer: string): number | null => {
 	const parsed = choiceAnswerIndexSchema.safeParse(answer);
 
-	return parsed.success ? parsed.data : Number.NaN;
+	return parsed.success ? parsed.data : null;
 };
 
 export const parseChoiceRecordKey = (key: string): string | number => {

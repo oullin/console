@@ -28,4 +28,4 @@ export const normalizeChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>>
 
 export const normalizeSearchChoices = <T>(options: ChoiceOptions<T>): Array<Choice<T>> => normalizeChoices(options);
 
-export const answerChoiceIndex = (answer: string): number => parseChoiceAnswerIndex(answer.trim());
+export const answerChoiceIndex = (answer: string): number | null => parseChoiceAnswerIndex(answer.trim());

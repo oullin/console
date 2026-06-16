@@ -33,7 +33,7 @@ export const readSelectedChoiceInteractive = async <T>(
 
 		const numeric = parseChoiceIndex(key);
 
-		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
+		if (numeric !== null && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
 			return indexedSelectedChoice(choices, numeric - 1, session.frame());
 		}
 

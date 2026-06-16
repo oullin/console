@@ -1,4 +1,5 @@
 import { promptEnvironment } from '#tui/environment';
+import { parseNumericValue } from '#tui/prompts/number/validators/value';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import { placeholderWithCursor, valueWithCursor } from '#tui/typed-value/cursor';
@@ -8,12 +9,11 @@ const UP_ARROW = '▲';
 const DOWN_ARROW = '▼';
 
 const renderNumberArrows = (value: string, options: NumberInputOptions, style: (text: string) => string = (text) => text): string => {
-	const numeric = value !== '' && !Number.isNaN(Number(value));
-	const number = Number(value);
-	const up = numeric && options.max !== undefined && number >= options.max ? dim(UP_ARROW) : style(UP_ARROW);
-	const down = numeric && options.min !== undefined && number <= options.min ? dim(DOWN_ARROW) : style(DOWN_ARROW);
+	const number = parseNumericValue(value);
+	const up = number !== null && options.max !== undefined && number >= options.max ? dim(UP_ARROW) : style(UP_ARROW);
+	const down = number !== null && options.min !== undefined && number <= options.min ? dim(DOWN_ARROW) : style(DOWN_ARROW);
 
-	if (value !== '' && !numeric) {
+	if (value !== '' && number === null) {
 		return `${dim(UP_ARROW)}${dim(DOWN_ARROW)}`;
 	}
 

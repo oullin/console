@@ -11,6 +11,16 @@ export type NumberValidationResult = {
 const numericInputSchema = z.string();
 
 const isNumeric = (value: string): boolean => value.trim() !== '' && Number.isFinite(Number(value));
+const numericValueSchema = numericInputSchema
+	.trim()
+	.refine(isNumeric)
+	.transform((value) => Number(value));
+
+export const parseNumericValue = (value: unknown): number | null => {
+	const parsed = numericValueSchema.safeParse(value);
+
+	return parsed.success ? parsed.data : null;
+};
 
 export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptions, 'integer' | 'max' | 'min'> = {}): NumberValidationResult => {
 	const raw = numericInputSchema.parse(input);

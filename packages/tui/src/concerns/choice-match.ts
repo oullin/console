@@ -10,7 +10,7 @@ export const findChoice = <T>(choices: Array<Choice<T>>, answer: string): Choice
 	const normalizedAnswer = answer.trim();
 	const index = answerChoiceIndex(normalizedAnswer);
 
-	if (!Number.isNaN(index)) {
+	if (index !== null) {
 		return choices[index - 1];
 	}
 
