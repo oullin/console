@@ -1,6 +1,5 @@
-import { number } from '#tui/prompts/basic';
-import { numberOptionsWithPreviousDefault } from '#tui/form/builder/prompts/basic/number/defaults';
 import { labelNumberOptions } from '#tui/form/builder/prompts/basic/number/options';
+import { runLabelNumberFormStep, runObjectNumberFormStep } from '#tui/form/builder/prompts/basic/number/step';
 import { isBasicPromptLabel } from '#tui/form/builder/prompts/validators/basic';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { NumberPromptOptions } from '#tui/types';
@@ -39,7 +38,7 @@ export function numberFormStep(
 	const hasLabelDefault = isBasicPromptLabel(optionsOrLabel) && arguments.length >= 3 && defaultValue !== undefined;
 
 	if (!isBasicPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => number(numberOptionsWithPreviousDefault(optionsOrLabel, previous)), placeholder);
+		return this.add((_, previous) => runObjectNumberFormStep(optionsOrLabel, previous), placeholder);
 	}
 
 	return this.add((_, previous) => {
@@ -58,6 +57,6 @@ export function numberFormStep(
 			validate,
 		});
 
-		return number(promptOptions);
+		return runLabelNumberFormStep(promptOptions);
 	}, name);
 }
