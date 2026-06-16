@@ -1,23 +1,9 @@
 import { number } from '#tui/prompts/basic';
-import { previousNumber } from '#tui/form/builder/previous';
+import { numberOptionsWithPreviousDefault } from '#tui/form/builder/prompts/basic/number/defaults';
+import { labelNumberOptions } from '#tui/form/builder/prompts/basic/number/options';
 import { isBasicPromptLabel } from '#tui/form/builder/prompts/validators/basic';
-import { hasPromptDefault } from '#tui/validators/default';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { NumberPromptOptions } from '#tui/types';
-
-const hasPreviousResponse = (previous: unknown): boolean => previous !== undefined && previous !== null;
-
-const numberOptionsWithPreviousDefault = (options: NumberPromptOptions, previous: unknown): NumberPromptOptions => {
-	if (hasPreviousResponse(previous)) {
-		return { ...options, default: previousNumber(previous, options.default ?? '') };
-	}
-
-	if (hasPromptDefault(options)) {
-		return { ...options, default: previousNumber(previous, options.default ?? '') };
-	}
-
-	return options;
-};
 
 export function numberFormStep(this: FormBuilder, options: NumberPromptOptions, name?: string): FormBuilder;
 
@@ -57,22 +43,20 @@ export function numberFormStep(
 	}
 
 	return this.add((_, previous) => {
-		const promptOptions: NumberPromptOptions = {
-			message: optionsOrLabel,
-			label: optionsOrLabel,
-			placeholder,
-			required,
-			validate,
+		const promptOptions = labelNumberOptions({
+			defaultValue,
+			hasLabelDefault,
 			hint,
-			min,
+			label: optionsOrLabel,
 			max,
+			min,
+			placeholder,
+			previous,
+			required,
 			step,
 			transform,
-		};
-
-		if (hasPreviousResponse(previous) || hasLabelDefault) {
-			promptOptions.default = previousNumber(previous, hasLabelDefault ? defaultValue : '');
-		}
+			validate,
+		});
 
 		return number(promptOptions);
 	}, name);
