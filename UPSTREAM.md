@@ -135,7 +135,7 @@ TypeScript and OpenTUI internals.
 | Data table scrollbar rendering | `packages/tui/src/output/data-table/scrollbar.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/tests/table.test.ts` |
 | Data table no-header and blank-cell rendering | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/tests/table.test.ts` |
 | Data table row-shape validation and normalization | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/tests/table.test.ts` |
-| Static table row-shape validation and header inference | `packages/tui/src/output/validators/table.ts`, `packages/tui/tests/table.test.ts` |
+| Static table row-shape validation and header inference | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/validators/table/*`, `packages/tui/tests/table.test.ts` |
 | Data table fixed visual height | `packages/tui/src/output/data-table/visual-window.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/tests/table.test.ts` |
 | Data table comfortable width and outlier truncation | `packages/tui/src/output/data-table/widths.ts`, `packages/tui/src/output/data-table/widths/*`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/tests/table.test.ts` |
 | Boxed balanced grid rendering | `packages/tui/src/output/grid.ts`, `packages/tui/tests/output.test.ts` |
@@ -157,7 +157,7 @@ TypeScript and OpenTUI internals.
 | Form builder label-first data table previous-response defaults | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/tests/form.test.ts` |
 | Form builder interactive data table object-option method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/src/output/validators/data-table.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder output overload validator layer | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/src/form/builder/validators/output.ts` |
-| Form builder object-option table output method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/src/output/validators/table.ts`, `packages/tui/tests/form.test.ts` |
+| Form builder object-option table output method surface | `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/validators/table/*`, `packages/tui/tests/form.test.ts` |
 | Form builder output method surface for grid, display data table, terminal helpers, and notifications | `packages/tui/src/form/builder/index.ts`, `packages/tui/src/form/builder/methods.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/tests/form.test.ts` |
 | Display-only output helper return values and form responses | `packages/tui/src/output/notes.ts`, `packages/tui/src/output/table.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/output/*`, `packages/tui/tests/output.test.ts`, `packages/tui/tests/form.test.ts` |
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
@@ -193,7 +193,7 @@ TypeScript and OpenTUI internals.
 | Data table prompt argument validation layer | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table.ts`, `packages/tui/src/output/data-table/reader/types.ts`, `packages/tui/tests/table.test.ts` |
 | Data table filter callback lifecycle | `packages/tui/src/contracts/output.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/src/output/data-table/reader/state.ts`, `packages/tui/src/output/data-table.ts` |
 | Data table search title and non-empty query filter lifecycle | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/src/output/data-table/reader/state.ts`, `packages/tui/src/output/data-table/reader/session.ts`, `packages/tui/tests/form.test.ts` |
-| Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
+| Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/validators/table/*`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
 | Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choice-normalize.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
 | Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
