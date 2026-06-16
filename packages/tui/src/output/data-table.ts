@@ -3,18 +3,10 @@ import { activePromptFrame } from '#tui/prompt/active-frame';
 import { readDataTableSelection } from '#tui/output/data-table/read';
 import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
 import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
+import { dataTableValidationOptions, normalizeDataTablePromptOptions, transformDataTableValue } from '#tui/output/data-table/options';
 import { parseDataTablePromptOptions } from '#tui/output/validators/data-table';
-import { hasPromptDefault } from '#tui/validators/default';
 import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
-
-type NormalizedDataTablePromptOptions<T> = DataTablePromptOptions<T> & {
-	hasDefault: boolean;
-};
-
-const transformDataTableValue = async <T>(options: Pick<DataTablePromptOptions<T>, 'transform'>, value: T | number): Promise<T | number> => {
-	return options.transform ? options.transform(value) : value;
-};
 
 export function datatable<T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number>;
 
@@ -42,16 +34,9 @@ export async function datatable<T = unknown>(
 	filter: DataTablePromptOptions<T>['filter'] = undefined,
 ): Promise<T | number> {
 	const parsedOptions = parseDataTablePromptOptions<T>(optionsOrHeaders, rows, scroll, label, hint, required, validate, transform, filter);
+	const options = normalizeDataTablePromptOptions(parsedOptions);
 
-	const options: NormalizedDataTablePromptOptions<T> = {
-		...parsedOptions,
-		hasDefault: hasPromptDefault(parsedOptions),
-	};
-
-	const validationOptions: DataTablePromptOptions<T> = {
-		...options,
-		default: options.hasDefault ? await transformDataTableValue(options, options.default as T | number) : undefined,
-	};
+	const validationOptions = await dataTableValidationOptions(options);
 
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
