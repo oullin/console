@@ -54,7 +54,7 @@ const placeholderBody = (options: TypedValueOptions, rows: number | undefined): 
 
 const textareaCancelledBody = (value: string, options: TypedValueOptions): string => {
 	const text = value.length > 0 ? value : (options.placeholder ?? '');
-	const lines = text.split('\n');
+	const lines = text.split(/\r?\n/u);
 
 	return lines.map((line) => strikethrough(dim(line))).join('\n');
 };

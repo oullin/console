@@ -1,9 +1,10 @@
 import { visibleWidth } from '#tui/strings';
+import { splitMultilineDataTableCell } from '#tui/output/data-table/multiline';
 
 export const naturalDataTableColumnWidth = (rows: string[][], column: number): number => {
 	const widths = rows
 		.map((row) => row[column] ?? '')
-		.flatMap((cell) => cell.split('\n').map(visibleWidth))
+		.flatMap((cell) => splitMultilineDataTableCell(cell).map(visibleWidth))
 		.filter((width) => width > 0)
 		.sort((left, right) => left - right);
 

@@ -1,4 +1,5 @@
 import { truncate, visibleWidth } from '#tui/strings';
+import { splitMultilineDataTableCell } from '#tui/output/data-table/multiline';
 
 type TruncateDataTableColumnsOptions = {
 	headers: string[];
@@ -12,7 +13,6 @@ export const truncateDataTableColumns = ({ headers, rows, widths }: TruncateData
 });
 
 const truncateDataTableCell = (cell: string, width: number): string =>
-	cell
-		.split('\n')
+	splitMultilineDataTableCell(cell)
 		.map((line) => truncate(line, width))
 		.join('\n');
