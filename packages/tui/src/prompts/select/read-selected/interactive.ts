@@ -28,7 +28,7 @@ export const readSelectedChoiceInteractive = async <T>(
 		}
 
 		if (key === Key.ctrlC) {
-			return cancelSelectedChoice(message, choices, session, scroll);
+			return cancelSelectedChoice(message, choices, session, defaultValue, scroll);
 		}
 
 		const numeric = parseChoiceIndex(key);

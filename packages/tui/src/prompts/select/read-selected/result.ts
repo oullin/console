@@ -36,3 +36,15 @@ export const selectedChoiceResult = <T>(choice: Choice<T>, submitted: boolean, c
 	submittedLabel: choice.label,
 	value: choice.value,
 });
+
+export const cancelledSelectedChoiceResult = <T>(
+	choice: Choice<T> | undefined,
+	cancelledValue: T,
+	frame?: string,
+): SelectedChoiceReadResult<T> => ({
+	cancelled: true,
+	frame,
+	submitted: false,
+	submittedLabel: choice?.label ?? '',
+	value: cancelledValue,
+});
