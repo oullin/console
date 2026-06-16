@@ -1,5 +1,5 @@
 import { progressStateSnapshot } from '#tui/status/progress/state/snapshot';
-import { nextProgressCurrent } from '#tui/status/progress/state/value';
+import { clampedProgressCurrent, nextProgressCurrent, progressRatio } from '#tui/status/progress/state/value';
 import { parseProgressTotal } from '#tui/status/validators/progress';
 import type { ProgressFrameState } from '#tui/status/progress/render';
 import type { ProgressStateSnapshot } from '#tui/status/progress/state/snapshot';
@@ -45,11 +45,11 @@ export class ProgressState {
 	}
 
 	current(): number {
-		return this.#current;
+		return clampedProgressCurrent(this.#current, this.total);
 	}
 
 	percentage(): number {
-		return this.#current / this.total;
+		return progressRatio(this.#current, this.total);
 	}
 
 	snapshot(): ProgressStateSnapshot {
