@@ -1,6 +1,6 @@
 import { text } from '#tui/prompts/basic';
 import { previousString } from '#tui/form/builder/previous';
-import { isBasicPromptLabel } from '#tui/form/builder/prompts/validators/basic';
+import { isBasicPromptLabel, parseBasicStepName } from '#tui/form/builder/prompts/validators/basic';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { TextPromptOptions } from '#tui/types';
 
@@ -30,7 +30,7 @@ export function textFormStep(
 	transform: TextPromptOptions['transform'] = undefined,
 ): FormBuilder {
 	if (!isBasicPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => text({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), placeholder);
+		return this.add((_, previous) => text({ ...optionsOrLabel, default: previousString(previous, optionsOrLabel.default ?? '') }), parseBasicStepName(placeholder));
 	}
 
 	return this.add((_, previous) => text(optionsOrLabel, placeholder, previousString(previous, defaultValue), required, validate, hint, transform), name);

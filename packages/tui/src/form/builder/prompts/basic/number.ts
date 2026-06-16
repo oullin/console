@@ -1,6 +1,6 @@
 import { labelNumberOptions } from '#tui/form/builder/prompts/basic/number/options';
 import { runLabelNumberFormStep, runObjectNumberFormStep } from '#tui/form/builder/prompts/basic/number/step';
-import { isBasicPromptLabel } from '#tui/form/builder/prompts/validators/basic';
+import { isBasicPromptLabel, parseBasicStepName } from '#tui/form/builder/prompts/validators/basic';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { NumberPromptOptions } from '#tui/types';
 
@@ -38,7 +38,7 @@ export function numberFormStep(
 	const hasLabelDefault = isBasicPromptLabel(optionsOrLabel) && arguments.length >= 3 && defaultValue !== undefined;
 
 	if (!isBasicPromptLabel(optionsOrLabel)) {
-		return this.add((_, previous) => runObjectNumberFormStep(optionsOrLabel, previous), placeholder);
+		return this.add((_, previous) => runObjectNumberFormStep(optionsOrLabel, previous), parseBasicStepName(placeholder));
 	}
 
 	return this.add((_, previous) => {
