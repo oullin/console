@@ -1,14 +1,16 @@
 import { StreamBuffer } from '#tui/status/stream/buffer';
 import { StreamLifecycle } from '#tui/status/stream/lifecycle';
+import { streamClosedError, streamPromptError } from '#tui/status/stream/output/errors';
+import { flushStreamBuffer, renderStreamBuffer } from '#tui/status/stream/output/rendering';
 import { StreamRenderer } from '#tui/status/stream/renderer';
 import { streamLines } from '#tui/status/stream/render';
 
 export class Stream {
 	readonly #buffer = new StreamBuffer(10);
+	readonly #renderer = new StreamRenderer();
 	readonly #lifecycle = new StreamLifecycle(() => {
 		this.flush();
 	});
-	readonly #renderer = new StreamRenderer();
 
 	write(content: string): this {
 		return this.append(content);
@@ -16,7 +18,7 @@ export class Stream {
 
 	append(content: string): this {
 		if (this.#lifecycle.closed()) {
-			throw new Error('Stream is closed.');
+			throw streamClosedError();
 		}
 
 		this.#buffer.append(content);
@@ -48,7 +50,7 @@ export class Stream {
 	}
 
 	prompt(): never {
-		throw new Error('Stream cannot be prompted');
+		throw streamPromptError();
 	}
 
 	value(): string {
@@ -56,15 +58,10 @@ export class Stream {
 	}
 
 	private render(): void {
-		this.#renderer.render({
-			fading: this.#buffer.fading,
-			value: this.#buffer.stableValue(),
-		});
+		renderStreamBuffer({ buffer: this.#buffer, renderer: this.#renderer });
 	}
 
 	private flush(): void {
-		while (this.#buffer.flushNext()) {
-			this.render();
-		}
+		flushStreamBuffer({ buffer: this.#buffer, renderer: this.#renderer });
 	}
 }
