@@ -98,13 +98,13 @@ const ansiCodeMatchesReset = (code: string, resetCode: string): boolean => {
 const foregroundAnsiCode = (code: string): boolean => {
 	const values = ansiCodeParts(code).map((part) => Number(part));
 
-	return code.startsWith('38;') || values.some((value) => (value >= 30 && value <= 37) || (value >= 90 && value <= 97));
+	return values.includes(38) || values.some((value) => (value >= 30 && value <= 37) || (value >= 90 && value <= 97));
 };
 
 const backgroundAnsiCode = (code: string): boolean => {
 	const values = ansiCodeParts(code).map((part) => Number(part));
 
-	return code.startsWith('48;') || values.some((value) => (value >= 40 && value <= 47) || (value >= 100 && value <= 107));
+	return values.includes(48) || values.some((value) => (value >= 40 && value <= 47) || (value >= 100 && value <= 107));
 };
 
 const readAnsiSequence = (value: string, start: number): string => {
