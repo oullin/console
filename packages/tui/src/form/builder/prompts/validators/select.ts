@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { ChoiceOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
+import type { ChoiceOptions, ConfirmPromptOptions, MultiSelectPromptOptions, SelectPromptOptions } from '#tui/types';
 
 const selectPromptLabelSchema = z.string();
 const selectPromptChoicesSchema = z.union([z.array(z.unknown()), z.record(z.string(), z.string())]);
@@ -14,6 +14,11 @@ export type ResolvedSelectFormArguments<T> = {
 export type ResolvedMultiSelectFormArguments<T> = {
 	name?: string;
 	options: MultiSelectPromptOptions<T>;
+};
+
+export type ResolvedConfirmFormArguments = {
+	name?: string;
+	options: ConfirmPromptOptions;
 };
 
 export const isSelectPromptLabel = (value: unknown): value is string => {
@@ -106,6 +111,40 @@ export const resolveMultiSelectFormArguments = <T>(
 			hint,
 			transform,
 			info,
+		},
+	};
+};
+
+export const resolveConfirmFormArguments = (
+	optionsOrLabel: ConfirmPromptOptions | string,
+	defaultValueOrName: boolean | string = true,
+	yes = 'Yes',
+	no = 'No',
+	required: boolean | string = false,
+	validate: ConfirmPromptOptions['validate'] = undefined,
+	hint = '',
+	name?: string,
+	transform: ConfirmPromptOptions['transform'] = undefined,
+): ResolvedConfirmFormArguments => {
+	if (isSelectPromptOptions(optionsOrLabel)) {
+		return {
+			name: parseSelectStepName(defaultValueOrName),
+			options: optionsOrLabel,
+		};
+	}
+
+	return {
+		name,
+		options: {
+			message: optionsOrLabel,
+			label: optionsOrLabel,
+			default: parseConfirmDefault(defaultValueOrName, true),
+			yes,
+			no,
+			required,
+			validate,
+			hint,
+			transform,
 		},
 	};
 };
