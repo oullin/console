@@ -45,13 +45,26 @@ format-all: ## Format + lint every non-ignored TS/Vue file in the repo via oxfmt
 	@cd "$(ROOT_PATH)" && tmp=$$(mktemp); git ls-files -z --cached --others --exclude-standard -- $(TS_GLOBS) | while IFS= read -r -d '' f; do [ -f "$$f" ] && printf '%s\0' "$$f"; done > "$$tmp"; if [ ! -s "$$tmp" ]; then echo "No TS/Vue files to format."; rm -f "$$tmp"; else xargs -0 $(FMT_RUN) format < "$$tmp"; rc=$$?; rm -f "$$tmp"; exit $$rc; fi
 
 ##@ Maintenance
-fresh: ## Clean generated state, reinstall dependencies, then run local gates
+fresh: ## Clean generated state, reinstall dependencies, then build
 	$(call step,Removing generated dependency/cache/build state)
 	@test -n "$(ROOT_PATH)" && test "$(ROOT_PATH)" != "/" || { echo "Refusing to clean unsafe ROOT_PATH='$(ROOT_PATH)'"; exit 1; }
-	rm -rf "$(ROOT_PATH)/node_modules" "$(ROOT_PATH)"/packages/*/node_modules "$(ROOT_PATH)"/packages/*/.turbo "$(ROOT_PATH)"/provision/*/.turbo "$(ROOT_PATH)/provision/.cache" "$(ROOT_PATH)/packages/artefacts/.logs" "$(ROOT_PATH)/packages/artefacts/dist" "$(ROOT_PATH)/packages/tui/dist"
+	rm -rf \
+		"$(ROOT_PATH)/node_modules" \
+		"$(ROOT_PATH)"/packages/*/node_modules \
+		"$(ROOT_PATH)"/provision/*/node_modules \
+		"$(ROOT_PATH)/provision/.cache" \
+		"$(ROOT_PATH)/packages/artefacts/.logs" \
+		"$(ROOT_PATH)/packages/artefacts/dist" \
+		"$(ROOT_PATH)/packages/docs/src/.vitepress/cache" \
+		"$(ROOT_PATH)/packages/docs/src/.vitepress/dist" \
+		"$(ROOT_PATH)/packages/docs/src/api" \
+		"$(ROOT_PATH)/packages/tui/dist"
+	$(call step,Removing generated workspace caches)
+	find "$(ROOT_PATH)" -path "$(ROOT_PATH)/.git" -prune -o -type d -name '.turbo' -prune -exec rm -rf {} +
+	find "$(ROOT_PATH)" -path "$(ROOT_PATH)/.git" -prune -o -path "$(ROOT_PATH)/provision/.cache" -prune -o -type d -name '.cache' -prune -exec rm -rf {} +
 	$(call step,Removing TypeScript build info files)
 	find "$(ROOT_PATH)" -name '*.tsbuildinfo' -type f -delete
 	$(call step,Installing dependencies)
-	cd "$(ROOT_PATH)" && pnpm install
-	$(call step,Running local gates)
-	cd "$(ROOT_PATH)" && pnpm build && pnpm typecheck && pnpm test
+	$(call run_in,$(ROOT_PATH),pnpm install)
+	$(call step,Building from scratch)
+	$(call run_in,$(ROOT_PATH),pnpm build)
