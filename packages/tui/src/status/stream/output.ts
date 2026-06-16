@@ -1,15 +1,12 @@
-import { StreamBuffer } from '#tui/status/stream/buffer';
-import { StreamLifecycle } from '#tui/status/stream/lifecycle';
+import { createStreamOutputContext } from '#tui/status/stream/output/context';
 import { streamClosedError, streamPromptError } from '#tui/status/stream/output/errors';
 import { pipeStreamSource } from '#tui/status/stream/output/pipe';
 import { streamBufferLines, streamBufferValue } from '#tui/status/stream/output/readback';
 import { flushStreamBuffer, renderStreamBuffer } from '#tui/status/stream/output/rendering';
-import { StreamRenderer } from '#tui/status/stream/renderer';
+import type { StreamOutputContext } from '#tui/status/stream/output/context';
 
 export class Stream {
-	readonly #buffer = new StreamBuffer(10);
-	readonly #renderer = new StreamRenderer();
-	readonly #lifecycle = new StreamLifecycle(() => {
+	readonly #context: StreamOutputContext = createStreamOutputContext(() => {
 		this.flush();
 	});
 
@@ -18,26 +15,26 @@ export class Stream {
 	}
 
 	append(content: string): this {
-		if (this.#lifecycle.closed()) {
+		if (this.#context.lifecycle.closed()) {
 			throw streamClosedError();
 		}
 
-		this.#buffer.append(content);
+		this.#context.buffer.append(content);
 		this.render();
 
 		return this;
 	}
 
 	close(): void {
-		this.#lifecycle.close();
+		this.#context.lifecycle.close();
 	}
 
 	closed(): boolean {
-		return this.#lifecycle.closed();
+		return this.#context.lifecycle.closed();
 	}
 
 	lines(): string[] {
-		return streamBufferLines(this.#buffer);
+		return streamBufferLines(this.#context.buffer);
 	}
 
 	async pipe(source: AsyncIterable<string> | Iterable<string>): Promise<void> {
@@ -57,14 +54,14 @@ export class Stream {
 	}
 
 	value(): string {
-		return streamBufferValue(this.#buffer);
+		return streamBufferValue(this.#context.buffer);
 	}
 
 	private render(): void {
-		renderStreamBuffer({ buffer: this.#buffer, renderer: this.#renderer });
+		renderStreamBuffer(this.#context);
 	}
 
 	private flush(): void {
-		flushStreamBuffer({ buffer: this.#buffer, renderer: this.#renderer });
+		flushStreamBuffer(this.#context);
 	}
 }
