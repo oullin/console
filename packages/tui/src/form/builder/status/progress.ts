@@ -1,6 +1,5 @@
 import { progress } from '#tui/status';
-import { isProgressTotal, isStatusLabel, parseProgressCallback, parseStatusLabel } from '#tui/form/builder/validators/status';
-import { progressStepsArgument } from '#tui/status/progress/validators/arguments';
+import { resolveProgressFormArguments } from '#tui/form/builder/validators/status';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MaybePromise } from '#tui/types';
 import type { Progress } from '#tui/status';
@@ -24,19 +23,19 @@ export function progressFormStep<T, R>(
 	hint = '',
 	name?: string,
 ): FormBuilder {
-	if (isProgressTotal(labelOrTotal)) {
-		const message = isStatusLabel(stepsOrMessage) ? stepsOrMessage : undefined;
+	const resolved = resolveProgressFormArguments<T, R>(labelOrTotal, stepsOrMessage, callbackOrName, hint, name);
 
+	if (resolved.kind === 'total') {
 		return this.addSideEffect(
 			() => {
-				const bar = progress(labelOrTotal, message);
+				const bar = progress(resolved.total, resolved.message);
 
 				bar.start();
 				bar.finish();
 			},
-			parseStatusLabel(callbackOrName),
+			resolved.name,
 		);
 	}
 
-	return this.add(() => progress(labelOrTotal, progressStepsArgument<T>(stepsOrMessage), parseProgressCallback<T, R>(callbackOrName), hint), name, true);
+	return this.add(() => progress(resolved.label, resolved.steps, resolved.callback, resolved.hint), resolved.name, true);
 }

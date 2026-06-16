@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { progressStepsArgument } from '#tui/status/progress/validators/arguments';
 import { parseTaskCallback } from '#tui/status/task/validators/definition';
 import { asyncIterableSchema, iterableSchema } from '#tui/validators/iterable';
 import type { MaybePromise } from '#tui/types';
@@ -22,6 +23,36 @@ export type ResolvedStreamFormArguments =
 			kind: 'source';
 			name?: string;
 			source: AsyncIterable<string> | Iterable<string>;
+	  };
+
+export type ResolvedSpinFormArguments<T> =
+	| {
+			callback: () => MaybePromise<T>;
+			kind: 'message';
+			message: string;
+			name?: string;
+	  }
+	| {
+			callback: () => MaybePromise<T>;
+			kind: 'callback';
+			message: string;
+			name?: string;
+	  };
+
+export type ResolvedProgressFormArguments<T, R> =
+	| {
+			kind: 'total';
+			message?: string;
+			name?: string;
+			total: number;
+	  }
+	| {
+			callback?: (step: T | number, bar: Progress) => MaybePromise<R>;
+			hint: string;
+			kind: 'label';
+			label: string;
+			name?: string;
+			steps: Iterable<T> | number;
 	  };
 
 export type ResolvedTaskFormArguments<T> =
@@ -84,6 +115,54 @@ export const resolveStreamFormArguments = (sourceOrName?: AsyncIterable<string> 
 	}
 
 	return { kind: 'source', name, source: sourceOrName };
+};
+
+export const resolveSpinFormArguments = <T>(
+	callbackOrMessage: (() => MaybePromise<T>) | string,
+	messageOrCallback: string | (() => MaybePromise<T>) = '',
+	name?: string,
+): ResolvedSpinFormArguments<T> => {
+	if (isStatusLabel(callbackOrMessage)) {
+		return {
+			callback: parseStatusCallback<T>(messageOrCallback),
+			kind: 'message',
+			message: callbackOrMessage,
+			name,
+		};
+	}
+
+	return {
+		callback: parseStatusCallback<T>(callbackOrMessage),
+		kind: 'callback',
+		message: parseStatusLabel(messageOrCallback) ?? '',
+		name,
+	};
+};
+
+export const resolveProgressFormArguments = <T, R>(
+	labelOrTotal: string | number,
+	stepsOrMessage?: Iterable<T> | number | string,
+	callbackOrName?: ((step: T | number, bar: Progress) => MaybePromise<R>) | string,
+	hint = '',
+	name?: string,
+): ResolvedProgressFormArguments<T, R> => {
+	if (isProgressTotal(labelOrTotal)) {
+		return {
+			kind: 'total',
+			message: isStatusLabel(stepsOrMessage) ? stepsOrMessage : undefined,
+			name: parseStatusLabel(callbackOrName),
+			total: labelOrTotal,
+		};
+	}
+
+	return {
+		callback: parseProgressCallback<T, R>(callbackOrName),
+		hint,
+		kind: 'label',
+		label: labelOrTotal,
+		name,
+		steps: progressStepsArgument<T>(stepsOrMessage),
+	};
 };
 
 export const resolveTaskFormArguments = <T>(
