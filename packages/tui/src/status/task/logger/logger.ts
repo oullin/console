@@ -1,11 +1,12 @@
 import { createTaskLoggerLimits } from '#tui/status/task/logger/limits';
-import { createTaskLoggerLabels, setTaskLoggerLabel, setTaskLoggerSubLabel } from '#tui/status/task/logger/labels';
+import { createTaskLoggerLabels } from '#tui/status/task/logger/labels';
 import {
 	clearTaskLoggerPartial,
 	writeStableTaskLoggerMessage,
 	writeTaskLoggerLine,
 	writeTaskLoggerPartial,
 } from '#tui/status/task/logger/methods';
+import { syncTaskLoggerLabel, syncTaskLoggerSubLabel } from '#tui/status/task/logger/sync';
 import type { TaskLoggerLimits } from '#tui/status/task/logger/limits';
 import type { PartialTaskLogState } from '#tui/status/task/logger/lines';
 import type { TaskLoggerLabels } from '#tui/status/task/logger/labels';
@@ -40,13 +41,17 @@ export class Logger {
 	}
 
 	label(message: string): void {
-		this.labels = setTaskLoggerLabel(this.labels, message);
-		this.labelValue = this.labels.label;
+		const next = syncTaskLoggerLabel(this.labels, message);
+
+		this.labels = next.labels;
+		this.labelValue = next.labelValue;
 	}
 
 	subLabel(message: string): void {
-		this.labels = setTaskLoggerSubLabel(this.labels, message);
-		this.subLabelValue = this.labels.subLabel;
+		const next = syncTaskLoggerSubLabel(this.labels, message);
+
+		this.labels = next.labels;
+		this.subLabelValue = next.subLabelValue;
 	}
 
 	partial(chunk: string): void {
