@@ -2,6 +2,7 @@ import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderCancelledSearch } from '#tui/prompts/search/render';
 import { cancelledSearchValue } from '#tui/prompts/search/read-single/result';
+import { fallbackSearchDefault } from '#tui/prompts/search/read-single/interactive/result';
 import type { SearchReaderSession } from '#tui/prompts/search/read-single/session';
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
@@ -17,5 +18,5 @@ export const cancelInteractiveSearchInput = async <T>(session: SearchReaderSessi
 	eraseRenderedFrame(session.frame());
 	renderCancelledSearch(options.message, session.query().value, options.placeholder);
 
-	return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(options.default) };
+	return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(fallbackSearchDefault(options)) };
 };
