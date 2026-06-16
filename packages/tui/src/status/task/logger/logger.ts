@@ -1,7 +1,11 @@
 import { createTaskLoggerLimits } from '#tui/status/task/logger/limits';
-import { appendPartialTaskLog, appendTaskLogLines } from '#tui/status/task/logger/lines';
 import { createTaskLoggerLabels, setTaskLoggerLabel, setTaskLoggerSubLabel } from '#tui/status/task/logger/labels';
-import { appendStableTaskLoggerOutput } from '#tui/status/task/logger/output';
+import {
+	clearTaskLoggerPartial,
+	writeStableTaskLoggerMessage,
+	writeTaskLoggerLine,
+	writeTaskLoggerPartial,
+} from '#tui/status/task/logger/methods';
 import type { TaskLoggerLimits } from '#tui/status/task/logger/limits';
 import type { PartialTaskLogState } from '#tui/status/task/logger/lines';
 import type { TaskLoggerLabels } from '#tui/status/task/logger/labels';
@@ -28,7 +32,7 @@ export class Logger {
 	}
 
 	line(message: string): void {
-		this.writeLines(message.trimEnd());
+		writeTaskLoggerLine(this.lines, message, this.limits.line);
 	}
 
 	log(message: string): void {
@@ -46,11 +50,11 @@ export class Logger {
 	}
 
 	partial(chunk: string): void {
-		this.#partial = appendPartialTaskLog(this.lines, this.#partial, chunk, this.limits.line);
+		this.#partial = writeTaskLoggerPartial(this.lines, this.#partial, chunk, this.limits.line);
 	}
 
 	commitPartial(): void {
-		this.#partial = { startIndex: null, value: '' };
+		this.#partial = clearTaskLoggerPartial();
 	}
 
 	info(message: string): void {
@@ -70,11 +74,6 @@ export class Logger {
 	}
 
 	private stable(type: StableTaskMessage['type'], message: string): void {
-		appendStableTaskLoggerOutput(this.stableMessages, this.lines, type, message, this.limits.stable);
-		this.commitPartial();
-	}
-
-	private writeLines(message: string): void {
-		appendTaskLogLines(this.lines, message, this.limits.line);
+		this.#partial = writeStableTaskLoggerMessage(this.stableMessages, this.lines, type, message, this.limits);
 	}
 }
