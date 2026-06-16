@@ -1,3 +1,4 @@
+import { parsePromptOutputContent } from '#tui/environment/validators/output';
 import { parseWritableOutputStream } from '#tui/environment/validators/stream-output';
 import type { PromptOutput } from '#tui/types';
 
@@ -6,7 +7,7 @@ export const outputFromStream = (stream: NodeJS.WritableStream): PromptOutput =>
 
 	return {
 		write(content: string): void {
-			writable.write(content);
+			writable.write(parsePromptOutputContent(content));
 		},
 	};
 };
