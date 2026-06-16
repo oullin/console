@@ -1,10 +1,10 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask } from '#tui/prompt/ask';
 import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
+import { readDataTableFallbackSelection } from '#tui/output/data-table/reader/fallback';
 import { assertSelectedDataTableRow, dataTableSelectionResult, initialDataTableSelection, selectedDataTableValue } from '#tui/output/data-table/reader/result';
 import { renderCancelledDataTableFrame, renderDataTableFrame } from '#tui/output/data-table/render';
 import { visibleDataTableRows } from '#tui/output/data-table/rows';
@@ -52,13 +52,7 @@ export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>
 			return dataTableSelectionResult(visibleRows(), selected, false);
 		}
 
-		const answer = await ask(options.message);
-
-		const rows = visibleDataTableRows(options, headers, answer);
-
-		assertSelectedDataTableRow(rows, 0, '');
-
-		return dataTableSelectionResult(rows, 0, false);
+		return readDataTableFallbackSelection(options, headers);
 	}
 
 	render();
