@@ -1,7 +1,8 @@
+import { parseScriptedInputLines } from '#tui/environment/validators/scripted-input';
 import type { PromptInput } from '#tui/types';
 
 export const createScriptedInput = (lines: string[]): PromptInput => {
-	const queued = [...lines];
+	const queued = parseScriptedInputLines(lines);
 
 	return {
 		async readKey(): Promise<string | null> {
