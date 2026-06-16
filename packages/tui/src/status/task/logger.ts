@@ -1,5 +1,7 @@
 import { parseLogLimit } from '#tui/status/validators/limit';
-import { sanitizeTaskLine } from '#tui/status/task/sanitize';
+import { appendPartialTaskLog, appendTaskLogLines } from '#tui/status/task/logger/lines';
+import { appendStableTaskMessage } from '#tui/status/task/logger/stable';
+import type { PartialTaskLogState } from '#tui/status/task/logger/lines';
 import type { StableTaskMessage } from '#tui/status/task/messages';
 
 export class Logger {
@@ -7,8 +9,7 @@ export class Logger {
 	readonly lines: string[] = [];
 	readonly stableMessages: StableTaskMessage[] = [];
 	subLabelValue: string;
-	#partialBuffer = '';
-	#partialStartIndex: number | null = null;
+	#partial: PartialTaskLogState = { startIndex: null, value: '' };
 	private readonly limit: number;
 	private readonly stableLimit: number;
 
@@ -40,20 +41,11 @@ export class Logger {
 	}
 
 	partial(chunk: string): void {
-		this.#partialBuffer += chunk;
-
-		if (this.#partialStartIndex === null) {
-			this.#partialStartIndex = this.lines.length;
-		}
-
-		this.lines.splice(this.#partialStartIndex);
-		this.writeLines(this.#partialBuffer);
-		this.#partialStartIndex = Math.min(this.#partialStartIndex, this.lines.length);
+		this.#partial = appendPartialTaskLog(this.lines, this.#partial, chunk, this.limit);
 	}
 
 	commitPartial(): void {
-		this.#partialBuffer = '';
-		this.#partialStartIndex = null;
+		this.#partial = { startIndex: null, value: '' };
 	}
 
 	info(message: string): void {
@@ -73,23 +65,12 @@ export class Logger {
 	}
 
 	private stable(type: StableTaskMessage['type'], message: string): void {
-		this.stableMessages.push({ message, type });
+		appendStableTaskMessage(this.stableMessages, type, message, this.stableLimit);
 		this.lines.splice(0);
-		this.#partialBuffer = '';
-		this.#partialStartIndex = null;
-
-		while (this.stableMessages.length > this.stableLimit) {
-			this.stableMessages.shift();
-		}
+		this.commitPartial();
 	}
 
 	private writeLines(message: string): void {
-		for (const line of message.split(/\r?\n/u).filter((value) => value.length > 0)) {
-			this.lines.push(sanitizeTaskLine(line));
-		}
-
-		while (this.lines.length > this.limit) {
-			this.lines.shift();
-		}
+		appendTaskLogLines(this.lines, message, this.limit);
 	}
 }
