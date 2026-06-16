@@ -1,7 +1,7 @@
 import { promptEnvironment } from '#tui/environment';
 import { defaultBackgroundColor, defaultForegroundColor, parseTerminalColor, terminalSupportsTrueColor } from '#tui/terminal/capabilities';
 import type { TerminalColor } from '#tui/terminal/capabilities';
-import { parseTerminalDimension } from '#tui/terminal/validators/size';
+import { parseTerminalDimension, parseTerminalLineCount } from '#tui/terminal/validators/size';
 
 export type TerminalSize = {
 	columns: number;
@@ -26,7 +26,7 @@ export const eraseLine = (): void => {
 };
 
 export const erasePreviousLines = (count: number): void => {
-	const lines = Math.max(0, Math.floor(count));
+	const lines = parseTerminalLineCount(count);
 
 	if (lines === 0) {
 		return;
