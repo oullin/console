@@ -1,13 +1,13 @@
 import { z } from 'zod';
+import { choiceOptionsSchema } from '#tui/concerns/validators/choice';
 import type { ChoiceOptions, MaybePromise } from '#tui/types';
 
 export type SearchChoiceSourceCallback<T> = (query: string) => MaybePromise<ChoiceOptions<T>>;
 
 const searchLabelSchema = z.string();
-const searchChoiceOptionsSchema = <T>(): z.ZodType<ChoiceOptions<T>> => z.union([z.array(z.unknown()), z.record(z.string(), z.string())]) as z.ZodType<ChoiceOptions<T>>;
 const searchChoiceSourceCallbackSchema = <T>(): z.ZodType<SearchChoiceSourceCallback<T>> => z.function() as z.ZodType<SearchChoiceSourceCallback<T>>;
 const searchChoiceSourceSchema = <T>(): z.ZodType<ChoiceOptions<T> | SearchChoiceSourceCallback<T>> =>
-	z.union([searchChoiceOptionsSchema<T>(), searchChoiceSourceCallbackSchema<T>()]);
+	z.union([choiceOptionsSchema<T>(), searchChoiceSourceCallbackSchema<T>()]);
 
 export const isSearchPromptLabel = (value: unknown): value is string => {
 	return searchLabelSchema.safeParse(value).success;

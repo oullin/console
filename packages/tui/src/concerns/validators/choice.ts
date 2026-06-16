@@ -16,6 +16,8 @@ const typedChoiceSchema = <T>(): z.ZodType<Choice<T>> => choiceSchema as z.ZodTy
 const typedChoiceOptionsListSchema = <T>(): z.ZodType<Array<Choice<T> | T>> => choiceOptionsListSchema as z.ZodType<Array<Choice<T> | T>>;
 const choiceValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
 
+export const choiceOptionsSchema = <T>(): z.ZodType<ChoiceOptions<T>> => z.union([choiceOptionsListSchema, choiceRecordSchema]) as z.ZodType<ChoiceOptions<T>>;
+
 export type ChoiceRecordEntry = {
 	label: string;
 	value: string;
