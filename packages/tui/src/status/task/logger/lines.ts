@@ -6,25 +6,39 @@ export type PartialTaskLogState = {
 	value: string;
 };
 
-export const appendTaskLogLines = (lines: string[], message: string, limit: number): void => {
-	for (const line of parseTaskLogMessageLines(message)) {
-		lines.push(sanitizeTaskLine(line));
+const parsedTaskLogLines = (message: string): string[] => parseTaskLogMessageLines(message).map((line) => sanitizeTaskLine(line));
+
+const trimTaskLogLines = (lines: string[], limit: number): number => {
+	const removed = Math.max(0, lines.length - limit);
+
+	if (removed > 0) {
+		lines.splice(0, removed);
 	}
 
-	while (lines.length > limit) {
-		lines.shift();
+	return removed;
+};
+
+export const appendTaskLogLines = (lines: string[], message: string, limit: number): void => {
+	for (const line of parsedTaskLogLines(message)) {
+		lines.push(line);
 	}
+
+	trimTaskLogLines(lines, limit);
 };
 
 export const appendPartialTaskLog = (lines: string[], partial: PartialTaskLogState, chunk: string, limit: number): PartialTaskLogState => {
 	const value = `${partial.value}${chunk}`;
-	const startIndex = partial.startIndex ?? lines.length;
+	const startIndex = Math.min(partial.startIndex ?? lines.length, lines.length);
+	const parsed = parsedTaskLogLines(value);
 
 	lines.splice(startIndex);
-	appendTaskLogLines(lines, value, limit);
+	lines.push(...parsed);
+
+	const removed = trimTaskLogLines(lines, limit);
+	const nextStartIndex = parsed.length === 0 || lines.length === 0 ? null : Math.max(0, startIndex - removed);
 
 	return {
-		startIndex: Math.min(startIndex, lines.length),
+		startIndex: nextStartIndex,
 		value,
 	};
 };
