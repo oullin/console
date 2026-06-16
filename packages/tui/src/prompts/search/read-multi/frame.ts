@@ -3,7 +3,7 @@ import { renderSearchChoices } from '#tui/prompts/search/render';
 import type { MultiSearchReaderState } from '#tui/prompts/search/read-multi/state';
 import type { MultiSearchPromptOptions } from '#tui/types';
 
-type MultiSearchFrameRenderer = {
+export type MultiSearchFrameRenderer = {
 	current(): string;
 	render(): void;
 };

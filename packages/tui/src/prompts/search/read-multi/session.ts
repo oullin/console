@@ -1,4 +1,10 @@
 import { createMultiSearchFrameRenderer } from '#tui/prompts/search/read-multi/frame';
+import {
+	applyMultiSearchSessionTypedInput,
+	moveMultiSearchSessionHighlight,
+	toggleAllMultiSearchSessionDisplayed,
+	toggleMultiSearchSessionHighlighted,
+} from '#tui/prompts/search/read-multi/session/actions';
 import { createMultiSearchReaderState } from '#tui/prompts/search/read-multi/state';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
@@ -25,13 +31,7 @@ export const createMultiSearchReaderSession = async <T>(options: MultiSearchProm
 
 	return {
 		async applyTypedInput(key: string) {
-			const next = await state.applyTypedInput(key);
-
-			if (!next.cancelled) {
-				frame.render();
-			}
-
-			return next;
+			return applyMultiSearchSessionTypedInput(state, frame, key);
 		},
 		frame() {
 			return frame.current();
@@ -40,9 +40,7 @@ export const createMultiSearchReaderSession = async <T>(options: MultiSearchProm
 			return state.highlighted();
 		},
 		async move(action) {
-			await state.move(action);
-
-			frame.render();
+			await moveMultiSearchSessionHighlight(state, frame, action);
 		},
 		query() {
 			return state.query();
@@ -55,12 +53,10 @@ export const createMultiSearchReaderSession = async <T>(options: MultiSearchProm
 			return state.selectedLabels();
 		},
 		toggleAllDisplayed() {
-			state.toggleAllDisplayed();
-			frame.render();
+			toggleAllMultiSearchSessionDisplayed(state, frame);
 		},
 		toggleHighlighted() {
-			state.toggleHighlighted();
-			frame.render();
+			toggleMultiSearchSessionHighlighted(state, frame);
 		},
 	};
 };
