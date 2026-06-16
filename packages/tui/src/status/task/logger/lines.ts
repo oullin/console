@@ -1,4 +1,5 @@
 import { sanitizeTaskLine } from '#tui/status/task/sanitize';
+import { parseTaskLogMessageLines } from '#tui/status/task/logger/validators/message';
 
 export type PartialTaskLogState = {
 	startIndex: number | null;
@@ -6,7 +7,7 @@ export type PartialTaskLogState = {
 };
 
 export const appendTaskLogLines = (lines: string[], message: string, limit: number): void => {
-	for (const line of message.split(/\r?\n/u).filter((value) => value.length > 0)) {
+	for (const line of parseTaskLogMessageLines(message)) {
 		lines.push(sanitizeTaskLine(line));
 	}
 
