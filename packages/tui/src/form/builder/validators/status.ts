@@ -5,8 +5,9 @@ import type { Progress } from '#tui/status';
 
 const progressTotalSchema = z.number();
 const statusLabelSchema = z.string();
-const statusCallbackSchema = z.function();
-const progressCallbackSchema = z.function();
+const statusCallbackSchema = <T>(): z.ZodType<() => MaybePromise<T>> => z.function() as z.ZodType<() => MaybePromise<T>>;
+const progressCallbackSchema = <T, R>(): z.ZodType<(step: T | number, bar: Progress) => MaybePromise<R>> =>
+	z.function() as z.ZodType<(step: T | number, bar: Progress) => MaybePromise<R>>;
 
 const streamSourceSchema = z.union([asyncIterableSchema<string>(), iterableSchema<string>()]);
 
@@ -25,19 +26,19 @@ export const parseStatusLabel = (value: unknown): string | undefined => {
 };
 
 export const parseStatusCallback = <T>(value: unknown): (() => MaybePromise<T>) => {
-	const parsed = statusCallbackSchema.safeParse(value);
+	const parsed = statusCallbackSchema<T>().safeParse(value);
 
 	if (!parsed.success) {
 		throw new Error('A status callback is required.');
 	}
 
-	return parsed.data as () => MaybePromise<T>;
+	return parsed.data;
 };
 
 export const parseProgressCallback = <T, R>(value: unknown): ((step: T | number, bar: Progress) => MaybePromise<R>) | undefined => {
-	const parsed = progressCallbackSchema.safeParse(value);
+	const parsed = progressCallbackSchema<T, R>().safeParse(value);
 
-	return parsed.success ? (parsed.data as (step: T | number, bar: Progress) => MaybePromise<R>) : undefined;
+	return parsed.success ? parsed.data : undefined;
 };
 
 export const isStreamSource = (value: unknown): value is AsyncIterable<string> | Iterable<string> => {
