@@ -1,7 +1,7 @@
-import { applyTypedKey } from '#tui/typed-value';
-import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight } from '#tui/prompts/search/keys';
-import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
+import { resolveSearchChoices } from '#tui/prompts/search/choices';
+import { createInitialSearchSelection, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
+import { createMultiSearchChoiceQuery } from '#tui/prompts/search/read-multi/choice-query';
 import { toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
@@ -22,33 +22,20 @@ export type MultiSearchReaderState<T> = {
 };
 
 export const createMultiSearchReaderState = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchReaderState<T>> => {
-	let query: TypedValueState = { cursor: 0, value: '' };
+	const initialChoices = await resolveSearchChoices(options.options, '');
 
-	let choices: Array<Choice<T>> = await resolveSearchChoices(options.options, query.value);
+	const selected = createInitialSearchSelection(initialChoices, options.default);
+	const query = createMultiSearchChoiceQuery(options, selected, initialChoices);
 
 	let highlighted: number | null = null;
 
-	const selected = createInitialSearchSelection(choices, options.default);
-	const displayedChoices = (): Array<Choice<T>> => displayedSearchChoices(choices, selected, query.value);
-
-	const resolveChoices = async (): Promise<void> => {
-		choices = await resolveSearchChoices(options.options, query.value);
-	};
-
 	return {
 		async applyTypedInput(key) {
-			const next = applyTypedKey(query, key);
+			const next = await query.applyTypedInput(key);
 
-			if (next.cancelled) {
-				return { cancelled: true };
-			}
-
-			query = { cursor: next.cursor, value: next.value };
 			highlighted = null;
 
-			await resolveChoices();
-
-			return { cancelled: false };
+			return next;
 		},
 		displayedChoices,
 		highlighted() {
@@ -58,12 +45,12 @@ export const createMultiSearchReaderState = async <T>(options: MultiSearchPrompt
 			return markedSearchChoiceIndexes(displayedChoices(), selected);
 		},
 		async move(action) {
-			await resolveChoices();
+			await query.resolveChoices();
 
 			highlighted = moveSearchHighlight(displayedChoices(), highlighted, action, { scroll: options.scroll });
 		},
 		query() {
-			return query;
+			return query.value();
 		},
 		selected() {
 			return selected;
@@ -78,4 +65,8 @@ export const createMultiSearchReaderState = async <T>(options: MultiSearchPrompt
 			toggleHighlightedSearchChoice(selected, displayedChoices(), highlighted);
 		},
 	};
+
+	function displayedChoices(): Array<Choice<T>> {
+		return query.displayedChoices();
+	}
 };
