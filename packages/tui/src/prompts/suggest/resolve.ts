@@ -1,9 +1,11 @@
+import { isSuggestionSourceCallback } from '#tui/prompts/suggest/validators/source';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const resolveSuggestions = async (source: SuggestOptions['options'], query: string): Promise<string[]> => {
-	const options = typeof source === 'function' ? await source(query) : source;
+	const isCallback = isSuggestionSourceCallback(source);
+	const options = isCallback ? await source(query) : source;
 
-	if (typeof source === 'function') {
+	if (isCallback) {
 		return [...options];
 	}
 
