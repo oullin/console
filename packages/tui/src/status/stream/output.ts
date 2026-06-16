@@ -1,9 +1,10 @@
 import { StreamBuffer } from '#tui/status/stream/buffer';
 import { StreamLifecycle } from '#tui/status/stream/lifecycle';
 import { streamClosedError, streamPromptError } from '#tui/status/stream/output/errors';
+import { pipeStreamSource } from '#tui/status/stream/output/pipe';
+import { streamBufferLines, streamBufferValue } from '#tui/status/stream/output/readback';
 import { flushStreamBuffer, renderStreamBuffer } from '#tui/status/stream/output/rendering';
 import { StreamRenderer } from '#tui/status/stream/renderer';
-import { streamLines } from '#tui/status/stream/render';
 
 export class Stream {
 	readonly #buffer = new StreamBuffer(10);
@@ -36,17 +37,19 @@ export class Stream {
 	}
 
 	lines(): string[] {
-		return streamLines({ value: this.value() });
+		return streamBufferLines(this.#buffer);
 	}
 
 	async pipe(source: AsyncIterable<string> | Iterable<string>): Promise<void> {
-		try {
-			for await (const chunk of source) {
+		return pipeStreamSource(
+			source,
+			(chunk) => {
 				this.write(chunk);
-			}
-		} finally {
-			this.close();
-		}
+			},
+			() => {
+				this.close();
+			},
+		);
 	}
 
 	prompt(): never {
@@ -54,7 +57,7 @@ export class Stream {
 	}
 
 	value(): string {
-		return this.#buffer.value();
+		return streamBufferValue(this.#buffer);
 	}
 
 	private render(): void {
