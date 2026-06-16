@@ -17,7 +17,7 @@ TypeScript and OpenTUI internals.
 | Prompt cancellation callback lifecycle | `packages/tui/src/prompt/cancel.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt revert rejection lifecycle | `packages/tui/src/prompt/revert.ts`, `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/form.test.ts` |
 | Prompt validation retry default lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/tests/text.test.ts` |
-| Prompt post-validation submitted-frame lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts` |
+| Prompt post-validation submitted-frame lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts` |
 | Prompt invalid-attempt active-frame cleanup lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/src/prompt/active-frame.ts`, `packages/tui/src/prompts/*`, `packages/tui/src/output/data-table.ts` |
 | Prompt non-interactive raw-default validation lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*` |
 | Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
@@ -26,10 +26,10 @@ TypeScript and OpenTUI internals.
 | Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
-| Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/tests/text.test.ts` |
-| Text active, submitted, cancelled, placeholder, and validation-safe rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/src/typed-value/render.ts`, `packages/tui/tests/text.test.ts` |
-| Text active-frame redraw and submitted-frame replacement | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/render.ts`, `packages/tui/src/prompts/text.ts` |
-| Text transformed fallback value, invalid retry default preservation, and plain placeholder rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text-default.ts`, `packages/tui/src/typed-value/render.ts` |
+| Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/tests/text.test.ts` |
+| Text active, submitted, cancelled, placeholder, and validation-safe rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/src/typed-value/render.ts`, `packages/tui/tests/text.test.ts` |
+| Text active-frame redraw and submitted-frame replacement | `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/render.ts`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*` |
+| Text transformed fallback value, invalid retry default preservation, and plain placeholder rendering | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*`, `packages/tui/src/prompts/text-default.ts`, `packages/tui/src/typed-value/render.ts` |
 | Textarea input | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts` |
 | Textarea defaults, transforms, validation, editing keys, line navigation, and non-interactive behavior | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/tests/textarea.test.ts` |
 | Textarea active, submitted, cancelled, scrollbar, placeholder, and validation-safe rendering | `packages/tui/src/prompts/textarea.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/src/typed-value/textarea-frame.ts`, `packages/tui/tests/textarea.test.ts` |

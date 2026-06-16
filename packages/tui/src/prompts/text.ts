@@ -1,9 +1,5 @@
-import { textOptions } from '#tui/concerns/text-options';
-import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { activePromptFrame } from '#tui/prompt/active-frame';
-import { transformedTextDefault } from '#tui/prompts/text-default';
-import { readTypedValue } from '#tui/typed-value';
-import { renderSubmittedTypedValue } from '#tui/typed-value/render';
+import { normalizeTextPromptOptions } from '#tui/prompts/text/options';
+import { runTextPrompt } from '#tui/prompts/text/run';
 import type { TextPromptOptions } from '#tui/types';
 
 export function text(options: TextPromptOptions): Promise<string>;
@@ -27,44 +23,15 @@ export async function text(
 	hint = '',
 	transform: TextPromptOptions['transform'] = undefined,
 ): Promise<string> {
-	const options = typeof message === 'string' ? textOptions({ message, label: message, placeholder, default: defaultValue, required, validate, hint, transform }) : textOptions(message);
-
-	const validationOptions: TextPromptOptions = {
-		...options,
-		default: await transformedTextDefault(options),
-	};
-
-	let shouldRenderSubmittedFrame = false;
-
-	const activeFrame = activePromptFrame();
-
-	return promptWithFallback('text', options, () =>
-		promptUntilValid(
-			validationOptions,
-			async () => {
-				const answer = await readTypedValue(options.message, {
-					default: options.default,
-					hint: options.hint,
-					placeholder: options.placeholder,
-				});
-
-				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
-
-				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = !answer.cancelled;
-
-				return options.transform ? options.transform(value) : value;
-			},
-			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
-					renderSubmittedTypedValue(options.message, value);
-				}
-			},
-			(value) => {
-				options.default = value;
-				activeFrame.clear();
-			},
-		),
+	return runTextPrompt(
+		normalizeTextPromptOptions({
+			defaultValue,
+			hint,
+			message,
+			placeholder,
+			required,
+			transform,
+			validate,
+		}),
 	);
 }
