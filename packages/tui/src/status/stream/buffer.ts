@@ -17,14 +17,13 @@ export class StreamBuffer {
 		}
 	}
 
-	flushNext(): boolean {
-		const next = this.fading.shift();
-
-		if (next === undefined) {
+	flush(): boolean {
+		if (this.fading.length === 0) {
 			return false;
 		}
 
-		this.#message += next;
+		this.#message += this.fading.join('');
+		this.fading.length = 0;
 
 		return true;
 	}

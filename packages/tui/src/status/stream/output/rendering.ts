@@ -14,7 +14,7 @@ export const renderStreamBuffer = ({ buffer, renderer }: StreamRenderContext): v
 };
 
 export const flushStreamBuffer = (context: StreamRenderContext): void => {
-	while (context.buffer.flushNext()) {
+	if (context.buffer.flush()) {
 		renderStreamBuffer(context);
 	}
 };
