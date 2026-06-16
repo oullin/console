@@ -1,66 +1,54 @@
-import { ProgressRenderer } from '#tui/status/progress/renderer';
-import { ProgressState } from '#tui/status/progress/state';
-import { ProgressTerminalLifecycle } from '#tui/status/progress/terminal';
+import { ProgressController } from '#tui/status/progress/controller';
 import type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
 export type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
 export class Progress {
-	readonly #state: ProgressState;
-	readonly #renderer: ProgressRenderer;
-	readonly #terminal: ProgressTerminalLifecycle;
+	readonly #controller: ProgressController;
 	readonly total: number;
 	#handleSignal = (): void => {
 		this.fail();
 	};
 
 	constructor(total: number, message = 'Progress', hint = '', signalTarget: ProgressSignalTarget = process) {
-		this.#state = new ProgressState(total, message, hint);
-		this.total = this.#state.total;
-		this.#terminal = new ProgressTerminalLifecycle(signalTarget, this.#handleSignal);
-		this.#renderer = new ProgressRenderer(this.#terminal);
+		this.#controller = new ProgressController(total, message, hint, signalTarget, this.#handleSignal);
+		this.total = this.#controller.state.total;
 	}
 
 	start(): void {
-		this.#state.activate();
-		this.render();
+		this.#controller.activate();
 	}
 
 	advance(step = 1): void {
-		this.#state.advance(step);
-		this.render();
+		this.#controller.advance(step);
 	}
 
 	finish(): void {
-		this.#state.finish();
-		this.render();
-		this.#terminal.restore();
+		this.#controller.finish();
 	}
 
 	fail(): void {
-		this.#state.fail();
-		this.render();
-		this.#terminal.restore();
+		this.#controller.fail();
 	}
 
 	label(value: string): this {
-		this.#state.label(value);
+		this.#controller.state.label(value);
 
 		return this;
 	}
 
 	hint(value: string): this {
-		this.#state.hint(value);
+		this.#controller.state.hint(value);
 
 		return this;
 	}
 
 	percentage(): number {
-		return this.#state.percentage();
+		return this.#controller.state.percentage();
 	}
 
 	current(): number {
-		return this.#state.current();
+		return this.#controller.state.current();
 	}
 
 	value(): boolean {
@@ -72,6 +60,6 @@ export class Progress {
 	}
 
 	render(): void {
-		this.#renderer.render(this.#state.snapshot());
+		this.#controller.render();
 	}
 }
