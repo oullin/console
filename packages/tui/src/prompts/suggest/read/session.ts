@@ -1,8 +1,5 @@
-import { applyTypedKey } from '#tui/typed-value';
-import { moveSuggestionHighlight } from '#tui/prompts/suggest/keys';
 import { createSuggestFrameRenderer } from '#tui/prompts/suggest/read/frame';
-import { initialSuggestionState } from '#tui/prompts/suggest/read-result';
-import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
+import { createSuggestReaderState } from '#tui/prompts/suggest/read/state';
 import type { SuggestNavigationAction } from '#tui/prompts/suggest/keys';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { TypedValueState } from '#tui/typed-value/types';
@@ -19,60 +16,47 @@ export type SuggestReaderSession = {
 };
 
 export const createSuggestReaderSession = async (options: SuggestOptions): Promise<SuggestReaderSession> => {
-	let state = initialSuggestionState(options.default ?? '');
-	let highlighted: number | null = null;
-
-	let matches = await resolveSuggestions(options.options, state.value);
+	const state = await createSuggestReaderState(options);
 
 	const frame = createSuggestFrameRenderer(options);
 
-	const resolveMatches = async (): Promise<void> => {
-		matches = await resolveSuggestions(options.options, state.value);
-	};
-
 	function render(): void {
-		frame.render({ highlighted, matches, state });
+		frame.render({ highlighted: state.highlighted(), matches: state.matches(), state: state.value() });
 	}
 
 	return {
 		async applyTypedInput(key) {
-			const next = applyTypedKey(state, key);
+			const next = await state.applyTypedInput(key);
 
 			if (next.submitted || next.cancelled) {
-				return { cancelled: next.cancelled, submitted: next.submitted };
+				return next;
 			}
-
-			state = { cursor: next.cursor, value: next.value };
-			highlighted = null;
-
-			await resolveMatches();
 
 			render();
 
-			return { cancelled: false, submitted: false };
+			return next;
 		},
 		clearHighlight() {
-			highlighted = null;
+			state.clearHighlight();
 			render();
 		},
 		frame() {
 			return frame.current();
 		},
 		highlighted() {
-			return highlighted;
+			return state.highlighted();
 		},
 		matches() {
-			return matches;
+			return state.matches();
 		},
 		async move(action) {
-			await resolveMatches();
+			await state.move(action);
 
-			highlighted = moveSuggestionHighlight(matches, highlighted, action, options.scroll);
 			render();
 		},
 		render,
 		state() {
-			return state;
+			return state.value();
 		},
 	};
 };

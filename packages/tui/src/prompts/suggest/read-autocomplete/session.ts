@@ -1,8 +1,5 @@
-import { applyTypedKey } from '#tui/typed-value';
-import { acceptAutocompleteMatch, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
 import { createAutocompleteFrameRenderer } from '#tui/prompts/suggest/read-autocomplete/frame';
-import { initialSuggestionState } from '#tui/prompts/suggest/read-result';
-import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
+import { createAutocompleteReaderState } from '#tui/prompts/suggest/read-autocomplete/state';
 import type { TypedValueState } from '#tui/typed-value/types';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
@@ -16,65 +13,42 @@ export type AutocompleteReaderSession = {
 };
 
 export const createAutocompleteReaderSession = async (options: SuggestOptions): Promise<AutocompleteReaderSession> => {
-	let state = initialSuggestionState(options.default ?? '');
-	let highlighted = 0;
-
-	let matches = await resolveSuggestions(options.options, state.value);
+	const state = await createAutocompleteReaderState(options);
 
 	const frame = createAutocompleteFrameRenderer(options);
 
-	const resolveMatches = async (): Promise<void> => {
-		matches = await resolveSuggestions(options.options, state.value);
-	};
-
 	function render(): void {
-		frame.render({ highlighted, matches, state });
+		frame.render({ highlighted: state.highlighted(), matches: state.matches(), state: state.value() });
 	}
 
 	return {
 		async acceptHighlighted(requireGrowth) {
-			await resolveMatches();
-
-			const next = acceptAutocompleteMatch(state, matches[highlighted], requireGrowth);
-
-			if (next !== null) {
-				state = next;
-
-				await resolveMatches();
-			} else {
-				highlighted = 0;
-			}
+			await state.acceptHighlighted(requireGrowth);
 
 			render();
 		},
 		async applyTypedInput(key) {
-			const next = applyTypedKey(state, key);
+			const next = await state.applyTypedInput(key);
 
 			if (next.submitted || next.cancelled) {
-				return { cancelled: next.cancelled, submitted: next.submitted };
+				return next;
 			}
-
-			state = { cursor: next.cursor, value: next.value };
-			highlighted = 0;
-
-			await resolveMatches();
 
 			render();
 
-			return { cancelled: false, submitted: false };
+			return next;
 		},
 		frame() {
 			return frame.current();
 		},
 		async move(direction) {
-			await resolveMatches();
+			await state.move(direction);
 
-			highlighted = moveAutocompleteHighlight(matches, highlighted, direction);
 			render();
 		},
 		render,
 		state() {
-			return state;
+			return state.value();
 		},
 	};
 };
