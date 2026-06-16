@@ -1,8 +1,7 @@
-import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { acceptAutocompleteMatch, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
+import { createAutocompleteFrameRenderer } from '#tui/prompts/suggest/read-autocomplete/frame';
 import { initialSuggestionState } from '#tui/prompts/suggest/read-result';
-import { renderAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
 import type { TypedValueState } from '#tui/typed-value/types';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
@@ -22,18 +21,14 @@ export const createAutocompleteReaderSession = async (options: SuggestOptions): 
 
 	let matches = await resolveSuggestions(options.options, state.value);
 
-	let frame = '';
+	const frame = createAutocompleteFrameRenderer(options);
 
 	const resolveMatches = async (): Promise<void> => {
 		matches = await resolveSuggestions(options.options, state.value);
 	};
 
 	function render(): void {
-		if (frame.length > 0) {
-			eraseRenderedFrame(frame);
-		}
-
-		frame = renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+		frame.render({ highlighted, matches, state });
 	}
 
 	return {
@@ -69,7 +64,7 @@ export const createAutocompleteReaderSession = async (options: SuggestOptions): 
 			return { cancelled: false, submitted: false };
 		},
 		frame() {
-			return frame;
+			return frame.current();
 		},
 		async move(direction) {
 			await resolveMatches();
