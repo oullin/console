@@ -1,27 +1,28 @@
-import { promptEnvironment } from '#tui/environment';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { StatusSignalCleanup } from '#tui/status/signals';
 import { Logger } from '#tui/status/task/logger';
 import { captureTaskProcessOutput } from '#tui/status/task/process-output';
-import { renderLoggerTaskFrame } from '#tui/status/task/frame';
+import { createTaskLifecycleRenderer } from '#tui/status/task/lifecycle/rendering';
 import { hideCursor, showCursor } from '#tui/terminal';
 import type { ResolvedTaskDefinition } from '#tui/status/task/definition';
+import type { TaskLifecycleRenderer } from '#tui/status/task/lifecycle/rendering';
 
 export const runTaskLifecycle = async <T>(definition: ResolvedTaskDefinition<T>): Promise<T> => {
-	const logger = new Logger(definition.limit, definition.title, definition.subLabel);
-	const output = promptEnvironment().output;
+	let renderer: TaskLifecycleRenderer | null = null;
+	const logger = new Logger(definition.limit, definition.title, definition.subLabel, () => {
+		renderer?.render();
+	});
 
 	hideCursor();
 
-	let frame = renderLoggerTaskFrame(logger);
-
-	output.write(frame);
+	renderer = createTaskLifecycleRenderer(logger);
+	renderer.render();
 
 	const processOutput = captureTaskProcessOutput(logger);
 
 	const cleanup = new StatusSignalCleanup(() => {
 		processOutput.stop();
-		eraseRenderedFrame(frame);
+		eraseRenderedFrame(renderer?.current() ?? '');
 		showCursor();
 	}).attach();
 
@@ -29,16 +30,12 @@ export const runTaskLifecycle = async <T>(definition: ResolvedTaskDefinition<T>)
 		const result = await definition.run(logger);
 
 		processOutput.stop();
-		eraseRenderedFrame(frame);
-		frame = renderLoggerTaskFrame(logger, { finished: true, keepSummary: definition.keepSummary });
-		output.write(frame);
+		renderer.render({ finished: true, keepSummary: definition.keepSummary });
 
 		return result;
 	} catch (error) {
 		processOutput.stop();
-		eraseRenderedFrame(frame);
-		frame = renderLoggerTaskFrame(logger);
-		output.write(frame);
+		renderer.render();
 
 		throw error;
 	} finally {

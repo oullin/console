@@ -1,5 +1,6 @@
 import { createTaskLoggerLimits } from '#tui/status/task/logger/limits';
 import { createTaskLoggerLabels } from '#tui/status/task/logger/labels';
+import { notifyTaskLoggerChanged } from '#tui/status/task/logger/events';
 import {
 	clearTaskLoggerPartial,
 	writeStableTaskLoggerMessage,
@@ -7,6 +8,7 @@ import {
 	writeTaskLoggerPartial,
 } from '#tui/status/task/logger/methods';
 import { syncTaskLoggerLabel, syncTaskLoggerSubLabel } from '#tui/status/task/logger/sync';
+import type { TaskLoggerChangeHandler } from '#tui/status/task/logger/events';
 import type { TaskLoggerLimits } from '#tui/status/task/logger/limits';
 import type { PartialTaskLogState } from '#tui/status/task/logger/lines';
 import type { TaskLoggerLabels } from '#tui/status/task/logger/labels';
@@ -21,7 +23,7 @@ export class Logger {
 	private labels: TaskLoggerLabels;
 	private readonly limits: TaskLoggerLimits;
 
-	constructor(limit: number, label: string, subLabel = '') {
+	constructor(limit: number, label: string, subLabel = '', private readonly onChange?: TaskLoggerChangeHandler) {
 		this.limits = createTaskLoggerLimits(limit);
 		this.labels = createTaskLoggerLabels(label, subLabel);
 		this.labelValue = this.labels.label;
@@ -34,6 +36,7 @@ export class Logger {
 
 	line(message: string): void {
 		writeTaskLoggerLine(this.lines, message, this.limits.line);
+		this.changed();
 	}
 
 	log(message: string): void {
@@ -45,6 +48,7 @@ export class Logger {
 
 		this.labels = next.labels;
 		this.labelValue = next.labelValue;
+		this.changed();
 	}
 
 	subLabel(message: string): void {
@@ -52,14 +56,17 @@ export class Logger {
 
 		this.labels = next.labels;
 		this.subLabelValue = next.subLabelValue;
+		this.changed();
 	}
 
 	partial(chunk: string): void {
 		this.#partial = writeTaskLoggerPartial(this.lines, this.#partial, chunk, this.limits.line);
+		this.changed();
 	}
 
 	commitPartial(): void {
 		this.#partial = clearTaskLoggerPartial();
+		this.changed();
 	}
 
 	info(message: string): void {
@@ -80,5 +87,10 @@ export class Logger {
 
 	private stable(type: StableTaskMessage['type'], message: string): void {
 		this.#partial = writeStableTaskLoggerMessage(this.stableMessages, this.lines, type, message, this.limits);
+		this.changed();
+	}
+
+	private changed(): void {
+		notifyTaskLoggerChanged(this.onChange);
 	}
 }
