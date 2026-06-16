@@ -1,22 +1,17 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
+import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
-import { renderChoices } from '#tui/theme';
-import { findChoice } from '#tui/concerns/choices';
-import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
+import { selectNavigationAction } from '#tui/prompts/select/keys';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
-import { defaultChoiceIndex, invalidSelectedChoice, selectedChoiceAt, selectedChoiceByDefault, selectedChoiceResult } from '#tui/prompts/select/read-selected/result';
-import { renderCancelledChoice, renderSelectedChoice } from '#tui/prompts/select/render';
+import { readSelectedChoiceLineMode } from '#tui/prompts/select/read-selected/line-mode';
+import { invalidSelectedChoice, selectedChoiceAt, selectedChoiceByDefault, selectedChoiceResult } from '#tui/prompts/select/read-selected/result';
+import { createSelectedChoiceReaderSession } from '#tui/prompts/select/read-selected/session';
+import type { SelectedChoiceReadResult } from '#tui/prompts/select/read-selected/types';
+import { renderCancelledChoice } from '#tui/prompts/select/render';
 import type { Choice, SelectPromptOptions } from '#tui/types';
 
-export type SelectedChoiceReadResult<T> = {
-	cancelled: boolean;
-	frame?: string;
-	submitted: boolean;
-	submittedLabel: string;
-	value: T;
-};
+export type { SelectedChoiceReadResult } from '#tui/prompts/select/read-selected/types';
 
 export const readSelectedChoice = async <T>(
 	message: string,
@@ -30,30 +25,12 @@ export const readSelectedChoice = async <T>(
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const rendered = renderChoices(choices);
-
-		const answer = await ask(`${message}\n${rendered}\n`, hint);
-
-		if (answer.trim() === '' && hasDefault) {
-			const choice = selectedChoiceByDefault(choices, defaultValue, hasDefault);
-
-			if (choice) {
-				return selectedChoiceResult(choice, false);
-			}
-		}
-
-		const choice = findChoice(choices, answer);
-
-		if (!choice || choice.disabled) {
-			throw invalidSelectedChoice();
-		}
-
-		return selectedChoiceResult(choice, false);
+		return readSelectedChoiceLineMode(message, choices, defaultValue, hasDefault, hint);
 	}
 
-	let selected = defaultChoiceIndex(choices, defaultValue, hasDefault);
+	const session = createSelectedChoiceReaderSession(message, choices, defaultValue, hasDefault, scroll, info);
 
-	let frame = renderSelectedChoice(message, choices, selected, scroll, info);
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -69,10 +46,10 @@ export const readSelectedChoice = async <T>(
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(frame);
-			renderCancelledChoice(message, choices, selected, scroll);
+			eraseRenderedFrame(session.frame());
+			renderCancelledChoice(message, choices, session.selected(), scroll);
 
-			const choice = selectedChoiceAt(choices, selected);
+			const choice = selectedChoiceAt(choices, session.selected());
 
 			return selectedChoiceResult({ ...choice, value: await cancelPrompt(choice.value) }, false, true);
 		}
@@ -82,22 +59,20 @@ export const readSelectedChoice = async <T>(
 		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
 			const choice = selectedChoiceAt(choices, numeric - 1);
 
-			return selectedChoiceResult(choice, true, false, frame);
+			return selectedChoiceResult(choice, true, false, session.frame());
 		}
 
 		const action = selectNavigationAction(key, { lineControls: true });
 
 		if (action !== null) {
-			selected = moveSelectHighlight(choices, selected, action, scroll);
-			eraseRenderedFrame(frame);
-			frame = renderSelectedChoice(message, choices, selected, scroll, info);
+			session.move(action);
 			continue;
 		}
 
 		if (key === Key.enter) {
-			const choice = selectedChoiceAt(choices, selected);
+			const choice = selectedChoiceAt(choices, session.selected());
 
-			return selectedChoiceResult(choice, true, false, frame);
+			return selectedChoiceResult(choice, true, false, session.frame());
 		}
 	}
 };

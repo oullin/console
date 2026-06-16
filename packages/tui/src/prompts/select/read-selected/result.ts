@@ -1,7 +1,7 @@
 import { PromptValidationError } from '#tui/prompt';
 import { choiceByValue, choiceValueEquals, firstEnabledIndex } from '#tui/concerns/choices';
+import type { SelectedChoiceReadResult } from '#tui/prompts/select/read-selected/types';
 import type { Choice } from '#tui/types';
-import type { SelectedChoiceReadResult } from '#tui/prompts/select/read-selected';
 
 export const invalidSelectedChoice = (): PromptValidationError => new PromptValidationError('Please select a valid option.');
 
