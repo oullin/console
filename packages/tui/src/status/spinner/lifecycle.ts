@@ -7,17 +7,28 @@ import type { MaybePromise } from '#tui/types';
 
 export const runSpinnerLifecycle = async <T>(message: string, callback: () => MaybePromise<T>): Promise<T> => {
 	const frame = renderSpinnerFrame(message);
+	let rendered = false;
 	const cleanup = new StatusSignalCleanup(() => {
 		try {
-			eraseRenderedFrame(frame);
+			if (rendered) {
+				eraseRenderedFrame(frame);
+			}
 		} finally {
 			showCursor();
 		}
 	});
 
-	hideCursor();
-	cleanup.attach();
-	promptEnvironment().output.write(frame);
+	try {
+		hideCursor();
+		cleanup.attach();
+		promptEnvironment().output.write(frame);
+		rendered = true;
+	} catch (error) {
+		cleanup.detach();
+		showCursor();
+
+		throw error;
+	}
 
 	try {
 		return await callback();
