@@ -1,7 +1,7 @@
-import { applyTypedKey } from '#tui/typed-value';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { moveSearchHighlight } from '#tui/prompts/search/keys';
 import { initialRetriedSearchHighlight } from '#tui/prompts/search/navigation';
+import { createSingleSearchChoiceQuery } from '#tui/prompts/search/read-single/choice-query';
 import { defaultSearchChoice, selectedSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchReaderSelection, SearchReadOptions } from '#tui/prompts/search/read-single/types';
@@ -20,45 +20,34 @@ export type SingleSearchReaderState<T> = {
 };
 
 export const createSingleSearchReaderState = async <T>(options: SearchReadOptions<T>, attempt: number): Promise<SingleSearchReaderState<T>> => {
-	let query: TypedValueState = { cursor: 0, value: '' };
+	const initialChoices = await resolveSearchChoices(options.options, '');
 
-	let choices = await resolveSearchChoices(options.options, query.value);
+	const query = createSingleSearchChoiceQuery(options, initialChoices);
 
-	let highlighted: number | null = initialRetriedSearchHighlight(choices, attempt);
-
-	const resolveChoices = async (): Promise<void> => {
-		choices = await resolveSearchChoices(options.options, query.value);
-	};
+	let highlighted: number | null = initialRetriedSearchHighlight(initialChoices, attempt);
 
 	return {
 		async applyTypedInput(key) {
-			const next = applyTypedKey(query, key);
+			const next = await query.applyTypedInput(key);
 
-			if (next.cancelled) {
-				return { cancelled: true };
-			}
-
-			query = { cursor: next.cursor, value: next.value };
 			highlighted = null;
 
-			await resolveChoices();
-
-			return { cancelled: false };
+			return next;
 		},
 		choices() {
-			return choices;
+			return query.choices();
 		},
 		clearHighlight() {
 			highlighted = null;
 		},
 		async defaultSelection() {
-			await resolveChoices();
+			await query.resolveChoices();
 
-			if (query.value !== '' || options.hasDefault !== true) {
+			if (query.value().value !== '' || options.hasDefault !== true) {
 				return { label: '', submitted: false, value: undefined };
 			}
 
-			const choice = defaultSearchChoice(choices, options.default, options.hasDefault);
+			const choice = defaultSearchChoice(query.choices(), options.default, options.hasDefault);
 
 			return { label: choice?.label ?? '', submitted: choice !== undefined, value: choice?.value ?? options.default };
 		},
@@ -66,14 +55,15 @@ export const createSingleSearchReaderState = async <T>(options: SearchReadOption
 			return highlighted;
 		},
 		async move(action) {
-			await resolveChoices();
+			await query.resolveChoices();
 
-			highlighted = moveSearchHighlight(choices, highlighted, action, { attempt, retryFirst: true, scroll: options.scroll });
+			highlighted = moveSearchHighlight(query.choices(), highlighted, action, { attempt, retryFirst: true, scroll: options.scroll });
 		},
 		query() {
-			return query;
+			return query.value();
 		},
 		selectedSelection() {
+			const choices = query.choices();
 			const choice = highlighted === null ? undefined : choices[highlighted];
 			const value = selectedSearchValue(choices, highlighted);
 
