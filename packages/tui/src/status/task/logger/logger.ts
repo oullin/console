@@ -1,8 +1,10 @@
 import { createTaskLoggerLimits } from '#tui/status/task/logger/limits';
 import { appendPartialTaskLog, appendTaskLogLines } from '#tui/status/task/logger/lines';
-import { appendStableTaskMessage } from '#tui/status/task/logger/stable';
+import { createTaskLoggerLabels, setTaskLoggerLabel, setTaskLoggerSubLabel } from '#tui/status/task/logger/labels';
+import { appendStableTaskLoggerOutput } from '#tui/status/task/logger/output';
 import type { TaskLoggerLimits } from '#tui/status/task/logger/limits';
 import type { PartialTaskLogState } from '#tui/status/task/logger/lines';
+import type { TaskLoggerLabels } from '#tui/status/task/logger/labels';
 import type { StableTaskMessage } from '#tui/status/task/messages';
 
 export class Logger {
@@ -11,12 +13,14 @@ export class Logger {
 	readonly stableMessages: StableTaskMessage[] = [];
 	subLabelValue: string;
 	#partial: PartialTaskLogState = { startIndex: null, value: '' };
+	private labels: TaskLoggerLabels;
 	private readonly limits: TaskLoggerLimits;
 
 	constructor(limit: number, label: string, subLabel = '') {
 		this.limits = createTaskLoggerLimits(limit);
-		this.labelValue = label;
-		this.subLabelValue = subLabel;
+		this.labels = createTaskLoggerLabels(label, subLabel);
+		this.labelValue = this.labels.label;
+		this.subLabelValue = this.labels.subLabel;
 	}
 
 	get limitValue(): number {
@@ -32,11 +36,13 @@ export class Logger {
 	}
 
 	label(message: string): void {
-		this.labelValue = message;
+		this.labels = setTaskLoggerLabel(this.labels, message);
+		this.labelValue = this.labels.label;
 	}
 
 	subLabel(message: string): void {
-		this.subLabelValue = message;
+		this.labels = setTaskLoggerSubLabel(this.labels, message);
+		this.subLabelValue = this.labels.subLabel;
 	}
 
 	partial(chunk: string): void {
@@ -64,8 +70,7 @@ export class Logger {
 	}
 
 	private stable(type: StableTaskMessage['type'], message: string): void {
-		appendStableTaskMessage(this.stableMessages, type, message, this.limits.stable);
-		this.lines.splice(0);
+		appendStableTaskLoggerOutput(this.stableMessages, this.lines, type, message, this.limits.stable);
 		this.commitPartial();
 	}
 
