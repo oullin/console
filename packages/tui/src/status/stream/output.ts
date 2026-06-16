@@ -1,28 +1,21 @@
-import { StatusSignalCleanup } from '#tui/status/signals';
 import { StreamBuffer } from '#tui/status/stream/buffer';
+import { StreamLifecycle } from '#tui/status/stream/lifecycle';
 import { StreamRenderer } from '#tui/status/stream/renderer';
 import { streamLines } from '#tui/status/stream/render';
-import { hideCursor, showCursor } from '#tui/terminal';
 
 export class Stream {
-	#closed = false;
 	readonly #buffer = new StreamBuffer(10);
-	readonly #renderer = new StreamRenderer();
-	readonly #signalCleanup = new StatusSignalCleanup(() => {
-		this.close();
+	readonly #lifecycle = new StreamLifecycle(() => {
+		this.flush();
 	});
-
-	constructor() {
-		hideCursor();
-		this.#signalCleanup.attach();
-	}
+	readonly #renderer = new StreamRenderer();
 
 	write(content: string): this {
 		return this.append(content);
 	}
 
 	append(content: string): this {
-		if (this.#closed) {
+		if (this.#lifecycle.closed()) {
 			throw new Error('Stream is closed.');
 		}
 
@@ -33,21 +26,11 @@ export class Stream {
 	}
 
 	close(): void {
-		if (this.#closed) {
-			return;
-		}
-
-		while (this.#buffer.flushNext()) {
-			this.render();
-		}
-
-		this.#closed = true;
-		this.#signalCleanup.detach();
-		showCursor();
+		this.#lifecycle.close();
 	}
 
 	closed(): boolean {
-		return this.#closed;
+		return this.#lifecycle.closed();
 	}
 
 	lines(): string[] {
@@ -77,5 +60,11 @@ export class Stream {
 			fading: this.#buffer.fading,
 			value: this.#buffer.stableValue(),
 		});
+	}
+
+	private flush(): void {
+		while (this.#buffer.flushNext()) {
+			this.render();
+		}
 	}
 }
