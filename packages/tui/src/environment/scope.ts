@@ -1,6 +1,6 @@
 import { defaultEnvironment } from '#tui/environment/runtime';
 import { mergePromptEnvironment } from '#tui/environment/scope/merge';
-import type { PromptEnvironment } from '#tui/types';
+import type { MaybePromise, PromptEnvironment } from '#tui/types';
 
 let currentEnvironment: PromptEnvironment = defaultEnvironment;
 
@@ -10,7 +10,7 @@ export const configurePrompts = (environment: Partial<PromptEnvironment>): void 
 	currentEnvironment = mergePromptEnvironment(currentEnvironment, environment);
 };
 
-export const withPromptEnvironment = async <T>(environment: Partial<PromptEnvironment>, callback: () => Promise<T>): Promise<T> => {
+export const withPromptEnvironment = async <T>(environment: Partial<PromptEnvironment>, callback: () => MaybePromise<T>): Promise<T> => {
 	const previous = currentEnvironment;
 
 	configurePrompts(environment);
