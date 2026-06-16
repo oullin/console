@@ -1,12 +1,12 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { dataTableNavigationAction, startsDataTableSearch } from '#tui/output/data-table/keys';
 import { moveDataTableSelection } from '#tui/output/data-table/navigation';
+import { cancelDataTableSelection } from '#tui/output/data-table/reader/cancel';
 import { readDataTableFallbackSelection } from '#tui/output/data-table/reader/fallback';
-import { assertSelectedDataTableRow, dataTableSelectionResult, initialDataTableSelection, selectedDataTableValue } from '#tui/output/data-table/reader/result';
-import { renderCancelledDataTableFrame, renderDataTableFrame } from '#tui/output/data-table/render';
+import { assertSelectedDataTableRow, dataTableSelectionResult, initialDataTableSelection } from '#tui/output/data-table/reader/result';
+import { renderDataTableFrame } from '#tui/output/data-table/render';
 import { visibleDataTableRows } from '#tui/output/data-table/rows';
 import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTableSearchState } from '#tui/output/data-table/search';
@@ -71,17 +71,7 @@ export const readDataTableSelection = async <T>(options: DataTableReadOptions<T>
 		const rows = visibleRows();
 
 		if (key === Key.ctrlC) {
-			assertSelectedDataTableRow(rows, selected, frame);
-			eraseRenderedFrame(frame);
-			renderCancelledDataTableFrame(options.message, headers, rows, selected);
-
-			return {
-				cancelled: true,
-				rows,
-				selected,
-				submitted: false,
-				value: await cancelPrompt(selectedDataTableValue(rows, selected)),
-			};
+			return cancelDataTableSelection(options.message, headers, rows, selected, frame);
 		}
 
 		const nextSearch = applyDataTableSearchKey(search, key);
