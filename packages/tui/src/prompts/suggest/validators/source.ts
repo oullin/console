@@ -24,7 +24,7 @@ export const resolveSuggestionSource = async (source: string[] | SuggestionSourc
 	const parsed = parseSuggestionSource(source);
 
 	if (isSuggestionSourceCallback(parsed)) {
-		return { filter: false, options: await parsed(query) };
+		return { filter: false, options: suggestionOptionsSchema.parse(await parsed(query)) };
 	}
 
 	return { filter: true, options: parsed };
