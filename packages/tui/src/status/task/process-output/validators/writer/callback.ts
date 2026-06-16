@@ -2,7 +2,9 @@ import { z } from 'zod';
 
 export type ProcessOutputCallback = (error?: Error | null) => void;
 
-const processOutputEncodingSchema = z.string() as z.ZodType<BufferEncoding>;
+const processOutputEncodingSchema = z
+	.string()
+	.refine((value): value is BufferEncoding => Buffer.isEncoding(value));
 const processOutputCallbackSchema = z.function() as z.ZodType<ProcessOutputCallback>;
 
 export const parseProcessOutputEncoding = (value: unknown): BufferEncoding | undefined => {
