@@ -1,9 +1,9 @@
+import { parseStatusSignalTarget } from '#tui/status/validators/signal-target';
+import type { StatusSignalTarget } from '#tui/status/validators/signal-target';
+
 const statusSignals = ['SIGINT', 'SIGTERM'] as const;
 
-export type StatusSignalTarget = {
-	off(signal: string, listener: () => void): unknown;
-	on(signal: string, listener: () => void): unknown;
-};
+export type { StatusSignalTarget };
 
 export class StatusSignalCleanup {
 	#attached = false;
@@ -16,7 +16,7 @@ export class StatusSignalCleanup {
 
 	constructor(restore: () => void, target: StatusSignalTarget = process) {
 		this.#restore = restore;
-		this.#target = target;
+		this.#target = parseStatusSignalTarget(target);
 	}
 
 	attach(): this {

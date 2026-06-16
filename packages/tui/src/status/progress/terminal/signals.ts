@@ -1,9 +1,9 @@
+import { parseStatusSignalTarget } from '#tui/status/validators/signal-target';
+import type { StatusSignalTarget } from '#tui/status/validators/signal-target';
+
 const progressSignals = ['SIGINT', 'SIGTERM'] as const;
 
-export type ProgressSignalTarget = {
-	off(signal: string, listener: () => void): unknown;
-	on(signal: string, listener: () => void): unknown;
-};
+export type ProgressSignalTarget = StatusSignalTarget;
 
 export class ProgressSignalHandlers {
 	#attached = false;
@@ -11,7 +11,7 @@ export class ProgressSignalHandlers {
 	readonly #target: ProgressSignalTarget;
 
 	constructor(target: ProgressSignalTarget, handleSignal: () => void) {
-		this.#target = target;
+		this.#target = parseStatusSignalTarget(target);
 		this.#handleSignal = handleSignal;
 	}
 
