@@ -1,4 +1,5 @@
 import type { Logger } from '#tui/status/task/logger';
+import { parseProcessOutputChunkLines } from '#tui/status/task/process-output/validators/chunk';
 
 export class ProcessOutputBuffer {
 	#pending = '';
@@ -9,7 +10,7 @@ export class ProcessOutputBuffer {
 	}
 
 	write(chunk: string): void {
-		const lines = `${this.#pending}${chunk}`.split(/\r?\n/u);
+		const lines = parseProcessOutputChunkLines(`${this.#pending}${chunk}`);
 
 		this.#pending = lines.pop() ?? '';
 

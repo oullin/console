@@ -1,5 +1,6 @@
 import { wrap } from '#tui/strings';
 import type { StreamFadeStyle } from '#tui/status/stream/fade';
+import { parseStreamChunkLines } from '#tui/status/stream/validators/chunk';
 
 type StreamFrameOptions = {
 	fading?: string[];
@@ -13,7 +14,7 @@ const fadedValue = (value: string, fading: string[], styles: StreamFadeStyle[]):
 };
 
 export const streamLines = ({ value, width = 60 }: StreamFrameOptions): string[] => {
-	return value.split(/\r?\n/u).flatMap((line) => wrap(line, width));
+	return parseStreamChunkLines(value).flatMap((line) => wrap(line, width));
 };
 
 export const renderStreamFrame = (options: StreamFrameOptions): string => {
