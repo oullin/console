@@ -1,4 +1,4 @@
-import { isTaskTitle, parseTaskCallback } from '#tui/status/task/validators/definition';
+import { isTaskTitle, parseTaskCallback, parseTaskDefinition } from '#tui/status/task/validators/definition';
 import type { Logger } from '#tui/status/task/logger';
 import type { MaybePromise } from '#tui/types';
 
@@ -35,11 +35,13 @@ export const resolveTaskDefinition = <T>(
 		};
 	}
 
+	const definition = parseTaskDefinition<T>(definitionOrLabel);
+
 	return {
-		keepSummary: definitionOrLabel.keepSummary ?? keepSummary,
-		limit: definitionOrLabel.limit ?? limit,
-		run: definitionOrLabel.task,
-		subLabel: definitionOrLabel.subLabel ?? subLabel ?? '',
-		title: definitionOrLabel.title,
+		keepSummary: definition.keepSummary ?? keepSummary,
+		limit: definition.limit ?? limit,
+		run: definition.task,
+		subLabel: definition.subLabel ?? subLabel ?? '',
+		title: definition.title,
 	};
 };

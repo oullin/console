@@ -1,8 +1,19 @@
 import { z } from 'zod';
+import type { TaskDefinition } from '#tui/status/task/definition';
 import type { Logger } from '#tui/status/task/logger';
 import type { MaybePromise } from '#tui/types';
 
 const taskCallbackSchema = <T>(): z.ZodType<(logger: Logger) => MaybePromise<T>> => z.function() as z.ZodType<(logger: Logger) => MaybePromise<T>>;
+const taskDefinitionSchema = <T>(): z.ZodType<TaskDefinition<T>> =>
+	z
+		.object({
+			keepSummary: z.boolean().optional(),
+			limit: z.number().optional(),
+			subLabel: z.string().optional(),
+			task: taskCallbackSchema<T>(),
+			title: z.string(),
+		})
+		.passthrough() as z.ZodType<TaskDefinition<T>>;
 const taskTitleSchema = z.string();
 
 export const isTaskTitle = (value: unknown): value is string => {
@@ -17,4 +28,8 @@ export const parseTaskCallback = <T>(value: unknown): ((logger: Logger) => Maybe
 	}
 
 	return parsed.data;
+};
+
+export const parseTaskDefinition = <T>(value: unknown): TaskDefinition<T> => {
+	return taskDefinitionSchema<T>().parse(value);
 };
