@@ -1,3 +1,4 @@
+import { isTaskTitle, parseTaskCallback } from '#tui/status/task/validators/definition';
 import type { Logger } from '#tui/status/task/logger';
 import type { MaybePromise } from '#tui/types';
 
@@ -24,15 +25,11 @@ export const resolveTaskDefinition = <T>(
 	keepSummary = false,
 	subLabel?: string,
 ): ResolvedTaskDefinition<T> => {
-	if (typeof definitionOrLabel === 'string') {
-		if (!callback) {
-			throw new Error('A task callback is required.');
-		}
-
+	if (isTaskTitle(definitionOrLabel)) {
 		return {
 			keepSummary,
 			limit,
-			run: callback,
+			run: parseTaskCallback(callback),
 			subLabel: subLabel ?? '',
 			title: definitionOrLabel,
 		};
