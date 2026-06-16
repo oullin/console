@@ -1,5 +1,5 @@
 import { stream } from '#tui/status';
-import { isStatusLabel, isStreamSource } from '#tui/form/builder/validators/status';
+import { resolveStreamFormArguments } from '#tui/form/builder/validators/status';
 import type { FormBuilder } from '#tui/form/builder/index';
 
 export function streamFormStep(this: FormBuilder, name?: string): FormBuilder;
@@ -9,13 +9,11 @@ export function streamFormStep(this: FormBuilder): FormBuilder;
 export function streamFormStep(this: FormBuilder, source: AsyncIterable<string> | Iterable<string>, name?: string): FormBuilder;
 
 export function streamFormStep(this: FormBuilder, sourceOrName?: AsyncIterable<string> | Iterable<string> | string, name?: string): FormBuilder {
-	if (isStatusLabel(sourceOrName)) {
-		return this.add(() => stream(), sourceOrName);
+	const resolved = resolveStreamFormArguments(sourceOrName, name);
+
+	if (resolved.kind === 'manual') {
+		return this.add(() => stream(), resolved.name);
 	}
 
-	if (!isStreamSource(sourceOrName)) {
-		return this.add(() => stream());
-	}
-
-	return this.addSideEffect(() => stream(sourceOrName), name);
+	return this.addSideEffect(() => stream(resolved.source), resolved.name);
 }
