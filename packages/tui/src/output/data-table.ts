@@ -1,11 +1,6 @@
-import { promptUntilValid, promptWithFallback } from '#tui/prompt';
-import { activePromptFrame } from '#tui/prompt/active-frame';
-import { readDataTableSelection } from '#tui/output/data-table/read';
-import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
-import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
-import { dataTableValidationOptions, normalizeDataTablePromptOptions, transformDataTableValue } from '#tui/output/data-table/options';
+import { normalizeDataTablePromptOptions } from '#tui/output/data-table/options';
+import { runDataTablePrompt } from '#tui/output/data-table/run';
 import { parseDataTablePromptOptions } from '#tui/output/validators/data-table';
-import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
 export function datatable<T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number>;
@@ -36,32 +31,5 @@ export async function datatable<T = unknown>(
 	const parsedOptions = parseDataTablePromptOptions<T>(optionsOrHeaders, rows, scroll, label, hint, required, validate, transform, filter);
 	const options = normalizeDataTablePromptOptions(parsedOptions);
 
-	const validationOptions = await dataTableValidationOptions(options);
-
-	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
-
-	let submittedSelection: DataTableSelectionReadResult<T> | null = null;
-
-	const activeFrame = activePromptFrame();
-
-	return promptWithFallback('datatable', options, () =>
-		promptUntilValid(
-			validationOptions,
-			async () => {
-				const selected = await readDataTableSelection(options, headers);
-
-				activeFrame.set(selected.frame);
-				submittedSelection = selected.submitted && !selected.cancelled ? selected : null;
-
-				return transformDataTableValue(options, selected.value);
-			},
-			() => {
-				if (submittedSelection) {
-					activeFrame.clear();
-					renderSubmittedDataTableFrame(options.message, headers, submittedSelection.rows, submittedSelection.selected);
-				}
-			},
-			activeFrame.clear,
-		),
-	);
+	return runDataTablePrompt(options);
 }
