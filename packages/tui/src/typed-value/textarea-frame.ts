@@ -5,6 +5,7 @@ import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import { valueWithCursor } from '#tui/typed-value/cursor';
 import { visibleTextWindow } from '#tui/typed-value/lines';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
+import { parseTypedValueRows } from '#tui/typed-value/validators/rows';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
 export const renderTextareaFrame = (message: string, state: TypedValueState, options: TypedValueOptions): string => {
@@ -24,7 +25,7 @@ export const renderCancelledTextareaFrame = (message: string, value: string, opt
 };
 
 const textareaBody = (state: TypedValueState, options: TypedValueOptions): string => {
-	const rows = options.rows === undefined || options.rows <= 0 ? undefined : Math.floor(options.rows);
+	const rows = parseTypedValueRows(options.rows);
 
 	if (state.value.length === 0) {
 		return placeholderBody(options, rows);

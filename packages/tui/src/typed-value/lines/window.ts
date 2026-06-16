@@ -1,12 +1,14 @@
 import { fromCharacters } from '#tui/typed-value/characters';
 import { currentLine, lineRanges } from '#tui/typed-value/line-ranges';
+import { parseTypedValueRows } from '#tui/typed-value/validators/rows';
 import type { VisibleLineWindow } from '#tui/typed-value/lines/types';
 
 export const visibleLineWindow = (value: string, cursor: number, rows: number | undefined, width?: number): VisibleLineWindow => {
 	const valueCharacters = [...value];
 	const ranges = lineRanges(valueCharacters, width);
+	const visibleRows = parseTypedValueRows(rows);
 
-	if (rows === undefined || rows <= 0) {
+	if (visibleRows === undefined) {
 		return {
 			lines: ranges.map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
 			start: 0,
@@ -15,8 +17,8 @@ export const visibleLineWindow = (value: string, cursor: number, rows: number | 
 	}
 
 	const line = currentLine(ranges, cursor);
-	const start = Math.max(0, line - rows + 1);
-	const end = start + rows;
+	const start = Math.max(0, line - visibleRows + 1);
+	const end = start + visibleRows;
 
 	return {
 		lines: ranges.slice(start, end).map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
