@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { readPasswordValue } from '#tui/prompts/password/input';
 import { renderSubmittedPasswordValue } from '#tui/prompts/password/render';
 import { transformedTextDefault } from '#tui/prompts/text-default';
@@ -11,14 +12,15 @@ export const runPasswordPrompt = async (options: TextPromptOptions): Promise<str
 		default: await transformedTextDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<void>(undefined);
 
 	return promptWithFallback('password', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const answer = await readPasswordValue(options.message, {
 					default: options.default,
 					hint: options.hint,
@@ -26,19 +28,20 @@ export const runPasswordPrompt = async (options: TextPromptOptions): Promise<str
 				});
 
 				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = !answer.cancelled;
+				submission.capture(!answer.cancelled, answer.cancelled, undefined);
 
 				return options.transform ? options.transform(answer.value) : answer.value;
 			},
 			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
+				activeFrame.clear();
+				submission.render(() => {
 					renderSubmittedPasswordValue(options.message, value);
-				}
+				});
 			},
 			(value) => {
 				options.default = value;
 				activeFrame.clear();
+				submission.reset();
 			},
 		),
 	);

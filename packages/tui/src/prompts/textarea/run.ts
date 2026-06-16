@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { transformedTextDefault } from '#tui/prompts/text-default';
 import { readTypedValue } from '#tui/typed-value';
 import { renderSubmittedTextareaFrame } from '#tui/typed-value/textarea-frame';
@@ -11,14 +12,15 @@ export const runTextareaPrompt = async (options: TextareaPromptOptions, fallback
 		default: await transformedTextDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<void>(undefined);
 
 	return promptWithFallback('textarea', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const answer = await readTypedValue(options.message, {
 					allowNewLine: true,
 					default: options.default,
@@ -30,19 +32,20 @@ export const runTextareaPrompt = async (options: TextareaPromptOptions, fallback
 				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
 				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = !answer.cancelled;
+				submission.capture(!answer.cancelled, answer.cancelled, undefined);
 
 				return options.transform ? options.transform(value) : value;
 			},
 			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
+				activeFrame.clear();
+				submission.render(() => {
 					renderSubmittedTextareaFrame(options.message, value);
-				}
+				});
 			},
 			(value) => {
 				options.default = value;
 				activeFrame.clear();
+				submission.reset();
 			},
 		),
 	);

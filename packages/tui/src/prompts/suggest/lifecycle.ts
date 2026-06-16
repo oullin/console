@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { transformedTextDefault } from '#tui/prompts/text-default';
 import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
@@ -21,32 +22,34 @@ export const runTextSuggestionPrompt = async (
 		default: await transformedTextDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<void>(undefined);
 
 	return promptWithFallback(name, options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const answer = await readValue(options);
 
 				const value = answer.value === '' && options.default !== undefined ? options.default : answer.value;
 
 				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = answer.rendered && !answer.cancelled;
+				submission.capture(answer.rendered, answer.cancelled, undefined);
 
 				return options.transform ? options.transform(value) : value;
 			},
 			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
+				activeFrame.clear();
+				submission.render(() => {
 					renderSubmitted(options.message, value);
-				}
+				});
 			},
 			(value) => {
 				options.default = value;
 				activeFrame.clear();
+				submission.reset();
 			},
 		),
 	);

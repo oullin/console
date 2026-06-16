@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { numberDefault, transformNumberValue } from '#tui/prompts/number/defaults';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
@@ -13,14 +14,15 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 		default: await numberDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<void>(undefined);
 
 	return promptWithFallback('number', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const answer = await readNumberValue(options.message, {
 					default: options.default,
 					hasDefault: options.hasDefault,
@@ -34,7 +36,7 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 				const value = answer.value;
 
 				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = !answer.cancelled;
+				submission.capture(!answer.cancelled, answer.cancelled, undefined);
 
 				if (value === '' && options.hasDefault) {
 					return numberDefault(options);
@@ -51,12 +53,15 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 				return transformNumberValue(options, parsedValue);
 			},
 			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
+				activeFrame.clear();
+				submission.render(() => {
 					renderSubmittedNumberValue(options.message, value);
-				}
+				});
 			},
-			activeFrame.clear,
+			() => {
+				activeFrame.clear();
+				submission.reset();
+			},
 		),
 	);
 };

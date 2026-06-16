@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { transformedConfirmDefault, transformConfirmValue } from '#tui/prompts/select/confirm-options';
 import { readConfirm } from '#tui/prompts/select/read-confirm';
 import { renderSubmittedConfirm } from '#tui/prompts/select/render-confirm';
@@ -12,28 +13,32 @@ export const runConfirmPrompt = async (options: NormalizedConfirmPromptOptions):
 		default: await transformedConfirmDefault(options),
 	};
 
-	let shouldRenderSubmittedFrame = false;
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<void>(undefined);
 
 	return promptWithFallback('confirm', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const answer = await readConfirm(options);
 
 				activeFrame.set(answer.frame);
-				shouldRenderSubmittedFrame = answer.submitted && !answer.cancelled;
+				submission.capture(answer.submitted, answer.cancelled, undefined);
 
 				return transformConfirmValue(options, answer.value);
 			},
 			(value) => {
-				if (shouldRenderSubmittedFrame) {
-					activeFrame.clear();
+				activeFrame.clear();
+				submission.render(() => {
 					renderSubmittedConfirm(options, value);
-				}
+				});
 			},
-			activeFrame.clear,
+			() => {
+				activeFrame.clear();
+				submission.reset();
+			},
 		),
 	);
 };
