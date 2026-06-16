@@ -88,7 +88,7 @@ TypeScript and OpenTUI internals.
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
 | Search and multi-search label-first helper argument surface with info | `packages/tui/src/prompts/search/index.ts`, `packages/tui/tests/search.test.ts` |
 | Search active boxed layout and row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/tests/search.test.ts` |
-| Search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/run.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/*`, `packages/tui/src/prompts/search/render.ts` |
+| Search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/run.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/*`, `packages/tui/src/prompts/search/read-single/session/*`, `packages/tui/src/prompts/search/render.ts` |
 | Search retry initial highlight lifecycle | `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/*`, `packages/tui/src/prompts/search/navigation.ts` |
 | Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/tests/search.test.ts` |
 | Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
