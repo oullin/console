@@ -1,6 +1,5 @@
 import { task } from '#tui/status';
-import { isStatusLabel, parseStatusLabel } from '#tui/form/builder/validators/status';
-import { parseTaskCallback } from '#tui/status/task/validators/definition';
+import { resolveTaskFormArguments } from '#tui/form/builder/validators/status';
 import type { FormBuilder } from '#tui/form/builder/index';
 import type { MaybePromise } from '#tui/types';
 import type { Logger, TaskDefinition } from '#tui/status';
@@ -18,9 +17,11 @@ export function taskFormStep<T>(
 	subLabel = '',
 	name?: string,
 ): FormBuilder {
-	if (isStatusLabel(definitionOrLabel)) {
-		return this.add(() => task(definitionOrLabel, parseTaskCallback<T>(callbackOrName), limit, keepSummary, subLabel), name);
+	const resolved = resolveTaskFormArguments(definitionOrLabel, callbackOrName, limit, keepSummary, subLabel, name);
+
+	if (resolved.kind === 'label') {
+		return this.add(() => task(resolved.label, resolved.callback, resolved.limit, resolved.keepSummary, resolved.subLabel), resolved.name);
 	}
 
-	return this.add(() => task(definitionOrLabel), parseStatusLabel(callbackOrName));
+	return this.add(() => task(resolved.definition), resolved.name);
 }

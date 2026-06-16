@@ -1,7 +1,9 @@
 import { z } from 'zod';
+import { parseTaskCallback } from '#tui/status/task/validators/definition';
 import { asyncIterableSchema, iterableSchema } from '#tui/validators/iterable';
 import type { MaybePromise } from '#tui/types';
-import type { Progress } from '#tui/status';
+import type { Progress, TaskDefinition } from '#tui/status';
+import type { Logger } from '#tui/status/task/logger';
 
 const progressTotalSchema = z.number();
 const statusLabelSchema = z.string();
@@ -20,6 +22,22 @@ export type ResolvedStreamFormArguments =
 			kind: 'source';
 			name?: string;
 			source: AsyncIterable<string> | Iterable<string>;
+	  };
+
+export type ResolvedTaskFormArguments<T> =
+	| {
+			callback: (logger: Logger) => MaybePromise<T>;
+			keepSummary: boolean;
+			kind: 'label';
+			label: string;
+			limit: number;
+			name?: string;
+			subLabel: string;
+	  }
+	| {
+			definition: TaskDefinition<T>;
+			kind: 'definition';
+			name?: string;
 	  };
 
 export const isProgressTotal = (value: unknown): value is number => {
@@ -66,4 +84,31 @@ export const resolveStreamFormArguments = (sourceOrName?: AsyncIterable<string> 
 	}
 
 	return { kind: 'source', name, source: sourceOrName };
+};
+
+export const resolveTaskFormArguments = <T>(
+	definitionOrLabel: TaskDefinition<T> | string,
+	callbackOrName?: ((logger: Logger) => MaybePromise<T>) | string,
+	limit = 10,
+	keepSummary = false,
+	subLabel = '',
+	name?: string,
+): ResolvedTaskFormArguments<T> => {
+	if (isStatusLabel(definitionOrLabel)) {
+		return {
+			callback: parseTaskCallback<T>(callbackOrName),
+			keepSummary,
+			kind: 'label',
+			label: definitionOrLabel,
+			limit,
+			name,
+			subLabel,
+		};
+	}
+
+	return {
+		definition: definitionOrLabel,
+		kind: 'definition',
+		name: parseStatusLabel(callbackOrName),
+	};
 };
