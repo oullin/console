@@ -7,16 +7,21 @@ import type { SearchReaderSession } from '#tui/prompts/search/read-single/sessio
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
 
-export const cancelInteractiveSearchChoice = async <T>(session: SearchReaderSession<T>, options: SearchReadOptions<T>): Promise<SearchChoiceReadResult<T>> => {
+const cancelInteractiveSearch = async <T>(
+	session: SearchReaderSession<T>,
+	options: SearchReadOptions<T>,
+	value: T | undefined,
+): Promise<SearchChoiceReadResult<T>> => {
 	eraseRenderedFrame(session.frame());
 	renderCancelledSearch(options.message, session.query().value, options.placeholder);
 
-	return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(session.choices(), session.highlighted(), options.default)) };
+	return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(value) };
+};
+
+export const cancelInteractiveSearchChoice = async <T>(session: SearchReaderSession<T>, options: SearchReadOptions<T>): Promise<SearchChoiceReadResult<T>> => {
+	return cancelInteractiveSearch(session, options, cancelledSearchValue(session.choices(), session.highlighted(), options.default));
 };
 
 export const cancelInteractiveSearchInput = async <T>(session: SearchReaderSession<T>, options: SearchReadOptions<T>): Promise<SearchChoiceReadResult<T>> => {
-	eraseRenderedFrame(session.frame());
-	renderCancelledSearch(options.message, session.query().value, options.placeholder);
-
-	return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(fallbackSearchDefault(options)) };
+	return cancelInteractiveSearch(session, options, fallbackSearchDefault(options));
 };
