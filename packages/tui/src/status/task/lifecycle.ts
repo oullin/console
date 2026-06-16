@@ -3,24 +3,9 @@ import { eraseRenderedFrame } from '#tui/status/frame';
 import { StatusSignalCleanup } from '#tui/status/signals';
 import { Logger } from '#tui/status/task/logger';
 import { captureTaskProcessOutput } from '#tui/status/task/process-output';
-import { renderTaskFrame } from '#tui/status/task/render';
+import { renderLoggerTaskFrame } from '#tui/status/task/frame';
 import { hideCursor, showCursor } from '#tui/terminal';
 import type { ResolvedTaskDefinition } from '#tui/status/task/definition';
-
-const renderLoggerTaskFrame = (logger: Logger, options: { finished?: boolean; keepSummary?: boolean } = {}): string => {
-	const finished = options.finished ?? false;
-	const keepSummary = options.keepSummary ?? false;
-
-	return renderTaskFrame({
-		finished,
-		keepSummary,
-		label: logger.labelValue,
-		limit: logger.limitValue,
-		lines: logger.lines,
-		stableMessages: finished && !keepSummary ? [] : logger.stableMessages,
-		subLabel: logger.subLabelValue,
-	});
-};
 
 export const runTaskLifecycle = async <T>(definition: ResolvedTaskDefinition<T>): Promise<T> => {
 	const logger = new Logger(definition.limit, definition.title, definition.subLabel);

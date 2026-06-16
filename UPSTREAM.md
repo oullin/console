@@ -113,9 +113,9 @@ TypeScript and OpenTUI internals.
 | Form builder first-step and conditional revert feature coverage | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder asynchronous condition lifecycle | `packages/tui/src/form/builder/conditions.ts`, `packages/tui/src/form/builder/submit.ts`, `packages/tui/src/form/types.ts`, `packages/tui/tests/form.test.ts` |
 | Form builder side-effect step surface and revert skipping | `packages/tui/src/form/builder/index.ts`, `packages/tui/src/form/builder/methods.ts`, `packages/tui/src/form/builder/step.ts`, `packages/tui/src/form/builder/output.ts`, `packages/tui/src/form/builder/status.ts` |
-| Notes and alert-style output | `packages/tui/src/output/notes.ts` |
-| Note multiline and typed theme rendering | `packages/tui/src/output/notes.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/output.test.ts` |
-| Note intro/outro visible-width padding | `packages/tui/src/output/notes.ts`, `packages/tui/tests/output.test.ts` |
+| Notes and alert-style output | `packages/tui/src/output/notes.ts`, `packages/tui/src/output/notes/*` |
+| Note multiline and typed theme rendering | `packages/tui/src/output/notes.ts`, `packages/tui/src/output/notes/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/output.test.ts` |
+| Note intro/outro visible-width padding | `packages/tui/src/output/notes.ts`, `packages/tui/src/output/notes/render.ts`, `packages/tui/tests/output.test.ts` |
 | Native notifications | `packages/tui/src/output/notify.ts` |
 | Notification command construction, executable discovery, and process result reporting | `packages/tui/src/output/notify.ts`, `packages/tui/src/output/notify/*` |
 | Tables, data tables, and grids | `packages/tui/src/output/table.ts`, `packages/tui/src/output/table-output.ts`, `packages/tui/src/output/grid-output.ts`, `packages/tui/src/output/data-table.ts` |
@@ -163,7 +163,7 @@ TypeScript and OpenTUI internals.
 | Progress boxed frame rendering and formatted fractions | `packages/tui/src/status/progress/render.ts`, `packages/tui/src/theme/box.ts` |
 | Spinner static and deterministic animated frame rendering | `packages/tui/src/status/spinner.ts`, `packages/tui/src/status/spinner/render.ts` |
 | Spinner empty default message | `packages/tui/src/status/spinner.ts`, `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/tests/spinner.test.ts`, `packages/tui/tests/form.test.ts` |
-| Task static and deterministic animated frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/definition.ts`, `packages/tui/src/status/task/lifecycle.ts`, `packages/tui/src/status/task/*` |
+| Task static and deterministic animated frame rendering, bounded logs, and stable summary symbols | `packages/tui/src/status/task.ts`, `packages/tui/src/status/task/definition.ts`, `packages/tui/src/status/task/lifecycle.ts`, `packages/tui/src/status/task/frame.ts`, `packages/tui/src/status/task/*` |
 | Task non-positive log limit defaulting | `packages/tui/src/status/validators/limit.ts`, `packages/tui/src/status/task/logger.ts`, `packages/tui/src/status/task/logger/*`, `packages/tui/tests/task.test.ts` |
 | Form builder root-aligned spinner and task overloads | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/tests/form.test.ts` |
 | Form builder root-aligned manual progress side-effect lifecycle | `packages/tui/src/form/builder/status.ts`, `packages/tui/src/form/builder/status/*`, `packages/tui/src/form/builder/validators/status.ts`, `packages/tui/tests/form.test.ts` |
