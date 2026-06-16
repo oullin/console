@@ -1,5 +1,6 @@
 import { promptUntilValid, promptWithFallback } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { createPromptSubmissionState } from '#tui/prompt/submission';
 import { dataTableValidationOptions, transformDataTableValue } from '#tui/output/data-table/options';
 import { readDataTableSelection } from '#tui/output/data-table/read';
 import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
@@ -11,28 +12,34 @@ export const runDataTablePrompt = async <T>(options: NormalizedDataTablePromptOp
 	const validationOptions = await dataTableValidationOptions(options);
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
-	let submittedSelection: DataTableSelectionReadResult<T> | null = null;
-
 	const activeFrame = activePromptFrame();
+	const submission = createPromptSubmissionState<DataTableSelectionReadResult<T> | null>(null);
 
 	return promptWithFallback('datatable', options, () =>
 		promptUntilValid(
 			validationOptions,
 			async () => {
+				submission.reset();
+
 				const selected = await readDataTableSelection(options, headers);
 
 				activeFrame.set(selected.frame);
-				submittedSelection = selected.submitted && !selected.cancelled ? selected : null;
+				submission.capture(selected.submitted, selected.cancelled, selected);
 
 				return transformDataTableValue(options, selected.value);
 			},
 			() => {
-				if (submittedSelection) {
-					activeFrame.clear();
-					renderSubmittedDataTableFrame(options.message, headers, submittedSelection.rows, submittedSelection.selected);
-				}
+				activeFrame.clear();
+				submission.render((selection) => {
+					if (selection) {
+						renderSubmittedDataTableFrame(options.message, headers, selection.rows, selection.selected);
+					}
+				});
 			},
-			activeFrame.clear,
+			() => {
+				activeFrame.clear();
+				submission.reset();
+			},
 		),
 	);
 };
