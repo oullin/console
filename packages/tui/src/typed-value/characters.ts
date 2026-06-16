@@ -7,6 +7,10 @@ export const characterLength = (value: string): number => characters(value).leng
 export const stringIndexToCharacterIndex = (value: string, index: number): number => characterLength(value.slice(0, index));
 
 export const isPrintable = (key: string): boolean => {
+	if (key.length === 0) {
+		return false;
+	}
+
 	return [...key].every((character) => {
 		const code = character.codePointAt(0) ?? 0;
 
