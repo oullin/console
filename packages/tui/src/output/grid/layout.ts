@@ -39,7 +39,8 @@ const chunkGridItems = (items: string[], columnCount: number): string[][] => {
 
 export const createGridLayout = (values: string[], availableWidth: number): GridLayout => {
 	const cellWidth = Math.max(...values.map(visibleWidth)) + 4;
-	const maxColumns = Math.max(1, Math.floor((availableWidth - 1) / (cellWidth + 1)));
+	const usableWidth = Math.max(1, availableWidth);
+	const maxColumns = Math.max(1, Math.floor((usableWidth - 1) / (cellWidth + 1)));
 	const columnCount = Math.max(1, balancedColumnCount(values.length, maxColumns));
 	const rows = chunkGridItems(values, columnCount);
 
