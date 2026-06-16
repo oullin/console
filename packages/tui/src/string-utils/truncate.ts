@@ -6,19 +6,25 @@ export const truncate = (value: string, width: number, marker = '...'): string =
 		return '';
 	}
 
+	const markerWidth = visibleWidth(marker);
+
 	if (visibleWidth(value) <= width) {
 		return value;
 	}
 
-	if (width <= visibleWidth(marker)) {
+	if (width <= markerWidth) {
 		let clippedMarker = '';
+		let clippedWidth = 0;
 
 		for (const char of marker) {
-			if (visibleWidth(`${clippedMarker}${char}`) > width) {
+			const charWidth = visibleWidth(char);
+
+			if (clippedWidth + charWidth > width) {
 				break;
 			}
 
 			clippedMarker += char;
+			clippedWidth += charWidth;
 		}
 
 		return clippedMarker;
@@ -26,8 +32,7 @@ export const truncate = (value: string, width: number, marker = '...'): string =
 
 	let result = '';
 	let activeCodes = '';
-
-	const markerWidth = visibleWidth(marker);
+	let resultWidth = 0;
 
 	for (const segment of parseAnsiSegments(value)) {
 		if (segment.codes !== activeCodes) {
@@ -43,11 +48,14 @@ export const truncate = (value: string, width: number, marker = '...'): string =
 		}
 
 		for (const char of segment.text) {
-			if (visibleWidth(`${result}${char}`) + markerWidth > width) {
+			const charWidth = visibleWidth(char);
+
+			if (resultWidth + charWidth + markerWidth > width) {
 				return `${result}${activeCodes === '' ? '' : ansiCloseSequence(activeCodes)}${marker}`;
 			}
 
 			result += char;
+			resultWidth += charWidth;
 		}
 	}
 
