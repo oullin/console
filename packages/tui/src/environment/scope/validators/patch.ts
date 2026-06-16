@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { PromptEnvironment, PromptInput } from '#tui/types';
+import type { PromptEnvironment, PromptInput, PromptOutput } from '#tui/types';
 
 const promptInputPatchSchema = z
 	.object({
@@ -8,12 +8,18 @@ const promptInputPatchSchema = z
 	})
 	.passthrough() as z.ZodType<PromptInput>;
 
+const promptOutputPatchSchema = z
+	.object({
+		write: z.function(),
+	})
+	.passthrough() as z.ZodType<PromptOutput>;
+
 const promptEnvironmentPatchSchema = z
 	.object({
-		error: z.unknown().optional(),
+		error: promptOutputPatchSchema.optional(),
 		input: promptInputPatchSchema.optional(),
 		interactive: z.boolean().optional(),
-		output: z.unknown().optional(),
+		output: promptOutputPatchSchema.optional(),
 	})
 	.passthrough() as z.ZodType<Partial<PromptEnvironment>>;
 
