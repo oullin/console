@@ -13,7 +13,7 @@ TypeScript and OpenTUI internals.
 | --- | --- |
 | Helper functions | `packages/tui/src/index.ts` |
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts`, `packages/tui/src/environment/*` |
-| Prompt fallback reset and predicate condition lifecycle | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt.ts`, `packages/tui/src/index.ts` |
+| Prompt fallback reset, predicate condition validation, and predicate condition lifecycle | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validators/fallback.ts`, `packages/tui/src/prompt.ts`, `packages/tui/src/index.ts` |
 | Prompt cancellation callback lifecycle | `packages/tui/src/prompt/cancel.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt revert rejection lifecycle | `packages/tui/src/prompt/revert.ts`, `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/form.test.ts` |
 | Prompt validation retry default lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/tests/text.test.ts` |
@@ -23,7 +23,7 @@ TypeScript and OpenTUI internals.
 | Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt validation warning line styling | `packages/tui/src/theme.ts`, `packages/tui/src/prompt/lifecycle.ts` |
 | Prompt local and global validation composition | `packages/tui/src/prompt/validation.ts`, `packages/tui/src/prompt/validate-using.ts` |
-| Key constants and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
+| Key constants, value validation, and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
 | Text input defaults, transforms, validation, editing keys, non-interactive behavior, and failed reads | `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*`, `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/typed-value.ts`, `packages/tui/src/typed-value/read/*`, `packages/tui/tests/text.test.ts` |
@@ -195,7 +195,7 @@ TypeScript and OpenTUI internals.
 | Data table search title and non-empty query filter lifecycle | `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/src/output/data-table/rows/*`, `packages/tui/src/output/data-table/reader/state.ts`, `packages/tui/src/output/data-table/reader/state/*`, `packages/tui/src/output/data-table/reader/session.ts`, `packages/tui/src/output/data-table/reader/session/*`, `packages/tui/tests/form.test.ts` |
 | Table row cell normalization validation layer | `packages/tui/src/output/validators/table.ts`, `packages/tui/src/output/validators/table/*`, `packages/tui/src/output/table.ts`, `packages/tui/tests/table.test.ts` |
 | Choice option shape validation layer | `packages/tui/src/concerns/validators/choice.ts`, `packages/tui/src/concerns/choice-normalize.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/tests/choices.test.ts` |
-| Required value validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
+| Required value and message validation layer | `packages/tui/src/validators/required.ts`, `packages/tui/tests/prompt.test.ts` |
 | Keyboard event normalization and key aliases | `packages/tui/src/key/event.ts`, `packages/tui/src/key/event/*`, `packages/tui/tests/key.test.ts` |
 | Key match validation layer | `packages/tui/src/key/validators/match.ts`, `packages/tui/src/key/match.ts`, `packages/tui/tests/key.test.ts` |
 | Form builder number empty-default lifecycle | `packages/tui/src/form/builder/prompts/basic.ts`, `packages/tui/src/form/builder/prompts/basic/*`, `packages/tui/src/form/builder/prompts/basic/number/*`, `packages/tui/tests/form.test.ts` |

@@ -1,0 +1,11 @@
+import { z } from 'zod';
+import type { FormResponses, FormStepCondition } from '#tui/form/types';
+import type { MaybePromise } from '#tui/types';
+
+type FormStepConditionCallback = (responses: FormResponses) => MaybePromise<boolean>;
+
+const formStepConditionCallbackSchema = z.function();
+
+export const isFormStepConditionCallback = (condition: FormStepCondition): condition is FormStepConditionCallback => {
+	return formStepConditionCallbackSchema.safeParse(condition).success;
+};
