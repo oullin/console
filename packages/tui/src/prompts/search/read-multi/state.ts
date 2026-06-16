@@ -1,6 +1,11 @@
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import { createMultiSearchChoiceQuery } from '#tui/prompts/search/read-multi/choice-query';
 import { createMultiSearchHighlightState } from '#tui/prompts/search/read-multi/state/highlight';
+import type { SearchNavigationAction } from '#tui/prompts/search/keys';
+import type { SearchSelection } from '#tui/prompts/search/selection';
+import type { TypedValueState } from '#tui/typed-value/types';
+import type { Choice, MultiSearchPromptOptions } from '#tui/types';
+
 import {
 	createMultiSearchSelection,
 	markedMultiSearchChoiceIndexes,
@@ -8,10 +13,6 @@ import {
 	toggleAllDisplayedMultiSearchChoices,
 	toggleHighlightedMultiSearchChoice,
 } from '#tui/prompts/search/read-multi/state/selection';
-import type { SearchNavigationAction } from '#tui/prompts/search/keys';
-import type { SearchSelection } from '#tui/prompts/search/selection';
-import type { TypedValueState } from '#tui/typed-value/types';
-import type { Choice, MultiSearchPromptOptions } from '#tui/types';
 
 export type MultiSearchReaderState<T> = {
 	applyTypedInput(key: string): Promise<{ cancelled: boolean }>;
