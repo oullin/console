@@ -1,7 +1,7 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
 import { createPromptSubmissionState } from '#tui/prompt/submission';
-import { numberDefault, transformNumberValue } from '#tui/prompts/number/defaults';
+import { numberDefault, preserveNumberRetryDefault, transformNumberValue } from '#tui/prompts/number/defaults';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
@@ -58,7 +58,8 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 					renderSubmittedNumberValue(options.message, value);
 				});
 			},
-			() => {
+			(value) => {
+				preserveNumberRetryDefault(options, value);
 				activeFrame.clear();
 				submission.reset();
 			},

@@ -11,6 +11,11 @@ export const transformNumberValue = async (options: Pick<NumberPromptOptions, 't
 	return options.transform ? options.transform(value) : value;
 };
 
+export const preserveNumberRetryDefault = (options: NormalizedNumberPromptOptions, value: number | string): void => {
+	options.default = value;
+	options.hasDefault = true;
+};
+
 export const numberDefault = async (options: NormalizedNumberPromptOptions): Promise<number | string> => {
 	if (!options.hasDefault) {
 		return '';
