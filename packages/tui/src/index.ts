@@ -33,7 +33,7 @@ export type { NoteType, NotificationCommand, NotificationPlatform, NotificationR
 export { cancelUsing, fallbackUsing, fallbackWhen, PromptValidationError, validateUsing } from '#tui/prompt';
 export type { PromptCancelHandler, PromptFallbackCondition, PromptFallbackHandler, PromptFallbackKind, PromptGlobalValidator } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
-export type { TaskDefinition } from '#tui/status';
+export type { ProgressSignalTarget, TaskDefinition } from '#tui/status';
 export {
 	backgroundColor,
 	clearTerminal,
