@@ -23,6 +23,10 @@ export const markedChoiceValues = <T>(choices: Array<Choice<T>>, marked: Set<num
 	return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
 };
 
+export const defaultChoiceValues = <T>(choices: Array<Choice<T>>, defaults: T[] = []): T[] => {
+	return defaults.map((value) => choices.find((choice) => choiceValueEquals(choice.value, value))?.value ?? value);
+};
+
 export const toggleMarkedChoice = <T>(choices: Array<Choice<T>>, marked: Set<number>, index: number): Set<number> => {
 	const next = new Set(marked);
 

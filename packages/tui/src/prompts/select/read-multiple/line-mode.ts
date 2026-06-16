@@ -1,6 +1,6 @@
 import { ask } from '#tui/prompt';
 import { renderChoices } from '#tui/theme';
-import { choicesFromCommaSeparated } from '#tui/prompts/select/multiple';
+import { choicesFromCommaSeparated, defaultChoiceValues } from '#tui/prompts/select/multiple';
 import { multipleChoicesValueResult } from '#tui/prompts/select/read-multiple/result';
 import type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple/types';
 import type { Choice } from '#tui/types';
@@ -10,7 +10,7 @@ export const readLineMultipleChoices = async <T>(message: string, choices: Array
 
 	const answer = await ask(`${message}\n${rendered}\n`, hint);
 
-	const value = answer.trim() === '' ? defaults : choicesFromCommaSeparated(choices, answer);
+	const value = answer.trim() === '' ? defaultChoiceValues(choices, defaults) : choicesFromCommaSeparated(choices, answer);
 
 	return multipleChoicesValueResult(value);
 };
