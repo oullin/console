@@ -1,6 +1,5 @@
-import { eraseRenderedFrame } from '#tui/status/frame';
+import { renderDataTableReaderSessionFrame } from '#tui/output/data-table/reader/session/render';
 import { createDataTableReaderState } from '#tui/output/data-table/reader/state';
-import { renderDataTableFrame } from '#tui/output/data-table/render';
 import type { DataTableNavigationAction } from '#tui/output/data-table/keys';
 import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
@@ -21,23 +20,7 @@ export const createDataTableReaderSession = <T>(options: DataTableReadOptions<T>
 	let frame = '';
 
 	function render(): void {
-		if (frame.length > 0) {
-			eraseRenderedFrame(frame);
-		}
-
-		const rendered = renderDataTableFrame({
-			allRows: options.rows,
-			headers,
-			message: options.message,
-			mode: state.mode(),
-			query: state.query(),
-			rows: state.rows(),
-			scroll: options.scroll,
-			selected: state.selected(),
-		});
-
-		frame = rendered.frame;
-		state.setSelected(rendered.selected);
+		frame = renderDataTableReaderSessionFrame(options, headers, state, frame);
 	}
 
 	return {
