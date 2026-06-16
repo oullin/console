@@ -3,6 +3,7 @@ import { streamClosedError, streamPromptError } from '#tui/status/stream/output/
 import { pipeStreamSource } from '#tui/status/stream/output/pipe';
 import { streamBufferLines, streamBufferValue } from '#tui/status/stream/output/readback';
 import { flushStreamBuffer, renderStreamBuffer } from '#tui/status/stream/output/rendering';
+import { parseStreamChunk } from '#tui/status/stream/validators/chunk';
 import type { StreamOutputContext } from '#tui/status/stream/output/context';
 
 export class Stream {
@@ -19,7 +20,7 @@ export class Stream {
 			throw streamClosedError();
 		}
 
-		this.#context.buffer.append(content);
+		this.#context.buffer.append(parseStreamChunk(content));
 		this.render();
 
 		return this;
