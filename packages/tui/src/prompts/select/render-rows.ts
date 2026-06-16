@@ -1,4 +1,4 @@
-import { choiceLabel } from '#tui/prompts/select/render-rows/label';
+import { choiceLabel } from '#tui/concerns/choice-label';
 import { renderChoiceWindowRows } from '#tui/prompts/select/render-rows/window';
 import { cyan, dim, strikethrough } from '#tui/theme/styles';
 import type { Choice } from '#tui/types';
