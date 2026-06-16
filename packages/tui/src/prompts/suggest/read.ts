@@ -1,11 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
+import { ask } from '#tui/prompt';
 import { clearsSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
+import { cancelSuggestionValue } from '#tui/prompts/suggest/read/cancel';
+import { currentSuggestionValue, highlightedSuggestionValue } from '#tui/prompts/suggest/read/submission';
 import { suggestionReadResult } from '#tui/prompts/suggest/read-result';
 import { createSuggestReaderSession } from '#tui/prompts/suggest/read/session';
-import { renderCancelledSuggestion } from '#tui/prompts/suggest/render';
 import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
@@ -26,7 +26,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return suggestionReadResult(session.state().value, true, false, session.frame());
+			return currentSuggestionValue(session);
 		}
 
 		const action = suggestNavigationAction(key);
@@ -43,27 +43,17 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 		}
 
 		if (key === Key.enter) {
-			const highlighted = session.highlighted();
-			const match = highlighted === null ? undefined : session.matches()[highlighted];
-
-			if (match !== undefined) {
-				return suggestionReadResult(match, true, false, session.frame());
-			}
-
-			return suggestionReadResult(session.state().value, true, false, session.frame());
+			return highlightedSuggestionValue(session);
 		}
 
 		const next = await session.applyTypedInput(key);
 
 		if (next.submitted) {
-			return suggestionReadResult(session.state().value, true, false, session.frame());
+			return currentSuggestionValue(session);
 		}
 
 		if (next.cancelled) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledSuggestion(options.message, session.state().value, options.placeholder);
-
-			return suggestionReadResult(await cancelPrompt(session.state().value), true, true);
+			return cancelSuggestionValue(options, session);
 		}
 	}
 };
