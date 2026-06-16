@@ -1,5 +1,8 @@
+import { z } from 'zod';
 import { dataObjectRowSchema, dataTableArrayRowSchema, dataTableRecordRowSchema } from '#tui/output/validators/data-table/schemas';
 import type { DataTableObjectRow, DataTableRow, TableCell } from '#tui/types';
+
+const dataTableRowValueSchema = <T>(): z.ZodType<T> => z.unknown() as z.ZodType<T>;
 
 export type DataTableRowShape<T> =
 	| {
@@ -33,4 +36,8 @@ export const parseDataTableRowShape = <T>(row: DataTableRow<T>): DataTableRowSha
 	}
 
 	return { kind: 'record', row: dataTableRecordRowSchema.parse(row) };
+};
+
+export const parseDataTableRowValue = <T>(value: unknown): T => {
+	return dataTableRowValueSchema<T>().parse(value);
 };

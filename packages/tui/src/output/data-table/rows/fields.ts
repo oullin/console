@@ -1,4 +1,4 @@
-import { parseDataTableRowShape } from '#tui/output/validators/data-table';
+import { parseDataTableRowShape, parseDataTableRowValue } from '#tui/output/validators/data-table';
 import { stringifyDataTableCell } from '#tui/output/data-table/rows/cells';
 import type { DataTableRow, TableCell } from '#tui/types';
 
@@ -36,7 +36,7 @@ export const dataTableRowValue = <T>(row: DataTableRow<T>, index: number): T | n
 	}
 
 	if (shape.kind === 'record' && shape.row.value !== undefined) {
-		return shape.row.value as T;
+		return parseDataTableRowValue<T>(shape.row.value);
 	}
 
 	return index;
