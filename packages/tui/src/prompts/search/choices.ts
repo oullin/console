@@ -1,9 +1,9 @@
 import { normalizeSearchChoices } from '#tui/concerns/choices';
-import { isSearchChoiceSourceCallback } from '#tui/prompts/search/validators/source';
+import { resolveSearchChoiceSourceOptions } from '#tui/prompts/search/validators/source';
 import type { Choice, SearchPromptOptions } from '#tui/types';
 
 export const resolveSearchChoices = async <T>(source: SearchPromptOptions<T>['options'], query: string): Promise<Array<Choice<T>>> => {
-	const options = isSearchChoiceSourceCallback(source) ? await source(query) : source;
+	const options = await resolveSearchChoiceSourceOptions(source, query);
 
 	return normalizeSearchChoices(options);
 };

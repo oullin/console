@@ -15,3 +15,9 @@ export const isSearchChoiceSourceCallback = <T>(source: SearchPromptOptions<T>['
 export const parseSearchChoiceSource = <T>(source: unknown): ChoiceOptions<T> | SearchChoiceSourceCallback<T> => {
 	return searchChoiceSourceSchema<T>().parse(source);
 };
+
+export const resolveSearchChoiceSourceOptions = async <T>(source: SearchPromptOptions<T>['options'], query: string): Promise<ChoiceOptions<T>> => {
+	const parsed = parseSearchChoiceSource<T>(source);
+
+	return isSearchChoiceSourceCallback(parsed) ? parsed(query) : parsed;
+};
