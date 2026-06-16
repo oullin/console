@@ -2,6 +2,7 @@ import { runTextSuggestionPrompt } from '#tui/prompts/suggest/lifecycle';
 import { readAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete';
 import { renderSubmittedAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { suggestOptions } from '#tui/prompts/suggest/options';
+import { isSuggestPromptLabel } from '#tui/prompts/suggest/validators/overload';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { MaybePromise, TextPromptOptions } from '#tui/types';
 
@@ -31,7 +32,7 @@ export async function autocomplete(
 	info: SuggestOptions['info'] = '',
 ): Promise<string> {
 	const options =
-		typeof message === 'string'
+		isSuggestPromptLabel(message)
 			? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform, info })
 			: suggestOptions(message);
 

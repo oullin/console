@@ -1,3 +1,4 @@
+import { isTextPromptLabel } from '#tui/concerns/validators/text-options';
 import type { TextareaPromptOptions } from '#tui/types';
 
 export type TextareaPromptArgumentOptions = {
@@ -12,7 +13,7 @@ export type TextareaPromptArgumentOptions = {
 };
 
 export const normalizeTextareaPromptOptions = (options: TextareaPromptArgumentOptions): TextareaPromptOptions => {
-	if (typeof options.message !== 'string') {
+	if (!isTextPromptLabel(options.message)) {
 		return {
 			...options.message,
 			default: options.message.default ?? '',

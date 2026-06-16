@@ -1,3 +1,4 @@
+import { hasNumberDefaultArgument, isNumberPromptLabel } from '#tui/prompts/number/validators/overload';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { NormalizedNumberPromptOptions } from '#tui/prompts/number/defaults';
 import type { NumberPromptOptions } from '#tui/types';
@@ -17,9 +18,10 @@ export type NumberPromptArgumentOptions = {
 };
 
 export const normalizeNumberPromptOptions = (options: NumberPromptArgumentOptions): NormalizedNumberPromptOptions => {
-	const hasDefault = typeof options.message === 'string' ? options.hasDefaultArgument && options.defaultValue !== undefined : hasPromptDefault(options.message);
+	const isLabel = isNumberPromptLabel(options.message);
+	const hasDefault = isLabel ? hasNumberDefaultArgument(options.hasDefaultArgument, options.defaultValue) : hasPromptDefault(options.message);
 
-	if (typeof options.message !== 'string') {
+	if (!isLabel) {
 		return {
 			...options.message,
 			default: hasDefault ? (options.message.default as number | string) : '',

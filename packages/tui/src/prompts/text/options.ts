@@ -1,4 +1,5 @@
 import { textOptions } from '#tui/concerns/text-options';
+import { isTextPromptLabel } from '#tui/concerns/validators/text-options';
 import type { TextPromptOptions } from '#tui/types';
 
 export type TextPromptArgumentOptions = {
@@ -12,7 +13,7 @@ export type TextPromptArgumentOptions = {
 };
 
 export const normalizeTextPromptOptions = (options: TextPromptArgumentOptions): TextPromptOptions => {
-	if (typeof options.message !== 'string') {
+	if (!isTextPromptLabel(options.message)) {
 		return textOptions(options.message);
 	}
 
