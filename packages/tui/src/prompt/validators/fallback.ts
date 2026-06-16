@@ -12,6 +12,10 @@ export const isFallbackConditionCallback = (condition: PromptFallbackCondition):
 	return fallbackConditionCallbackSchema.safeParse(condition).success;
 };
 
+export const resolveFallbackCondition = (condition: PromptFallbackCondition): boolean => {
+	return isFallbackConditionCallback(condition) ? condition() : condition;
+};
+
 export const parseFallbackHandler = <TOptions, TResult>(handler: unknown): PromptFallbackHandler<TOptions, TResult> => {
 	return fallbackHandlerSchema<TOptions, TResult>().parse(handler);
 };
