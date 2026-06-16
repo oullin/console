@@ -36,11 +36,23 @@ export const parseDataTableRowShape = <T>(row: DataTableRow<T>): DataTableRowSha
 		return { kind: 'array', row: arrayRow.data };
 	}
 
-	return { kind: 'record', row: dataTableRecordRowSchema.parse(row) };
+	const recordRow = dataTableRecordRowSchema.safeParse(row);
+
+	if (!recordRow.success) {
+		throw new TypeError('Data table rows must be arrays, records, or object rows.');
+	}
+
+	return { kind: 'record', row: recordRow.data };
 };
 
 export const parseDataTableRowValue = <T>(value: unknown): T => {
-	return dataTableRowValueSchema<T>().parse(value);
+	const parsed = dataTableRowValueSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Data table row values must resolve to a typed value.');
+	}
+
+	return parsed.data;
 };
 
 export const parseDataTableArrayRowFields = (row: TableCell[]): Record<string, TableCell> => {

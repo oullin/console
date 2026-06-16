@@ -24,7 +24,11 @@ export const tableRowCells = (row: TableOptions['rows'][number], headers: string
 		return arrayRow.data.map(stringifyTableCell);
 	}
 
-	const recordRow = tableCellRecordSchema.parse(row);
+	const recordRow = tableCellRecordSchema.safeParse(row);
 
-	return headers.map((header) => stringifyTableCell(recordRow[header]));
+	if (!recordRow.success) {
+		throw new TypeError('Table rows must be arrays or records.');
+	}
+
+	return headers.map((header) => stringifyTableCell(recordRow.data[header]));
 };

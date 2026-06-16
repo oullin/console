@@ -35,11 +35,11 @@ export const parseDataTablePromptOptions = <T>(
 
 	return {
 		filter,
-		headers: dataTableHeadersSchema.parse(optionsOrHeaders),
+		headers: parseDataTableHeaders(optionsOrHeaders),
 		hint,
 		message: label,
 		required,
-		rows: dataTableRowsTypedSchema<T>().parse(rows ?? []),
+		rows: parseDataTableRows<T>(rows ?? []),
 		scroll,
 		transform,
 		validate,
@@ -47,5 +47,31 @@ export const parseDataTablePromptOptions = <T>(
 };
 
 export const parseDataTableDefault = <T>(value: unknown): T | number => {
-	return dataTableDefaultSchema<T>().parse(value);
+	const parsed = dataTableDefaultSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Data table defaults must resolve to a typed value or row number.');
+	}
+
+	return parsed.data;
+};
+
+const parseDataTableHeaders = (value: unknown): string[] => {
+	const parsed = dataTableHeadersSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Data table headers must be an array of strings.');
+	}
+
+	return parsed.data;
+};
+
+const parseDataTableRows = <T>(value: unknown): Array<DataTableRow<T>> => {
+	const parsed = dataTableRowsTypedSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Data table rows must be a non-empty array.');
+	}
+
+	return parsed.data;
 };

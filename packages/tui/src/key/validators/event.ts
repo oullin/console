@@ -12,5 +12,7 @@ const keyboardEventSchema = z
 	.catch({});
 
 export const parseKeyboardEvent = (event: unknown): KeyboardEventLike => {
-	return keyboardEventSchema.parse(event);
+	const parsed = keyboardEventSchema.safeParse(event);
+
+	return parsed.success ? parsed.data : {};
 };

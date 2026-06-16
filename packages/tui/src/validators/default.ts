@@ -9,5 +9,11 @@ export const hasPromptDefault = (value: unknown): boolean => {
 };
 
 export const parsePromptDefault = <T>(value: unknown): T => {
-	return promptDefaultValueSchema<T>().parse(value);
+	const parsed = promptDefaultValueSchema<T>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Prompt defaults must resolve to a typed value.');
+	}
+
+	return parsed.data;
 };

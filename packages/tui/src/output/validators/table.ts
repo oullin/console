@@ -32,7 +32,27 @@ export const parseTableOptions = (headersOrOptions: unknown = [], rows: unknown 
 	}
 
 	return {
-		headers: tableHeadersSchema.parse(headersOrOptions),
-		rows: rows === null ? [] : tableRowsSchema.parse(rows),
+		headers: parseTableHeaders(headersOrOptions),
+		rows: rows === null ? [] : parseTableRows(rows),
 	};
+};
+
+const parseTableHeaders = (value: unknown): string[] => {
+	const parsed = tableHeadersSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Table headers must be an array of strings.');
+	}
+
+	return parsed.data;
+};
+
+const parseTableRows = (value: unknown): TableOptions['rows'] => {
+	const parsed = tableRowsSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Table rows must be an array.');
+	}
+
+	return parsed.data;
 };

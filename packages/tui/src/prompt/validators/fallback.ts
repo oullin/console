@@ -17,5 +17,11 @@ export const resolveFallbackCondition = (condition: PromptFallbackCondition): bo
 };
 
 export const parseFallbackHandler = <TOptions, TResult>(handler: unknown): PromptFallbackHandler<TOptions, TResult> => {
-	return fallbackHandlerSchema<TOptions, TResult>().parse(handler);
+	const parsed = fallbackHandlerSchema<TOptions, TResult>().safeParse(handler);
+
+	if (!parsed.success) {
+		throw new TypeError('Prompt fallback handlers must be functions.');
+	}
+
+	return parsed.data;
 };

@@ -13,5 +13,11 @@ const statusSignalTargetSchema = z
 	.passthrough() as z.ZodType<StatusSignalTarget>;
 
 export const parseStatusSignalTarget = (target: unknown): StatusSignalTarget => {
-	return statusSignalTargetSchema.parse(target);
+	const parsed = statusSignalTargetSchema.safeParse(target);
+
+	if (!parsed.success) {
+		throw new TypeError('Status signal targets must include on and off functions.');
+	}
+
+	return parsed.data;
 };

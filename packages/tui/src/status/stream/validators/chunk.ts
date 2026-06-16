@@ -4,9 +4,21 @@ const streamChunkSchema = z.string();
 const streamChunkLinesSchema = streamChunkSchema.transform((chunk) => chunk.split(/\r?\n/u));
 
 export const parseStreamChunk = (chunk: unknown): string => {
-	return streamChunkSchema.parse(chunk);
+	const parsed = streamChunkSchema.safeParse(chunk);
+
+	if (!parsed.success) {
+		throw new TypeError('Stream chunks must be strings.');
+	}
+
+	return parsed.data;
 };
 
 export const parseStreamChunkLines = (chunk: unknown): string[] => {
-	return streamChunkLinesSchema.parse(chunk);
+	const parsed = streamChunkLinesSchema.safeParse(chunk);
+
+	if (!parsed.success) {
+		throw new TypeError('Stream chunks must be strings.');
+	}
+
+	return parsed.data;
 };

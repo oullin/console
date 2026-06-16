@@ -12,9 +12,21 @@ const writableProcessStreamSchema = z
 	.passthrough() as z.ZodType<WritableProcessStream>;
 
 export const parseProcessOutputWrite = (value: unknown): NodeJS.WriteStream['write'] => {
-	return processOutputWriteSchema.parse(value);
+	const parsed = processOutputWriteSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Process output writers must be functions.');
+	}
+
+	return parsed.data;
 };
 
 export const parseWritableProcessStream = (value: unknown): WritableProcessStream => {
-	return writableProcessStreamSchema.parse(value);
+	const parsed = writableProcessStreamSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Process output streams must include a write function.');
+	}
+
+	return parsed.data;
 };
