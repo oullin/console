@@ -1,33 +1,12 @@
 import { promptUntilValid, promptWithFallback, PromptValidationError } from '#tui/prompt';
 import { activePromptFrame } from '#tui/prompt/active-frame';
+import { numberDefault, transformNumberValue } from '#tui/prompts/number/defaults';
 import { readNumberValue } from '#tui/prompts/number/input';
 import { renderSubmittedNumberValue } from '#tui/prompts/number/render';
 import { parseNumberInput } from '#tui/prompts/number/validators/value';
 import { hasPromptDefault } from '#tui/validators/default';
+import type { NormalizedNumberPromptOptions } from '#tui/prompts/number/defaults';
 import type { NumberPromptOptions } from '#tui/types';
-
-type NormalizedNumberPromptOptions = NumberPromptOptions & {
-	default: number | string;
-	hasDefault: boolean;
-};
-
-const transformNumberValue = async (options: Pick<NumberPromptOptions, 'transform'>, value: number | string): Promise<number | string> => {
-	return options.transform ? options.transform(value) : value;
-};
-
-const numberDefault = async (options: NormalizedNumberPromptOptions): Promise<number | string> => {
-	if (!options.hasDefault) {
-		return '';
-	}
-
-	const result = parseNumberInput(String(options.default), options);
-
-	if (result.error !== undefined) {
-		throw new PromptValidationError(result.error);
-	}
-
-	return transformNumberValue(options, result.value ?? '');
-};
 
 export function number(options: NumberPromptOptions): Promise<number | string>;
 
