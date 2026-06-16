@@ -1,6 +1,7 @@
 import { createDataTableReaderSelectionState } from '#tui/output/data-table/reader/state/selection';
+import { applyDataTableReaderSearchKey, beginDataTableReaderSearch } from '#tui/output/data-table/reader/state/search';
 import { visibleDataTableRows } from '#tui/output/data-table/rows';
-import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
+import { initialDataTableSearchState } from '#tui/output/data-table/search';
 import type { DataTableNavigationAction } from '#tui/output/data-table/keys';
 import type { DataTableSearchState } from '#tui/output/data-table/search';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
@@ -32,7 +33,7 @@ export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, 
 
 	return {
 		applySearchKey(key) {
-			const nextSearch = applyDataTableSearchKey(search, key);
+			const nextSearch = applyDataTableReaderSearchKey(search, key);
 
 			if (!nextSearch.changed) {
 				return false;
@@ -43,7 +44,7 @@ export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, 
 			return true;
 		},
 		beginSearch() {
-			resetSearchSelection(startDataTableSearch());
+			resetSearchSelection(beginDataTableReaderSearch());
 		},
 		mode() {
 			return search.mode;
