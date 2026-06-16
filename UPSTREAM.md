@@ -87,16 +87,16 @@ TypeScript and OpenTUI internals.
 | Autocomplete active-frame redraw and cursor fallback rendering | `packages/tui/src/prompts/suggest/autocomplete-prompt.ts`, `packages/tui/src/prompts/suggest/read-autocomplete.ts`, `packages/tui/src/prompts/suggest/render-autocomplete.ts`, `packages/tui/src/prompts/suggest/ghost-text.ts` |
 | Search, multisearch | `packages/tui/src/prompts/search/*` |
 | Search and multi-search label-first helper argument surface with info | `packages/tui/src/prompts/search/index.ts`, `packages/tui/tests/search.test.ts` |
-| Search active boxed layout and row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
+| Search active boxed layout and row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/tests/search.test.ts` |
 | Search active-frame redraw and cursor rendering | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/render.ts` |
 | Search retry initial highlight lifecycle | `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/navigation.ts` |
-| Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
-| Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
+| Search and multisearch empty-result rendering | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/tests/search.test.ts` |
+| Search highlighted-result row styling | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/src/theme/styles.ts`, `packages/tui/tests/search.test.ts` |
 | Search explicit-default lifecycle and transformed fallback value | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/defaults.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/src/prompts/search/line-mode.ts`, `packages/tui/src/concerns/choices.ts`, `packages/tui/src/concerns/choice-match.ts`, `packages/tui/src/validators/default.ts` |
 | Search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
 | Search submitted frame renders only after validation passes | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/search.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/src/prompts/search/read-single/result.ts`, `packages/tui/tests/search.test.ts` |
 | Search cancel final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-single.ts`, `packages/tui/tests/search.test.ts` |
-| Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/tests/search.test.ts` |
+| Multi-search active boxed layout and selected-count footer | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/render-body.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search transformed fallback value | `packages/tui/src/prompts/search/index.ts`, `packages/tui/src/prompts/search/multisearch.ts`, `packages/tui/src/prompts/search/defaults.ts` |
 | Multi-search submitted final frame | `packages/tui/src/prompts/search/render.ts`, `packages/tui/src/prompts/search/read-multi.ts`, `packages/tui/tests/search.test.ts` |
 | Multi-search empty submitted final frame | `packages/tui/src/prompts/search/render.ts` |
