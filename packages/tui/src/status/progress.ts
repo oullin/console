@@ -13,7 +13,9 @@ export type { ProgressSignalTarget } from '#tui/status/progress/progress';
 
 export function progress(total: number, message?: string): Progress;
 
-export function progress<T, R>(label: string, steps: Iterable<T> | number, callback?: (step: T | number, progress: Progress) => MaybePromise<R>, hint?: string): Progress | Promise<R[]>;
+export function progress<T>(label: string, steps: Iterable<T> | number): Progress;
+
+export function progress<T, R>(label: string, steps: Iterable<T> | number, callback: (step: T | number, progress: Progress) => MaybePromise<R>, hint?: string): Promise<R[]>;
 
 export function progress<T, R>(
 	labelOrTotal: string | number,
