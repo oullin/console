@@ -1,5 +1,4 @@
-import { eraseRenderedFrame } from '#tui/status/frame';
-import { renderSearchChoices } from '#tui/prompts/search/render';
+import { createMultiSearchFrameRenderer } from '#tui/prompts/search/read-multi/frame';
 import { createMultiSearchReaderState } from '#tui/prompts/search/read-multi/state';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
@@ -22,42 +21,20 @@ export type MultiSearchReaderSession<T> = {
 export const createMultiSearchReaderSession = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchReaderSession<T>> => {
 	const state = await createMultiSearchReaderState(options);
 
-	let frame = '';
-
-	function render(): void {
-		if (frame.length > 0) {
-			eraseRenderedFrame(frame);
-		}
-
-		const query = state.query();
-
-		frame = renderSearchChoices(
-			options.message,
-			query.value,
-			query.cursor,
-			state.displayedChoices(),
-			state.highlighted(),
-			state.markedChoiceIndexes(),
-			state.selectedLabels(),
-			options.scroll,
-			options.info,
-			true,
-			options.placeholder,
-		);
-	}
+	const frame = createMultiSearchFrameRenderer(options, state);
 
 	return {
 		async applyTypedInput(key: string) {
 			const next = await state.applyTypedInput(key);
 
 			if (!next.cancelled) {
-				render();
+				frame.render();
 			}
 
 			return next;
 		},
 		frame() {
-			return frame;
+			return frame.current();
 		},
 		highlighted() {
 			return state.highlighted();
@@ -65,12 +42,12 @@ export const createMultiSearchReaderSession = async <T>(options: MultiSearchProm
 		async move(action) {
 			await state.move(action);
 
-			render();
+			frame.render();
 		},
 		query() {
 			return state.query();
 		},
-		render,
+		render: frame.render,
 		selected() {
 			return state.selected();
 		},
@@ -79,11 +56,11 @@ export const createMultiSearchReaderSession = async <T>(options: MultiSearchProm
 		},
 		toggleAllDisplayed() {
 			state.toggleAllDisplayed();
-			render();
+			frame.render();
 		},
 		toggleHighlighted() {
 			state.toggleHighlighted();
-			render();
+			frame.render();
 		},
 	};
 };
