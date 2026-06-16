@@ -4,33 +4,22 @@ import { ask, cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { clearsSuggestionHighlight, moveSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
+import { initialSuggestionState, suggestionReadResult } from '#tui/prompts/suggest/read-result';
 import { renderCancelledSuggestion, renderSuggestions } from '#tui/prompts/suggest/render';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
-import { characterLength } from '#tui/typed-value/characters';
+import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export type SuggestReadResult = {
-	cancelled: boolean;
-	frame?: string;
-	rendered: boolean;
-	value: string;
-};
+export type SuggestReadResult = TextSuggestionReadResult;
 
 export const readSuggestionValue = async (options: SuggestOptions): Promise<SuggestReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return {
-			cancelled: false,
-			rendered: false,
-			value: await ask(options.message, options.hint),
-		};
+		return suggestionReadResult(await ask(options.message, options.hint), false);
 	}
 
-	let state = {
-		cursor: characterLength(options.default ?? ''),
-		value: options.default ?? '',
-	};
+	let state = initialSuggestionState(options.default ?? '');
 	let highlighted: number | null = null;
 
 	let matches: string[] = await resolveSuggestions(options.options, state.value);
@@ -41,12 +30,7 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return {
-				cancelled: false,
-				frame,
-				rendered: true,
-				value: state.value,
-			};
+			return suggestionReadResult(state.value, true, false, frame);
 		}
 
 		const action = suggestNavigationAction(key);
@@ -69,42 +53,23 @@ export const readSuggestionValue = async (options: SuggestOptions): Promise<Sugg
 
 		if (key === Key.enter) {
 			if (highlighted !== null && matches[highlighted] !== undefined) {
-				return {
-					cancelled: false,
-					frame,
-					rendered: true,
-					value: matches[highlighted],
-				};
+				return suggestionReadResult(matches[highlighted], true, false, frame);
 			}
 
-			return {
-				cancelled: false,
-				frame,
-				rendered: true,
-				value: state.value,
-			};
+			return suggestionReadResult(state.value, true, false, frame);
 		}
 
 		const next = applyTypedKey(state, key);
 
 		if (next.submitted) {
-			return {
-				cancelled: false,
-				frame,
-				rendered: true,
-				value: state.value,
-			};
+			return suggestionReadResult(state.value, true, false, frame);
 		}
 
 		if (next.cancelled) {
 			eraseRenderedFrame(frame);
 			renderCancelledSuggestion(options.message, state.value, options.placeholder);
 
-			return {
-				cancelled: true,
-				rendered: true,
-				value: await cancelPrompt(state.value),
-			};
+			return suggestionReadResult(await cancelPrompt(state.value), true, true);
 		}
 
 		state = { cursor: next.cursor, value: next.value };

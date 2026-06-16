@@ -4,33 +4,22 @@ import { ask, cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { applyTypedKey } from '#tui/typed-value';
 import { acceptAutocompleteMatch, autocompleteNavigationDirection, canAcceptAutocomplete, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
+import { initialSuggestionState, suggestionReadResult } from '#tui/prompts/suggest/read-result';
 import { renderAutocomplete, renderCancelledAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
 import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
-import { characterLength } from '#tui/typed-value/characters';
+import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export type AutocompleteReadResult = {
-	cancelled: boolean;
-	frame?: string;
-	rendered: boolean;
-	value: string;
-};
+export type AutocompleteReadResult = TextSuggestionReadResult;
 
 export const readAutocompleteValue = async (options: SuggestOptions): Promise<AutocompleteReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return {
-			cancelled: false,
-			rendered: false,
-			value: await ask(options.message, options.hint),
-		};
+		return suggestionReadResult(await ask(options.message, options.hint), false);
 	}
 
-	let state = {
-		cursor: characterLength(options.default ?? ''),
-		value: options.default ?? '',
-	};
+	let state = initialSuggestionState(options.default ?? '');
 	let highlighted = 0;
 
 	let matches = await resolveSuggestions(options.options, state.value);
@@ -41,12 +30,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return {
-				cancelled: false,
-				frame,
-				rendered: true,
-				value: state.value,
-			};
+			return suggestionReadResult(state.value, true, false, frame);
 		}
 
 		const direction = autocompleteNavigationDirection(key);
@@ -91,23 +75,14 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 		const next = applyTypedKey(state, key);
 
 		if (next.submitted) {
-			return {
-				cancelled: false,
-				frame,
-				rendered: true,
-				value: state.value,
-			};
+			return suggestionReadResult(state.value, true, false, frame);
 		}
 
 		if (next.cancelled) {
 			eraseRenderedFrame(frame);
 			renderCancelledAutocomplete(options.message, state.value, options.placeholder);
 
-			return {
-				cancelled: true,
-				rendered: true,
-				value: await cancelPrompt(state.value),
-			};
+			return suggestionReadResult(await cancelPrompt(state.value), true, true);
 		}
 
 		state = { cursor: next.cursor, value: next.value };
