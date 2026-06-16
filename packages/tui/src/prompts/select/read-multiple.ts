@@ -3,21 +3,16 @@ import { Key } from '#tui/key';
 import { ask, cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
 import { renderChoices } from '#tui/theme';
-import { firstEnabledIndex } from '#tui/concerns/choices';
-import { moveSelectHighlight, selectNavigationAction } from '#tui/prompts/select/keys';
-import { choicesFromCommaSeparated, markedChoiceIndexes, markedChoiceValues, toggleAllEnabledChoices, toggleMarkedChoice } from '#tui/prompts/select/multiple';
+import { selectNavigationAction } from '#tui/prompts/select/keys';
+import { choicesFromCommaSeparated, markedChoiceValues } from '#tui/prompts/select/multiple';
 import { parseChoiceIndex } from '#tui/prompts/select/navigation';
 import { cancelledMultipleChoicesResult, multipleChoicesResult, multipleChoicesValueResult } from '#tui/prompts/select/read-multiple/result';
-import { renderCancelledChoices, renderMultipleChoices } from '#tui/prompts/select/render';
+import { createMultipleChoicesReaderSession } from '#tui/prompts/select/read-multiple/session';
+import type { MultipleChoicesReadResult as MultipleChoicesReadResultType } from '#tui/prompts/select/read-multiple/types';
+import { renderCancelledChoices } from '#tui/prompts/select/render';
 import type { Choice, MultiSelectPromptOptions } from '#tui/types';
 
-export type MultipleChoicesReadResult<T> = {
-	cancelled: boolean;
-	frame?: string;
-	submitted: boolean;
-	submittedLabels: string[];
-	value: T[];
-};
+export type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple/types';
 
 export const readMultipleChoices = async <T>(
 	message: string,
@@ -26,7 +21,7 @@ export const readMultipleChoices = async <T>(
 	hint?: string,
 	scroll?: number,
 	info?: MultiSelectPromptOptions<T>['info'],
-): Promise<MultipleChoicesReadResult<T>> => {
+): Promise<MultipleChoicesReadResultType<T>> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
@@ -39,24 +34,22 @@ export const readMultipleChoices = async <T>(
 		return multipleChoicesValueResult(value);
 	}
 
-	let selected = firstEnabledIndex(choices);
+	const session = createMultipleChoicesReaderSession(message, choices, defaults, scroll, info);
 
-	let marked = markedChoiceIndexes(choices, defaults);
-
-	let frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return multipleChoicesResult(choices, marked, true, false, frame);
+			return multipleChoicesResult(choices, session.marked(), true, false, session.frame());
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(frame);
-			renderCancelledChoices(message, choices, selected, marked, scroll);
+			eraseRenderedFrame(session.frame());
+			renderCancelledChoices(message, choices, session.selected(), session.marked(), scroll);
 
-			return cancelledMultipleChoicesResult(choices, marked, await cancelPrompt(markedChoiceValues(choices, marked)));
+			return cancelledMultipleChoicesResult(choices, session.marked(), await cancelPrompt(markedChoiceValues(choices, session.marked())));
 		}
 
 		if (key.includes(',')) {
@@ -65,47 +58,29 @@ export const readMultipleChoices = async <T>(
 
 		const numeric = parseChoiceIndex(key);
 
-		if (!Number.isNaN(numeric) && choices[numeric - 1] && !choices[numeric - 1]?.disabled) {
-			const index = numeric - 1;
-
-			if (marked.has(index)) {
-				marked.delete(index);
-			} else {
-				marked.add(index);
-			}
-
-			eraseRenderedFrame(frame);
-			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
+		if (!Number.isNaN(numeric) && session.toggleIndex(numeric - 1)) {
 			continue;
 		}
 
 		const action = selectNavigationAction(key);
 
 		if (action !== null) {
-			selected = moveSelectHighlight(choices, selected, action, scroll);
-			eraseRenderedFrame(frame);
-			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			session.move(action);
 			continue;
 		}
 
 		if (key === Key.ctrlA) {
-			marked = toggleAllEnabledChoices(choices, marked);
-
-			eraseRenderedFrame(frame);
-			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			session.toggleAll();
 			continue;
 		}
 
 		if (key === Key.space) {
-			marked = toggleMarkedChoice(choices, marked, selected);
-
-			eraseRenderedFrame(frame);
-			frame = renderMultipleChoices(message, choices, selected, marked, scroll, info);
+			session.toggleSelected();
 			continue;
 		}
 
 		if (key === Key.enter) {
-			return multipleChoicesResult(choices, marked, true, false, frame);
+			return multipleChoicesResult(choices, session.marked(), true, false, session.frame());
 		}
 	}
 };

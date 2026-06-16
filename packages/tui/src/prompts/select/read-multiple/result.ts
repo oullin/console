@@ -1,6 +1,6 @@
 import { markedChoiceValues } from '#tui/prompts/select/multiple';
+import type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple/types';
 import type { Choice } from '#tui/types';
-import type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multiple';
 
 export const markedChoiceLabels = <T>(choices: Array<Choice<T>>, marked: Set<number>): string[] => {
 	return [...marked]
