@@ -137,7 +137,7 @@ TypeScript and OpenTUI internals.
 | Data table row-shape validation and normalization | `packages/tui/src/output/validators/data-table.ts`, `packages/tui/src/output/data-table/rows.ts`, `packages/tui/tests/table.test.ts` |
 | Static table row-shape validation and header inference | `packages/tui/src/output/validators/table.ts`, `packages/tui/tests/table.test.ts` |
 | Data table fixed visual height | `packages/tui/src/output/data-table/visual-window.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/tests/table.test.ts` |
-| Data table comfortable width and outlier truncation | `packages/tui/src/output/data-table/widths.ts`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/tests/table.test.ts` |
+| Data table comfortable width and outlier truncation | `packages/tui/src/output/data-table/widths.ts`, `packages/tui/src/output/data-table/widths/*`, `packages/tui/src/output/data-table/render.ts`, `packages/tui/src/output/data-table/render-body.ts`, `packages/tui/tests/table.test.ts` |
 | Boxed balanced grid rendering | `packages/tui/src/output/grid.ts`, `packages/tui/tests/output.test.ts` |
 | Terminal title and clear output | `packages/tui/src/output/terminal.ts` |
 | Spinner, progress, task, stream | `packages/tui/src/status/*`, `packages/tui/src/status.ts` |
