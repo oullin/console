@@ -1,5 +1,4 @@
-import { moveDataTableSelection } from '#tui/output/data-table/navigation';
-import { initialDataTableSelection } from '#tui/output/data-table/reader/result';
+import { createDataTableReaderSelectionState } from '#tui/output/data-table/reader/state/selection';
 import { visibleDataTableRows } from '#tui/output/data-table/rows';
 import { applyDataTableSearchKey, initialDataTableSearchState, startDataTableSearch } from '#tui/output/data-table/search';
 import type { DataTableNavigationAction } from '#tui/output/data-table/keys';
@@ -20,7 +19,7 @@ export type DataTableReaderState<T> = {
 
 export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, headers: string[]): DataTableReaderState<T> => {
 	let search = initialDataTableSearchState();
-	let selected = initialDataTableSelection(visibleRows(), options.default, options.hasDefault);
+	const selected = createDataTableReaderSelectionState(visibleRows(), options);
 
 	function visibleRows(): Array<VisibleDataTableRow<T>> {
 		return visibleDataTableRows(options, headers, search.query.value);
@@ -28,7 +27,7 @@ export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, 
 
 	function resetSearchSelection(nextSearch: DataTableSearchState): void {
 		search = nextSearch;
-		selected = 0;
+		selected.reset();
 	}
 
 	return {
@@ -50,17 +49,17 @@ export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, 
 			return search.mode;
 		},
 		moveSelection(action) {
-			selected = moveDataTableSelection(action, selected, visibleRows().length, options.scroll);
+			selected.move(action, visibleRows().length);
 		},
 		query() {
 			return search.query.value;
 		},
 		rows: visibleRows,
 		selected() {
-			return selected;
+			return selected.value();
 		},
 		setSelected(nextSelected) {
-			selected = nextSelected;
+			selected.set(nextSelected);
 		},
 	};
 };
