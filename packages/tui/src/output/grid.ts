@@ -8,7 +8,8 @@ export const renderGrid = (items: Array<string | number | boolean> = [], maxWidt
 	}
 
 	const values = items.map(String);
-	const width = Math.max(1, Math.trunc(maxWidth ?? terminalSize().columns));
+	const requestedWidth = Math.trunc(maxWidth ?? terminalSize().columns);
+	const width = Number.isFinite(requestedWidth) ? Math.max(1, requestedWidth) : 1;
 	const availableWidth = width - 2;
 	const layout = createGridLayout(values, availableWidth);
 
