@@ -31,16 +31,18 @@ export class ProgressTerminalLifecycle {
 	}
 
 	restore(): void {
-		if (this.#renderedFrame) {
-			eraseRenderedFrame(this.#renderedFrame);
-			this.#renderedFrame = null;
-		}
+		try {
+			if (this.#renderedFrame) {
+				eraseRenderedFrame(this.#renderedFrame);
+				this.#renderedFrame = null;
+			}
+		} finally {
+			if (this.#cursorHidden) {
+				showCursor();
+				this.#cursorHidden = false;
+			}
 
-		if (this.#cursorHidden) {
-			showCursor();
-			this.#cursorHidden = false;
+			this.#signals.detach();
 		}
-
-		this.#signals.detach();
 	}
 }
