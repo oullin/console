@@ -1,4 +1,5 @@
 import { isSearchPromptLabel } from '#tui/prompts/search/validators/overload';
+import { parseMultiSearchDefault } from '#tui/prompts/search/validators/defaults';
 import { parseSearchChoiceSource } from '#tui/prompts/search/validators/source';
 import type { ChoiceOptions, MultiSearchPromptOptions } from '#tui/types';
 
@@ -24,6 +25,6 @@ export const normalizeMultiSearchPromptOptions = <T>(
 
 	return {
 		...options,
-		default: options.default ?? [],
+		default: parseMultiSearchDefault<T>(options.default ?? []),
 	};
 };
