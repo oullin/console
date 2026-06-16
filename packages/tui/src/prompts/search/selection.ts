@@ -9,7 +9,7 @@ export const createInitialSearchSelection = <T>(choices: Array<Choice<T>>, defau
 	for (const value of defaults) {
 		const choice = choices.find((candidate) => choiceValueEquals(candidate.value, value));
 
-		selected.set(value, choice?.label ?? String(value));
+		selected.set(choice?.value ?? value, choice?.label ?? String(value));
 	}
 
 	return selected;
