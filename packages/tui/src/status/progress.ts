@@ -1,6 +1,11 @@
 import { Progress } from '#tui/status/progress/progress';
 import { runProgressSteps } from '#tui/status/progress/run';
 import { progressValues } from '#tui/status/progress/steps';
+import {
+	isProgressTotalArgument,
+	progressMessageArgument,
+	progressStepsArgument,
+} from '#tui/status/progress/validators/arguments';
 import type { MaybePromise } from '#tui/types';
 
 export { Progress };
@@ -16,17 +21,11 @@ export function progress<T, R>(
 	callback?: (step: T | number, progress: Progress) => MaybePromise<R>,
 	hint = '',
 ): Progress | Promise<R[]> {
-	if (typeof labelOrTotal === 'number') {
-		return new Progress(labelOrTotal, typeof stepsOrMessage === 'string' ? stepsOrMessage : undefined);
+	if (isProgressTotalArgument(labelOrTotal)) {
+		return new Progress(labelOrTotal, progressMessageArgument(stepsOrMessage));
 	}
 
-	const steps = stepsOrMessage ?? 0;
-
-	if (typeof steps === 'string') {
-		throw new Error('Progress steps must be an iterable or a number.');
-	}
-
-	const values = progressValues(steps);
+	const values = progressValues(progressStepsArgument(stepsOrMessage));
 	const bar = new Progress(values.length, labelOrTotal, hint);
 
 	if (!callback) {
