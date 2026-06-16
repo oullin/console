@@ -9,7 +9,13 @@ const isInvalidRequiredValue = (value: unknown): boolean => {
 };
 
 export const requiredMessage = (value: unknown, required?: boolean | string): string | undefined => {
-	const parsed = requiredOptionSchema.parse(required);
+	const requiredOption = requiredOptionSchema.safeParse(required);
+
+	if (!requiredOption.success) {
+		return undefined;
+	}
+
+	const parsed = requiredOption.data;
 
 	if (parsed === false || parsed === undefined || !isInvalidRequiredValue(value)) {
 		return undefined;
