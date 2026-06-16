@@ -13,5 +13,11 @@ export type NotificationOptions = z.input<typeof notificationOptionsSchema>;
 export type ResolvedNotificationOptions = z.output<typeof notificationOptionsSchema>;
 
 export const parseNotificationOptions = (options: unknown): ResolvedNotificationOptions => {
-	return notificationOptionsSchema.parse(options);
+	const parsed = notificationOptionsSchema.safeParse(options);
+
+	if (!parsed.success) {
+		throw new Error('Notification options must include a string title.');
+	}
+
+	return parsed.data;
 };
