@@ -2,18 +2,12 @@ import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { cancelPrompt } from '#tui/prompt';
 import { eraseRenderedFrame } from '#tui/status/frame';
-import { applyTypedKey } from '#tui/typed-value';
-import { resolveSearchChoices } from '#tui/prompts/search/choices';
-import { clearsSearchHighlight, moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { initialRetriedSearchHighlight } from '#tui/prompts/search/navigation';
-import { renderCancelledSearch, renderSearchChoices } from '#tui/prompts/search/render';
-import { cancelledSearchValue, defaultSearchChoice, lineSearchValue, selectedSearchValue } from '#tui/prompts/search/read-single/result';
+import { clearsSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
+import { renderCancelledSearch } from '#tui/prompts/search/render';
+import { cancelledSearchValue, lineSearchValue } from '#tui/prompts/search/read-single/result';
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
-import type { SearchPromptOptions } from '#tui/types';
-
-type SearchReadOptions<T> = SearchPromptOptions<T> & {
-	hasDefault?: boolean;
-};
+import { createSearchReaderSession } from '#tui/prompts/search/read-single/session';
+import type { SearchReadOptions } from '#tui/prompts/search/read-single/session';
 
 export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt = 0): Promise<SearchChoiceReadResult<T>> => {
 	const environment = promptEnvironment();
@@ -22,13 +16,9 @@ export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt
 		return { cancelled: false, submitted: false, submittedLabel: '', value: await lineSearchValue(options) };
 	}
 
-	let state = { cursor: 0, value: '' };
+	const session = await createSearchReaderSession(options, attempt);
 
-	let choices = await resolveSearchChoices(options.options, state.value);
-
-	let highlighted: number | null = initialRetriedSearchHighlight(choices, attempt);
-
-	let frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
@@ -38,67 +28,49 @@ export const readSearchChoice = async <T>(options: SearchReadOptions<T>, attempt
 		}
 
 		if (key === Key.ctrlC) {
-			eraseRenderedFrame(frame);
-			renderCancelledSearch(options.message, state.value, options.placeholder);
+			eraseRenderedFrame(session.frame());
+			renderCancelledSearch(options.message, session.query().value, options.placeholder);
 
-			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(choices, highlighted, options.default)) };
+			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(cancelledSearchValue(session.choices(), session.highlighted(), options.default)) };
 		}
 
 		const action = searchNavigationAction(key, { controlNavigation: true, lineControls: true });
 
-		if (action !== null && (action !== 'first' || highlighted !== null) && (action !== 'last' || highlighted !== null)) {
-			choices = await resolveSearchChoices(options.options, state.value);
+		if (action !== null && (action !== 'first' || session.highlighted() !== null) && (action !== 'last' || session.highlighted() !== null)) {
+			await session.move(action);
 
-			highlighted = moveSearchHighlight(choices, highlighted, action, { attempt, retryFirst: true, scroll: options.scroll });
-			eraseRenderedFrame(frame);
-			frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 			continue;
 		}
 
-		if (clearsSearchHighlight(key) && highlighted !== null) {
-			highlighted = null;
-			eraseRenderedFrame(frame);
-			frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+		if (clearsSearchHighlight(key) && session.highlighted() !== null) {
+			session.clearHighlight();
 			continue;
 		}
 
 		if (key === Key.enter) {
-			if (highlighted !== null) {
-				const choice = choices[highlighted];
-				const value = selectedSearchValue(choices, highlighted);
+			if (session.highlighted() !== null) {
+				const selected = session.selectedSelection();
 
-				return { cancelled: false, frame, submitted: choice !== undefined && value !== undefined, submittedLabel: choice?.label ?? '', value };
+				return { cancelled: false, frame: session.frame(), submitted: selected.submitted, submittedLabel: selected.label, value: selected.value };
 			}
 
-			choices = await resolveSearchChoices(options.options, state.value);
+			const selected = await session.defaultSelection();
 
-			if (state.value === '' && options.hasDefault === true) {
-				const choice = defaultSearchChoice(choices, options.default, options.hasDefault);
-
-				return { cancelled: false, frame, submitted: choice !== undefined, submittedLabel: choice?.label ?? '', value: choice?.value ?? options.default };
+			if (session.query().value === '' && options.hasDefault === true) {
+				return { cancelled: false, frame: session.frame(), submitted: selected.submitted, submittedLabel: selected.label, value: selected.value };
 			}
 
-			highlighted = null;
-			eraseRenderedFrame(frame);
-			frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
+			session.clearHighlight();
 			continue;
 		}
 
-		const next = applyTypedKey(state, key);
+		const next = await session.applyTypedInput(key);
 
 		if (next.cancelled) {
-			eraseRenderedFrame(frame);
-			renderCancelledSearch(options.message, state.value, options.placeholder);
+			eraseRenderedFrame(session.frame());
+			renderCancelledSearch(options.message, session.query().value, options.placeholder);
 
 			return { cancelled: true, submitted: false, submittedLabel: '', value: await cancelPrompt(options.default) };
 		}
-
-		state = { cursor: next.cursor, value: next.value };
-		highlighted = null;
-
-		choices = await resolveSearchChoices(options.options, state.value);
-
-		eraseRenderedFrame(frame);
-		frame = renderSearchChoices(options.message, state.value, state.cursor, choices, highlighted, new Set(), [], options.scroll, options.info, false, options.placeholder);
 	}
 };
