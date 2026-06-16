@@ -7,6 +7,10 @@ export const fallbackSearchDefault = <T>(options: SearchReadOptions<T>): T | und
 };
 
 export const exhaustedInteractiveSearchChoice = async <T>(session: SearchReaderSession<T>, options: SearchReadOptions<T>): Promise<SearchChoiceReadResult<T>> => {
+	if (session.highlighted() !== null) {
+		return highlightedInteractiveSearchChoice(session);
+	}
+
 	if (session.query().value === '' && options.hasDefault === true) {
 		const selected = await defaultInteractiveSearchChoice(session);
 
