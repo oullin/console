@@ -6,6 +6,7 @@ import {
 	toggleHighlightedDisplayedMultiSearchSelection,
 } from '#tui/prompts/search/read-multi/state/displayed';
 import { createMultiSearchReaderStateContext } from '#tui/prompts/search/read-multi/state/context';
+import { applyMultiSearchTypedInput } from '#tui/prompts/search/read-multi/state/input';
 import { multiSearchSelectedLabels } from '#tui/prompts/search/read-multi/state/selection';
 import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
@@ -30,11 +31,7 @@ export const createMultiSearchReaderState = async <T>(options: MultiSearchPrompt
 
 	return {
 		async applyTypedInput(key) {
-			const next = await query.applyTypedInput(key);
-
-			highlighted.clear();
-
-			return next;
+			return applyMultiSearchTypedInput(query, highlighted, key);
 		},
 		displayedChoices,
 		highlighted() {
