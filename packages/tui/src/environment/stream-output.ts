@@ -4,10 +4,11 @@ import type { PromptOutput } from '#tui/types';
 
 export const outputFromStream = (stream: NodeJS.WritableStream): PromptOutput => {
 	const writable = parseWritableOutputStream(stream);
+	const write = writable.write.bind(writable);
 
 	return {
 		write(content: string): void {
-			writable.write(parsePromptOutputContent(content));
+			write(parsePromptOutputContent(content));
 		},
 	};
 };
