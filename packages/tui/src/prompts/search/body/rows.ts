@@ -1,5 +1,6 @@
 import { choiceWindow } from '#tui/concerns/choices';
 import { renderScrollbarRows } from '#tui/concerns/scrollbar';
+import { choiceDisabledSuffix } from '#tui/theme/choice-disabled';
 import { cyan, dim } from '#tui/theme/styles';
 import type { Choice } from '#tui/types';
 
@@ -19,7 +20,7 @@ export const renderSearchRows = <T>(choices: Array<Choice<T>>, highlighted: numb
 };
 
 const choiceLabel = <T>(choice: Choice<T>): string => {
-	const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
+	const disabled = choiceDisabledSuffix(choice.disabled);
 	const hint = choice.hint ? ` ${choice.hint}` : '';
 
 	return `${choice.label}${hint}${disabled}`;
