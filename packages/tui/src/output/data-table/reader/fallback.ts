@@ -6,9 +6,10 @@ import type { DataTableSelectionReadResult } from '#tui/output/data-table/types'
 
 export const readDataTableFallbackSelection = async <T>(options: DataTableReadOptions<T>, headers: string[]): Promise<DataTableSelectionReadResult<T>> => {
 	const answer = await ask(options.message);
+	const query = answer.trim();
 
-	const rows = visibleDataTableRows(options, headers, answer);
-	const selected = answer.trim() === '' ? initialDataTableSelection(rows, options.default, options.hasDefault) : 0;
+	const rows = visibleDataTableRows(options, headers, query);
+	const selected = query === '' ? initialDataTableSelection(rows, options.default, options.hasDefault) : 0;
 
 	assertSelectedDataTableRow(rows, selected, '');
 
