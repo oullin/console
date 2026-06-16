@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import type { ChoiceOptions, MaybePromise } from '#tui/types';
 
+type SearchChoiceSourceCallback<T> = (query: string) => MaybePromise<ChoiceOptions<T>>;
+
 const searchLabelSchema = z.string();
-const searchChoiceSourceSchema = <T>() =>
-	z.union([
-		z.array(z.unknown()),
-		z.record(z.string(), z.string()),
-		z.function(),
-	]) as z.ZodType<ChoiceOptions<T> | ((query: string) => MaybePromise<ChoiceOptions<T>>)>;
+const searchChoiceOptionsSchema = <T>(): z.ZodType<ChoiceOptions<T>> => z.union([z.array(z.unknown()), z.record(z.string(), z.string())]) as z.ZodType<ChoiceOptions<T>>;
+const searchChoiceSourceCallbackSchema = <T>(): z.ZodType<SearchChoiceSourceCallback<T>> => z.function() as z.ZodType<SearchChoiceSourceCallback<T>>;
+const searchChoiceSourceSchema = <T>(): z.ZodType<ChoiceOptions<T> | SearchChoiceSourceCallback<T>> =>
+	z.union([searchChoiceOptionsSchema<T>(), searchChoiceSourceCallbackSchema<T>()]);
 
 export const isSearchPromptLabel = (value: unknown): value is string => {
 	return searchLabelSchema.safeParse(value).success;
@@ -19,6 +19,6 @@ export const parseSearchStepName = (value: unknown): string | undefined => {
 	return parsed.success ? parsed.data : undefined;
 };
 
-export const parseSearchChoiceSource = <T>(value: unknown): ChoiceOptions<T> | ((query: string) => MaybePromise<ChoiceOptions<T>>) => {
+export const parseSearchChoiceSource = <T>(value: unknown): ChoiceOptions<T> | SearchChoiceSourceCallback<T> => {
 	return searchChoiceSourceSchema<T>().parse(value);
 };

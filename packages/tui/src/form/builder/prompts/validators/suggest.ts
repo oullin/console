@@ -1,8 +1,11 @@
 import { z } from 'zod';
 import type { MaybePromise } from '#tui/types';
 
+type SuggestSourceCallback = (query: string) => MaybePromise<string[]>;
+
 const suggestLabelSchema = z.string();
-const suggestSourceSchema = z.union([z.array(z.string()), z.function()]) as z.ZodType<string[] | ((query: string) => MaybePromise<string[]>)>;
+const suggestSourceCallbackSchema: z.ZodType<SuggestSourceCallback> = z.function() as z.ZodType<SuggestSourceCallback>;
+const suggestSourceSchema = z.union([z.array(z.string()), suggestSourceCallbackSchema]);
 
 export const isSuggestPromptLabel = (value: unknown): value is string => {
 	return suggestLabelSchema.safeParse(value).success;
@@ -14,6 +17,6 @@ export const parseSuggestStepName = (value: unknown): string | undefined => {
 	return parsed.success ? parsed.data : undefined;
 };
 
-export const parseSuggestSource = (value: unknown): string[] | ((query: string) => MaybePromise<string[]>) => {
+export const parseSuggestSource = (value: unknown): string[] | SuggestSourceCallback => {
 	return suggestSourceSchema.parse(value);
 };
