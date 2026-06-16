@@ -1,5 +1,8 @@
+import { z } from 'zod';
 import { dataTableHeadersSchema, dataTablePromptOptionsSchema, dataTableRowsSchema, dataTableStepNameSchema } from '#tui/output/validators/data-table/schemas';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
+
+const dataTableDefaultSchema = <T>(): z.ZodType<T | number> => z.unknown() as z.ZodType<T | number>;
 
 export const isDataTablePromptOptions = <T>(value: unknown): value is DataTablePromptOptions<T> => {
 	return dataTablePromptOptionsSchema.safeParse(value).success;
@@ -39,4 +42,8 @@ export const parseDataTablePromptOptions = <T>(
 		transform,
 		validate,
 	};
+};
+
+export const parseDataTableDefault = <T>(value: unknown): T | number => {
+	return dataTableDefaultSchema<T>().parse(value);
 };

@@ -1,3 +1,4 @@
+import { parseDataTableDefault } from '#tui/output/validators/data-table';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { DataTablePromptOptions } from '#tui/types';
 
@@ -21,5 +22,5 @@ export const preserveDataTableRetryDefault = <T>(options: NormalizedDataTablePro
 
 export const dataTableValidationOptions = async <T>(options: NormalizedDataTablePromptOptions<T>): Promise<DataTablePromptOptions<T>> => ({
 	...options,
-	default: options.hasDefault ? await transformDataTableValue(options, options.default as T | number) : undefined,
+	default: options.hasDefault ? await transformDataTableValue(options, parseDataTableDefault<T>(options.default)) : undefined,
 });
