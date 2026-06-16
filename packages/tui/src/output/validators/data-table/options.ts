@@ -3,6 +3,8 @@ import { dataTableHeadersSchema, dataTablePromptOptionsSchema, dataTableRowsSche
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
 const dataTableDefaultSchema = <T>(): z.ZodType<T | number> => z.unknown() as z.ZodType<T | number>;
+const dataTablePromptOptionsTypedSchema = <T>(): z.ZodType<DataTablePromptOptions<T>> => dataTablePromptOptionsSchema as z.ZodType<DataTablePromptOptions<T>>;
+const dataTableRowsTypedSchema = <T>(): z.ZodType<Array<DataTableRow<T>>> => dataTableRowsSchema as z.ZodType<Array<DataTableRow<T>>>;
 
 export const isDataTablePromptOptions = <T>(value: unknown): value is DataTablePromptOptions<T> => {
 	return dataTablePromptOptionsSchema.safeParse(value).success;
@@ -25,10 +27,10 @@ export const parseDataTablePromptOptions = <T>(
 	transform: DataTablePromptOptions<T>['transform'] = undefined,
 	filter: DataTablePromptOptions<T>['filter'] = undefined,
 ): DataTablePromptOptions<T> => {
-	const promptOptions = dataTablePromptOptionsSchema.safeParse(optionsOrHeaders);
+	const promptOptions = dataTablePromptOptionsTypedSchema<T>().safeParse(optionsOrHeaders);
 
 	if (promptOptions.success) {
-		return promptOptions.data as DataTablePromptOptions<T>;
+		return promptOptions.data;
 	}
 
 	return {
@@ -37,7 +39,7 @@ export const parseDataTablePromptOptions = <T>(
 		hint,
 		message: label,
 		required,
-		rows: rows === null ? [] : (dataTableRowsSchema.parse(rows) as Array<DataTableRow<T>>),
+		rows: rows === null ? [] : dataTableRowsTypedSchema<T>().parse(rows),
 		scroll,
 		transform,
 		validate,

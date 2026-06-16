@@ -6,6 +6,7 @@ import type { DataTableRow, TableOptions } from '#tui/types';
 const outputStepNameSchema = z.string();
 const outputScrollSchema = z.number();
 const nullOutputRowsSchema = z.null();
+const outputDataTableRowsSchema = <T>(): z.ZodType<Array<DataTableRow<T>>> => dataTableRowsSchema as z.ZodType<Array<DataTableRow<T>>>;
 
 export const parseOutputStepName = (value: unknown): string | undefined => {
 	const parsed = outputStepNameSchema.safeParse(value);
@@ -32,5 +33,5 @@ export const parseOutputDataTableRows = <T>(value: unknown): Array<DataTableRow<
 		return null;
 	}
 
-	return dataTableRowsSchema.parse(value) as Array<DataTableRow<T>>;
+	return outputDataTableRowsSchema<T>().parse(value);
 };
