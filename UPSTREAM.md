@@ -219,8 +219,8 @@ Current implementation evidence:
 - Source imports use package aliases instead of relative paths.
 - The package is ESM-only through `packages/tui/package.json` `type` and
   `exports`.
-- CI is configured in `.github/workflows/ci.yml` to run build, typecheck, and
-  tests only when a draft pull request is marked ready for review.
+- CI is configured in `.github/workflows/ci.yml` as a manual-only
+  `workflow_dispatch` workflow while validation is being confirmed locally.
 
 Latest local verification:
 
