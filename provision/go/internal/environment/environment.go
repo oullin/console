@@ -33,11 +33,16 @@ var (
 		Interactive: false,
 	}
 	currentMu sync.Mutex
+	scopes    = map[uint64][]Environment{}
 )
 
 func Current() Environment {
 	currentMu.Lock()
 	defer currentMu.Unlock()
+
+	if scoped, ok := currentScope(); ok {
+		return scoped
+	}
 
 	return current
 }
@@ -46,18 +51,27 @@ func Configure(patch Patch) {
 	currentMu.Lock()
 	defer currentMu.Unlock()
 
+	if scoped, ok := currentScope(); ok {
+		updateCurrentScope(merge(scoped, patch))
+
+		return
+	}
+
 	current = merge(current, patch)
 }
 
 func With(patch Patch, callback func() error) error {
 	currentMu.Lock()
-	previous := current
-	current = merge(current, patch)
+	base := current
+	if scoped, ok := currentScope(); ok {
+		base = scoped
+	}
+	pushScope(merge(base, patch))
 	currentMu.Unlock()
 
 	defer func() {
 		currentMu.Lock()
-		current = previous
+		popScope()
 		currentMu.Unlock()
 	}()
 
