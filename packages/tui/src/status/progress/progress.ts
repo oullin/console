@@ -1,5 +1,6 @@
 import { ProgressController } from '#tui/status/progress/controller';
 import { progressPromptError } from '#tui/status/progress/prompt';
+import { progressCurrent, progressPercentageValue, progressValue } from '#tui/status/progress/readback';
 import type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
 export type { ProgressSignalTarget } from '#tui/status/progress/terminal';
@@ -45,15 +46,15 @@ export class Progress {
 	}
 
 	percentage(): number {
-		return this.#controller.state.percentage();
+		return progressPercentageValue(this.#controller);
 	}
 
 	current(): number {
-		return this.#controller.state.current();
+		return progressCurrent(this.#controller);
 	}
 
 	value(): boolean {
-		return true;
+		return progressValue();
 	}
 
 	prompt(): never {
