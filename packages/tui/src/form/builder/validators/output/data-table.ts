@@ -11,9 +11,9 @@ export type ResolvedDataTableFormArguments<T> = {
 	options: DataTablePromptOptions<T>;
 };
 
-export const parseOutputDataTableRows = <T>(value: unknown): Array<DataTableRow<T>> | null => {
+export const parseOutputDataTableRows = <T>(value: unknown): Array<DataTableRow<T>> => {
 	if (isNullOutputRows(value)) {
-		return null;
+		return outputDataTableRowsSchema<T>().parse([]);
 	}
 
 	return outputDataTableRowsSchema<T>().parse(value);
@@ -46,7 +46,7 @@ export const resolveDataTableFormArguments = <T>(
 			hint,
 			message: label,
 			required,
-			rows: parseOutputDataTableRows<T>(rowsOrName) ?? [],
+			rows: parseOutputDataTableRows<T>(rowsOrName),
 			scroll: parseOutputScroll(scrollOrName, 10),
 			transform,
 			validate,

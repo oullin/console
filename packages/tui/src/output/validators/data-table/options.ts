@@ -39,7 +39,7 @@ export const parseDataTablePromptOptions = <T>(
 		hint,
 		message: label,
 		required,
-		rows: rows === null ? [] : dataTableRowsTypedSchema<T>().parse(rows),
+		rows: dataTableRowsTypedSchema<T>().parse(rows ?? []),
 		scroll,
 		transform,
 		validate,

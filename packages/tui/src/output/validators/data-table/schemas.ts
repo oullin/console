@@ -17,15 +17,15 @@ export const dataObjectRowSchema: z.ZodType<DataTableObjectRow<unknown>> = z
 
 export const dataTableRowSchema = z.union([dataObjectRowSchema, dataTableArrayRowSchema, dataTableRecordRowSchema]);
 
+export const dataTableRowsSchema = z.array(dataTableRowSchema).min(1, 'Data table must have at least one row.');
+
 export const dataTablePromptOptionsSchema = z
 	.object({
 		headers: z.array(z.string()).optional(),
 		message: z.string(),
-		rows: z.array(dataTableRowSchema),
+		rows: dataTableRowsSchema,
 		scroll: z.number().optional(),
 	})
 	.passthrough();
 
 export const dataTableHeadersSchema = z.array(z.string());
-
-export const dataTableRowsSchema = z.array(dataTableRowSchema);
