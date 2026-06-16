@@ -24,11 +24,12 @@ export const runSearchPrompt = async <T>(options: NormalizedSearchPromptOptions<
 
 				const selected = await readSearchChoice(options, attempt);
 
+				activeFrame.set(selected.frame);
+
 				if (selected.value === undefined) {
 					throw new PromptValidationError('Please select a valid option.');
 				}
 
-				activeFrame.set(selected.frame);
 				submission.capture(selected.submitted, selected.cancelled, selected.submittedLabel);
 				preserveSearchRetryDefault(options, selected.value);
 
