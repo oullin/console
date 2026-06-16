@@ -1,10 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
-import { choiceWindow } from '#tui/concerns/choices';
 import { resolveInfo } from '#tui/concerns/info';
-import { renderScrollbarRows } from '#tui/concerns/scrollbar';
+import { renderSuggestBody } from '#tui/prompts/suggest/render/body';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
 export const renderSuggestions = (
@@ -34,31 +32,4 @@ export const renderCancelledSuggestion = (message: string, value: string, placeh
 
 	promptEnvironment().output.write(`${renderBox({ body: strikethrough(dim(displayValue)), borderStyle: red, title: message })}\n`);
 	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
-};
-
-const renderSuggestBody = (value: string, cursor: number, placeholder: string, matches: string[], highlighted: number | null, scroll?: number): string => {
-	const query = value.length > 0 ? valueWithCursor(value, cursor) : dim(placeholder);
-	const rows = renderSuggestRows(matches, highlighted, scroll);
-
-	if (matches.length === 0) {
-		return [query, dim('  No results.')].join('\n');
-	}
-
-	return rows.length > 0 ? [query, rows].join('\n') : query;
-};
-
-const renderSuggestRows = (matches: string[], highlighted: number | null, scroll?: number): string => {
-	const window = choiceWindow(matches.length, highlighted ?? 0, scroll);
-
-	const rows = matches.slice(window.start, window.end).map((match, offset) => {
-		const index = window.start + offset;
-
-		if (index === highlighted) {
-			return `${cyan('›')} ${match}  `;
-		}
-
-		return `  ${dim(match)}  `;
-	});
-
-	return renderScrollbarRows(rows, window.start, window.end - window.start, matches.length).join('\n');
 };
