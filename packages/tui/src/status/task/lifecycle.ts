@@ -21,9 +21,12 @@ export const runTaskLifecycle = async <T>(definition: ResolvedTaskDefinition<T>)
 	const processOutput = captureTaskProcessOutput(logger);
 
 	const cleanup = new StatusSignalCleanup(() => {
-		processOutput.stop();
-		eraseRenderedFrame(renderer?.current() ?? '');
-		showCursor();
+		try {
+			processOutput.stop();
+			eraseRenderedFrame(renderer?.current() ?? '');
+		} finally {
+			showCursor();
+		}
 	}).attach();
 
 	try {
