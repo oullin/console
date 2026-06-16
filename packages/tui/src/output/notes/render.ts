@@ -1,4 +1,5 @@
 import { visibleWidth } from '#tui/strings';
+import { parseNoteMessageLines } from '#tui/output/notes/validators/message';
 import { backgroundCyan, backgroundRed, black, green, red, white, yellow } from '#tui/theme/styles';
 import type { NoteType } from '#tui/output/notes/types';
 
@@ -34,7 +35,7 @@ const renderNoteLine = (line: string, type?: NoteType | null): string => {
 };
 
 export const renderNoteLines = (message: string, type?: NoteType | null): string[] => {
-	const lines = message.split('\n');
+	const lines = parseNoteMessageLines(message);
 
 	switch (type) {
 		case 'intro':
