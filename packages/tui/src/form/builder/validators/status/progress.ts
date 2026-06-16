@@ -1,4 +1,4 @@
-import { isProgressTotal, isStatusLabel, parseProgressCallback, parseStatusLabel } from '#tui/form/builder/validators/status/common';
+import { isProgressTotal, isStatusLabel, parseRequiredProgressCallback, parseStatusLabel } from '#tui/form/builder/validators/status/common';
 import { progressStepsArgument } from '#tui/status/progress/validators/arguments';
 import type { MaybePromise } from '#tui/types';
 import type { Progress } from '#tui/status';
@@ -11,7 +11,7 @@ export type ResolvedProgressFormArguments<T, R> =
 			total: number;
 	  }
 	| {
-			callback?: (step: T | number, bar: Progress) => MaybePromise<R>;
+			callback: (step: T | number, bar: Progress) => MaybePromise<R>;
 			hint: string;
 			kind: 'label';
 			label: string;
@@ -36,7 +36,7 @@ export const resolveProgressFormArguments = <T, R>(
 	}
 
 	return {
-		callback: parseProgressCallback<T, R>(callbackOrName),
+		callback: parseRequiredProgressCallback<T, R>(callbackOrName),
 		hint,
 		kind: 'label',
 		label: labelOrTotal,

@@ -37,3 +37,13 @@ export const parseProgressCallback = <T, R>(value: unknown): ((step: T | number,
 
 	return parsed.success ? parsed.data : undefined;
 };
+
+export const parseRequiredProgressCallback = <T, R>(value: unknown): ((step: T | number, bar: Progress) => MaybePromise<R>) => {
+	const parsed = progressCallbackSchema<T, R>().safeParse(value);
+
+	if (!parsed.success) {
+		throw new Error('A progress callback is required.');
+	}
+
+	return parsed.data;
+};

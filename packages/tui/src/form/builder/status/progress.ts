@@ -10,7 +10,7 @@ export function progressFormStep<T, R>(
 	this: FormBuilder,
 	label: string,
 	steps: Iterable<T> | number,
-	callback?: (step: T | number, bar: Progress) => MaybePromise<R>,
+	callback: (step: T | number, bar: Progress) => MaybePromise<R>,
 	hint?: string,
 	name?: string,
 ): FormBuilder;
