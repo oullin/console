@@ -1,5 +1,4 @@
-import { promptEnvironment } from '#tui/environment';
-import { renderProgressFrame } from '#tui/status/progress/render';
+import { ProgressRenderer } from '#tui/status/progress/renderer';
 import { ProgressState } from '#tui/status/progress/state';
 import { ProgressTerminalLifecycle } from '#tui/status/progress/terminal';
 import type { ProgressSignalTarget } from '#tui/status/progress/terminal';
@@ -8,6 +7,7 @@ export type { ProgressSignalTarget } from '#tui/status/progress/terminal';
 
 export class Progress {
 	readonly #state: ProgressState;
+	readonly #renderer: ProgressRenderer;
 	readonly #terminal: ProgressTerminalLifecycle;
 	readonly total: number;
 	#handleSignal = (): void => {
@@ -18,6 +18,7 @@ export class Progress {
 		this.#state = new ProgressState(total, message, hint);
 		this.total = this.#state.total;
 		this.#terminal = new ProgressTerminalLifecycle(signalTarget, this.#handleSignal);
+		this.#renderer = new ProgressRenderer(this.#terminal);
 	}
 
 	start(): void {
@@ -71,10 +72,6 @@ export class Progress {
 	}
 
 	render(): void {
-		const frame = renderProgressFrame(this.#state.snapshot());
-
-		this.#terminal.beginRender();
-		promptEnvironment().output.write(frame);
-		this.#terminal.commitFrame(frame);
+		this.#renderer.render(this.#state.snapshot());
 	}
 }
