@@ -1,11 +1,11 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
-import { eraseRenderedFrame } from '#tui/status/frame';
+import { ask } from '#tui/prompt';
 import { autocompleteNavigationDirection, canAcceptAutocomplete } from '#tui/prompts/suggest/autocomplete';
+import { cancelAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete/cancel';
 import { suggestionReadResult } from '#tui/prompts/suggest/read-result';
 import { createAutocompleteReaderSession } from '#tui/prompts/suggest/read-autocomplete/session';
-import { renderCancelledAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
+import { currentAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete/submission';
 import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
@@ -26,7 +26,7 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return suggestionReadResult(session.state().value, true, false, session.frame());
+			return currentAutocompleteValue(session);
 		}
 
 		const direction = autocompleteNavigationDirection(key);
@@ -52,14 +52,11 @@ export const readAutocompleteValue = async (options: SuggestOptions): Promise<Au
 		const next = await session.applyTypedInput(key);
 
 		if (next.submitted) {
-			return suggestionReadResult(session.state().value, true, false, session.frame());
+			return currentAutocompleteValue(session);
 		}
 
 		if (next.cancelled) {
-			eraseRenderedFrame(session.frame());
-			renderCancelledAutocomplete(options.message, session.state().value, options.placeholder);
-
-			return suggestionReadResult(await cancelPrompt(session.state().value), true, true);
+			return cancelAutocompleteValue(options, session);
 		}
 	}
 };
