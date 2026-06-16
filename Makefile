@@ -48,7 +48,7 @@ format-all: ## Format + lint every non-ignored TS/Vue file in the repo via oxfmt
 fresh: ## Clean generated state, reinstall dependencies, then run local gates
 	$(call step,Removing generated dependency/cache/build state)
 	@test -n "$(ROOT_PATH)" && test "$(ROOT_PATH)" != "/" || { echo "Refusing to clean unsafe ROOT_PATH='$(ROOT_PATH)'"; exit 1; }
-	rm -rf "$(ROOT_PATH)/node_modules" "$(ROOT_PATH)"/packages/*/node_modules "$(ROOT_PATH)/provision/.cache" "$(ROOT_PATH)/packages/artefacts/.logs" "$(ROOT_PATH)/packages/artefacts/dist" "$(ROOT_PATH)/packages/tui/dist"
+	rm -rf "$(ROOT_PATH)/node_modules" "$(ROOT_PATH)"/packages/*/node_modules "$(ROOT_PATH)"/packages/*/.turbo "$(ROOT_PATH)"/provision/*/.turbo "$(ROOT_PATH)/provision/.cache" "$(ROOT_PATH)/packages/artefacts/.logs" "$(ROOT_PATH)/packages/artefacts/dist" "$(ROOT_PATH)/packages/tui/dist"
 	$(call step,Removing TypeScript build info files)
 	find "$(ROOT_PATH)" -name '*.tsbuildinfo' -type f -delete
 	$(call step,Installing dependencies)
