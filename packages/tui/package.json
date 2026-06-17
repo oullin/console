@@ -41,6 +41,36 @@
       "import": "./dist/output.js",
       "default": "./dist/output.js"
     },
+    "./output/data-table": {
+      "types": "./dist/output/data-table.d.ts",
+      "import": "./dist/output/data-table.js",
+      "default": "./dist/output/data-table.js"
+    },
+    "./output/grid": {
+      "types": "./dist/output/grid-output.d.ts",
+      "import": "./dist/output/grid-output.js",
+      "default": "./dist/output/grid-output.js"
+    },
+    "./output/notes": {
+      "types": "./dist/output/notes.d.ts",
+      "import": "./dist/output/notes.js",
+      "default": "./dist/output/notes.js"
+    },
+    "./output/notify": {
+      "types": "./dist/output/notify.d.ts",
+      "import": "./dist/output/notify.js",
+      "default": "./dist/output/notify.js"
+    },
+    "./output/table": {
+      "types": "./dist/output/table.d.ts",
+      "import": "./dist/output/table.js",
+      "default": "./dist/output/table.js"
+    },
+    "./output/terminal": {
+      "types": "./dist/output/terminal.d.ts",
+      "import": "./dist/output/terminal.js",
+      "default": "./dist/output/terminal.js"
+    },
     "./prompt": {
       "types": "./dist/prompt.d.ts",
       "import": "./dist/prompt.js",
@@ -75,6 +105,26 @@
       "types": "./dist/status.d.ts",
       "import": "./dist/status.js",
       "default": "./dist/status.js"
+    },
+    "./status/progress": {
+      "types": "./dist/status/progress.d.ts",
+      "import": "./dist/status/progress.js",
+      "default": "./dist/status/progress.js"
+    },
+    "./status/spinner": {
+      "types": "./dist/status/spinner.d.ts",
+      "import": "./dist/status/spinner.js",
+      "default": "./dist/status/spinner.js"
+    },
+    "./status/stream": {
+      "types": "./dist/status/stream.d.ts",
+      "import": "./dist/status/stream.js",
+      "default": "./dist/status/stream.js"
+    },
+    "./status/task": {
+      "types": "./dist/status/task.d.ts",
+      "import": "./dist/status/task.js",
+      "default": "./dist/status/task.js"
     },
     "./strings": {
       "types": "./dist/strings.d.ts",
