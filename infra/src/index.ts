@@ -10,7 +10,7 @@ export const repoRoot = resolve(infraRoot, '..');
 
 export const repoPath = (...segments: string[]): string => resolve(repoRoot, ...segments);
 
-export const workspacePath = (...segments: string[]): string => repoPath('packages', ...segments);
+export const workspacePath = (...segments: string[]): string => repoPath('pkgs-ts', ...segments);
 
 export const cacheDir = (...segments: string[]): string => resolve(cacheRoot, ...segments);
 

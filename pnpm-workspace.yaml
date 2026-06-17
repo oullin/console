@@ -1,5 +1,7 @@
 packages:
-  - "packages/*"
+  - "pkgs-ts/*"
+  - "apps/*"
+  - "pkgs-go"
   - "infra"
 
 allowBuilds:

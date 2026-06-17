@@ -8,6 +8,11 @@ infra/.cache/
 .idea/
 coverage/
 *.tsbuildinfo
-packages/tui/dist/
-packages/docs/src/.vitepress/
-packages/docs/src/api/
+pkgs-ts/console/dist/
+apps/docs/src/.vitepress/
+apps/docs/src/api/
+
+# Go
+pkgs-go/bin/
+*.test
+*.out

@@ -1,13 +1,13 @@
 # Infra Workspace
 
-The `infra` workspace (`@ollin/infra`) owns project tooling that is not part of
+The `infra` workspace (`@ollin/console-infra`) owns project tooling that is not part of
 the public package runtime:
 
 - `src` exposes shared TypeScript path helpers (`infraRoot`, `cacheDir`,
   `workspacePath`, …) for the tool cache.
 - `tsconfig` holds the centralized TypeScript configs every package extends
-  (`base.json`, `tui.json`, `acceptance.json`), published via the
-  `@ollin/infra/tsconfig/*.json` exports.
+  (`base.json`, `console.json`, `acceptance.json`), published via the
+  `@ollin/console-infra/tsconfig/*.json` exports.
 - `make` holds the modular Makefile. The repo-root `Makefile` is a transparent
   forwarder into `infra/make/Makefile`.
 - `.cache` is the only mutable tool-cache root for workspace commands.

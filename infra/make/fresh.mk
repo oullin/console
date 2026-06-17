@@ -6,13 +6,15 @@ fresh: ## Clean generated state, reinstall dependencies, then build
 	@test -n "$(ROOT_PATH)" && test "$(ROOT_PATH)" != "/" || { echo "Refusing to clean unsafe ROOT_PATH='$(ROOT_PATH)'"; exit 1; }
 	rm -rf \
 		"$(ROOT_PATH)/node_modules" \
-		"$(ROOT_PATH)"/packages/*/node_modules \
+		"$(ROOT_PATH)"/pkgs-ts/*/node_modules \
+		"$(ROOT_PATH)"/apps/*/node_modules \
+		"$(ROOT_PATH)/pkgs-go/node_modules" \
 		"$(ROOT_PATH)/infra/node_modules" \
 		"$(ROOT_PATH)/infra/.cache" \
-		"$(ROOT_PATH)/packages/docs/src/.vitepress/cache" \
-		"$(ROOT_PATH)/packages/docs/src/.vitepress/dist" \
-		"$(ROOT_PATH)/packages/docs/src/api" \
-		"$(ROOT_PATH)/packages/tui/dist"
+		"$(ROOT_PATH)/apps/docs/src/.vitepress/cache" \
+		"$(ROOT_PATH)/apps/docs/src/.vitepress/dist" \
+		"$(ROOT_PATH)/apps/docs/src/api" \
+		"$(ROOT_PATH)/pkgs-ts/console/dist"
 	$(call step,Removing generated workspace caches)
 	find "$(ROOT_PATH)" -path "$(ROOT_PATH)/.git" -prune -o -type d -name '.turbo' -prune -exec rm -rf {} +
 	find "$(ROOT_PATH)" -path "$(ROOT_PATH)/.git" -prune -o -path "$(ROOT_PATH)/infra/.cache" -prune -o -type d -name '.cache' -prune -exec rm -rf {} +
