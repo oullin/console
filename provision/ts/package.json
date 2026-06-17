@@ -1,0 +1,17 @@
+{
+  "name": "@ollin/provision-ts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#provision-ts/*": "./src/*.ts"
+  },
+  "scripts": {
+    "build": "XDG_CACHE_HOME=../.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../.cache/playwright tsc -p tsconfig.json --noEmit",
+    "test": "node -e \"\"",
+    "typecheck": "XDG_CACHE_HOME=../.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../.cache/playwright tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@ollin/tsconfig": "workspace:*"
+  }
+}

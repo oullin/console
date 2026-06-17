@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@source "../../**/*.{md,ts,vue}";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--font-sans: var(--docs-font-sans);
+	--font-mono: var(--docs-font-mono);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+	--docs-font-sans: "Geist Sans", var(--vp-font-family-base);
+	--docs-font-mono: "Geist Mono", var(--vp-font-family-mono);
+	--vp-font-family-base: "Geist Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+	--vp-font-family-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+	--radius: 0.5rem;
+	--background: var(--vp-c-bg);
+	--foreground: var(--vp-c-text-1);
+	--card: var(--vp-c-bg-soft);
+	--card-foreground: var(--vp-c-text-1);
+	--popover: var(--vp-c-bg-elv);
+	--popover-foreground: var(--vp-c-text-1);
+	--primary: var(--vp-c-brand-1);
+	--primary-foreground: #ffffff;
+	--secondary: var(--vp-c-bg-alt);
+	--secondary-foreground: var(--vp-c-text-1);
+	--muted: var(--vp-c-bg-soft);
+	--muted-foreground: var(--vp-c-text-2);
+	--accent: var(--vp-c-default-soft);
+	--accent-foreground: var(--vp-c-text-1);
+	--destructive: #ef4444;
+	--border: var(--vp-c-divider);
+	--input: var(--vp-c-divider);
+	--ring: var(--vp-c-brand-2);
+	--terminal-background: #0c0f14;
+	--terminal-danger: #ef4444;
+	--terminal-success: #22c55e;
+	--terminal-warning: #facc15;
+}
+
+.dark {
+	--background: var(--vp-c-bg);
+	--foreground: var(--vp-c-text-1);
+	--card: var(--vp-c-bg-soft);
+	--card-foreground: var(--vp-c-text-1);
+	--popover: var(--vp-c-bg-elv);
+	--popover-foreground: var(--vp-c-text-1);
+	--primary: var(--vp-c-brand-1);
+	--primary-foreground: #ffffff;
+	--secondary: var(--vp-c-bg-alt);
+	--secondary-foreground: var(--vp-c-text-1);
+	--muted: var(--vp-c-bg-soft);
+	--muted-foreground: var(--vp-c-text-2);
+	--accent: var(--vp-c-default-soft);
+	--accent-foreground: var(--vp-c-text-1);
+	--destructive: #f87171;
+	--border: var(--vp-c-divider);
+	--input: var(--vp-c-divider);
+	--ring: var(--vp-c-brand-2);
+}
+
+.xterm {
+	font-family: var(--docs-font-mono);
+	padding: 0;
+}
+
+.xterm-viewport {
+	overflow: hidden !important;
+}

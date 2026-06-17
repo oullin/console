@@ -1,0 +1,12 @@
+{
+	"extends": ["@ollin/tsconfig/base.json", "@ollin/artefacts/tsconfig/acceptance.json"],
+	"compilerOptions": {
+		"baseUrl": "..",
+		"paths": {
+			"@ollin/tui": ["tui/src/index.ts"],
+			"#tui/*": ["tui/src/*"],
+			"#tui/prompts/*": ["tui/src/prompts/*"]
+		}
+	},
+	"include": ["tests/**/*.ts", "vitest.config.ts", "../tui/src/**/*.ts"]
+}

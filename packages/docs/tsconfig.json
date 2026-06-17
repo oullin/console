@@ -1,0 +1,20 @@
+{
+	"extends": "@ollin/tsconfig/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@docs/*": ["src/*"],
+			"@docs-components/*": ["vitepress/theme/components/*"],
+			"@docs-config": ["vitepress/config.ts"],
+			"@docs-lib/*": ["vitepress/theme/lib/*"],
+			"@docs-tests/*": ["tests/*"],
+			"@docs-theme/*": ["vitepress/theme/*"],
+			"@docs-ui/*": ["vitepress/theme/components/ui/*"],
+			"@ollin/tui": ["../tui/src/index.ts"],
+			"#tui/*": ["../tui/src/*"],
+			"#tui/prompts/*": ["../tui/src/prompts/*"]
+		},
+		"tsBuildInfoFile": "../../provision/.cache/tsbuild/docs.tsbuildinfo"
+	},
+	"include": ["examples/**/*.ts", "tests/**/*.ts", "vitepress/**/*.ts", "vitest.config.ts", "../tui/src/**/*.ts"]
+}

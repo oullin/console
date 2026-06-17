@@ -1,0 +1,12 @@
+packages:
+  - "packages/*"
+  - "provision/go"
+  - "provision/ts"
+
+allowBuilds:
+  esbuild: true
+  vue-demi: true
+
+onlyBuiltDependencies:
+  - "@opentui/core"
+  - esbuild

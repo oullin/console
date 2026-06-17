@@ -1,0 +1,14 @@
+node_modules/
+.turbo/
+**/.turbo/
+.cache/
+**/.cache/
+provision/.cache/
+.DS_Store
+coverage/
+*.tsbuildinfo
+packages/artefacts/.logs/
+packages/artefacts/dist/
+packages/tui/dist/
+packages/docs/src/.vitepress/
+packages/docs/src/api/

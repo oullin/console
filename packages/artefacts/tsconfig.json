@@ -1,0 +1,11 @@
+{
+  "extends": "@ollin/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "tsBuildInfoFile": "../../provision/.cache/tsbuild/artefacts.tsbuildinfo",
+    "paths": {
+      "#artefacts/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}
