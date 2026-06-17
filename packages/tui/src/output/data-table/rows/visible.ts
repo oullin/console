@@ -9,5 +9,7 @@ export const visibleDataTableRows = <T>(options: DataTablePromptOptions<T>, head
 		return rows;
 	}
 
-	return rows.filter(({ row }) => options.filter?.(query, row) ?? dataTableRowLabel(headers, row).toLowerCase().includes(query.toLowerCase()));
+	const normalizedQuery = query.toLowerCase();
+
+	return rows.filter(({ row }) => options.filter?.(query, row) ?? dataTableRowLabel(headers, row).toLowerCase().includes(normalizedQuery));
 };

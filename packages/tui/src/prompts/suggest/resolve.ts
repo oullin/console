@@ -8,5 +8,7 @@ export const resolveSuggestions = async (source: SuggestOptions['options'], quer
 		return [...resolved.options];
 	}
 
-	return resolved.options.filter((option) => option.toLowerCase().startsWith(query.toLowerCase()));
+	const normalizedQuery = query.toLowerCase();
+
+	return resolved.options.filter((option) => option.toLowerCase().startsWith(normalizedQuery));
 };

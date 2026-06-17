@@ -3,7 +3,11 @@ import { characterLength, characters, fromCharacters } from '#tui/typed-value/ch
 import { valueWithCursor } from '#tui/typed-value/cursor';
 import type { TypedValueState } from '#tui/typed-value/types';
 
-const startsWithInput = (match: string, value: string): boolean => match.toLowerCase().startsWith(value.toLowerCase());
+const startsWithInput = (match: string, value: string): boolean => {
+	const normalizedValue = value.toLowerCase();
+
+	return match.toLowerCase().startsWith(normalizedValue);
+};
 
 export const autocompleteGhostText = (value: string, match: string | undefined): string => {
 	if (value.length === 0 || match === undefined || !startsWithInput(match, value) || characterLength(match) <= characterLength(value)) {
