@@ -6,7 +6,7 @@ the public package runtime:
 - `src` exposes shared TypeScript path helpers (`infraRoot`, `cacheDir`,
   `workspacePath`, …) for the tool cache.
 - `tsconfig` holds the centralized TypeScript configs every package extends
-  (`base.json`, `console.json`, `acceptance.json`), published via the
+  (`base.json`, `console.json`, `tests.json`), published via the
   `@ollin/console-infra/tsconfig/*.json` exports.
 - `make` holds the modular Makefile. The repo-root `Makefile` is a transparent
   forwarder into `infra/make/Makefile`.

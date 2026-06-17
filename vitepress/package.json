@@ -1,0 +1,31 @@
+{
+	"name": "@ollin/vitepress",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./config.ts"
+	},
+	"scripts": {
+		"typecheck": "XDG_CACHE_HOME=../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../infra/.cache/playwright tsc -p tsconfig.json --noEmit"
+	},
+	"dependencies": {
+		"@fontsource/geist-mono": "^5.2.8",
+		"@fontsource/geist-sans": "^5.2.5",
+		"@vueuse/core": "^14.3.0",
+		"@xterm/xterm": "^6.0.0",
+		"reka-ui": "^2.9.10"
+	},
+	"devDependencies": {
+		"@ollin/console-infra": "workspace:*",
+		"@tailwindcss/vite": "^4.3.0",
+		"@types/node": "^25.6.2",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"tailwind-merge": "^3.6.0",
+		"tailwindcss": "^4.3.0",
+		"typescript": "^6.0.3",
+		"vitepress": "^1.6.4",
+		"vue": "^3.5.38"
+	}
+}

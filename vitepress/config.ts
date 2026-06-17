@@ -2,12 +2,11 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitepress';
 
-const sourcePath = fileURLToPath(new URL('../src/', import.meta.url));
 const themePath = fileURLToPath(new URL('theme', import.meta.url));
 const themeComponentsPath = fileURLToPath(new URL('theme/components', import.meta.url));
 const themeLibPath = fileURLToPath(new URL('theme/lib', import.meta.url));
 const themeUiPath = fileURLToPath(new URL('theme/components/ui', import.meta.url));
-const viteCachePath = fileURLToPath(new URL('../../../infra/.cache/vitepress/docs', import.meta.url));
+const viteCachePath = fileURLToPath(new URL('../infra/.cache/vitepress/docs', import.meta.url));
 const tailwindPlugin = tailwindcss() as never;
 
 export const guideSections = [
@@ -51,7 +50,6 @@ export default defineConfig({
 		plugins: [tailwindPlugin],
 		resolve: {
 			alias: [
-				{ find: '@docs', replacement: sourcePath },
 				{ find: '@docs-components', replacement: themeComponentsPath },
 				{ find: '@docs-lib', replacement: themeLibPath },
 				{ find: '@docs-theme', replacement: themePath },

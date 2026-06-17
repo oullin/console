@@ -1,5 +1,5 @@
 {
-	"extends": ["@ollin/console-infra/tsconfig/base.json", "@ollin/console-infra/tsconfig/acceptance.json"],
+	"extends": ["@ollin/console-infra/tsconfig/base.json", "@ollin/console-infra/tsconfig/tests.json"],
 	"compilerOptions": {
 		"baseUrl": "..",
 		"paths": {

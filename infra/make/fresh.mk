@@ -9,6 +9,7 @@ fresh: ## Clean generated state, reinstall dependencies, then build
 		"$(ROOT_PATH)"/pkgs-ts/*/node_modules \
 		"$(ROOT_PATH)"/apps/*/node_modules \
 		"$(ROOT_PATH)/pkgs-go/node_modules" \
+		"$(ROOT_PATH)/vitepress/node_modules" \
 		"$(ROOT_PATH)/infra/node_modules" \
 		"$(ROOT_PATH)/infra/.cache" \
 		"$(ROOT_PATH)/apps/docs/src/.vitepress/cache" \

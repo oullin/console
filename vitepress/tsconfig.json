@@ -1,0 +1,14 @@
+{
+	"extends": "@ollin/console-infra/tsconfig/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@docs-components/*": ["theme/components/*"],
+			"@docs-lib/*": ["theme/lib/*"],
+			"@docs-theme/*": ["theme/*"],
+			"@docs-ui/*": ["theme/components/ui/*"]
+		},
+		"tsBuildInfoFile": "../infra/.cache/tsbuild/vitepress.tsbuildinfo"
+	},
+	"include": ["config.ts", "theme/**/*.ts", "vue.d.ts"]
+}
