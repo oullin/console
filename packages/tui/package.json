@@ -76,6 +76,11 @@
       "import": "./dist/prompt.js",
       "default": "./dist/prompt.js"
     },
+    "./prompts": {
+      "types": "./dist/prompts.d.ts",
+      "import": "./dist/prompts.js",
+      "default": "./dist/prompts.js"
+    },
     "./prompts/basic": {
       "types": "./dist/prompts/basic.d.ts",
       "import": "./dist/prompts/basic.js",
