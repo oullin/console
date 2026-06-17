@@ -2,7 +2,7 @@ import { createStreamOutputContext } from '#tui/status/stream/output/context';
 import { streamClosedError, streamPromptError } from '#tui/status/stream/output/errors';
 import { pipeStreamSource } from '#tui/status/stream/output/pipe';
 import { streamBufferLines, streamBufferValue } from '#tui/status/stream/output/readback';
-import { flushStreamBuffer, renderStreamBuffer } from '#tui/status/stream/output/rendering';
+import { flushStreamBuffer, renderStreamBuffer, requestStreamBufferRender } from '#tui/status/stream/output/rendering';
 import { parseStreamChunk } from '#tui/status/stream/validators/chunk';
 import type { StreamOutputContext } from '#tui/status/stream/output/context';
 
@@ -15,13 +15,13 @@ export class Stream {
 		return this.append(content);
 	}
 
-	append(content: string): this {
+	append(content: string, deferred = false): this {
 		if (this.#context.lifecycle.closed()) {
 			throw streamClosedError();
 		}
 
 		this.#context.buffer.append(parseStreamChunk(content));
-		this.render();
+		this.render(deferred);
 
 		return this;
 	}
@@ -42,7 +42,7 @@ export class Stream {
 		return pipeStreamSource(
 			source,
 			(chunk) => {
-				this.write(chunk);
+				this.append(chunk, true);
 			},
 			() => {
 				this.close();
@@ -58,7 +58,12 @@ export class Stream {
 		return streamBufferValue(this.#context.buffer);
 	}
 
-	private render(): void {
+	private render(deferred: boolean): void {
+		if (deferred) {
+			requestStreamBufferRender(this.#context);
+			return;
+		}
+
 		renderStreamBuffer(this.#context);
 	}
 

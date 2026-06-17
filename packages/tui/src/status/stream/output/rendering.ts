@@ -4,6 +4,10 @@ import type { StreamRenderer } from '#tui/status/stream/renderer';
 type StreamRenderContext = {
 	buffer: StreamBuffer;
 	renderer: StreamRenderer;
+	scheduler: {
+		flush(render: () => void): void;
+		request(render: () => void): void;
+	};
 };
 
 export const renderStreamBuffer = ({ buffer, renderer }: StreamRenderContext): void => {
@@ -13,8 +17,16 @@ export const renderStreamBuffer = ({ buffer, renderer }: StreamRenderContext): v
 	});
 };
 
+export const requestStreamBufferRender = (context: StreamRenderContext): void => {
+	context.scheduler.request(() => {
+		renderStreamBuffer(context);
+	});
+};
+
 export const flushStreamBuffer = (context: StreamRenderContext): void => {
 	if (context.buffer.flush()) {
-		renderStreamBuffer(context);
+		context.scheduler.flush(() => {
+			renderStreamBuffer(context);
+		});
 	}
 };
