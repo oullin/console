@@ -6,7 +6,12 @@ export const processOutputWriter = (buffer: ProcessOutputBuffer) => {
 		const resolved = resolveProcessOutputWrite(chunk, encodingOrCallback, callback);
 
 		buffer.write(resolved.content);
-		resolved.callback?.();
+
+		if (resolved.callback) {
+			queueMicrotask(() => {
+				resolved.callback?.();
+			});
+		}
 
 		return true;
 	};
