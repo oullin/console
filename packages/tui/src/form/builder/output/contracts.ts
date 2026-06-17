@@ -5,6 +5,7 @@ export type OutputBuilderMethods = {
 	alert(this: FormBuilder, message: string, name?: string): FormBuilder;
 	clear(this: FormBuilder, name?: string): FormBuilder;
 	dataTable(this: FormBuilder, options: TableOptions, name?: string): FormBuilder;
+	dataTable(this: FormBuilder, headers: string[], name: string): FormBuilder;
 	dataTable(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
 	datatable<T = unknown>(this: FormBuilder, options: DataTablePromptOptions<T>, name?: string): FormBuilder;
 	datatable<T = unknown>(
@@ -28,6 +29,7 @@ export type OutputBuilderMethods = {
 	notify(this: FormBuilder, title: string, body?: string, subtitle?: string, sound?: string, icon?: string, name?: string): FormBuilder;
 	outro(this: FormBuilder, message: string, name?: string): FormBuilder;
 	table(this: FormBuilder, options: TableOptions, name?: string): FormBuilder;
+	table(this: FormBuilder, headers: string[], name: string): FormBuilder;
 	table(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
 	title(this: FormBuilder, value: string, name?: string): FormBuilder;
 	warning(this: FormBuilder, message: string, name?: string): FormBuilder;

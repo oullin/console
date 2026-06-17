@@ -43,6 +43,17 @@ export const resolveTableFormArguments = (
 		};
 	}
 
+	const rowsStepName = tableStepName(rowsOrName);
+
+	if (rowsStepName !== undefined) {
+		return {
+			headers: headersOrOptions,
+			kind: 'rows',
+			name: rowsStepName,
+			rows: null,
+		};
+	}
+
 	return {
 		headers: headersOrOptions,
 		kind: 'rows',

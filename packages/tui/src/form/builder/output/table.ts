@@ -5,6 +5,8 @@ import type { TableOptions } from '#tui/types';
 
 export function dataTableFormStep(this: FormBuilder, options: TableOptions, name?: string): FormBuilder;
 
+export function dataTableFormStep(this: FormBuilder, headers: string[], name: string): FormBuilder;
+
 export function dataTableFormStep(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
 
 export function dataTableFormStep(this: FormBuilder, headersOrOptions: TableOptions | string[] = [], rowsOrName: TableOptions['rows'] | string | null = null, name?: string): FormBuilder {
@@ -18,6 +20,8 @@ export function dataTableFormStep(this: FormBuilder, headersOrOptions: TableOpti
 }
 
 export function tableFormStep(this: FormBuilder, options: TableOptions, name?: string): FormBuilder;
+
+export function tableFormStep(this: FormBuilder, headers: string[], name: string): FormBuilder;
 
 export function tableFormStep(this: FormBuilder, headersOrOptions?: TableOptions | string[], rows?: TableOptions['rows'] | null, name?: string): FormBuilder;
 
