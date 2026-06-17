@@ -1,6 +1,11 @@
 name: Build, typecheck, and test
 
 on:
+  pull_request:
+    types:
+      - ready_for_review
+      - reopened
+      - synchronize
   workflow_dispatch:
 
 jobs:
