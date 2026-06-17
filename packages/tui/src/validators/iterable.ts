@@ -1,16 +1,22 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 
-const iteratorMethodSchema = z.function();
-const iteratorContainerSchema = z.object({ [Symbol.iterator]: iteratorMethodSchema }).passthrough();
-const asyncIteratorContainerSchema = z.object({ [Symbol.asyncIterator]: iteratorMethodSchema }).passthrough();
+const iteratorMethodSchema = functionSchema<() => Iterator<unknown>>();
+const asyncIteratorMethodSchema = functionSchema<() => AsyncIterator<unknown>>();
 const stringValueSchema = z.string();
 
-const hasIteratorMethod = (value: unknown): boolean => iteratorContainerSchema.safeParse(value).success;
+const hasIteratorMethod = (value: unknown): boolean => {
+	const iterator = (value as Partial<Iterable<unknown>> | null | undefined)?.[Symbol.iterator];
 
-const hasAsyncIteratorMethod = (value: unknown): boolean => asyncIteratorContainerSchema.safeParse(value).success;
+	return iteratorMethodSchema.safeParse(iterator).success;
+};
 
-export const iterableSchema = <T>(): z.ZodType<Iterable<T>> =>
-	z.custom<Iterable<T>>((value) => !stringValueSchema.safeParse(value).success && hasIteratorMethod(value));
+const hasAsyncIteratorMethod = (value: unknown): boolean => {
+	const iterator = (value as Partial<AsyncIterable<unknown>> | null | undefined)?.[Symbol.asyncIterator];
 
-export const asyncIterableSchema = <T>(): z.ZodType<AsyncIterable<T>> =>
-	z.custom<AsyncIterable<T>>((value) => hasAsyncIteratorMethod(value));
+	return asyncIteratorMethodSchema.safeParse(iterator).success;
+};
+
+export const iterableSchema = <T>(): z.ZodType<Iterable<T>> => z.custom<Iterable<T>>((value) => !stringValueSchema.safeParse(value).success && hasIteratorMethod(value));
+
+export const asyncIterableSchema = <T>(): z.ZodType<AsyncIterable<T>> => z.custom<AsyncIterable<T>>((value) => hasAsyncIteratorMethod(value));

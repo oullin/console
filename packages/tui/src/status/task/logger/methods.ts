@@ -8,12 +8,7 @@ export const writeTaskLoggerLine = (lines: string[], message: string, limit: num
 	appendTaskLogLines(lines, message.trimEnd(), limit);
 };
 
-export const writeTaskLoggerPartial = (
-	lines: string[],
-	partial: PartialTaskLogState,
-	chunk: string,
-	limit: number,
-): PartialTaskLogState => {
+export const writeTaskLoggerPartial = (lines: string[], partial: PartialTaskLogState, chunk: string, limit: number): PartialTaskLogState => {
 	return appendPartialTaskLog(lines, partial, chunk, limit);
 };
 
@@ -22,13 +17,7 @@ export const clearTaskLoggerPartial = (): PartialTaskLogState => ({
 	value: '',
 });
 
-export const writeStableTaskLoggerMessage = (
-	stableMessages: StableTaskMessage[],
-	lines: string[],
-	type: StableTaskMessage['type'],
-	message: string,
-	limits: TaskLoggerLimits,
-): PartialTaskLogState => {
+export const writeStableTaskLoggerMessage = (stableMessages: StableTaskMessage[], lines: string[], type: StableTaskMessage['type'], message: string, limits: TaskLoggerLimits): PartialTaskLogState => {
 	appendStableTaskLoggerOutput(stableMessages, lines, type, message, limits.stable);
 
 	return clearTaskLoggerPartial();

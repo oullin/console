@@ -20,6 +20,7 @@ export type DataTableReaderState<T> = {
 
 export const createDataTableReaderState = <T>(options: DataTableReadOptions<T>, headers: string[]): DataTableReaderState<T> => {
 	let search = initialDataTableSearchState();
+
 	const selected = createDataTableReaderSelectionState(visibleRows(), options);
 
 	function visibleRows(): Array<VisibleDataTableRow<T>> {

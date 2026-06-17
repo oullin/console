@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -138,12 +138,16 @@ describe('package consumption', () => {
 		});
 
 		const typecheckCachePath = join(acceptanceCachePath, 'types');
+
 		mkdirSync(typecheckCachePath, { recursive: true });
 
 		const consumerDirectory = mkdtempSync(join(typecheckCachePath, 'consumer-'));
+		const packageScopeDirectory = join(consumerDirectory, 'node_modules', '@ollin');
 		const consumerPath = join(consumerDirectory, 'consumer.ts');
 
 		try {
+			mkdirSync(packageScopeDirectory, { recursive: true });
+			symlinkSync(join(packagesPath, 'tui'), join(packageScopeDirectory, 'tui'), 'dir');
 			writeFileSync(
 				consumerPath,
 				`

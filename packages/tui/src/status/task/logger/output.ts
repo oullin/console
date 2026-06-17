@@ -5,13 +5,7 @@ export const resetTaskLoggerLines = (lines: string[]): void => {
 	lines.splice(0);
 };
 
-export const appendStableTaskLoggerOutput = (
-	messages: StableTaskMessage[],
-	lines: string[],
-	type: StableTaskMessage['type'],
-	message: string,
-	limit: number,
-): void => {
+export const appendStableTaskLoggerOutput = (messages: StableTaskMessage[], lines: string[], type: StableTaskMessage['type'], message: string, limit: number): void => {
 	appendStableTaskMessage(messages, type, message, limit);
 	resetTaskLoggerLines(lines);
 };

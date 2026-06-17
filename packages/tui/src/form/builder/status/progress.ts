@@ -26,15 +26,12 @@ export function progressFormStep<T, R>(
 	const resolved = resolveProgressFormArguments<T, R>(labelOrTotal, stepsOrMessage, callbackOrName, hint, name);
 
 	if (resolved.kind === 'total') {
-		return this.addSideEffect(
-			() => {
-				const bar = progress(resolved.total, resolved.message);
+		return this.addSideEffect(() => {
+			const bar = progress(resolved.total, resolved.message);
 
-				bar.start();
-				bar.finish();
-			},
-			resolved.name,
-		);
+			bar.start();
+			bar.finish();
+		}, resolved.name);
 	}
 
 	return this.add(() => progress(resolved.label, resolved.steps, resolved.callback, resolved.hint), resolved.name, true);

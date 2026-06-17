@@ -14,6 +14,7 @@ type PromptFallbackState = {
 };
 
 const scopedFallbackState = new AsyncLocalStorage<PromptFallbackState>();
+
 const currentFallbackState: PromptFallbackState = {
 	condition: false,
 	handlers: new Map(),
@@ -55,9 +56,8 @@ export const promptWithFallback = async <TOptions, TResult>(kind: PromptFallback
 	}
 
 	const handlers = promptFallbackState().handlers;
-	const fallback = handlers.has(kind)
-		? parseFallbackHandler<TOptions, TResult>(handlers.get(kind))
-		: undefined;
+
+	const fallback = handlers.has(kind) ? parseFallbackHandler<TOptions, TResult>(handlers.get(kind)) : undefined;
 
 	if (!fallback) {
 		return run();

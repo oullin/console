@@ -7,11 +7,7 @@ import type { SearchReaderSession } from '#tui/prompts/search/read-single/sessio
 import type { SearchChoiceReadResult } from '#tui/prompts/search/read-single/result';
 import type { SearchReadOptions } from '#tui/prompts/search/read-single/types';
 
-const cancelInteractiveSearch = async <T>(
-	session: SearchReaderSession<T>,
-	options: SearchReadOptions<T>,
-	value: T | undefined,
-): Promise<SearchChoiceReadResult<T>> => {
+const cancelInteractiveSearch = async <T>(session: SearchReaderSession<T>, options: SearchReadOptions<T>, value: T | undefined): Promise<SearchChoiceReadResult<T>> => {
 	eraseRenderedFrame(session.frame());
 	renderCancelledSearch(options.message, session.query().value, options.placeholder);
 

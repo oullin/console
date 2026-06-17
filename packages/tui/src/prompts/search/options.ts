@@ -19,10 +19,9 @@ export const normalizeSearchPromptOptions = <T>(
 	const isLabel = isSearchPromptLabel(optionsOrLabel);
 	const hasDefault = isLabel ? false : hasPromptDefault(optionsOrLabel);
 
-	const options: NormalizedSearchPromptOptions<T> =
-		isLabel
-			? { message: optionsOrLabel, label: optionsOrLabel, options: parseSearchChoiceSource<T>(source), hasDefault, placeholder, scroll, validate, hint, required, transform, info }
-			: { ...optionsOrLabel, hasDefault, required: optionsOrLabel.required ?? true };
+	const options: NormalizedSearchPromptOptions<T> = isLabel
+		? { message: optionsOrLabel, label: optionsOrLabel, options: parseSearchChoiceSource<T>(source), hasDefault, placeholder, scroll, validate, hint, required, transform, info }
+		: { ...optionsOrLabel, hasDefault, required: optionsOrLabel.required ?? true };
 
 	assertSearchOptions(options);
 

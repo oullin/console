@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { iterableSchema } from '#tui/validators/iterable';
 
-const progressTotalArgumentSchema = z.number();
+const progressTotalArgumentSchema = z.union([z.number(), z.literal(Number.POSITIVE_INFINITY), z.literal(Number.NEGATIVE_INFINITY)]);
 const progressMessageArgumentSchema = z.string();
 
-const progressStepsArgumentSchema = <T>() => z.union([z.number(), iterableSchema<T>()]);
+const progressStepsArgumentSchema = <T>() => z.union([progressTotalArgumentSchema, iterableSchema<T>()]);
 
 export const isProgressTotalArgument = (value: unknown): value is number => {
 	return progressTotalArgumentSchema.safeParse(value).success;
@@ -16,9 +16,7 @@ export const progressMessageArgument = (value: unknown): string | undefined => {
 	return parsed.success ? parsed.data : undefined;
 };
 
-export const progressStepsArgument = <T>(
-	value: Iterable<T> | number | string | undefined,
-): Iterable<T> | number => {
+export const progressStepsArgument = <T>(value: Iterable<T> | number | string | undefined): Iterable<T> | number => {
 	const steps = value ?? 0;
 	const parsed = progressStepsArgumentSchema<T>().safeParse(steps);
 

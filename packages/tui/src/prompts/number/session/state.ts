@@ -33,11 +33,7 @@ export const applyNumberReaderInput = (state: NumberReaderState, key: string): N
 	};
 };
 
-export const steppedNumberReaderState = (
-	state: NumberReaderState,
-	delta: 1 | -1,
-	options: NumberInputOptions,
-): NumberReaderState => {
+export const steppedNumberReaderState = (state: NumberReaderState, delta: 1 | -1, options: NumberInputOptions): NumberReaderState => {
 	const value = steppedNumberValue(state.value, delta, options);
 
 	return {

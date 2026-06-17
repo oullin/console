@@ -1,12 +1,9 @@
 import { Progress } from '#tui/status/progress/progress';
 import { runProgressSteps } from '#tui/status/progress/run';
 import { progressValues } from '#tui/status/progress/steps';
-import {
-	isProgressTotalArgument,
-	progressMessageArgument,
-	progressStepsArgument,
-} from '#tui/status/progress/validators/arguments';
 import type { MaybePromise } from '#tui/types';
+
+import { isProgressTotalArgument, progressMessageArgument, progressStepsArgument } from '#tui/status/progress/validators/arguments';
 
 export { Progress };
 export type { ProgressSignalTarget } from '#tui/status/progress/progress';

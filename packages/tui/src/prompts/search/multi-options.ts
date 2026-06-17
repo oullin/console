@@ -18,10 +18,9 @@ export const normalizeMultiSearchPromptOptions = <T>(
 	transform: MultiSearchPromptOptions<T>['transform'],
 	info: MultiSearchPromptOptions<T>['info'],
 ): NormalizedMultiSearchPromptOptions<T> => {
-	const options: MultiSearchPromptOptions<T> =
-		isSearchPromptLabel(optionsOrLabel)
-			? { message: optionsOrLabel, label: optionsOrLabel, options: parseSearchChoiceSource<T>(source), placeholder, scroll, required, validate, hint, transform, info }
-			: optionsOrLabel;
+	const options: MultiSearchPromptOptions<T> = isSearchPromptLabel(optionsOrLabel)
+		? { message: optionsOrLabel, label: optionsOrLabel, options: parseSearchChoiceSource<T>(source), placeholder, scroll, required, validate, hint, transform, info }
+		: optionsOrLabel;
 
 	return {
 		...options,

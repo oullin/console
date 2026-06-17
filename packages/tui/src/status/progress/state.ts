@@ -54,12 +54,6 @@ export class ProgressState {
 	}
 
 	snapshot(): ProgressStateSnapshot {
-		return progressStateSnapshot(
-			this.#current,
-			this.total,
-			this.#label,
-			this.#hint,
-			this.#state,
-		);
+		return progressStateSnapshot(this.#current, this.total, this.#label, this.#hint, this.#state);
 	}
 }

@@ -24,7 +24,7 @@ export const steppedNumberValue = (value: string, direction: 1 | -1, options: Nu
 		return value;
 	}
 
-	const value = clamp(numeric + step * direction, options.min, options.max);
+	const steppedValue = clamp(numeric + step * direction, options.min, options.max);
 
-	return String(options.integer === true ? Math.trunc(value) : value);
+	return String(options.integer === false ? steppedValue : Math.trunc(steppedValue));
 };

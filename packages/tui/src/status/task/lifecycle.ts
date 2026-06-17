@@ -9,6 +9,7 @@ import type { TaskLifecycleRenderer } from '#tui/status/task/lifecycle/rendering
 
 export const runTaskLifecycle = async <T>(definition: ResolvedTaskDefinition<T>): Promise<T> => {
 	let renderer: TaskLifecycleRenderer | null = null;
+
 	const logger = new Logger(definition.limit, definition.title, definition.subLabel, () => {
 		renderer?.render();
 	});

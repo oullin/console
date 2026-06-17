@@ -1,8 +1,12 @@
 import { z } from 'zod';
 
-const terminalTitleSchema = z
-	.string()
-	.transform((title) => title.replace(/[\u0000-\u001F\u007F\u009B]/gu, ''));
+const isTerminalTitleCharacter = (character: string): boolean => {
+	const code = character.codePointAt(0);
+
+	return code === undefined || !((code >= 0 && code <= 31) || code === 127 || code === 155);
+};
+
+const terminalTitleSchema = z.string().transform((title) => Array.from(title).filter(isTerminalTitleCharacter).join(''));
 
 export const parseTerminalTitle = (title: unknown): string => {
 	const parsed = terminalTitleSchema.safeParse(title);

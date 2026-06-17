@@ -20,5 +20,5 @@ export const readMultipleChoices = async <T>(
 		return readLineMultipleChoices(message, choices, defaults, hint);
 	}
 
-	return readMultipleChoicesInteractive(environment.input.readKey, message, choices, defaults, scroll, info);
+	return readMultipleChoicesInteractive(async () => environment.input.readKey?.() ?? null, message, choices, defaults, scroll, info);
 };

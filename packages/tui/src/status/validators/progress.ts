@@ -2,10 +2,9 @@ import { z } from 'zod';
 import { iterableSchema } from '#tui/validators/iterable';
 
 const progressNumberSchema = z.number().finite();
+const progressTotalInputSchema = z.union([z.number(), z.literal(Number.POSITIVE_INFINITY), z.literal(Number.NEGATIVE_INFINITY)]);
 
-type ProgressValuesInput<T> =
-	| { kind: 'steps'; steps: Iterable<T> }
-	| { kind: 'total'; total: number };
+type ProgressValuesInput<T> = { kind: 'steps'; steps: Iterable<T> } | { kind: 'total'; total: number };
 
 export const parseProgressTotal = (total: unknown): number => {
 	const parsed = progressNumberSchema.safeParse(total);
@@ -25,7 +24,7 @@ export const parseProgressStep = (step: unknown): number => {
 };
 
 export const parseProgressValuesInput = <T>(steps: Iterable<T> | number): ProgressValuesInput<T> => {
-	const total = progressNumberSchema.safeParse(steps);
+	const total = progressTotalInputSchema.safeParse(steps);
 
 	if (total.success) {
 		return { kind: 'total', total: parseProgressTotal(total.data) };

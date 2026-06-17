@@ -7,6 +7,7 @@ import { withPromptGlobalValidationScope } from '#tui/prompt/validate-using';
 import type { MaybePromise, PromptEnvironment } from '#tui/types';
 
 let currentEnvironment: PromptEnvironment = defaultEnvironment;
+
 const scopedEnvironment = new AsyncLocalStorage<PromptEnvironment>();
 
 export const promptEnvironment = (): PromptEnvironment => scopedEnvironment.getStore() ?? currentEnvironment;
@@ -27,11 +28,5 @@ export const configurePrompts = (environment: Partial<PromptEnvironment>): void 
 export const withPromptEnvironment = async <T>(environment: Partial<PromptEnvironment>, callback: () => MaybePromise<T>): Promise<T> => {
 	const next = mergePromptEnvironment(promptEnvironment(), environment);
 
-	return scopedEnvironment.run(next, () =>
-		withPromptCancelScope(() =>
-			withPromptFallbackScope(() =>
-				withPromptGlobalValidationScope(callback),
-			),
-		),
-	);
+	return scopedEnvironment.run(next, () => withPromptCancelScope(() => withPromptFallbackScope(() => withPromptGlobalValidationScope(callback))));
 };

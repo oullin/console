@@ -20,10 +20,7 @@ export const syncTaskLoggerLabel = (labels: TaskLoggerLabels, label: string): Ta
 	};
 };
 
-export const syncTaskLoggerSubLabel = (
-	labels: TaskLoggerLabels,
-	subLabel: string,
-): TaskLoggerSubLabelSync => {
+export const syncTaskLoggerSubLabel = (labels: TaskLoggerLabels, subLabel: string): TaskLoggerSubLabelSync => {
 	const next = setTaskLoggerSubLabel(labels, subLabel);
 
 	return {

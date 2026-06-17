@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 import type { MaybePromise } from '#tui/types';
 
 export type SuggestSourceCallback = (query: string) => MaybePromise<string[]>;
 
 const suggestLabelSchema = z.string();
-const suggestSourceCallbackSchema: z.ZodType<SuggestSourceCallback> = z.function() as z.ZodType<SuggestSourceCallback>;
+const suggestSourceCallbackSchema: z.ZodType<SuggestSourceCallback> = functionSchema<SuggestSourceCallback>();
 const suggestSourceSchema = z.union([z.array(z.string()), suggestSourceCallbackSchema]);
 
 export const isSuggestPromptLabel = (value: unknown): value is string => {

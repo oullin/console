@@ -1,8 +1,10 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 import type { MaybePromise } from '#tui/types';
 
-const spinnerCallbackSchema = <T>(): z.ZodType<() => MaybePromise<T>> => z.function() as z.ZodType<() => MaybePromise<T>>;
+const spinnerCallbackSchema = <T>(): z.ZodType<() => MaybePromise<T>> => functionSchema<() => MaybePromise<T>>();
 const spinnerMessageSchema = z.string();
+
 const spinnerOptionsSchema = z
 	.object({
 		message: spinnerMessageSchema.default(''),

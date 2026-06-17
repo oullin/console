@@ -7,11 +7,7 @@ import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
 import type { DataTableSearchMode } from '#tui/output/data-table/search';
 import type { DataTableSelectionReadResult, VisibleDataTableRow } from '#tui/output/data-table/types';
 
-const cancelledDataTableValue = <T>(
-	options: DataTableReadOptions<T>,
-	rows: Array<VisibleDataTableRow<T>>,
-	selected: number,
-): T | number => {
+const cancelledDataTableValue = <T>(options: DataTableReadOptions<T>, rows: Array<VisibleDataTableRow<T>>, selected: number): T | number => {
 	if (rows[selected] !== undefined) {
 		return selectedDataTableValue(rows, selected);
 	}

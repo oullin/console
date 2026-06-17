@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 import type { MaybePromise } from '#tui/types';
 
 type SuggestionSourceCallback = (query: string) => MaybePromise<string[]>;
@@ -9,7 +10,7 @@ export type ResolvedSuggestionSource = {
 };
 
 const suggestionOptionsSchema = z.array(z.string());
-const suggestionSourceCallbackSchema: z.ZodType<SuggestionSourceCallback> = z.function() as z.ZodType<SuggestionSourceCallback>;
+const suggestionSourceCallbackSchema: z.ZodType<SuggestionSourceCallback> = functionSchema<SuggestionSourceCallback>();
 const suggestionSourceSchema = z.union([suggestionOptionsSchema, suggestionSourceCallbackSchema]);
 
 export const isSuggestionSourceCallback = (source: string[] | SuggestionSourceCallback): source is SuggestionSourceCallback => {

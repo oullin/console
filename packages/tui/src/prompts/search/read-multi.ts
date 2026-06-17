@@ -31,7 +31,7 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return multiSearchSelectionResult(session, false);
+			return multiSearchSelectionResult(session, true);
 		}
 
 		if (key === Key.enter) {

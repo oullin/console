@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 
 const writableStreamSchema = z
 	.object({
-		write: z.function(),
+		write: functionSchema<NodeJS.WritableStream['write']>(),
 	})
-	.passthrough() as z.ZodType<NodeJS.WritableStream>;
+	.passthrough() as unknown as z.ZodType<NodeJS.WritableStream>;
 
 export const parseWritableOutputStream = (stream: unknown): NodeJS.WritableStream => {
 	const parsed = writableStreamSchema.safeParse(stream);
@@ -13,5 +14,5 @@ export const parseWritableOutputStream = (stream: unknown): NodeJS.WritableStrea
 		throw new Error('Prompt output streams must include a write function.');
 	}
 
-	return parsed.data;
+	return stream as NodeJS.WritableStream;
 };

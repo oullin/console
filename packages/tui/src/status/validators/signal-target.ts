@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 
 export type StatusSignalTarget = {
 	off(signal: string, listener: () => void): unknown;
@@ -7,10 +8,10 @@ export type StatusSignalTarget = {
 
 const statusSignalTargetSchema = z
 	.object({
-		off: z.function(),
-		on: z.function(),
+		off: functionSchema<StatusSignalTarget['off']>(),
+		on: functionSchema<StatusSignalTarget['on']>(),
 	})
-	.passthrough() as z.ZodType<StatusSignalTarget>;
+	.passthrough() as unknown as z.ZodType<StatusSignalTarget>;
 
 export const parseStatusSignalTarget = (target: unknown): StatusSignalTarget => {
 	const parsed = statusSignalTargetSchema.safeParse(target);
@@ -19,5 +20,5 @@ export const parseStatusSignalTarget = (target: unknown): StatusSignalTarget => 
 		throw new TypeError('Status signal targets must include on and off functions.');
 	}
 
-	return parsed.data;
+	return target as StatusSignalTarget;
 };

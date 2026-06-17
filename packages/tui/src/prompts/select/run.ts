@@ -20,7 +20,6 @@ export const runSelectPrompt = async <T>(options: NormalizedSelectPromptOptions<
 	};
 
 	const choices = normalizeChoices(options.options);
-
 	const activeFrame = activePromptFrame();
 	const submission = createPromptSubmissionState('');
 

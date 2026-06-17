@@ -1,7 +1,7 @@
-import { z } from 'zod';
 import { isNullOutputRows, parseOutputScroll, parseOutputStepName } from '#tui/form/builder/validators/output/common';
 import { dataTableStepName, isDataTablePromptOptions } from '#tui/output/validators/data-table';
 import { dataTableRowsSchema } from '#tui/output/validators/data-table/schemas';
+import type { z } from 'zod';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
 const outputDataTableRowsSchema = <T>(): z.ZodType<Array<DataTableRow<T>>> => dataTableRowsSchema as z.ZodType<Array<DataTableRow<T>>>;

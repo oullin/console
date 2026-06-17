@@ -11,6 +11,7 @@ import type { NormalizedDataTablePromptOptions } from '#tui/output/data-table/op
 
 export const runDataTablePrompt = async <T>(options: NormalizedDataTablePromptOptions<T>): Promise<T | number> => {
 	const validationOptions = await dataTableValidationOptions(options, !promptEnvironment().interactive);
+
 	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
 
 	const activeFrame = activePromptFrame();

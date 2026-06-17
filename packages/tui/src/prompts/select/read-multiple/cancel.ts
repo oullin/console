@@ -7,12 +7,7 @@ import type { MultipleChoicesReadResult } from '#tui/prompts/select/read-multipl
 import { renderCancelledChoices } from '#tui/prompts/select/render';
 import type { Choice } from '#tui/types';
 
-export const cancelMultipleChoices = async <T>(
-	message: string,
-	choices: Array<Choice<T>>,
-	session: MultipleChoicesReaderSession,
-	scroll?: number,
-): Promise<MultipleChoicesReadResult<T>> => {
+export const cancelMultipleChoices = async <T>(message: string, choices: Array<Choice<T>>, session: MultipleChoicesReaderSession, scroll?: number): Promise<MultipleChoicesReadResult<T>> => {
 	eraseRenderedFrame(session.frame());
 	renderCancelledChoices(message, choices, session.selected(), session.marked(), scroll);
 

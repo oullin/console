@@ -3,12 +3,7 @@ import { eraseRenderedFrame } from '#tui/status/frame';
 import type { DataTableReaderState } from '#tui/output/data-table/reader/state';
 import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
 
-export const renderDataTableReaderSessionFrame = <T>(
-	options: DataTableReadOptions<T>,
-	headers: string[],
-	state: DataTableReaderState<T>,
-	currentFrame: string,
-): string => {
+export const renderDataTableReaderSessionFrame = <T>(options: DataTableReadOptions<T>, headers: string[], state: DataTableReaderState<T>, currentFrame: string): string => {
 	if (currentFrame.length > 0) {
 		eraseRenderedFrame(currentFrame);
 	}

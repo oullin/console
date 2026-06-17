@@ -31,10 +31,9 @@ export async function autocomplete(
 	transform: TextPromptOptions['transform'] = undefined,
 	info: SuggestOptions['info'] = '',
 ): Promise<string> {
-	const options =
-		isSuggestPromptLabel(message)
-			? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform, info })
-			: suggestOptions(message);
+	const options = isSuggestPromptLabel(message)
+		? suggestOptions({ message, label: message, options: source, placeholder, default: defaultValue, required, validate, hint, transform, info })
+		: suggestOptions(message);
 
 	return runTextSuggestionPrompt('autocomplete', options, readAutocompleteValue, renderSubmittedAutocomplete);
 }

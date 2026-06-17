@@ -1,15 +1,17 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 
 export type WritableProcessStream = {
 	write: NodeJS.WriteStream['write'];
 };
 
-const processOutputWriteSchema = z.function() as z.ZodType<NodeJS.WriteStream['write']>;
+const processOutputWriteSchema = functionSchema<NodeJS.WriteStream['write']>();
+
 const writableProcessStreamSchema = z
 	.object({
 		write: processOutputWriteSchema,
 	})
-	.passthrough() as z.ZodType<WritableProcessStream>;
+	.passthrough() as unknown as z.ZodType<WritableProcessStream>;
 
 export const parseProcessOutputWrite = (value: unknown): NodeJS.WriteStream['write'] => {
 	const parsed = processOutputWriteSchema.safeParse(value);
@@ -18,7 +20,7 @@ export const parseProcessOutputWrite = (value: unknown): NodeJS.WriteStream['wri
 		throw new TypeError('Process output writers must be functions.');
 	}
 
-	return parsed.data;
+	return value as NodeJS.WriteStream['write'];
 };
 
 export const parseWritableProcessStream = (value: unknown): WritableProcessStream => {
@@ -28,5 +30,5 @@ export const parseWritableProcessStream = (value: unknown): WritableProcessStrea
 		throw new TypeError('Process output streams must include a write function.');
 	}
 
-	return parsed.data;
+	return value as WritableProcessStream;
 };

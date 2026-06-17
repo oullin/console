@@ -6,10 +6,7 @@ import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestReaderSession } from '#tui/prompts/suggest/read/session';
 
-export const cancelSuggestionValue = async (
-	options: SuggestOptions,
-	session: SuggestReaderSession,
-): Promise<TextSuggestionReadResult> => {
+export const cancelSuggestionValue = async (options: SuggestOptions, session: SuggestReaderSession): Promise<TextSuggestionReadResult> => {
 	const value = session.state().value;
 
 	eraseRenderedFrame(session.frame());

@@ -31,9 +31,7 @@ export const readConfirm = async (options: ConfirmReadOptions): Promise<ConfirmR
 
 		if (directValue !== null) {
 			session.set(directValue);
-			const submitted = session.submission();
-
-			return { cancelled: false, frame: submitted.frame, submitted: true, value: submitted.value };
+			continue;
 		}
 
 		if (isConfirmToggleKey(key)) {

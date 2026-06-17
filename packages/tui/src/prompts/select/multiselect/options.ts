@@ -17,10 +17,9 @@ export const normalizeMultiSelectPromptOptions = <T>(
 	transform: MultiSelectPromptOptions<T>['transform'],
 	info: MultiSelectPromptOptions<T>['info'],
 ): NormalizedMultiSelectPromptOptions<T> => {
-	const options =
-		isSelectPromptLabel(optionsOrLabel)
-			? { message: optionsOrLabel, label: optionsOrLabel, options: parseSelectChoiceOptions<T>(source), default: defaultValue, scroll, required, validate, hint, transform, info }
-			: optionsOrLabel;
+	const options = isSelectPromptLabel(optionsOrLabel)
+		? { message: optionsOrLabel, label: optionsOrLabel, options: parseSelectChoiceOptions<T>(source), default: defaultValue, scroll, required, validate, hint, transform, info }
+		: optionsOrLabel;
 
 	return { ...options, default: parseMultiSelectDefault<T>(options.default ?? []) };
 };

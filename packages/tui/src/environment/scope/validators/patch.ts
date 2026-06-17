@@ -1,18 +1,19 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 import type { PromptEnvironment, PromptInput, PromptOutput } from '#tui/types';
 
 const promptInputPatchSchema = z
 	.object({
-		readKey: z.function().optional(),
-		readLine: z.function().optional(),
+		readKey: functionSchema<NonNullable<PromptInput['readKey']>>().optional(),
+		readLine: functionSchema<NonNullable<PromptInput['readLine']>>().optional(),
 	})
-	.passthrough() as z.ZodType<PromptInput>;
+	.passthrough() as unknown as z.ZodType<PromptInput>;
 
 const promptOutputPatchSchema = z
 	.object({
-		write: z.function(),
+		write: functionSchema<PromptOutput['write']>(),
 	})
-	.passthrough() as z.ZodType<PromptOutput>;
+	.passthrough() as unknown as z.ZodType<PromptOutput>;
 
 const promptEnvironmentPatchSchema = z
 	.object({
@@ -21,7 +22,7 @@ const promptEnvironmentPatchSchema = z
 		interactive: z.boolean().optional(),
 		output: promptOutputPatchSchema.optional(),
 	})
-	.passthrough() as z.ZodType<Partial<PromptEnvironment>>;
+	.passthrough() as unknown as z.ZodType<Partial<PromptEnvironment>>;
 
 export const parsePromptEnvironmentPatch = (environment: Partial<PromptEnvironment>): Partial<PromptEnvironment> => {
 	const parsed = promptEnvironmentPatchSchema.safeParse(environment);
@@ -30,5 +31,5 @@ export const parsePromptEnvironmentPatch = (environment: Partial<PromptEnvironme
 		throw new Error('Prompt environment patches must include valid input, output, error, or interactive values.');
 	}
 
-	return parsed.data;
+	return environment;
 };

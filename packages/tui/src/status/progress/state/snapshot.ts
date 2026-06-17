@@ -8,13 +8,7 @@ export type ProgressStateSnapshot = {
 	total: number;
 };
 
-export const progressStateSnapshot = (
-	current: number,
-	total: number,
-	label: string,
-	hint: string,
-	state: ProgressFrameState,
-): ProgressStateSnapshot => ({
+export const progressStateSnapshot = (current: number, total: number, label: string, hint: string, state: ProgressFrameState): ProgressStateSnapshot => ({
 	current,
 	hint,
 	label,

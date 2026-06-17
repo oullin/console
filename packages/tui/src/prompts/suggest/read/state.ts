@@ -15,6 +15,7 @@ export type SuggestReaderState = {
 
 export const createSuggestReaderState = async (options: SuggestOptions): Promise<SuggestReaderState> => {
 	const query = await createSuggestQueryState(options);
+
 	const highlighted = createSuggestHighlightState();
 
 	return {

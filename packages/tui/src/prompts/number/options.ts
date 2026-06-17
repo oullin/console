@@ -18,24 +18,27 @@ export type NumberPromptArgumentOptions = {
 };
 
 export const normalizeNumberPromptOptions = (options: NumberPromptArgumentOptions): NormalizedNumberPromptOptions => {
-	const isLabel = isNumberPromptLabel(options.message);
-	const hasDefault = isLabel ? hasNumberDefaultArgument(options.hasDefaultArgument, options.defaultValue) : hasPromptDefault(options.message);
+	const message = options.message;
 
-	if (!isLabel) {
+	if (!isNumberPromptLabel(message)) {
+		const hasDefault = hasPromptDefault(message);
+
 		return {
-			...options.message,
-			default: hasDefault ? parseNumberDefault(options.message.default, '') : '',
+			...message,
+			default: hasDefault ? parseNumberDefault(message.default, '') : '',
 			hasDefault,
 		};
 	}
+
+	const hasDefault = hasNumberDefaultArgument(options.hasDefaultArgument, options.defaultValue);
 
 	return {
 		default: hasDefault ? options.defaultValue : '',
 		hasDefault,
 		hint: options.hint,
-		label: options.message,
+		label: message,
 		max: options.max,
-		message: options.message,
+		message,
 		min: options.min,
 		placeholder: options.placeholder,
 		required: options.required,

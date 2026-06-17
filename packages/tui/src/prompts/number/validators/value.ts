@@ -9,11 +9,8 @@ export type NumberValidationResult = {
 };
 
 const numericInputSchema = z.string();
-const numericValueSchema = numericInputSchema
-	.trim()
-	.min(1)
-	.transform(Number)
-	.pipe(z.number().finite());
+
+const numericValueSchema = numericInputSchema.trim().min(1).transform(Number).pipe(z.number().finite());
 
 export const parseNumericValue = (value: unknown): number | null => {
 	const parsed = numericValueSchema.safeParse(value);
@@ -51,5 +48,5 @@ export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptio
 		return { error: `Must be less than ${options.max}` };
 	}
 
-	return { value: options.integer === true ? Math.trunc(numeric) : numeric };
+	return { value: options.integer === false ? numeric : Math.trunc(numeric) };
 };

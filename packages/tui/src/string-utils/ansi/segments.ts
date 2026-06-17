@@ -44,14 +44,13 @@ export const parseAnsiSegments = (value: string): AnsiSegment[] => {
 };
 
 const activeAnsiCodes = (codes: string[]): string => codes.join('');
+const hasAnsiStyleCode = (code: string): boolean => ansiCodeParts(code).some((part) => !isAnsiResetCode(part));
 
 const applyAnsiStyleSequence = (codes: string[], code: string, sequence: string): string[] => {
 	const next = isAnsiResetCode(code) ? resetAnsiCodes(codes, code) : codes;
 
 	return hasAnsiStyleCode(code) ? [...next, sequence] : next;
 };
-
-const hasAnsiStyleCode = (code: string): boolean => ansiCodeParts(code).some((part) => !isAnsiResetCode(part));
 
 const resetAnsiCodes = (codes: string[], resetCode: string): string[] => {
 	if (ansiCodeParts(resetCode).includes('0')) {

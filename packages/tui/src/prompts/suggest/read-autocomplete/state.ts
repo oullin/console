@@ -15,6 +15,7 @@ export type AutocompleteReaderState = {
 
 export const createAutocompleteReaderState = async (options: SuggestOptions): Promise<AutocompleteReaderState> => {
 	const query = await createSuggestQueryState(options);
+
 	const highlighted = createAutocompleteHighlightState();
 
 	return {

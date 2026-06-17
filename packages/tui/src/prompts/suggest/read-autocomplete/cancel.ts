@@ -6,10 +6,7 @@ import type { AutocompleteReaderSession } from '#tui/prompts/suggest/read-autoco
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 
-export const cancelAutocompleteValue = async (
-	options: SuggestOptions,
-	session: AutocompleteReaderSession,
-): Promise<TextSuggestionReadResult> => {
+export const cancelAutocompleteValue = async (options: SuggestOptions, session: AutocompleteReaderSession): Promise<TextSuggestionReadResult> => {
 	const value = session.state().value;
 
 	eraseRenderedFrame(session.frame());

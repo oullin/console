@@ -20,6 +20,7 @@ export type SuggestQueryState = {
 
 export const createSuggestQueryState = async (options: SuggestOptions): Promise<SuggestQueryState> => {
 	let value = initialSuggestionState(options.default ?? '');
+
 	let matches = await resolveSuggestions(options.options, value.value);
 
 	const resolve = async (): Promise<void> => {

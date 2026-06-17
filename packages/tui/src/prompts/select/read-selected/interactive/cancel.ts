@@ -19,6 +19,7 @@ export const cancelSelectedChoice = async <T>(
 
 	const choice = choices[session.selected()];
 	const fallback = choice?.value ?? defaultValue;
+
 	const value = parseChoiceValue<T>(await cancelPrompt(fallback));
 
 	return cancelledSelectedChoiceResult(choice, value);

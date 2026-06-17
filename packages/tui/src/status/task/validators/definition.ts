@@ -1,9 +1,11 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 import type { TaskDefinition } from '#tui/status/task/definition';
 import type { Logger } from '#tui/status/task/logger';
 import type { MaybePromise } from '#tui/types';
 
-const taskCallbackSchema = <T>(): z.ZodType<(logger: Logger) => MaybePromise<T>> => z.function() as z.ZodType<(logger: Logger) => MaybePromise<T>>;
+const taskCallbackSchema = <T>(): z.ZodType<(logger: Logger) => MaybePromise<T>> => functionSchema<(logger: Logger) => MaybePromise<T>>();
+
 const taskDefinitionSchema = <T>(): z.ZodType<TaskDefinition<T>> =>
 	z
 		.object({
@@ -14,6 +16,7 @@ const taskDefinitionSchema = <T>(): z.ZodType<TaskDefinition<T>> =>
 			title: z.string(),
 		})
 		.passthrough() as z.ZodType<TaskDefinition<T>>;
+
 const taskTitleSchema = z.string();
 
 export const isTaskTitle = (value: unknown): value is string => {

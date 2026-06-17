@@ -4,6 +4,7 @@ export class StreamRenderScheduler {
 	flush(render: () => void): void {
 		if (!this.#scheduled) {
 			render();
+
 			return;
 		}
 

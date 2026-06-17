@@ -1,11 +1,11 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 
 export type ProcessOutputCallback = (error?: Error | null) => void;
 
-const processOutputEncodingSchema = z
-	.string()
-	.refine((value): value is BufferEncoding => Buffer.isEncoding(value));
-const processOutputCallbackSchema = z.function() as z.ZodType<ProcessOutputCallback>;
+const processOutputEncodingSchema = z.string().refine((value): value is BufferEncoding => Buffer.isEncoding(value));
+
+const processOutputCallbackSchema = functionSchema<ProcessOutputCallback>();
 
 export const parseProcessOutputEncoding = (value: unknown): BufferEncoding | undefined => {
 	const parsed = processOutputEncodingSchema.safeParse(value);

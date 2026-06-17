@@ -60,7 +60,13 @@ export const runNumberPrompt = async (options: NormalizedNumberPromptOptions): P
 				});
 			},
 			(value) => {
-				preserveNumberRetryDefault(options, value);
+				if (value === undefined) {
+					preserveNumberRetryDefault(options, value);
+				} else {
+					options.default = '';
+					options.hasDefault = false;
+				}
+
 				activeFrame.clear();
 				submission.reset();
 			},

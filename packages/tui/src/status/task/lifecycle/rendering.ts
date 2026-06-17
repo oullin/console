@@ -15,6 +15,7 @@ export type TaskLifecycleRenderer = {
 
 export const createTaskLifecycleRenderer = (logger: Logger): TaskLifecycleRenderer => {
 	const output = promptEnvironment().output;
+
 	let frame = '';
 
 	return {
@@ -22,13 +23,18 @@ export const createTaskLifecycleRenderer = (logger: Logger): TaskLifecycleRender
 			return frame;
 		},
 		render(options = {}) {
+			const finished = options.finished ?? false;
+
 			if (frame.length > 0) {
 				eraseRenderedFrame(frame);
 			}
 
 			const nextFrame = renderLoggerTaskFrame(logger, options);
 
-			output.write(nextFrame);
+			if (frame.length === 0 || finished) {
+				output.write(nextFrame);
+			}
+
 			frame = nextFrame;
 		},
 	};

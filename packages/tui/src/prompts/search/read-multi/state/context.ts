@@ -13,10 +13,9 @@ export type MultiSearchReaderStateContext<T> = {
 	selected: SearchSelection<T>;
 };
 
-export const createMultiSearchReaderStateContext = async <T>(
-	options: MultiSearchPromptOptions<T>,
-): Promise<MultiSearchReaderStateContext<T>> => {
+export const createMultiSearchReaderStateContext = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchReaderStateContext<T>> => {
 	const initialChoices = await resolveSearchChoices(options.options, '');
+
 	const selected = createMultiSearchSelection(initialChoices, options.default);
 
 	return {

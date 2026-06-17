@@ -2,14 +2,7 @@ import { dim } from '#tui/theme/styles';
 import { valueWithCursor } from '#tui/typed-value/cursor';
 import { renderSuggestRows } from '#tui/prompts/suggest/render/rows';
 
-export const renderSuggestBody = (
-	value: string,
-	cursor: number,
-	placeholder: string,
-	matches: string[],
-	highlighted: number | null,
-	scroll?: number,
-): string => {
+export const renderSuggestBody = (value: string, cursor: number, placeholder: string, matches: string[], highlighted: number | null, scroll?: number): string => {
 	const query = value.length > 0 ? valueWithCursor(value, cursor) : dim(placeholder);
 	const rows = renderSuggestRows(matches, highlighted, scroll);
 

@@ -1,10 +1,3 @@
-import {
-	displayedMultiSearchChoices,
-	markedDisplayedMultiSearchChoiceIndexes,
-	moveDisplayedMultiSearchHighlight,
-	toggleAllDisplayedMultiSearchSelection,
-	toggleHighlightedDisplayedMultiSearchSelection,
-} from '#tui/prompts/search/read-multi/state/displayed';
 import { createMultiSearchReaderStateContext } from '#tui/prompts/search/read-multi/state/context';
 import { applyMultiSearchTypedInput } from '#tui/prompts/search/read-multi/state/input';
 import { selectedMultiSearchLabels } from '#tui/prompts/search/read-multi/state/labels';
@@ -12,6 +5,14 @@ import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchSelection } from '#tui/prompts/search/selection';
 import type { TypedValueState } from '#tui/typed-value/types';
 import type { Choice, MultiSearchPromptOptions } from '#tui/types';
+
+import {
+	displayedMultiSearchChoices,
+	markedDisplayedMultiSearchChoiceIndexes,
+	moveDisplayedMultiSearchHighlight,
+	toggleAllDisplayedMultiSearchSelection,
+	toggleHighlightedDisplayedMultiSearchSelection,
+} from '#tui/prompts/search/read-multi/state/displayed';
 
 export type MultiSearchReaderState<T> = {
 	applyTypedInput(key: string): Promise<{ cancelled: boolean }>;

@@ -6,10 +6,7 @@ import type { MultiSearchChoicesReadResult } from '#tui/prompts/search/read-mult
 import type { MultiSearchReaderSession } from '#tui/prompts/search/read-multi/session';
 import type { MultiSearchPromptOptions } from '#tui/types';
 
-export const cancelMultiSearchChoices = async <T>(
-	options: MultiSearchPromptOptions<T>,
-	session: MultiSearchReaderSession<T>,
-): Promise<MultiSearchChoicesReadResult<T>> => {
+export const cancelMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>, session: MultiSearchReaderSession<T>): Promise<MultiSearchChoicesReadResult<T>> => {
 	eraseRenderedFrame(session.frame());
 	renderCancelledSearch(options.message, session.query().value, options.placeholder);
 

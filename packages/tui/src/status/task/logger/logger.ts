@@ -1,18 +1,14 @@
 import { createTaskLoggerLimits } from '#tui/status/task/logger/limits';
 import { createTaskLoggerLabels } from '#tui/status/task/logger/labels';
 import { notifyTaskLoggerChanged } from '#tui/status/task/logger/events';
-import {
-	clearTaskLoggerPartial,
-	writeStableTaskLoggerMessage,
-	writeTaskLoggerLine,
-	writeTaskLoggerPartial,
-} from '#tui/status/task/logger/methods';
 import { syncTaskLoggerLabel, syncTaskLoggerSubLabel } from '#tui/status/task/logger/sync';
 import type { TaskLoggerChangeHandler } from '#tui/status/task/logger/events';
 import type { TaskLoggerLimits } from '#tui/status/task/logger/limits';
 import type { PartialTaskLogState } from '#tui/status/task/logger/lines';
 import type { TaskLoggerLabels } from '#tui/status/task/logger/labels';
 import type { StableTaskMessage } from '#tui/status/task/messages';
+
+import { clearTaskLoggerPartial, writeStableTaskLoggerMessage, writeTaskLoggerLine, writeTaskLoggerPartial } from '#tui/status/task/logger/methods';
 
 export class Logger {
 	labelValue: string;
@@ -23,7 +19,12 @@ export class Logger {
 	private labels: TaskLoggerLabels;
 	private readonly limits: TaskLoggerLimits;
 
-	constructor(limit: number, label: string, subLabel = '', private readonly onChange?: TaskLoggerChangeHandler) {
+	constructor(
+		limit: number,
+		label: string,
+		subLabel = '',
+		private readonly onChange?: TaskLoggerChangeHandler,
+	) {
 		this.limits = createTaskLoggerLimits(limit);
 		this.labels = createTaskLoggerLabels(label, subLabel);
 		this.labelValue = this.labels.label;

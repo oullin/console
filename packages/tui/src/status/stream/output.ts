@@ -65,6 +65,7 @@ export class Stream {
 	private render(deferred: boolean): void {
 		if (deferred) {
 			requestStreamBufferRender(this.#context);
+
 			return;
 		}
 

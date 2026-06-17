@@ -2,11 +2,7 @@ import type { SearchNavigationAction } from '#tui/prompts/search/keys';
 import type { SearchReaderSessionFrame } from '#tui/prompts/search/read-single/session/frame';
 import type { SingleSearchReaderState } from '#tui/prompts/search/read-single/state';
 
-export const applySearchSessionTypedInput = async <T>(
-	state: SingleSearchReaderState<T>,
-	frame: SearchReaderSessionFrame,
-	key: string,
-): Promise<{ cancelled: boolean }> => {
+export const applySearchSessionTypedInput = async <T>(state: SingleSearchReaderState<T>, frame: SearchReaderSessionFrame, key: string): Promise<{ cancelled: boolean }> => {
 	const next = await state.applyTypedInput(key);
 
 	if (!next.cancelled) {
@@ -16,19 +12,13 @@ export const applySearchSessionTypedInput = async <T>(
 	return next;
 };
 
-export const clearSearchSessionHighlight = <T>(
-	state: SingleSearchReaderState<T>,
-	frame: SearchReaderSessionFrame,
-): void => {
+export const clearSearchSessionHighlight = <T>(state: SingleSearchReaderState<T>, frame: SearchReaderSessionFrame): void => {
 	state.clearHighlight();
 	frame.render();
 };
 
-export const moveSearchSessionHighlight = async <T>(
-	state: SingleSearchReaderState<T>,
-	frame: SearchReaderSessionFrame,
-	action: SearchNavigationAction,
-): Promise<void> => {
+export const moveSearchSessionHighlight = async <T>(state: SingleSearchReaderState<T>, frame: SearchReaderSessionFrame, action: SearchNavigationAction): Promise<void> => {
 	await state.move(action);
+
 	frame.render();
 };

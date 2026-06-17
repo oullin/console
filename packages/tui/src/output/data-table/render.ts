@@ -48,23 +48,14 @@ export const renderSubmittedDataTableFrame = <T>(message: string, headers: strin
 	promptEnvironment().output.write(`${message}\n${display}\n`);
 };
 
-export const renderCancelledDataTableFrame = <T>(
-	message: string,
-	headers: string[],
-	rows: Array<VisibleDataTableRow<T>>,
-	selected: number,
-	mode: DataTableSearchMode,
-	query: string,
-): void => {
+export const renderCancelledDataTableFrame = <T>(message: string, headers: string[], rows: Array<VisibleDataTableRow<T>>, selected: number, mode: DataTableSearchMode, query: string): void => {
 	const outputRows = renderCancelledDataTableRows(headers, rows, selected);
 	const querySuffix = mode === 'search' || query.length > 0 ? ` ${query}` : '';
 
 	const environment = promptEnvironment();
 
 	environment.output.write(`${message}\n`);
-	if (querySuffix.length > 0) {
-		environment.output.write(`${dim(`/ Search${querySuffix}`)}\n`);
-	}
+	environment.output.write(`${dim(`/ Search${querySuffix}`)}\n`);
 	environment.output.write(`${renderTable(renderDataTableHeaders(headers), outputRows)}\n`);
 	environment.error.write(`${red('  ⚠ Cancelled.')}\n`);
 };

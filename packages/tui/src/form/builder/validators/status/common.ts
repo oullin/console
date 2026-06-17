@@ -1,12 +1,13 @@
 import { z } from 'zod';
+import { functionSchema } from '#tui/validators/function';
 import type { MaybePromise } from '#tui/types';
 import type { Progress } from '#tui/status';
 
 const progressTotalSchema = z.number();
 const statusLabelSchema = z.string();
-const statusCallbackSchema = <T>(): z.ZodType<() => MaybePromise<T>> => z.function() as z.ZodType<() => MaybePromise<T>>;
-const progressCallbackSchema = <T, R>(): z.ZodType<(step: T | number, bar: Progress) => MaybePromise<R>> =>
-	z.function() as z.ZodType<(step: T | number, bar: Progress) => MaybePromise<R>>;
+const statusCallbackSchema = <T>(): z.ZodType<() => MaybePromise<T>> => functionSchema<() => MaybePromise<T>>();
+
+const progressCallbackSchema = <T, R>(): z.ZodType<(step: T | number, bar: Progress) => MaybePromise<R>> => functionSchema<(step: T | number, bar: Progress) => MaybePromise<R>>();
 
 export const isProgressTotal = (value: unknown): value is number => {
 	return progressTotalSchema.safeParse(value).success;

@@ -11,10 +11,7 @@ export type DataTableReaderSelectionState = {
 	value(): number;
 };
 
-export const createDataTableReaderSelectionState = <T>(
-	rows: Array<VisibleDataTableRow<T>>,
-	options: DataTableReadOptions<T>,
-): DataTableReaderSelectionState => {
+export const createDataTableReaderSelectionState = <T>(rows: Array<VisibleDataTableRow<T>>, options: DataTableReadOptions<T>): DataTableReaderSelectionState => {
 	let selected = initialDataTableSelection(rows, options.default, options.hasDefault);
 
 	return {

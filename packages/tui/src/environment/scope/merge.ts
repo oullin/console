@@ -7,6 +7,6 @@ export const mergePromptEnvironment = (current: PromptEnvironment, patch: Partia
 	return {
 		...current,
 		...environment,
-		input: environment.input === undefined ? current.input : { ...current.input, ...environment.input },
+		input: environment.input === undefined ? current.input : environment.input,
 	};
 };

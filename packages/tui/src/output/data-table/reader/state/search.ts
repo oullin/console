@@ -3,10 +3,7 @@ import type { DataTableSearchChange, DataTableSearchState } from '#tui/output/da
 
 export type DataTableReaderSearchChange = DataTableSearchChange;
 
-export const applyDataTableReaderSearchKey = (
-	state: DataTableSearchState,
-	key: string,
-): DataTableReaderSearchChange => {
+export const applyDataTableReaderSearchKey = (state: DataTableSearchState, key: string): DataTableReaderSearchChange => {
 	return applyDataTableSearchKey(state, key);
 };
 
