@@ -1,4 +1,4 @@
-import { parseDataTableDefault } from '#tui/output/validators/data-table';
+import { parseDataTableDefault, parseInitialDataTableRow } from '#tui/output/validators/data-table';
 import { dataTableRowValue } from '#tui/output/data-table/rows';
 import { hasPromptDefault } from '#tui/validators/default';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
@@ -22,13 +22,7 @@ export const preserveDataTableRetryDefault = <T>(options: NormalizedDataTablePro
 };
 
 export const initialDataTableDefault = <T>(rows: Array<DataTableRow<T>>): T | number => {
-	const firstRow = rows.at(0);
-
-	if (firstRow === undefined) {
-		throw new Error('Data table must have at least one row.');
-	}
-
-	return dataTableRowValue(firstRow, 0);
+	return dataTableRowValue(parseInitialDataTableRow<T>(rows), 0);
 };
 
 export const dataTableValidationOptions = async <T>(

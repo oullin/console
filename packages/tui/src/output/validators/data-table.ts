@@ -1,4 +1,10 @@
-export { dataTableStepName, isDataTablePromptOptions, parseDataTableDefault, parseDataTablePromptOptions } from '#tui/output/validators/data-table/options';
+export {
+	dataTableStepName,
+	isDataTablePromptOptions,
+	parseDataTableDefault,
+	parseDataTablePromptOptions,
+	parseInitialDataTableRow,
+} from '#tui/output/validators/data-table/options';
 export {
 	isDataObjectRow,
 	parseDataTableArrayHeaders,

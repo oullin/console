@@ -56,6 +56,11 @@ export const parseDataTableDefault = <T>(value: unknown): T | number => {
 	return parsed.data;
 };
 
+export const parseInitialDataTableRow = <T>(value: unknown): DataTableRow<T> => {
+	const rows = parseDataTableRows<T>(value);
+	return rows[0];
+};
+
 const parseDataTableHeaders = (value: unknown): string[] => {
 	const parsed = dataTableHeadersSchema.safeParse(value);
 
