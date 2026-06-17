@@ -30,8 +30,8 @@ export const moveLine = (value: string[], cursor: number, direction: 1 | -1, wid
 	return target.start + targetColumn;
 };
 
-export const moveToLineBoundary = (value: string[], cursor: number, boundary: 'start' | 'end'): number => {
-	const ranges = lineRanges(value);
+export const moveToLineBoundary = (value: string[], cursor: number, boundary: 'start' | 'end', width?: number): number => {
+	const ranges = lineRanges(value, width);
 	const range = ranges[currentLine(ranges, cursor)];
 
 	if (!range) {
