@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, Progress, Stream, text, withPromptEnvironment } from '#tui/index';
+import { confirm, createMemoryOutput, createScriptedInput, form, Key, outro, Stream, text, withPromptEnvironment } from '#tui/index';
 
 describe('form builder', () => {
 	it('runs chained steps and returns positional responses', async () => {
@@ -830,23 +830,12 @@ describe('form builder', () => {
 				output,
 				error: output,
 			},
-			async () => {
-				const values = await form().progress(2, 'Manual', 'bar').submit();
-
-				const bar = values.bar as Progress;
-
-				bar.start();
-				bar.advance();
-				bar.finish();
-
-				return values;
-			},
+			() => form().progress(2, 'Manual', 'bar').submit(),
 		);
 
-		expect(responses.bar).toBeInstanceOf(Progress);
-		expect((responses.bar as Progress).total).toBe(2);
+		expect(responses.bar).toBeNull();
 		expect(output.text()).toContain('Manual');
-		expect(output.text()).toContain('1 / 2');
+		expect(output.text()).toContain('0 / 2');
 	});
 
 	it('creates manual streams from form steps', async () => {

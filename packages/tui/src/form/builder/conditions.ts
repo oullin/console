@@ -1,7 +1,8 @@
+import { resolveFormStepCondition } from '#tui/form/builder/validators/conditions';
 import type { FormResponses, FormStep } from '#tui/form/types';
 
 export const shouldRunStep = async (step: FormStep, responses: FormResponses): Promise<boolean> => {
-	return typeof step.condition === 'function' ? step.condition(responses) : step.condition;
+	return resolveFormStepCondition(step.condition, responses);
 };
 
 export const shouldIgnoreStepWhenReverting = async (step: FormStep, responses: FormResponses): Promise<boolean> => {

@@ -1,6 +1,9 @@
 import { truncate, visibleWidth } from '#tui/strings';
+import { terminalSize } from '#tui/terminal';
+import { parseBoxWidth } from '#tui/theme/validators/box';
 
 const DEFAULT_BOX_WIDTH = 60;
+const TERMINAL_PADDING = 6;
 
 type BoxOptions = {
 	body: string;
@@ -12,9 +15,12 @@ type BoxOptions = {
 
 const padVisible = (value: string, width: number): string => `${value}${' '.repeat(Math.max(0, width - visibleWidth(value)))}`;
 
-export const renderBox = ({ body, borderStyle = (value) => value, info = '', title = '', width = DEFAULT_BOX_WIDTH }: BoxOptions): string => {
+const defaultBoxWidth = (): number => Math.min(DEFAULT_BOX_WIDTH, Math.max(0, terminalSize().columns - TERMINAL_PADDING));
+
+export const renderBox = ({ body, borderStyle = (value) => value, info = '', title = '', width }: BoxOptions): string => {
 	const bodyLines = body.split('\n');
-	const contentWidth = Math.max(width, visibleWidth(title), ...bodyLines.map(visibleWidth));
+	const requestedWidth = parseBoxWidth(width, defaultBoxWidth());
+	const contentWidth = Math.max(requestedWidth, visibleWidth(title), ...bodyLines.map(visibleWidth));
 	const titleWidth = visibleWidth(title);
 	const titleLabel = titleWidth > 0 ? ` ${title} ` : '';
 	const topBorder = '─'.repeat(contentWidth - titleWidth + (titleWidth > 0 ? 0 : 2));

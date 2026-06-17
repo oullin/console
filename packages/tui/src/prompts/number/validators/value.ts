@@ -10,21 +10,35 @@ export type NumberValidationResult = {
 
 const numericInputSchema = z.string();
 
-const isNumeric = (value: string): boolean => value.trim() !== '' && Number.isFinite(Number(value));
+const numericValueSchema = numericInputSchema.trim().min(1).transform(Number).pipe(z.number().finite());
+
+export const parseNumericValue = (value: unknown): number | null => {
+	const parsed = numericValueSchema.safeParse(value);
+
+	return parsed.success ? parsed.data : null;
+};
 
 export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptions, 'integer' | 'max' | 'min'> = {}): NumberValidationResult => {
-	const raw = numericInputSchema.parse(input);
+	const rawInput = numericInputSchema.safeParse(input);
+
+	if (!rawInput.success) {
+		return { error: 'Must be a number' };
+	}
+
+	const raw = rawInput.data;
 	const normalized = raw.trim();
 
 	if (normalized === '') {
 		return { value: '' };
 	}
 
-	if (!isNumeric(normalized)) {
+	const parsed = numericValueSchema.safeParse(raw);
+
+	if (!parsed.success) {
 		return { error: 'Must be a number' };
 	}
 
-	const numeric = Number(normalized);
+	const numeric = parsed.data;
 
 	if (options.min !== undefined && numeric < options.min) {
 		return { error: `Must be at least ${options.min}` };
@@ -34,5 +48,5 @@ export const parseNumberInput = (input: unknown, options: Pick<NumberPromptOptio
 		return { error: `Must be less than ${options.max}` };
 	}
 
-	return { value: Math.trunc(numeric) };
+	return { value: options.integer === false ? numeric : Math.trunc(numeric) };
 };

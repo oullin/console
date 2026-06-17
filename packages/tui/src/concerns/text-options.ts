@@ -1,7 +1,8 @@
+import { isTextPromptLabel } from '#tui/concerns/validators/text-options';
 import type { TextPromptOptions } from '#tui/types';
 
 export const textOptions = (message: string | TextPromptOptions, fallback = ''): TextPromptOptions => {
-	if (typeof message === 'string') {
+	if (isTextPromptLabel(message)) {
 		return { message, default: fallback };
 	}
 

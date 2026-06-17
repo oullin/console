@@ -1,13 +1,21 @@
-import { findChoice } from '#tui/concerns/choices';
+import { choiceByValue, choiceValueEquals, findChoice } from '#tui/concerns/choices';
+import { parseChoiceAnswerList } from '#tui/concerns/validators/choice-answer';
 import { PromptValidationError } from '#tui/prompt';
 import { resolveSearchChoices } from '#tui/prompts/search/choices';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
 
-export const resolveLineSearchChoice = async <T>(options: SearchPromptOptions<T>, query: string): Promise<T | undefined> => {
+type SearchLineOptions<T> = SearchPromptOptions<T> & {
+	hasDefault?: boolean;
+};
+
+export const resolveLineSearchChoice = async <T>(options: SearchLineOptions<T>, query: string): Promise<T | undefined> => {
 	const choices = await resolveSearchChoices(options.options, query);
 
-	if (query === '' && options.default !== undefined) {
-		return options.default;
+	if (query === '' && options.hasDefault === true) {
+		const disabledChoice = choices.find((candidate) => candidate.disabled && choiceValueEquals(candidate.value, options.default));
+		const choice = choiceByValue(choices, options.default);
+
+		return disabledChoice ? undefined : (choice?.value ?? options.default);
 	}
 
 	const matched = findChoice(choices, query);
@@ -25,13 +33,18 @@ export const resolveLineMultiSearchChoices = async <T>(options: MultiSearchPromp
 	const choices = await resolveSearchChoices(options.options, query);
 
 	if (query === '' && options.default !== undefined) {
-		return options.default;
+		return options.default.flatMap((value) => {
+			const choice = choices.find((candidate) => choiceValueEquals(candidate.value, value));
+
+			if (choice?.disabled) {
+				return [];
+			}
+
+			return [choice?.value ?? value];
+		});
 	}
 
-	const parts = query
-		.split(',')
-		.map((part) => part.trim())
-		.filter((part) => part.length > 0);
+	const parts = parseChoiceAnswerList(query);
 
 	const selectedChoices = parts.map((part) => findChoice(choices, part)).filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
 

@@ -1,34 +1,8 @@
-import { z } from 'zod';
-import type { TableCell, TableOptions } from '#tui/types';
+import { tableHeadersSchema, tableOptionsSchema, tableRowsSchema, tableStepNameSchema } from '#tui/output/validators/table/schemas';
+import { inferredTableHeaders } from '#tui/output/validators/table/rows';
+import type { TableOptions } from '#tui/types';
 
-const tableCellSchema: z.ZodType<TableCell> = z.union([z.string(), z.number(), z.boolean(), z.null(), z.undefined()]);
-const tableRowSchema = z.union([z.array(tableCellSchema), z.record(z.string(), tableCellSchema)]);
-const tableRowsSchema = z.array(tableRowSchema);
-const tableHeadersSchema = z.array(z.string());
-const tableStepNameSchema = z.string();
-
-const tableOptionsSchema = z
-	.object({
-		headers: tableHeadersSchema.optional(),
-		rows: tableRowsSchema,
-	})
-	.passthrough();
-
-const inferredTableHeaders = (rows: TableOptions['rows']): string[] => {
-	const firstRow = rows[0];
-
-	const arrayRow = z.array(tableCellSchema).safeParse(firstRow);
-
-	if (arrayRow.success || firstRow === undefined) {
-		return [];
-	}
-
-	return Object.keys(firstRow);
-};
-
-const stringifyTableCell = (value: TableCell): string => {
-	return value === null || value === undefined ? '' : String(value);
-};
+export { tableRowCells } from '#tui/output/validators/table/rows';
 
 export const isTableOptions = (value: unknown): value is TableOptions => {
 	return tableOptionsSchema.safeParse(value).success;
@@ -58,19 +32,27 @@ export const parseTableOptions = (headersOrOptions: unknown = [], rows: unknown 
 	}
 
 	return {
-		headers: tableHeadersSchema.parse(headersOrOptions),
-		rows: rows === null ? [] : tableRowsSchema.parse(rows),
+		headers: parseTableHeaders(headersOrOptions),
+		rows: rows === null ? [] : parseTableRows(rows),
 	};
 };
 
-export const tableRowCells = (row: TableOptions['rows'][number], headers: string[]): string[] => {
-	const arrayRow = z.array(tableCellSchema).safeParse(row);
+const parseTableHeaders = (value: unknown): string[] => {
+	const parsed = tableHeadersSchema.safeParse(value);
 
-	if (arrayRow.success) {
-		return arrayRow.data.map(stringifyTableCell);
+	if (!parsed.success) {
+		throw new TypeError('Table headers must be an array of strings.');
 	}
 
-	const recordRow = z.record(z.string(), tableCellSchema).parse(row);
+	return parsed.data;
+};
 
-	return headers.map((header) => stringifyTableCell(recordRow[header]));
+const parseTableRows = (value: unknown): TableOptions['rows'] => {
+	const parsed = tableRowsSchema.safeParse(value);
+
+	if (!parsed.success) {
+		throw new TypeError('Table rows must be an array.');
+	}
+
+	return parsed.data;
 };

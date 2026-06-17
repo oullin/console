@@ -1,12 +1,10 @@
-import { findChoice } from '#tui/concerns/choices';
+import { choiceValueEquals, findChoice } from '#tui/concerns/choices';
+import { parseChoiceAnswerList } from '#tui/concerns/validators/choice-answer';
 import { PromptValidationError } from '#tui/prompt';
 import type { Choice } from '#tui/types';
 
 export const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: string): T[] => {
-	const parts = answer
-		.split(',')
-		.map((part) => part.trim())
-		.filter((part) => part.length > 0);
+	const parts = parseChoiceAnswerList(answer);
 
 	const selected = parts.map((part) => findChoice(choices, part)).filter((choice): choice is Choice<T> => choice !== undefined && !choice.disabled);
 
@@ -18,13 +16,23 @@ export const choicesFromCommaSeparated = <T>(choices: Array<Choice<T>>, answer: 
 };
 
 export const markedChoiceIndexes = <T>(choices: Array<Choice<T>>, defaults: T[] = []): Set<number> => {
-	const selectedValues = new Set(defaults);
-
-	return new Set(choices.flatMap((choice, index) => (selectedValues.has(choice.value) ? [index] : [])));
+	return new Set(choices.flatMap((choice, index) => (!choice.disabled && defaults.some((value) => choiceValueEquals(choice.value, value)) ? [index] : [])));
 };
 
 export const markedChoiceValues = <T>(choices: Array<Choice<T>>, marked: Set<number>): T[] => {
 	return [...marked].map((index) => choices[index]?.value).filter((value): value is T => value !== undefined);
+};
+
+export const defaultChoiceValues = <T>(choices: Array<Choice<T>>, defaults: T[] = []): T[] => {
+	return defaults.flatMap((value) => {
+		const choice = choices.find((candidate) => choiceValueEquals(candidate.value, value));
+
+		if (choice?.disabled) {
+			return [];
+		}
+
+		return [choice?.value ?? value];
+	});
 };
 
 export const toggleMarkedChoice = <T>(choices: Array<Choice<T>>, marked: Set<number>, index: number): Set<number> => {

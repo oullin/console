@@ -4,9 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "turbo build",
-    "test": "turbo test",
-    "typecheck": "turbo typecheck"
+    "build": "XDG_CACHE_HOME=provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=provision/.cache/playwright turbo run build --cache-dir provision/.cache/turbo --log-file provision/.cache/turbo/logs/build.json --output-logs=none",
+    "dev": "make dev",
+    "format": "make format",
+    "format-all": "make format-all",
+    "test": "XDG_CACHE_HOME=provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=provision/.cache/playwright turbo run test --cache-dir provision/.cache/turbo --log-file provision/.cache/turbo/logs/test.json --output-logs=full",
+    "typecheck": "XDG_CACHE_HOME=provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=provision/.cache/playwright turbo run typecheck --cache-dir provision/.cache/turbo --log-file provision/.cache/turbo/logs/typecheck.json --output-logs=none"
   },
   "devDependencies": {
     "@ollin/artefacts": "workspace:*",

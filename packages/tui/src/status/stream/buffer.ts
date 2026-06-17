@@ -1,25 +1,29 @@
+import { parseStreamFadeSteps } from '#tui/status/stream/validators/fade';
+
 export class StreamBuffer {
 	readonly fading: string[] = [];
+	readonly #fadeLimit: number;
 	#message = '';
 
-	constructor(private readonly fadeLimit: number) {}
+	constructor(fadeLimit: number) {
+		this.#fadeLimit = parseStreamFadeSteps(fadeLimit, 10);
+	}
 
 	append(message: string): void {
 		this.fading.push(message);
 
-		while (this.fading.length > this.fadeLimit) {
+		while (this.fading.length > this.#fadeLimit) {
 			this.#message += this.fading.shift() ?? '';
 		}
 	}
 
-	flushNext(): boolean {
-		const next = this.fading.shift();
-
-		if (next === undefined) {
+	flush(): boolean {
+		if (this.fading.length === 0) {
 			return false;
 		}
 
-		this.#message += next;
+		this.#message += this.fading.join('');
+		this.fading.length = 0;
 
 		return true;
 	}

@@ -11,7 +11,7 @@
     "./tsconfig/*.json": "./tsconfig/*.json"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "XDG_CACHE_HOME=../../provision/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../provision/.cache/playwright tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@ollin/tsconfig": "workspace:*",

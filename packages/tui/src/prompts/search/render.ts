@@ -1,7 +1,6 @@
 import { promptEnvironment } from '#tui/environment';
-import { choiceWindow } from '#tui/concerns/choices';
-import { resolveInfo } from '#tui/concerns/info';
-import { renderScrollbarRows } from '#tui/concerns/scrollbar';
+import { joinedInfoDetails, resolveInfo } from '#tui/concerns/info';
+import { renderSearchBody } from '#tui/prompts/search/render-body';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
 import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui/types';
@@ -9,6 +8,7 @@ import type { Choice, MultiSearchPromptOptions, SearchPromptOptions } from '#tui
 export const renderSearchChoices = <T>(
 	message: string,
 	query: string,
+	cursor: number,
 	choices: Array<Choice<T>>,
 	highlighted: number | null,
 	marked: Set<number> = new Set(),
@@ -17,14 +17,15 @@ export const renderSearchChoices = <T>(
 	info?: SearchPromptOptions<T>['info'] | MultiSearchPromptOptions<T>['info'],
 	showSelectedSummary = false,
 	placeholder = '',
-): void => {
+): string => {
 	const text = resolveInfo(info, highlighted === null ? null : (choices[highlighted]?.value ?? null));
 	const summary = showSelectedSummary ? selectedSummary(selectedLabels.length, selectedLabels.length - marked.size) : '';
-	const details = [text, summary].filter((part) => part.length > 0).join(' · ');
+	const details = joinedInfoDetails(text, summary);
+	const frame = `${renderBox({ body: renderSearchBody(query, cursor, placeholder, choices, highlighted, marked, scroll, showSelectedSummary), borderStyle: cyan, info: details, title: cyan(message) })}\n`;
 
-	promptEnvironment().output.write(
-		`${renderBox({ body: renderSearchBody(query, placeholder, choices, highlighted, marked, scroll, showSelectedSummary), borderStyle: cyan, info: details, title: cyan(message) })}\n`,
-	);
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedSearchChoice = (message: string, label: string): void => {
@@ -32,9 +33,7 @@ export const renderSubmittedSearchChoice = (message: string, label: string): voi
 };
 
 export const renderSubmittedSearchChoices = (message: string, labels: string[]): void => {
-	const body = labels.length === 0 ? dim('None') : labels.join('\n');
-
-	promptEnvironment().output.write(`${renderBox({ body, title: dim(message) })}\n`);
+	promptEnvironment().output.write(`${renderBox({ body: labels.join('\n'), title: dim(message) })}\n`);
 };
 
 export const renderCancelledSearch = (message: string, query: string, placeholder = ''): void => {
@@ -42,63 +41,6 @@ export const renderCancelledSearch = (message: string, query: string, placeholde
 
 	promptEnvironment().output.write(`${renderBox({ body, borderStyle: red, title: dim(message) })}\n`);
 	promptEnvironment().error.write(`${red('  ⚠ Cancelled.')}\n`);
-};
-
-const renderSearchBody = <T>(query: string, placeholder: string, choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): string => {
-	const value = query.length > 0 ? query : dim(placeholder);
-	const rows = renderSearchRows(choices, highlighted, marked, scroll, multiple);
-
-	if (query.length > 0 && choices.length === 0) {
-		return [value, dim('  No results.')].join('\n');
-	}
-
-	return rows.length > 0 ? [value, rows].join('\n') : value;
-};
-
-const renderSearchRows = <T>(choices: Array<Choice<T>>, highlighted: number | null, marked: Set<number>, scroll: number | undefined, multiple: boolean): string => {
-	const window = choiceWindow(choices.length, highlighted ?? 0, scroll);
-
-	const rows = choices.slice(window.start, window.end).map((choice, offset) => {
-		const index = window.start + offset;
-		const active = highlighted === index;
-		const selected = marked.has(index);
-		const label = choiceLabel(choice);
-
-		return multiple ? multiSearchRow(label, active, selected) : searchRow(label, active);
-	});
-
-	return renderScrollbarRows(rows, window.start, window.end - window.start, choices.length).join('\n');
-};
-
-const choiceLabel = <T>(choice: Choice<T>): string => {
-	const disabled = choice.disabled ? ` (${typeof choice.disabled === 'string' ? choice.disabled : 'disabled'})` : '';
-	const hint = choice.hint ? ` ${choice.hint}` : '';
-
-	return `${choice.label}${hint}${disabled}`;
-};
-
-const searchRow = (label: string, active: boolean): string => {
-	if (active) {
-		return `${cyan('›')} ${label}  `;
-	}
-
-	return `  ${dim(label)}  `;
-};
-
-const multiSearchRow = (label: string, active: boolean, selected: boolean): string => {
-	if (active && selected) {
-		return `${cyan('› ◼')} ${label}  `;
-	}
-
-	if (active) {
-		return `${cyan('›')} ◻ ${label}  `;
-	}
-
-	if (selected) {
-		return `  ${cyan('◼')} ${dim(label)}  `;
-	}
-
-	return `  ${dim('◻')} ${dim(label)}  `;
 };
 
 const selectedSummary = (selectedCount: number, hiddenCount: number): string => {

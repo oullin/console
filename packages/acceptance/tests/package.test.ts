@@ -1,12 +1,14 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const testPath = dirname(fileURLToPath(import.meta.url));
-const acceptancePath = resolve(testPath, '..');
-const workspacePath = resolve(acceptancePath, '../..');
+const acceptancePath = dirname(testPath);
+const packagesPath = dirname(acceptancePath);
+const workspacePath = dirname(packagesPath);
+const acceptanceCachePath = join(workspacePath, 'provision', '.cache', 'vitest', 'acceptance');
 
 describe('package consumption', () => {
 	it('imports the built public entrypoint through ESM package resolution', () => {
@@ -25,7 +27,7 @@ describe('package consumption', () => {
 		);
 
 		expect(output.trim()).toBe('function,function,function');
-	});
+	}, 30_000);
 
 	it('exports the complete runtime helper surface from the root entrypoint', () => {
 		execFileSync('pnpm', ['--filter', '@ollin/tui', 'build'], {
@@ -59,6 +61,8 @@ describe('package consumption', () => {
 			'erasePreviousLines',
 			'error',
 			'executeNotificationCommand',
+			'fallbackUsing',
+			'fallbackWhen',
 			'foregroundColor',
 			'form',
 			'grid',
@@ -99,6 +103,7 @@ describe('package consumption', () => {
 			'textarea',
 			'title',
 			'truncate',
+			'validateUsing',
 			'visibleWidth',
 			'warning',
 			'withPromptEnvironment',
@@ -124,7 +129,7 @@ describe('package consumption', () => {
 		);
 
 		expect(JSON.parse(output) as { missing: string[] }).toEqual({ missing: [], count: expectedExports.length });
-	});
+	}, 30_000);
 
 	it('exports public helper types from the built root entrypoint', () => {
 		execFileSync('pnpm', ['--filter', '@ollin/tui', 'build'], {
@@ -132,10 +137,17 @@ describe('package consumption', () => {
 			stdio: 'pipe',
 		});
 
-		const consumerDirectory = mkdtempSync(resolve(acceptancePath, '.types-'));
-		const consumerPath = resolve(consumerDirectory, 'consumer.ts');
+		const typecheckCachePath = join(acceptanceCachePath, 'types');
+
+		mkdirSync(typecheckCachePath, { recursive: true });
+
+		const consumerDirectory = mkdtempSync(join(typecheckCachePath, 'consumer-'));
+		const packageScopeDirectory = join(consumerDirectory, 'node_modules', '@ollin');
+		const consumerPath = join(consumerDirectory, 'consumer.ts');
 
 		try {
+			mkdirSync(packageScopeDirectory, { recursive: true });
+			symlinkSync(join(packagesPath, 'tui'), join(packageScopeDirectory, 'tui'), 'dir');
 			writeFileSync(
 				consumerPath,
 				`
@@ -215,5 +227,5 @@ describe('package consumption', () => {
 		} finally {
 			rmSync(consumerDirectory, { force: true, recursive: true });
 		}
-	});
+	}, 30_000);
 });

@@ -1,108 +1,59 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
-import { applyTypedKey } from '#tui/typed-value';
-import { clearsSuggestionHighlight, moveSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
-import { renderCancelledSuggestion, renderSuggestions } from '#tui/prompts/suggest/render';
-import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
-import { characterLength } from '#tui/typed-value/characters';
+import { ask } from '#tui/prompt';
+import { clearsSuggestionHighlight, suggestNavigationAction } from '#tui/prompts/suggest/keys';
+import { cancelSuggestionValue } from '#tui/prompts/suggest/read/cancel';
+import { currentSuggestionValue, highlightedSuggestionValue } from '#tui/prompts/suggest/read/submission';
+import { suggestionReadResult } from '#tui/prompts/suggest/read-result';
+import { createSuggestReaderSession } from '#tui/prompts/suggest/read/session';
+import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export type SuggestReadResult = {
-	cancelled: boolean;
-	rendered: boolean;
-	value: string;
-};
+export type SuggestReadResult = TextSuggestionReadResult;
 
 export const readSuggestionValue = async (options: SuggestOptions): Promise<SuggestReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return {
-			cancelled: false,
-			rendered: false,
-			value: await ask(options.message, options.hint),
-		};
+		return suggestionReadResult(await ask(options.message, options.hint), false);
 	}
 
-	let state = {
-		cursor: characterLength(options.default ?? ''),
-		value: options.default ?? '',
-	};
-	let highlighted: number | null = null;
+	const session = await createSuggestReaderSession(options);
 
-	let matches: string[] = await resolveSuggestions(options.options, state.value);
-
-	renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return {
-				cancelled: false,
-				rendered: true,
-				value: state.value,
-			};
+			return highlightedSuggestionValue(session);
 		}
 
 		const action = suggestNavigationAction(key);
 
-		if (action !== null && (action !== 'first' || highlighted !== null) && (action !== 'last' || highlighted !== null)) {
-			matches = await resolveSuggestions(options.options, state.value);
+		if (action !== null && (action !== 'first' || session.highlighted() !== null) && (action !== 'last' || session.highlighted() !== null)) {
+			await session.move(action);
 
-			highlighted = moveSuggestionHighlight(matches, highlighted, action, options.scroll);
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
 			continue;
 		}
 
-		if (clearsSuggestionHighlight(key) && highlighted !== null) {
-			highlighted = null;
-			renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
+		if (clearsSuggestionHighlight(key) && session.highlighted() !== null) {
+			session.clearHighlight();
 			continue;
 		}
 
 		if (key === Key.enter) {
-			if (highlighted !== null && matches[highlighted] !== undefined) {
-				return {
-					cancelled: false,
-					rendered: true,
-					value: matches[highlighted],
-				};
-			}
-
-			return {
-				cancelled: false,
-				rendered: true,
-				value: state.value,
-			};
+			return highlightedSuggestionValue(session);
 		}
 
-		const next = applyTypedKey(state, key);
+		const next = await session.applyTypedInput(key);
 
 		if (next.submitted) {
-			return {
-				cancelled: false,
-				rendered: true,
-				value: state.value,
-			};
+			return currentSuggestionValue(session);
 		}
 
 		if (next.cancelled) {
-			renderCancelledSuggestion(options.message, state.value, options.placeholder);
-
-			return {
-				cancelled: true,
-				rendered: true,
-				value: await cancelPrompt(state.value),
-			};
+			return cancelSuggestionValue(options, session);
 		}
-
-		state = { cursor: next.cursor, value: next.value };
-		highlighted = null;
-
-		matches = await resolveSuggestions(options.options, state.value);
-
-		renderSuggestions(options.message, state.value, matches, highlighted, options.scroll, options.info, options.placeholder);
 	}
 };

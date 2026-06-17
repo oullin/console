@@ -6,6 +6,7 @@ import type { Choice, MultiSearchPromptOptions } from '#tui/types';
 
 export type MultiSearchChoicesReadResult<T> = {
 	cancelled: boolean;
+	frame?: string;
 	submitted: boolean;
 	submittedLabels: string[];
 	value: T[];

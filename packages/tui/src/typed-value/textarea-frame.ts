@@ -2,8 +2,10 @@ import { renderScrollbarRows } from '#tui/concerns/scrollbar';
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { visibleLineWindow } from '#tui/typed-value/lines';
+import { valueWithCursor } from '#tui/typed-value/cursor';
+import { visibleTextWindow } from '#tui/typed-value/lines';
 import { TEXTAREA_CONTENT_WIDTH } from '#tui/typed-value/textarea';
+import { parseTypedValueRows } from '#tui/typed-value/validators/rows';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
 export const renderTextareaFrame = (message: string, state: TypedValueState, options: TypedValueOptions): string => {
@@ -23,19 +25,20 @@ export const renderCancelledTextareaFrame = (message: string, value: string, opt
 };
 
 const textareaBody = (state: TypedValueState, options: TypedValueOptions): string => {
-	const rows = options.rows === undefined || options.rows <= 0 ? undefined : Math.floor(options.rows);
+	const rows = parseTypedValueRows(options.rows);
 
 	if (state.value.length === 0) {
 		return placeholderBody(options, rows);
 	}
 
-	const window = visibleLineWindow(state.value, state.cursor, rows, TEXTAREA_CONTENT_WIDTH);
+	const window = visibleTextWindow(state.value, state.cursor, rows, TEXTAREA_CONTENT_WIDTH);
 
 	if (rows === undefined) {
-		return window.lines.join('\n');
+		return valueWithCursor(window.text, window.cursor);
 	}
 
-	const padded = [...window.lines.slice(0, rows), ...Array.from({ length: Math.max(0, rows - window.lines.length) }, () => '')];
+	const visibleLines = valueWithCursor(window.text, window.cursor).split('\n');
+	const padded = [...visibleLines.slice(0, rows), ...Array.from({ length: Math.max(0, rows - visibleLines.length) }, () => '')];
 
 	return renderScrollbarRows(padded, window.start, rows, window.total).join('\n');
 };
@@ -52,7 +55,7 @@ const placeholderBody = (options: TypedValueOptions, rows: number | undefined): 
 
 const textareaCancelledBody = (value: string, options: TypedValueOptions): string => {
 	const text = value.length > 0 ? value : (options.placeholder ?? '');
-	const lines = text.split('\n');
+	const lines = text.split(/\r?\n/u);
 
 	return lines.map((line) => strikethrough(dim(line))).join('\n');
 };

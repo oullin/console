@@ -1,105 +1,17 @@
-import type { FormBuilder } from '#tui/form/builder/index';
-import type { SuggestOptions } from '#tui/prompts/choices';
-import type { ChoiceOptions, ConfirmPromptOptions, MaybePromise, MultiSearchPromptOptions, MultiSelectPromptOptions, SearchPromptOptions, SelectPromptOptions, TextPromptOptions } from '#tui/types';
+import type { AutocompletePromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/autocomplete';
+import type { ConfirmPromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/confirm';
+import type { MultiSearchPromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/multisearch';
+import type { MultiSelectPromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/multiselect';
+import type { PausePromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/pause';
+import type { SearchPromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/search';
+import type { SelectPromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/select';
+import type { SuggestPromptBuilderMethods } from '#tui/form/builder/prompts/contracts/choices/suggest';
 
-export type ChoicePromptBuilderMethods = {
-	autocomplete(this: FormBuilder, options: SuggestOptions, name?: string): FormBuilder;
-	autocomplete(
-		this: FormBuilder,
-		label: string,
-		options: SuggestOptions['options'],
-		placeholder?: string,
-		defaultValue?: string,
-		required?: boolean | string,
-		validate?: TextPromptOptions['validate'],
-		hint?: string,
-		name?: string,
-		transform?: TextPromptOptions['transform'],
-		info?: SuggestOptions['info'],
-	): FormBuilder;
-	confirm(this: FormBuilder, options: ConfirmPromptOptions, name?: string): FormBuilder;
-	confirm(
-		this: FormBuilder,
-		label: string,
-		defaultValue?: boolean,
-		yes?: string,
-		no?: string,
-		required?: boolean | string,
-		validate?: (value: boolean) => MaybePromise<string | null | undefined>,
-		hint?: string,
-		name?: string,
-		transform?: (value: boolean) => MaybePromise<boolean>,
-	): FormBuilder;
-	multisearch<T>(this: FormBuilder, options: MultiSearchPromptOptions<T>, name?: string): FormBuilder;
-	multisearch<T>(
-		this: FormBuilder,
-		label: string,
-		options: MultiSearchPromptOptions<T>['options'],
-		placeholder?: string,
-		scroll?: number,
-		required?: MultiSearchPromptOptions<T>['required'],
-		validate?: MultiSearchPromptOptions<T>['validate'],
-		hint?: string,
-		name?: string,
-		transform?: MultiSearchPromptOptions<T>['transform'],
-		info?: MultiSearchPromptOptions<T>['info'],
-	): FormBuilder;
-	multiselect<T>(this: FormBuilder, options: MultiSelectPromptOptions<T>, name?: string): FormBuilder;
-	multiselect<T>(
-		this: FormBuilder,
-		label: string,
-		options: ChoiceOptions<T>,
-		defaultValue?: T[],
-		scroll?: number,
-		required?: boolean | string,
-		validate?: (value: T[]) => MaybePromise<string | null | undefined>,
-		hint?: string,
-		name?: string,
-		transform?: (value: T[]) => MaybePromise<T[]>,
-		info?: MultiSelectPromptOptions<T>['info'],
-	): FormBuilder;
-	pause(this: FormBuilder, message?: string, name?: string): FormBuilder;
-	search<T>(this: FormBuilder, options: SearchPromptOptions<T>, name?: string): FormBuilder;
-	search<T>(
-		this: FormBuilder,
-		label: string,
-		options: SearchPromptOptions<T>['options'],
-		placeholder?: string,
-		scroll?: number,
-		validate?: SearchPromptOptions<T>['validate'],
-		hint?: string,
-		required?: SearchPromptOptions<T>['required'],
-		name?: string,
-		transform?: SearchPromptOptions<T>['transform'],
-		info?: SearchPromptOptions<T>['info'],
-	): FormBuilder;
-	select<T>(this: FormBuilder, options: SelectPromptOptions<T>, name?: string): FormBuilder;
-	select<T>(
-		this: FormBuilder,
-		label: string,
-		options: ChoiceOptions<T>,
-		defaultValue?: T,
-		scroll?: number,
-		validate?: (value: T) => MaybePromise<string | null | undefined>,
-		hint?: string,
-		required?: boolean | string,
-		name?: string,
-		transform?: (value: T) => MaybePromise<T>,
-		info?: SelectPromptOptions<T>['info'],
-	): FormBuilder;
-	suggest(this: FormBuilder, options: SuggestOptions, name?: string): FormBuilder;
-	suggest(
-		this: FormBuilder,
-		label: string,
-		options: SuggestOptions['options'],
-		placeholder?: string,
-		defaultValue?: string,
-		scroll?: number,
-		required?: boolean | string,
-		validate?: TextPromptOptions['validate'],
-		hint?: string,
-		name?: string,
-		transform?: TextPromptOptions['transform'],
-		info?: SuggestOptions['info'],
-	): FormBuilder;
-};
+export type ChoicePromptBuilderMethods = AutocompletePromptBuilderMethods &
+	ConfirmPromptBuilderMethods &
+	MultiSearchPromptBuilderMethods &
+	MultiSelectPromptBuilderMethods &
+	PausePromptBuilderMethods &
+	SearchPromptBuilderMethods &
+	SelectPromptBuilderMethods &
+	SuggestPromptBuilderMethods;

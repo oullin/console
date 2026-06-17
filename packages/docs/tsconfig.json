@@ -4,17 +4,17 @@
 		"baseUrl": ".",
 		"paths": {
 			"@docs/*": ["src/*"],
-			"@docs-components/*": ["src/.vitepress/theme/components/*"],
-			"@docs-config": ["src/.vitepress/config.ts"],
-			"@docs-lib/*": ["src/.vitepress/theme/lib/*"],
+			"@docs-components/*": ["vitepress/theme/components/*"],
+			"@docs-config": ["vitepress/config.ts"],
+			"@docs-lib/*": ["vitepress/theme/lib/*"],
 			"@docs-tests/*": ["tests/*"],
-			"@docs-theme/*": ["src/.vitepress/theme/*"],
-			"@docs-ui/*": ["src/.vitepress/theme/components/ui/*"],
+			"@docs-theme/*": ["vitepress/theme/*"],
+			"@docs-ui/*": ["vitepress/theme/components/ui/*"],
 			"@ollin/tui": ["../tui/src/index.ts"],
 			"#tui/*": ["../tui/src/*"],
 			"#tui/prompts/*": ["../tui/src/prompts/*"]
 		},
-		"tsBuildInfoFile": "../artefacts/.cache/tsbuild/docs.tsbuildinfo"
+		"tsBuildInfoFile": "../../provision/.cache/tsbuild/docs.tsbuildinfo"
 	},
-	"include": ["examples/**/*.ts", "src/.vitepress/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "../tui/src/**/*.ts"]
+	"include": ["examples/**/*.ts", "tests/**/*.ts", "vitepress/**/*.ts", "vitest.config.ts", "../tui/src/**/*.ts"]
 }

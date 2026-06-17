@@ -1,3 +1,4 @@
+import { parsePromptOutputContent } from '#tui/environment/validators/output';
 import type { PromptOutput } from '#tui/types';
 
 export type MemoryOutput = PromptOutput & {
@@ -13,7 +14,7 @@ export const createMemoryOutput = (): MemoryOutput => {
 			buffer = '';
 		},
 		write(content: string): void {
-			buffer += content;
+			buffer += parsePromptOutputContent(content);
 		},
 		text(): string {
 			return buffer;

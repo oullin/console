@@ -1,4 +1,5 @@
 import { renderSpinnerFrame } from '#tui/status/spinner/render';
+import { parseLogLimit } from '#tui/status/validators/limit';
 import type { StableTaskMessage } from '#tui/status/task/messages';
 
 const TASK_DIVIDER_WIDTH = 60;
@@ -31,6 +32,8 @@ const renderStableMessage = (message: StableTaskMessage): string => {
 };
 
 export const renderTaskFrame = ({ finished = false, frameCount, keepSummary = false, label, limit, lines, stableMessages, subLabel }: TaskFrameOptions): string => {
+	const visibleLimit = parseLogLimit(limit, 10);
+
 	if (finished && keepSummary && stableMessages.length > 0) {
 		return [` • ${label}`, ...stableMessages.map(renderStableMessage), ''].join('\n');
 	}
@@ -49,11 +52,11 @@ export const renderTaskFrame = ({ finished = false, frameCount, keepSummary = fa
 		output.push('');
 	}
 
-	const visibleLines = lines.slice(-limit);
+	const visibleLines = lines.slice(-visibleLimit);
 
 	output.push(...visibleLines.map((line) => ` ${line}`));
 
-	for (let remaining = limit - visibleLines.length; remaining > 0; remaining -= 1) {
+	for (let remaining = visibleLimit - visibleLines.length; remaining > 0; remaining -= 1) {
 		output.push('');
 	}
 

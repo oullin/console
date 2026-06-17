@@ -4,12 +4,13 @@ import { deleteTypedValueKey } from '#tui/typed-value/edit/deletion';
 import { insertPrintableKey } from '#tui/typed-value/edit/insertion';
 import { moveTypedValueCursor } from '#tui/typed-value/edit/navigation';
 import { typedKeyResult } from '#tui/typed-value/edit/result';
+import { parseTypedValueCursor } from '#tui/typed-value/validators/cursor';
 import type { AppliedTypedKey, TypedValueState } from '#tui/typed-value/types';
 
 export const applyTypedKey = (state: TypedValueState, key: string, allowNewLine = false, wrapWidth?: number): AppliedTypedKey => {
 	const value = characters(state.value);
 
-	let cursor = Math.max(0, Math.min(value.length, state.cursor));
+	let cursor = parseTypedValueCursor(state.cursor, value.length);
 
 	if (key === Key.ctrlC) {
 		return typedKeyResult(value, cursor, { cancelled: true });

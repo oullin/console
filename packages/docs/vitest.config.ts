@@ -1,17 +1,24 @@
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-const tuiSourcePath = fileURLToPath(new URL('../tui/src/index.ts', import.meta.url));
-const internalSourcePath = fileURLToPath(new URL('../tui/src/$1', import.meta.url));
-const docsSourcePath = fileURLToPath(new URL('src', import.meta.url));
-const docsComponentsPath = fileURLToPath(new URL('src/.vitepress/theme/components', import.meta.url));
-const docsConfigPath = fileURLToPath(new URL('src/.vitepress/config.ts', import.meta.url));
-const docsLibPath = fileURLToPath(new URL('src/.vitepress/theme/lib', import.meta.url));
-const docsTestsPath = fileURLToPath(new URL('tests', import.meta.url));
-const docsThemePath = fileURLToPath(new URL('src/.vitepress/theme', import.meta.url));
-const docsUiPath = fileURLToPath(new URL('src/.vitepress/theme/components/ui', import.meta.url));
+const packagePath = dirname(fileURLToPath(import.meta.url));
+const packagesPath = dirname(packagePath);
+const workspacePath = dirname(packagesPath);
+const docsSourcePath = join(packagePath, 'src');
+const docsVitepressPath = join(packagePath, 'vitepress');
+const docsThemePath = join(docsVitepressPath, 'theme');
+const docsComponentsPath = join(docsThemePath, 'components');
+const cachePath = join(workspacePath, 'provision', '.cache', 'vitest', 'docs');
+const tuiSourcePath = join(packagesPath, 'tui', 'src', 'index.ts');
+const internalSourcePath = join(packagesPath, 'tui', 'src', '$1');
+const docsConfigPath = join(docsVitepressPath, 'config.ts');
+const docsLibPath = join(docsThemePath, 'lib');
+const docsTestsPath = join(packagePath, 'tests');
+const docsUiPath = join(docsComponentsPath, 'ui');
 
 export default defineConfig({
+	cacheDir: cachePath,
 	resolve: {
 		alias: [
 			{

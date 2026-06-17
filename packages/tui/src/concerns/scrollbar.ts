@@ -1,3 +1,4 @@
+import { parseScrollbarState } from '#tui/concerns/validators/scrollbar';
 import { visibleWidth } from '#tui/strings';
 import { cyan, dim } from '#tui/theme/styles';
 
@@ -20,11 +21,13 @@ export const scrollbarPosition = (firstVisible: number, height: number, total: n
 };
 
 export const renderScrollbarRows = (rows: string[], firstVisible: number, height: number, total: number, style = cyan): string[] => {
-	if (height >= total || rows.length === 0) {
+	const state = parseScrollbarState({ firstVisible, height, total });
+
+	if (state === undefined || rows.length === 0) {
 		return rows;
 	}
 
-	const position = scrollbarPosition(firstVisible, height, total);
+	const position = scrollbarPosition(state.firstVisible, state.height, state.total);
 	const width = Math.max(...rows.map((row) => visibleWidth(row)));
 
 	return rows.map((row, index) => {

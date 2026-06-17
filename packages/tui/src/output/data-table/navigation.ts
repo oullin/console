@@ -1,25 +1,32 @@
 import { parseScrollSize } from '#tui/concerns/validators/scroll';
+import { parseDataTableRowTotal, parseDataTableSelectedIndex } from '#tui/output/data-table/validators/selection';
 import type { DataTableNavigationAction } from '#tui/output/data-table/keys';
 
 export const nextDataTableSelection = (selected: number, total: number): number => {
-	return total === 0 ? 0 : (selected + 1) % total;
+	const rowTotal = parseDataTableRowTotal(total);
+
+	return rowTotal === 0 ? 0 : (parseDataTableSelectedIndex(selected, rowTotal) + 1) % rowTotal;
 };
 
 export const previousDataTableSelection = (selected: number, total: number): number => {
-	return total === 0 ? 0 : (selected - 1 + total) % total;
+	const rowTotal = parseDataTableRowTotal(total);
+
+	return rowTotal === 0 ? 0 : (parseDataTableSelectedIndex(selected, rowTotal) - 1 + rowTotal) % rowTotal;
 };
 
 export const pageDataTableSelection = (selected: number, total: number, direction: 1 | -1, scroll?: number): number => {
-	if (total === 0) {
+	const rowTotal = parseDataTableRowTotal(total);
+
+	if (rowTotal === 0) {
 		return 0;
 	}
 
-	return Math.max(0, Math.min(total - 1, selected + parseScrollSize(scroll, 10) * direction));
+	return Math.max(0, Math.min(rowTotal - 1, parseDataTableSelectedIndex(selected, rowTotal) + parseScrollSize(scroll, 10) * direction));
 };
 
 export const firstDataTableSelection = (): number => 0;
 
-export const lastDataTableSelection = (total: number): number => Math.max(0, total - 1);
+export const lastDataTableSelection = (total: number): number => Math.max(0, parseDataTableRowTotal(total) - 1);
 
 export const moveDataTableSelection = (action: DataTableNavigationAction, selected: number, total: number, scroll?: number): number => {
 	if (action === 'next') {

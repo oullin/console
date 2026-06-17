@@ -1,9 +1,14 @@
+import { dirname, join } from 'node:path';
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
 
-const sourcePath = fileURLToPath(new URL('./src/$1', import.meta.url));
+const packagePath = dirname(fileURLToPath(import.meta.url));
+const workspacePath = dirname(dirname(packagePath));
+const cachePath = join(workspacePath, 'provision', '.cache', 'vitest', 'tui');
+const sourcePath = join(packagePath, 'src', '$1');
 
 export default defineConfig({
+	cacheDir: cachePath,
 	resolve: {
 		alias: [
 			{

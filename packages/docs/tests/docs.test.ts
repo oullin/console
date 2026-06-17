@@ -1,12 +1,14 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { extname, join, relative } from 'node:path';
+import { dirname, extname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { guideSections } from '@docs-config';
 
-const packagePath = new URL('..', import.meta.url);
-const sourcePath = new URL('../src/', import.meta.url);
-const examplesPath = new URL('../examples/', import.meta.url);
-const vitepressPath = new URL('../src/.vitepress/', import.meta.url);
+const testsPath = dirname(fileURLToPath(import.meta.url));
+const packagePath = dirname(testsPath);
+const sourcePath = join(packagePath, 'src');
+const examplesPath = join(packagePath, 'examples');
+const vitepressPath = join(sourcePath, '.vitepress');
 const blockedTokens = ['TODO', 'lorem', 'fake', 'mocked', 'stubbed'];
 const importSpecifierPattern = /\b(?:import|export)\b(?:[\s\S]*?\bfrom\s*)?['"]([^'"]+)['"]|import\(\s*['"]([^'"]+)['"]\s*\)/gu;
 
@@ -39,18 +41,18 @@ const walk = (directory: string): string[] =>
 		return statSync(path).isDirectory() ? walk(path) : [path];
 	});
 
-const markdownFiles = (): string[] => walk(sourcePath.pathname).filter((path) => extname(path) === '.md');
-const exampleFiles = (): string[] => walk(examplesPath.pathname).filter((path) => extname(path) === '.ts');
+const markdownFiles = (): string[] => walk(sourcePath).filter((path) => extname(path) === '.md');
+const exampleFiles = (): string[] => walk(examplesPath).filter((path) => extname(path) === '.ts');
 
 const docsCodeFiles = (): string[] =>
-	[...walk(vitepressPath.pathname), ...walk(new URL('../tests/', import.meta.url).pathname)]
+	[...walk(vitepressPath), ...walk(testsPath)]
 		.filter((path) => ['.ts', '.vue'].includes(extname(path)))
 		.filter((path) => !path.includes('/.vitepress/cache/') && !path.includes('/.vitepress/dist/'));
 
 describe('docs structure', () => {
 	it('has a markdown page for every guide section', () => {
 		for (const section of guideSections) {
-			const path = join(sourcePath.pathname, `${section.link.replace(/^\//u, '')}.md`);
+			const path = join(sourcePath, `${section.link.replace(/^\//u, '')}.md`);
 
 			expect(existsSync(path), `${section.text} is missing at ${path}`).toBe(true);
 		}
@@ -73,7 +75,7 @@ describe('docs structure', () => {
 			const content = readFileSync(path, 'utf8');
 
 			for (const token of blockedTokens) {
-				expect(content, `${relative(packagePath.pathname, path)} contains ${token}`).not.toContain(token);
+				expect(content, `${relative(packagePath, path)} contains ${token}`).not.toContain(token);
 			}
 		}
 	});
@@ -82,8 +84,8 @@ describe('docs structure', () => {
 		for (const path of markdownFiles().filter((file) => file.includes('/guide/'))) {
 			const content = readFileSync(path, 'utf8');
 
-			expect(content, `${relative(packagePath.pathname, path)} needs inline TypeScript usage`).toContain('```ts');
-			expect(content, `${relative(packagePath.pathname, path)} should not send readers to source fixtures`).not.toMatch(/\.\.\/\.\.\/examples\//u);
+			expect(content, `${relative(packagePath, path)} needs inline TypeScript usage`).toContain('```ts');
+			expect(content, `${relative(packagePath, path)} should not send readers to source fixtures`).not.toMatch(/\.\.\/\.\.\/examples\//u);
 		}
 	});
 
@@ -94,7 +96,7 @@ describe('docs structure', () => {
 			for (const match of content.matchAll(importSpecifierPattern)) {
 				const specifier = match[1] ?? match[2] ?? '';
 
-				expect(specifier, `${relative(packagePath.pathname, path)} imports ${specifier}`).not.toMatch(/^\.\.?(?:\/|$)/u);
+				expect(specifier, `${relative(packagePath, path)} imports ${specifier}`).not.toMatch(/^\.\.?(?:\/|$)/u);
 			}
 		}
 	});

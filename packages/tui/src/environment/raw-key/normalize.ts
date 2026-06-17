@@ -1,6 +1,7 @@
 import { Key } from '#tui/key';
+import { parseKnownKeyValues } from '#tui/key/validators/value';
 
-const knownRawKeys: string[] = Object.values(Key).flatMap((value) => (typeof value === 'string' ? [value] : [...value]));
+const knownRawKeys = parseKnownKeyValues();
 
 const rawKeyAliases = new Map<string, string>([
 	['\r', Key.enter],

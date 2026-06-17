@@ -1,5 +1,5 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "../.cache/tsbuild/tui.tsbuildinfo"
+    "tsBuildInfoFile": "../../../provision/.cache/tsbuild/tui.tsbuildinfo"
   }
 }

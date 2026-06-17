@@ -6,5 +6,6 @@ export type PasswordInputOptions = {
 
 export type PasswordReadResult = {
 	cancelled: boolean;
+	frame?: string;
 	value: string;
 };

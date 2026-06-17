@@ -1,72 +1,54 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
+import { cancelPrompt } from '#tui/prompt';
 import { rejectPromptRevert } from '#tui/prompt/revert';
-import { renderActiveConfirm, renderCancelledConfirm } from '#tui/prompts/select/render-confirm';
-import type { ConfirmPromptOptions } from '#tui/types';
+import { confirmDirectValue, isConfirmToggleKey } from '#tui/prompts/select/read-confirm/keys';
+import { readLineConfirm } from '#tui/prompts/select/read-confirm/line-mode';
+import { createConfirmReaderSession } from '#tui/prompts/select/read-confirm/session';
+import type { ConfirmReadOptions, ConfirmReadResult } from '#tui/prompts/select/read-confirm/types';
 
-const toggleKeys = new Set([Key.tab, Key.up, Key.upArrow, Key.down, Key.downArrow, Key.left, Key.leftArrow, Key.right, Key.rightArrow, Key.ctrlP, Key.ctrlF, Key.ctrlN, Key.ctrlB, 'h', 'j', 'k', 'l']);
+export type { ConfirmReadOptions, ConfirmReadResult } from '#tui/prompts/select/read-confirm/types';
 
-export type ConfirmReadResult = {
-	cancelled: boolean;
-	submitted: boolean;
-	value: boolean;
-};
-
-export const readConfirm = async (options: ConfirmPromptOptions): Promise<ConfirmReadResult> => {
+export const readConfirm = async (options: ConfirmReadOptions): Promise<ConfirmReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		const suffix = options.default === false ? ' [y/N]' : ' [Y/n]';
-
-		const answer = (await ask(`${options.message}${suffix}`, options.hint)).trim().toLowerCase();
-
-		if (answer === '' && options.default !== undefined) {
-			return { cancelled: false, submitted: false, value: options.default };
-		}
-
-		return { cancelled: false, submitted: false, value: ['y', 'yes', options.yes?.toLowerCase()].includes(answer) };
+		return readLineConfirm(options);
 	}
 
-	let confirmed = options.default ?? true;
-
-	renderActiveConfirm(options, confirmed);
+	const session = createConfirmReaderSession(options);
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return { cancelled: false, submitted: true, value: confirmed };
+			const submitted = session.submission();
+
+			return { cancelled: false, frame: submitted.frame, submitted: false, value: submitted.value };
 		}
 
-		const normalizedKey = key.toLowerCase();
+		const directValue = confirmDirectValue(key);
 
-		if (normalizedKey === 'y') {
-			confirmed = true;
-			renderActiveConfirm(options, confirmed);
+		if (directValue !== null) {
+			session.set(directValue);
 			continue;
 		}
 
-		if (normalizedKey === 'n') {
-			confirmed = false;
-			renderActiveConfirm(options, confirmed);
-			continue;
-		}
-
-		if (toggleKeys.has(key)) {
-			confirmed = !confirmed;
-			renderActiveConfirm(options, confirmed);
+		if (isConfirmToggleKey(key)) {
+			session.toggle();
 			continue;
 		}
 
 		if (key === Key.enter) {
-			return { cancelled: false, submitted: true, value: confirmed };
+			const submitted = session.submission();
+
+			return { cancelled: false, frame: submitted.frame, submitted: true, value: submitted.value };
 		}
 
 		if (key === Key.ctrlC) {
-			renderCancelledConfirm(options, confirmed);
+			session.cancel();
 
-			return { cancelled: true, submitted: false, value: await cancelPrompt(confirmed) };
+			return { cancelled: true, submitted: false, value: await cancelPrompt(session.value()) };
 		}
 
 		if (key === Key.ctrlU) {

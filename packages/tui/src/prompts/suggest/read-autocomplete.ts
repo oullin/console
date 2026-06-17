@@ -1,112 +1,62 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { ask, cancelPrompt } from '#tui/prompt';
-import { applyTypedKey } from '#tui/typed-value';
-import { acceptAutocompleteMatch, autocompleteNavigationDirection, canAcceptAutocomplete, moveAutocompleteHighlight } from '#tui/prompts/suggest/autocomplete';
-import { renderAutocomplete, renderCancelledAutocomplete } from '#tui/prompts/suggest/render-autocomplete';
-import { resolveSuggestions } from '#tui/prompts/suggest/resolve';
-import { characterLength } from '#tui/typed-value/characters';
+import { ask } from '#tui/prompt';
+import { autocompleteNavigationDirection, canAcceptAutocomplete } from '#tui/prompts/suggest/autocomplete';
+import { cancelAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete/cancel';
+import { suggestionReadResult } from '#tui/prompts/suggest/read-result';
+import { createAutocompleteReaderSession } from '#tui/prompts/suggest/read-autocomplete/session';
+import { currentAutocompleteValue } from '#tui/prompts/suggest/read-autocomplete/submission';
+import type { TextSuggestionReadResult } from '#tui/prompts/suggest/read-result';
 import type { SuggestOptions } from '#tui/prompts/suggest/options';
 
-export type AutocompleteReadResult = {
-	cancelled: boolean;
-	rendered: boolean;
-	value: string;
-};
+export type AutocompleteReadResult = TextSuggestionReadResult;
 
 export const readAutocompleteValue = async (options: SuggestOptions): Promise<AutocompleteReadResult> => {
 	const environment = promptEnvironment();
 
 	if (!environment.input.readKey) {
-		return {
-			cancelled: false,
-			rendered: false,
-			value: await ask(options.message, options.hint),
-		};
+		return suggestionReadResult(await ask(options.message, options.hint), false);
 	}
 
-	let state = {
-		cursor: characterLength(options.default ?? ''),
-		value: options.default ?? '',
-	};
-	let highlighted = 0;
+	const session = await createAutocompleteReaderSession(options);
 
-	let matches = await resolveSuggestions(options.options, state.value);
-
-	renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
 
 		if (key === null) {
-			return {
-				cancelled: false,
-				rendered: true,
-				value: state.value,
-			};
+			return currentAutocompleteValue(session);
 		}
 
 		const direction = autocompleteNavigationDirection(key);
 
 		if (direction !== null) {
-			matches = await resolveSuggestions(options.options, state.value);
+			await session.move(direction);
 
-			highlighted = moveAutocompleteHighlight(matches, highlighted, direction);
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
-		if (key === Key.tab && canAcceptAutocomplete(state)) {
-			matches = await resolveSuggestions(options.options, state.value);
+		if (key === Key.tab && canAcceptAutocomplete(session.state())) {
+			await session.acceptHighlighted(true);
 
-			const next = acceptAutocompleteMatch(state, matches[highlighted], true);
-
-			if (next !== null) {
-				state = next;
-
-				matches = await resolveSuggestions(options.options, state.value);
-			} else {
-				highlighted = 0;
-			}
-
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
-		if ((key === Key.right || key === Key.rightArrow) && canAcceptAutocomplete(state)) {
-			matches = await resolveSuggestions(options.options, state.value);
+		if ((key === Key.right || key === Key.rightArrow) && canAcceptAutocomplete(session.state())) {
+			await session.acceptHighlighted(false);
 
-			state = acceptAutocompleteMatch(state, matches[highlighted], false) ?? state;
-
-			renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 			continue;
 		}
 
-		const next = applyTypedKey(state, key);
+		const next = await session.applyTypedInput(key);
 
 		if (next.submitted) {
-			return {
-				cancelled: false,
-				rendered: true,
-				value: state.value,
-			};
+			return currentAutocompleteValue(session);
 		}
 
 		if (next.cancelled) {
-			renderCancelledAutocomplete(options.message, state.value, options.placeholder);
-
-			return {
-				cancelled: true,
-				rendered: true,
-				value: await cancelPrompt(state.value),
-			};
+			return cancelAutocompleteValue(options, session);
 		}
-
-		state = { cursor: next.cursor, value: next.value };
-		highlighted = 0;
-
-		matches = await resolveSuggestions(options.options, state.value);
-
-		renderAutocomplete(options.message, state, matches, highlighted, options.hint, options.placeholder, options.info);
 	}
 };

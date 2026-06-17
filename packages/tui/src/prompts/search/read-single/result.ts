@@ -1,9 +1,11 @@
 import { ask } from '#tui/prompt';
+import { choiceByValue } from '#tui/concerns/choices';
 import { resolveLineSearchChoice } from '#tui/prompts/search/line-mode';
 import type { Choice, SearchPromptOptions } from '#tui/types';
 
 export type SearchChoiceReadResult<T> = {
 	cancelled: boolean;
+	frame?: string;
 	submitted: boolean;
 	submittedLabel: string;
 	value: T | undefined;
@@ -25,12 +27,12 @@ export const selectedSearchValue = <T>(choices: Array<Choice<T>>, highlighted: n
 	return choice?.disabled ? undefined : choice?.value;
 };
 
-export const defaultSearchChoice = <T>(choices: Array<Choice<T>>, fallback?: T): Choice<T> | undefined => {
-	if (fallback === undefined) {
+export const defaultSearchChoice = <T>(choices: Array<Choice<T>>, fallback: T | undefined, hasDefault = false): Choice<T> | undefined => {
+	if (!hasDefault) {
 		return undefined;
 	}
 
-	return choices.find((choice) => !choice.disabled && Object.is(choice.value, fallback));
+	return choiceByValue(choices, fallback);
 };
 
 export const cancelledSearchValue = <T>(choices: Array<Choice<T>>, highlighted: number | null, fallback?: T): T | undefined => {

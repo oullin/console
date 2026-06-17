@@ -9,5 +9,7 @@ export const parseLogLimit = (limit: unknown, defaultValue: number): number => {
 		return defaultValue;
 	}
 
-	return Math.max(0, Math.trunc(parsed.data));
+	const value = Math.trunc(parsed.data);
+
+	return value <= 0 ? defaultValue : value;
 };

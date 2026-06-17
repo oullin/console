@@ -19,11 +19,11 @@ export const moveTypedValueCursor = (value: string[], cursor: number, key: strin
 	}
 
 	if (oneOf([Key.home, Key.ctrlA], key)) {
-		return allowNewLine ? moveToLineBoundary(value, cursor, 'start') : 0;
+		return allowNewLine ? moveToLineBoundary(value, cursor, 'start', wrapWidth) : 0;
 	}
 
 	if (oneOf([Key.end, Key.ctrlE], key)) {
-		return allowNewLine ? moveToLineBoundary(value, cursor, 'end') : value.length;
+		return allowNewLine ? moveToLineBoundary(value, cursor, 'end', wrapWidth) : value.length;
 	}
 
 	return undefined;

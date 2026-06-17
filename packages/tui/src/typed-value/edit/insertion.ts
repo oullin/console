@@ -5,12 +5,9 @@ export const insertPrintableKey = (value: string[], cursor: number, key: string)
 		return undefined;
 	}
 
-	let nextCursor = cursor;
+	const inserted = characters(key);
 
-	for (const character of characters(key)) {
-		value.splice(nextCursor, 0, character);
-		nextCursor += 1;
-	}
+	value.splice(cursor, 0, ...inserted);
 
-	return nextCursor;
+	return cursor + inserted.length;
 };

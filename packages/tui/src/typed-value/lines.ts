@@ -1,92 +1,12 @@
-import { fromCharacters } from '#tui/typed-value/characters';
-import { visibleWidth } from '#tui/strings';
+import { currentLine, lineRanges } from '#tui/typed-value/line-ranges';
+import { visibleLineWindow } from '#tui/typed-value/lines/window';
 
-type LineRange = {
-	end: number;
-	start: number;
-};
-
-export type VisibleLineWindow = {
-	lines: string[];
-	start: number;
-	total: number;
-};
-
-const lineRanges = (value: string[], width?: number): LineRange[] => {
-	const ranges: LineRange[] = [];
-
-	let start = 0;
-
-	for (const [index, character] of value.entries()) {
-		if (character === '\n') {
-			ranges.push(...wrappedRanges(value, start, index, width));
-			start = index + 1;
-		}
-	}
-
-	ranges.push(...wrappedRanges(value, start, value.length, width));
-
-	return ranges;
-};
-
-const wrappedRanges = (value: string[], start: number, end: number, width?: number): LineRange[] => {
-	if (width === undefined || width <= 0 || start === end) {
-		return [{ end, start }];
-	}
-
-	const ranges: LineRange[] = [];
-
-	let rangeStart = start;
-	let rangeWidth = 0;
-
-	for (let index = start; index < end; index += 1) {
-		const characterWidth = visibleWidth(value[index] ?? '');
-
-		if (rangeWidth > 0 && rangeWidth + characterWidth > width) {
-			ranges.push({ end: index, start: rangeStart });
-			rangeStart = index;
-			rangeWidth = 0;
-		}
-
-		rangeWidth += characterWidth;
-	}
-
-	ranges.push({ end, start: rangeStart });
-
-	return ranges;
-};
-
-const currentLine = (ranges: LineRange[], cursor: number): number => {
-	const index = ranges.findIndex((range) => cursor <= range.end);
-
-	return index === -1 ? ranges.length - 1 : index;
-};
+export { visibleLineWindow } from '#tui/typed-value/lines/window';
+export { visibleTextWindow } from '#tui/typed-value/lines/text-window';
+export type { VisibleLineWindow, VisibleTextWindow } from '#tui/typed-value/lines/types';
 
 export const visibleLines = (value: string, cursor: number, rows: number | undefined): string => {
 	return visibleLineWindow(value, cursor, rows).lines.join('\n');
-};
-
-export const visibleLineWindow = (value: string, cursor: number, rows: number | undefined, width?: number): VisibleLineWindow => {
-	const valueCharacters = [...value];
-	const ranges = lineRanges(valueCharacters, width);
-
-	if (rows === undefined || rows <= 0) {
-		return {
-			lines: ranges.map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
-			start: 0,
-			total: ranges.length,
-		};
-	}
-
-	const line = currentLine(ranges, cursor);
-	const start = Math.max(0, line - rows + 1);
-	const end = start + rows;
-
-	return {
-		lines: ranges.slice(start, end).map((range) => fromCharacters(valueCharacters.slice(range.start, range.end))),
-		start,
-		total: ranges.length,
-	};
 };
 
 export const moveLine = (value: string[], cursor: number, direction: 1 | -1, width?: number): number => {
@@ -110,8 +30,8 @@ export const moveLine = (value: string[], cursor: number, direction: 1 | -1, wid
 	return target.start + targetColumn;
 };
 
-export const moveToLineBoundary = (value: string[], cursor: number, boundary: 'start' | 'end'): number => {
-	const ranges = lineRanges(value);
+export const moveToLineBoundary = (value: string[], cursor: number, boundary: 'start' | 'end', width?: number): number => {
+	const ranges = lineRanges(value, width);
 	const range = ranges[currentLine(ranges, cursor)];
 
 	if (!range) {

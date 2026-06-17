@@ -7,6 +7,7 @@ export type VisibleDataTableRow<T> = {
 
 export type DataTableSelectionReadResult<T> = {
 	cancelled: boolean;
+	frame?: string;
 	rows: Array<VisibleDataTableRow<T>>;
 	selected: number;
 	submitted: boolean;

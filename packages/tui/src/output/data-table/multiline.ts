@@ -1,4 +1,4 @@
-export const splitMultilineDataTableCell = (cell: string): string[] => cell.split('\n');
+export const splitMultilineDataTableCell = (cell: string): string[] => cell.split(/\r?\n/u);
 
 export const expandMultilineDataTableRows = (rows: string[][]): string[][] => {
 	return rows.flatMap((row) => {

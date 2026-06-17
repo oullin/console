@@ -1,6 +1,8 @@
 import { promptEnvironment } from '#tui/environment';
 import { defaultBackgroundColor, defaultForegroundColor, parseTerminalColor, terminalSupportsTrueColor } from '#tui/terminal/capabilities';
 import type { TerminalColor } from '#tui/terminal/capabilities';
+import { parseTerminalDimension, parseTerminalLineCount } from '#tui/terminal/validators/size';
+import { parseTerminalTitle } from '#tui/terminal/validators/title';
 
 export type TerminalSize = {
 	columns: number;
@@ -8,8 +10,8 @@ export type TerminalSize = {
 };
 
 export const terminalSize = (): TerminalSize => ({
-	columns: process.stdout.columns ?? 80,
-	rows: process.stdout.rows ?? 24,
+	columns: parseTerminalDimension(process.stdout.columns, 80),
+	rows: parseTerminalDimension(process.stdout.rows, 24),
 });
 
 export const clearTerminal = (): void => {
@@ -17,7 +19,7 @@ export const clearTerminal = (): void => {
 };
 
 export const setTerminalTitle = (title: string): void => {
-	promptEnvironment().output.write(`\u001B]0;${title}\u0007`);
+	promptEnvironment().output.write(`\u001B]0;${parseTerminalTitle(title)}\u0007`);
 };
 
 export const eraseLine = (): void => {
@@ -25,7 +27,7 @@ export const eraseLine = (): void => {
 };
 
 export const erasePreviousLines = (count: number): void => {
-	const lines = Math.max(0, Math.floor(count));
+	const lines = parseTerminalLineCount(count);
 
 	if (lines === 0) {
 		return;

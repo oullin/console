@@ -1,9 +1,11 @@
 export { configurePrompts, createMemoryOutput, createScriptedInput, promptEnvironment, withPromptEnvironment } from '#tui/environment';
+export type { MemoryOutput, RawKeyInput } from '#tui/environment';
 export { FormBuilder, form } from '#tui/form';
 export type { FormResponses, FormStep, FormStepCondition } from '#tui/form';
 export { Key, keyFromEvent, oneOf } from '#tui/key';
 export type { KeyboardEventLike, KeyName, KeyValue } from '#tui/key';
 export { renderOpenTuiTextFrame } from '#tui/opentui';
+export type { OpenTuiFrame } from '#tui/opentui';
 export { confirm, select, multiselect, suggest, search, multisearch, autocomplete, pause } from '#tui/prompts/choices';
 export type { SuggestOptions } from '#tui/prompts/choices';
 export { number, password, text, textarea } from '#tui/prompts/basic';
@@ -28,11 +30,11 @@ export {
 	title,
 	warning,
 } from '#tui/output';
-export type { NoteType, NotificationCommand, NotificationPlatform, NotificationRuntime } from '#tui/output';
-export { cancelUsing, PromptValidationError } from '#tui/prompt';
-export type { PromptCancelHandler } from '#tui/prompt';
+export type { NoteType, NotificationCommand, NotificationOptions, NotificationPlatform, NotificationRuntime } from '#tui/output';
+export { cancelUsing, fallbackUsing, fallbackWhen, PromptValidationError, validateUsing } from '#tui/prompt';
+export type { PromptCancelHandler, PromptFallbackCondition, PromptFallbackHandler, PromptFallbackKind, PromptGlobalValidator } from '#tui/prompt';
 export { Logger, Progress, Stream, progress, spin, stream, task } from '#tui/status';
-export type { TaskDefinition } from '#tui/status';
+export type { ProgressSignalTarget, TaskDefinition } from '#tui/status';
 export {
 	backgroundColor,
 	clearTerminal,

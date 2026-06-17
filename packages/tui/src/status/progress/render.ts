@@ -1,4 +1,6 @@
 import { renderBox } from '#tui/theme/box';
+import { clampedProgressCurrent, progressRatio } from '#tui/status/progress/state/value';
+import { progressFrameWidth } from '#tui/status/progress/validators/frame';
 
 export type ProgressFrameState = 'active' | 'cancel' | 'error' | 'submit';
 
@@ -12,19 +14,20 @@ export type ProgressFrameOptions = {
 };
 
 export const progressPercentage = (current: number, total: number): number => {
-	return current / total;
+	return progressRatio(current, total);
 };
 
 const formatProgressNumber = (value: number): string => new Intl.NumberFormat('en-US').format(value);
 
 export const formatProgressFraction = (current: number, total: number): string => {
-	return `${formatProgressNumber(current)} / ${formatProgressNumber(total)}`;
+	return `${formatProgressNumber(clampedProgressCurrent(current, total))} / ${formatProgressNumber(total)}`;
 };
 
 export const renderProgressFrame = ({ current, hint, label, state = 'active', total, width = 60 }: ProgressFrameOptions): string => {
-	const filled = Math.ceil(width * progressPercentage(current, total));
+	const fillWidth = progressFrameWidth(width);
+	const filled = Math.ceil(fillWidth * progressPercentage(current, total));
 	const body = '█'.repeat(filled);
-	const lines = [renderBox({ body, info: formatProgressFraction(current, total), title: label, width })];
+	const lines = [renderBox({ body, info: formatProgressFraction(current, total), title: label, width: fillWidth })];
 
 	if (state === 'active') {
 		lines.push(hint ? `  ${hint}` : '');

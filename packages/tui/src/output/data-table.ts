@@ -1,9 +1,6 @@
-import { promptUntilValid } from '#tui/prompt';
-import { readDataTableSelection } from '#tui/output/data-table/read';
-import { renderSubmittedDataTableFrame } from '#tui/output/data-table/render';
-import { deriveDataTableHeaders } from '#tui/output/data-table/rows';
+import { normalizeDataTablePromptOptions } from '#tui/output/data-table/options';
+import { runDataTablePrompt } from '#tui/output/data-table/run';
 import { parseDataTablePromptOptions } from '#tui/output/validators/data-table';
-import type { DataTableSelectionReadResult } from '#tui/output/data-table/types';
 import type { DataTablePromptOptions, DataTableRow } from '#tui/types';
 
 export function datatable<T = unknown>(options: DataTablePromptOptions<T>): Promise<T | number>;
@@ -31,25 +28,8 @@ export async function datatable<T = unknown>(
 	transform: DataTablePromptOptions<T>['transform'] = undefined,
 	filter: DataTablePromptOptions<T>['filter'] = undefined,
 ): Promise<T | number> {
-	const options = parseDataTablePromptOptions<T>(optionsOrHeaders, rows, scroll, label, hint, required, validate, transform, filter);
+	const parsedOptions = parseDataTablePromptOptions<T>(optionsOrHeaders, rows, scroll, label, hint, required, validate, transform, filter);
+	const options = normalizeDataTablePromptOptions(parsedOptions);
 
-	const headers = options.headers ?? deriveDataTableHeaders(options.rows);
-
-	let submittedSelection: DataTableSelectionReadResult<T> | null = null;
-
-	return promptUntilValid(
-		options,
-		async () => {
-			const selected = await readDataTableSelection(options, headers);
-
-			submittedSelection = selected.submitted && !selected.cancelled ? selected : null;
-
-			return options.transform ? options.transform(selected.value) : selected.value;
-		},
-		() => {
-			if (submittedSelection) {
-				renderSubmittedDataTableFrame(options.message, headers, submittedSelection.rows, submittedSelection.selected);
-			}
-		},
-	);
+	return runDataTablePrompt(options);
 }

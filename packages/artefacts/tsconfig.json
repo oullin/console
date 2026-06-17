@@ -2,7 +2,7 @@
   "extends": "@ollin/tsconfig/base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "tsBuildInfoFile": ".cache/tsbuild/artefacts.tsbuildinfo",
+    "tsBuildInfoFile": "../../provision/.cache/tsbuild/artefacts.tsbuildinfo",
     "paths": {
       "#artefacts/*": ["./src/*"]
     }

@@ -1,3 +1,4 @@
+import { isSuggestPromptLabel } from '#tui/prompts/suggest/validators/overload';
 import type { MaybePromise, TextPromptOptions } from '#tui/types';
 
 export type SuggestOptions = TextPromptOptions & {
@@ -18,7 +19,7 @@ export const suggestOptions = (
 	transform: TextPromptOptions['transform'] = undefined,
 	info: SuggestOptions['info'] = '',
 ): SuggestOptions => {
-	if (typeof message === 'string') {
+	if (isSuggestPromptLabel(message)) {
 		return { message, label: message, options, placeholder, default: defaultValue, scroll, required, validate, hint, transform, info };
 	}
 

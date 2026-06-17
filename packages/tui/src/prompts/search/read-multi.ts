@@ -1,14 +1,20 @@
 import { promptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
-import { cancelPrompt } from '#tui/prompt';
-import { applyTypedKey } from '#tui/typed-value';
-import { resolveSearchChoices } from '#tui/prompts/search/choices';
-import { moveSearchHighlight, searchNavigationAction } from '#tui/prompts/search/keys';
-import { renderCancelledSearch, renderSearchChoices } from '#tui/prompts/search/render';
-import { lineMultiSearchValues, selectedSearchValues, toggleHighlightedSearchChoice } from '#tui/prompts/search/read-multi/result';
+import { cancelMultiSearchChoices } from '#tui/prompts/search/read-multi/cancel';
+import { applyMultiSearchKey } from '#tui/prompts/search/read-multi/keys';
+import { lineMultiSearchValues, selectedSearchValues } from '#tui/prompts/search/read-multi/result';
 import type { MultiSearchChoicesReadResult } from '#tui/prompts/search/read-multi/result';
-import { createInitialSearchSelection, displayedSearchChoices, markedSearchChoiceIndexes, toggleSearchChoices } from '#tui/prompts/search/selection';
+import { createMultiSearchReaderSession } from '#tui/prompts/search/read-multi/session';
+import type { MultiSearchReaderSession } from '#tui/prompts/search/read-multi/session';
 import type { MultiSearchPromptOptions } from '#tui/types';
+
+const multiSearchSelectionResult = <T>(session: MultiSearchReaderSession<T>, submitted: boolean): MultiSearchChoicesReadResult<T> => ({
+	cancelled: false,
+	frame: session.frame(),
+	submitted,
+	submittedLabels: session.selectedLabels(),
+	value: selectedSearchValues(session.selected()),
+});
 
 export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOptions<T>): Promise<MultiSearchChoicesReadResult<T>> => {
 	const environment = promptEnvironment();
@@ -17,80 +23,33 @@ export const readMultiSearchChoices = async <T>(options: MultiSearchPromptOption
 		return { cancelled: false, submitted: false, submittedLabels: [], value: await lineMultiSearchValues(options) };
 	}
 
-	let state = { cursor: 0, value: '' };
+	const session = await createMultiSearchReaderSession(options);
 
-	let choices = await resolveSearchChoices(options.options, state.value);
-
-	let highlighted: number | null = null;
-
-	const selected = createInitialSearchSelection(choices, options.default);
-	const displayedChoices = () => displayedSearchChoices(choices, selected, state.value);
-
-	const render = (): void => {
-		const currentChoices = displayedChoices();
-		const marked = markedSearchChoiceIndexes(currentChoices, selected);
-
-		renderSearchChoices(options.message, state.value, currentChoices, highlighted, marked, [...selected.values()], options.scroll, options.info, true, options.placeholder);
-	};
-
-	render();
+	session.render();
 
 	while (true) {
 		const key = await environment.input.readKey();
 
-		if (key === null || key === Key.enter) {
-			return { cancelled: false, submitted: true, submittedLabels: [...selected.values()], value: selectedSearchValues(selected) };
+		if (key === null) {
+			return multiSearchSelectionResult(session, true);
+		}
+
+		if (key === Key.enter) {
+			return multiSearchSelectionResult(session, true);
 		}
 
 		if (key === Key.ctrlC) {
-			renderCancelledSearch(options.message, state.value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabels: [...selected.values()], value: await cancelPrompt(selectedSearchValues(selected)) };
+			return cancelMultiSearchChoices(options, session);
 		}
 
-		const action = searchNavigationAction(key);
-
-		if (action !== null && (action !== 'first' || highlighted !== null) && (action !== 'last' || highlighted !== null)) {
-			choices = await resolveSearchChoices(options.options, state.value);
-
-			const currentChoices = displayedChoices();
-
-			highlighted = moveSearchHighlight(currentChoices, highlighted, action, { scroll: options.scroll });
-			render();
+		if (await applyMultiSearchKey(key, session)) {
 			continue;
 		}
 
-		if (key === Key.ctrlE && highlighted !== null) {
-			continue;
-		}
-
-		if (key === Key.ctrlA && highlighted !== null) {
-			toggleSearchChoices(selected, displayedChoices());
-
-			render();
-			continue;
-		}
-
-		if (key === Key.space && highlighted !== null) {
-			toggleHighlightedSearchChoice(selected, displayedChoices(), highlighted);
-
-			render();
-			continue;
-		}
-
-		const next = applyTypedKey(state, key);
+		const next = await session.applyTypedInput(key);
 
 		if (next.cancelled) {
-			renderCancelledSearch(options.message, state.value, options.placeholder);
-
-			return { cancelled: true, submitted: false, submittedLabels: [], value: await cancelPrompt(options.default ?? []) };
+			return cancelMultiSearchChoices(options, session);
 		}
-
-		state = { cursor: next.cursor, value: next.value };
-
-		choices = await resolveSearchChoices(options.options, state.value);
-
-		highlighted = null;
-		render();
 	}
 };

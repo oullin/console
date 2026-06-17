@@ -1,13 +1,5 @@
 import { z } from 'zod';
 
-export type NotificationOptions = {
-	body: string;
-	icon: string;
-	sound: string;
-	subtitle: string;
-	title: string;
-};
-
 const notificationOptionsSchema = z.object({
 	body: z.string().default(''),
 	icon: z.string().default(''),
@@ -16,6 +8,16 @@ const notificationOptionsSchema = z.object({
 	title: z.string(),
 });
 
-export const parseNotificationOptions = (options: unknown): NotificationOptions => {
-	return notificationOptionsSchema.parse(options);
+export type NotificationOptions = z.input<typeof notificationOptionsSchema>;
+
+export type ResolvedNotificationOptions = z.output<typeof notificationOptionsSchema>;
+
+export const parseNotificationOptions = (options: unknown): ResolvedNotificationOptions => {
+	const parsed = notificationOptionsSchema.safeParse(options);
+
+	if (!parsed.success) {
+		throw new Error('Notification options must include a string title.');
+	}
+
+	return parsed.data;
 };

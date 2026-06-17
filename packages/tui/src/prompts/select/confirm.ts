@@ -1,6 +1,5 @@
-import { promptUntilValid } from '#tui/prompt';
-import { readConfirm } from '#tui/prompts/select/read-confirm';
-import { renderSubmittedConfirm } from '#tui/prompts/select/render-confirm';
+import { confirmHasDefault, normalizeConfirmPromptOptions } from '#tui/prompts/select/confirm-options';
+import { runConfirmPrompt } from '#tui/prompts/select/confirm-run';
 import type { ConfirmPromptOptions } from '#tui/types';
 
 export function confirm(options: ConfirmPromptOptions): Promise<boolean>;
@@ -26,24 +25,5 @@ export async function confirm(
 	hint = '',
 	transform: ConfirmPromptOptions['transform'] = undefined,
 ): Promise<boolean> {
-	const options: ConfirmPromptOptions =
-		typeof message === 'string' ? { message, label: message, default: defaultValue, yes, no, required, validate, hint, transform } : { ...message, default: message.default ?? true };
-
-	let shouldRenderSubmittedFrame = false;
-
-	return promptUntilValid(
-		options,
-		async () => {
-			const answer = await readConfirm(options);
-
-			shouldRenderSubmittedFrame = answer.submitted && !answer.cancelled;
-
-			return options.transform ? options.transform(answer.value) : answer.value;
-		},
-		(value) => {
-			if (shouldRenderSubmittedFrame) {
-				renderSubmittedConfirm(options, value);
-			}
-		},
-	);
+	return runConfirmPrompt(normalizeConfirmPromptOptions(message, defaultValue, yes, no, required, validate, hint, transform, confirmHasDefault(message, arguments.length, defaultValue)));
 }

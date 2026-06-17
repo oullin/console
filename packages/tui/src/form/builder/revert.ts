@@ -1,4 +1,4 @@
-import { configurePrompts, promptEnvironment } from '#tui/environment';
+import { promptEnvironment, withPromptEnvironment } from '#tui/environment';
 import { Key } from '#tui/key';
 import { rejectPromptRevert } from '#tui/prompt/revert';
 import type { MaybePromise, PromptInput } from '#tui/types';
@@ -38,11 +38,5 @@ export const runWithFormRevert = async <T>(canRevert: boolean, callback: () => M
 		},
 	};
 
-	configurePrompts({ input });
-
-	try {
-		return await callback();
-	} finally {
-		configurePrompts({ input: previousInput });
-	}
+	return withPromptEnvironment({ input }, callback);
 };

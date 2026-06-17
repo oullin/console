@@ -1,24 +1,32 @@
 import { promptEnvironment } from '#tui/environment';
 import { renderBox } from '#tui/theme/box';
 import { cyan, dim, red, strikethrough } from '#tui/theme/styles';
-import { visibleLines } from '#tui/typed-value/lines';
+import { valueWithCursor } from '#tui/typed-value/cursor';
+import { visibleTextWindow } from '#tui/typed-value/lines';
 import { renderTextareaFrame } from '#tui/typed-value/textarea-frame';
 import type { TypedValueOptions, TypedValueState } from '#tui/typed-value/types';
 
-export const renderTypedValue = (message: string, state: TypedValueState, options: TypedValueOptions): void => {
+export const renderTypedValue = (message: string, state: TypedValueState, options: TypedValueOptions): string => {
 	if (options.allowNewLine) {
-		promptEnvironment().output.write(`${renderTextareaFrame(message, state, options)}\n`);
+		const frame = `${renderTextareaFrame(message, state, options)}\n`;
+
+		promptEnvironment().output.write(frame);
 
 		if (options.hint) {
 			promptEnvironment().output.write(`${dim(options.hint)}\n`);
 		}
 
-		return;
+		return options.hint ? `${frame}${dim(options.hint)}\n` : frame;
 	}
 
-	const displayValue = state.value.length > 0 ? visibleLines(state.value, state.cursor, options.rows) : dim(options.placeholder ?? '');
+	const visible = visibleTextWindow(state.value, state.cursor, options.rows);
+	const displayValue = state.value.length > 0 ? valueWithCursor(visible.text, visible.cursor) : dim(options.placeholder ?? '');
 
-	promptEnvironment().output.write(`${renderBox({ body: displayValue, borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`);
+	const frame = `${renderBox({ body: displayValue, borderStyle: cyan, info: options.hint, title: cyan(message) })}\n`;
+
+	promptEnvironment().output.write(frame);
+
+	return frame;
 };
 
 export const renderSubmittedTypedValue = (message: string, value: string): void => {
