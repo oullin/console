@@ -1,5 +1,5 @@
 import { Key } from '#tui/key/constants';
-import { ctrlKeyMap, namedKeyMap } from '#tui/key/event/maps';
+import { ctrlKeyMap, namedKeyMap, shiftedKeyMap } from '#tui/key/event/maps';
 import { firstKeyValue, keyValueFromName } from '#tui/key/event/value';
 import { parseKeyboardEvent } from '#tui/key/validators/event';
 import type { KeyboardEventLike, KeyName } from '#tui/key/types';
@@ -21,6 +21,14 @@ export const keyFromEvent = (event: KeyboardEventLike): KeyName | string => {
 
 	if (parsedEvent.shift && parsedEvent.name?.toLowerCase() === 'tab') {
 		return Key.shiftTab;
+	}
+
+	if (parsedEvent.shift && parsedEvent.name) {
+		const key = shiftedKeyMap[parsedEvent.name.toLowerCase()];
+
+		if (key !== undefined) {
+			return key;
+		}
 	}
 
 	if (parsedEvent.name) {

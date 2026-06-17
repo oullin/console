@@ -19,3 +19,8 @@ export const namedKeyMap: Record<string, KeyName> = {
 	pageup: Key.pageUp,
 	return: Key.enter,
 };
+
+export const shiftedKeyMap: Record<string, KeyName> = {
+	down: Key.shiftDown,
+	up: Key.shiftUp,
+};
