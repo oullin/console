@@ -2,13 +2,16 @@ import { renderDataTableReaderSessionFrame } from '#tui/output/data-table/reader
 import { createDataTableReaderState } from '#tui/output/data-table/reader/state';
 import type { DataTableNavigationAction } from '#tui/output/data-table/keys';
 import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
+import type { DataTableSearchMode } from '#tui/output/data-table/search';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
 export type DataTableReaderSession<T> = {
 	applySearchKey(key: string): boolean;
 	beginSearch(): void;
 	frame(): string;
+	mode(): DataTableSearchMode;
 	moveSelection(action: DataTableNavigationAction): void;
+	query(): string;
 	render(): void;
 	rows(): Array<VisibleDataTableRow<T>>;
 	selected(): number;
@@ -40,9 +43,15 @@ export const createDataTableReaderSession = <T>(options: DataTableReadOptions<T>
 		frame() {
 			return frame;
 		},
+		mode() {
+			return state.mode();
+		},
 		moveSelection(action) {
 			state.moveSelection(action);
 			render();
+		},
+		query() {
+			return state.query();
 		},
 		render,
 		rows: state.rows,

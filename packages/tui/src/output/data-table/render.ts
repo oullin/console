@@ -4,6 +4,7 @@ import { renderCancelledDataTableRows, renderDataTableBody, renderDataTableHeade
 import { clampDataTableSelection } from '#tui/output/data-table/selection';
 import { dim, red } from '#tui/theme/styles';
 import type { DataTableRow } from '#tui/types';
+import type { DataTableSearchMode } from '#tui/output/data-table/search';
 import type { VisibleDataTableRow } from '#tui/output/data-table/types';
 
 type RenderDataTableFrameOptions<T> = {
@@ -47,13 +48,23 @@ export const renderSubmittedDataTableFrame = <T>(message: string, headers: strin
 	promptEnvironment().output.write(`${message}\n${display}\n`);
 };
 
-export const renderCancelledDataTableFrame = <T>(message: string, headers: string[], rows: Array<VisibleDataTableRow<T>>, selected: number): void => {
+export const renderCancelledDataTableFrame = <T>(
+	message: string,
+	headers: string[],
+	rows: Array<VisibleDataTableRow<T>>,
+	selected: number,
+	mode: DataTableSearchMode,
+	query: string,
+): void => {
 	const outputRows = renderCancelledDataTableRows(headers, rows, selected);
+	const querySuffix = mode === 'search' || query.length > 0 ? ` ${query}` : '';
 
 	const environment = promptEnvironment();
 
 	environment.output.write(`${message}\n`);
-	environment.output.write(`${dim('/ Search')}\n`);
+	if (querySuffix.length > 0) {
+		environment.output.write(`${dim(`/ Search${querySuffix}`)}\n`);
+	}
 	environment.output.write(`${renderTable(renderDataTableHeaders(headers), outputRows)}\n`);
 	environment.error.write(`${red('  ⚠ Cancelled.')}\n`);
 };

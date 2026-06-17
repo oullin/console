@@ -4,6 +4,7 @@ import { renderCancelledDataTableFrame } from '#tui/output/data-table/render';
 import { dataTableRowValue } from '#tui/output/data-table/rows';
 import { selectedDataTableValue } from '#tui/output/data-table/reader/result';
 import type { DataTableReadOptions } from '#tui/output/data-table/reader/types';
+import type { DataTableSearchMode } from '#tui/output/data-table/search';
 import type { DataTableSelectionReadResult, VisibleDataTableRow } from '#tui/output/data-table/types';
 
 const cancelledDataTableValue = <T>(
@@ -28,11 +29,13 @@ export const cancelDataTableSelection = async <T>(
 	rows: Array<VisibleDataTableRow<T>>,
 	selected: number,
 	frame: string,
+	mode: DataTableSearchMode,
+	query: string,
 ): Promise<DataTableSelectionReadResult<T>> => {
 	const value = cancelledDataTableValue(options, rows, selected);
 
 	eraseRenderedFrame(frame);
-	renderCancelledDataTableFrame(options.message, headers, rows, selected);
+	renderCancelledDataTableFrame(options.message, headers, rows, selected, mode, query);
 
 	return {
 		cancelled: true,
