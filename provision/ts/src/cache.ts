@@ -1,7 +1,7 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const provisionRoot = resolve(fileURLToPath(new URL('../..', import.meta.url)));
+export const provisionRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
 export const provisionPath = (...segments: string[]): string => resolve(provisionRoot, ...segments);
 

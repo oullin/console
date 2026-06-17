@@ -1,9 +1,9 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const artefactsRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
+export const artefactsRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
-export const workspaceRoot = resolve(artefactsRoot, '../..');
+export const workspaceRoot = dirname(dirname(artefactsRoot));
 
 export const provisionRoot = resolve(workspaceRoot, 'provision');
 
