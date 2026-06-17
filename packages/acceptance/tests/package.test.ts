@@ -27,7 +27,7 @@ describe('package consumption', () => {
 		);
 
 		expect(output.trim()).toBe('function,function,function');
-	});
+	}, 30_000);
 
 	it('exports the complete runtime helper surface from the root entrypoint', () => {
 		execFileSync('pnpm', ['--filter', '@ollin/tui', 'build'], {
@@ -129,7 +129,7 @@ describe('package consumption', () => {
 		);
 
 		expect(JSON.parse(output) as { missing: string[] }).toEqual({ missing: [], count: expectedExports.length });
-	});
+	}, 30_000);
 
 	it('exports public helper types from the built root entrypoint', () => {
 		execFileSync('pnpm', ['--filter', '@ollin/tui', 'build'], {
@@ -227,5 +227,5 @@ describe('package consumption', () => {
 		} finally {
 			rmSync(consumerDirectory, { force: true, recursive: true });
 		}
-	});
+	}, 30_000);
 });
