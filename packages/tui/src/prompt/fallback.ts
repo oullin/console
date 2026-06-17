@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { parseFallbackHandler, resolveFallbackCondition } from '#tui/prompt/validators/fallback';
 import type { MaybePromise } from '#tui/types';
 
@@ -7,28 +8,45 @@ export type PromptFallbackHandler<TOptions = unknown, TResult = unknown> = (opti
 
 export type PromptFallbackCondition = boolean | (() => boolean);
 
-const fallbackHandlers = new Map<PromptFallbackKind, PromptFallbackHandler>();
+type PromptFallbackState = {
+	condition: PromptFallbackCondition;
+	handlers: Map<PromptFallbackKind, PromptFallbackHandler>;
+};
 
-let fallbackCondition: PromptFallbackCondition = false;
+const scopedFallbackState = new AsyncLocalStorage<PromptFallbackState>();
+const currentFallbackState: PromptFallbackState = {
+	condition: false,
+	handlers: new Map(),
+};
+
+const cloneFallbackState = (state: PromptFallbackState): PromptFallbackState => ({
+	condition: state.condition,
+	handlers: new Map(state.handlers),
+});
+
+const promptFallbackState = (): PromptFallbackState => scopedFallbackState.getStore() ?? currentFallbackState;
 
 export const fallbackWhen = (condition: PromptFallbackCondition): void => {
-	fallbackCondition = condition;
+	promptFallbackState().condition = condition;
 };
 
 export const fallbackUsing = <TOptions, TResult>(kind: PromptFallbackKind, handler?: PromptFallbackHandler<TOptions, TResult> | null): void => {
+	const state = promptFallbackState();
+
 	if (!handler) {
-		fallbackHandlers.delete(kind);
+		state.handlers.delete(kind);
 
 		return;
 	}
 
-	fallbackHandlers.set(kind, parseFallbackHandler<unknown, unknown>(handler));
+	state.handlers.set(kind, parseFallbackHandler<unknown, unknown>(handler));
 };
 
 export const shouldFallback = (kind: PromptFallbackKind): boolean => {
-	const enabled = resolveFallbackCondition(fallbackCondition);
+	const state = promptFallbackState();
+	const enabled = resolveFallbackCondition(state.condition);
 
-	return enabled && fallbackHandlers.has(kind);
+	return enabled && state.handlers.has(kind);
 };
 
 export const promptWithFallback = async <TOptions, TResult>(kind: PromptFallbackKind, options: TOptions, run: () => MaybePromise<TResult>): Promise<TResult> => {
@@ -36,8 +54,9 @@ export const promptWithFallback = async <TOptions, TResult>(kind: PromptFallback
 		return run();
 	}
 
-	const fallback = fallbackHandlers.has(kind)
-		? parseFallbackHandler<TOptions, TResult>(fallbackHandlers.get(kind))
+	const handlers = promptFallbackState().handlers;
+	const fallback = handlers.has(kind)
+		? parseFallbackHandler<TOptions, TResult>(handlers.get(kind))
 		: undefined;
 
 	if (!fallback) {
@@ -45,4 +64,8 @@ export const promptWithFallback = async <TOptions, TResult>(kind: PromptFallback
 	}
 
 	return fallback(options);
+};
+
+export const withPromptFallbackScope = <T>(callback: () => MaybePromise<T>): Promise<T> => {
+	return Promise.resolve(scopedFallbackState.run(cloneFallbackState(promptFallbackState()), callback));
 };

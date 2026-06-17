@@ -1,18 +1,32 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { parseCancelValue } from '#tui/prompt/validators/cancel';
 import type { MaybePromise } from '#tui/types';
 
 export type PromptCancelHandler = () => MaybePromise<unknown>;
 
-let promptCancelHandler: PromptCancelHandler | null = null;
+type PromptCancelState = {
+	handler: PromptCancelHandler | null;
+};
+
+const scopedCancelState = new AsyncLocalStorage<PromptCancelState>();
+const currentCancelState: PromptCancelState = { handler: null };
+
+const promptCancelState = (): PromptCancelState => scopedCancelState.getStore() ?? currentCancelState;
 
 export const cancelUsing = (handler?: PromptCancelHandler | null): void => {
-	promptCancelHandler = handler ?? null;
+	promptCancelState().handler = handler ?? null;
 };
 
 export const cancelPrompt = async <T>(fallback: T): Promise<T> => {
-	if (promptCancelHandler === null) {
+	const handler = promptCancelState().handler;
+
+	if (handler === null) {
 		return fallback;
 	}
 
-	return parseCancelValue<T>(await promptCancelHandler());
+	return parseCancelValue<T>(await handler());
+};
+
+export const withPromptCancelScope = <T>(callback: () => MaybePromise<T>): Promise<T> => {
+	return Promise.resolve(scopedCancelState.run({ ...promptCancelState() }, callback));
 };

@@ -13,8 +13,8 @@ TypeScript and OpenTUI internals.
 | --- | --- |
 | Helper functions | `packages/tui/src/index.ts` |
 | Prompt lifecycle and fallback behavior | `packages/tui/src/prompt.ts`, `packages/tui/src/environment.ts`, `packages/tui/src/environment/*` |
-| Prompt fallback reset, predicate condition validation, and predicate condition lifecycle | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validators/fallback.ts`, `packages/tui/src/prompt.ts`, `packages/tui/src/index.ts` |
-| Prompt cancellation callback lifecycle | `packages/tui/src/prompt/cancel.ts`, `packages/tui/tests/prompt.test.ts` |
+| Prompt fallback reset, predicate condition validation, scoped lifecycle, and predicate condition lifecycle | `packages/tui/src/prompt/fallback.ts`, `packages/tui/src/prompt/validators/fallback.ts`, `packages/tui/src/environment/scope.ts`, `packages/tui/src/prompt.ts`, `packages/tui/src/index.ts` |
+| Prompt cancellation callback scoped lifecycle | `packages/tui/src/prompt/cancel.ts`, `packages/tui/src/environment/scope.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt revert rejection lifecycle | `packages/tui/src/prompt/revert.ts`, `packages/tui/src/form/builder/revert.ts`, `packages/tui/src/prompts/select/read-confirm.ts`, `packages/tui/tests/form.test.ts` |
 | Prompt validation retry default lifecycle and parser-error submitted-value preservation | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/src/prompt/error.ts`, `packages/tui/tests/text.test.ts` |
 | Prompt post-validation submitted-frame lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*`, `packages/tui/src/prompts/text.ts`, `packages/tui/src/prompts/text/*`, `packages/tui/src/prompts/number.ts`, `packages/tui/tests/text.test.ts`, `packages/tui/tests/number.test.ts` |
@@ -22,7 +22,7 @@ TypeScript and OpenTUI internals.
 | Prompt non-interactive raw-default validation lifecycle | `packages/tui/src/prompt/lifecycle.ts`, `packages/tui/src/prompt/lifecycle/*` |
 | Prompt validation error styling | `packages/tui/src/theme.ts`, `packages/tui/tests/prompt.test.ts` |
 | Prompt validation warning line styling | `packages/tui/src/theme.ts`, `packages/tui/src/prompt/lifecycle.ts` |
-| Prompt local and global validation composition | `packages/tui/src/prompt/validation.ts`, `packages/tui/src/prompt/validate-using.ts` |
+| Prompt local and scoped global validation composition | `packages/tui/src/prompt/validation.ts`, `packages/tui/src/prompt/validate-using.ts`, `packages/tui/src/environment/scope.ts` |
 | Key constants, value validation, and event mapping | `packages/tui/src/key.ts`, `packages/tui/src/key/*` |
 | Terminal helpers | `packages/tui/src/terminal.ts` |
 | Text input | `packages/tui/src/prompts/text.ts`, `packages/tui/src/typed-value.ts` |
