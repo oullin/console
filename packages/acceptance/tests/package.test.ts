@@ -1,12 +1,14 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const testPath = dirname(fileURLToPath(import.meta.url));
-const acceptancePath = resolve(testPath, '..');
-const workspacePath = resolve(acceptancePath, '../..');
+const acceptancePath = dirname(testPath);
+const packagesPath = dirname(acceptancePath);
+const workspacePath = dirname(packagesPath);
+const acceptanceCachePath = join(workspacePath, 'provision', '.cache', 'vitest', 'acceptance');
 
 describe('package consumption', () => {
 	it('imports the built public entrypoint through ESM package resolution', () => {
@@ -135,8 +137,11 @@ describe('package consumption', () => {
 			stdio: 'pipe',
 		});
 
-		const consumerDirectory = mkdtempSync(resolve(acceptancePath, '.types-'));
-		const consumerPath = resolve(consumerDirectory, 'consumer.ts');
+		const typecheckCachePath = join(acceptanceCachePath, 'types');
+		mkdirSync(typecheckCachePath, { recursive: true });
+
+		const consumerDirectory = mkdtempSync(join(typecheckCachePath, 'consumer-'));
+		const consumerPath = join(consumerDirectory, 'consumer.ts');
 
 		try {
 			writeFileSync(
