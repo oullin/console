@@ -6,9 +6,11 @@ import '@xterm/xterm/css/xterm.css';
 import '@docs-theme/styles.css';
 import type { Theme } from 'vitepress';
 
-export default {
+const docsTheme: Theme = {
 	extends: DefaultTheme,
 	enhanceApp({ app }) {
 		app.component('TerminalOutput', TerminalOutput);
 	},
-} satisfies Theme;
+};
+
+export default docsTheme;
