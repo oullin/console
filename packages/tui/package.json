@@ -56,6 +56,21 @@
       "import": "./dist/prompts/choices.js",
       "default": "./dist/prompts/choices.js"
     },
+    "./prompts/search": {
+      "types": "./dist/prompts/search/index.d.ts",
+      "import": "./dist/prompts/search/index.js",
+      "default": "./dist/prompts/search/index.js"
+    },
+    "./prompts/select": {
+      "types": "./dist/prompts/select/index.d.ts",
+      "import": "./dist/prompts/select/index.js",
+      "default": "./dist/prompts/select/index.js"
+    },
+    "./prompts/suggest": {
+      "types": "./dist/prompts/suggest/index.d.ts",
+      "import": "./dist/prompts/suggest/index.js",
+      "default": "./dist/prompts/suggest/index.js"
+    },
     "./status": {
       "types": "./dist/status.d.ts",
       "import": "./dist/status.js",
