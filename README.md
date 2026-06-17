@@ -7,10 +7,16 @@ This repository targets behavioral parity with reference prompt toolkit release
 
 ## Status
 
-The port is being delivered phase by phase on one draft PR. Current code includes
-working key-driven text and choice prompts, output helpers, terminal utilities,
-OpenTUI adapter wiring, and local parity tests. Full reference feature-test parity
-is tracked in `UPSTREAM.md`.
+The current codebase is a TypeScript ESM package with the public `@ollin/tui`
+entrypoint exporting prompts, form composition, output helpers, status
+indicators, terminal utilities, OpenTUI adapter wiring, and deterministic prompt
+environment helpers.
+
+Local test suites cover prompt behavior, form flows, output and status helpers,
+terminal and string utilities, key handling, typed-value editing, and package
+consumption through `packages/acceptance`. The docs package builds a VitePress
+guide plus generated API reference. Reference parity and the completion audit are
+tracked in `UPSTREAM.md`.
 
 ## Development
 

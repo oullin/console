@@ -12,7 +12,9 @@ It also exports `form`, output helpers such as `info`, `warning`, `table`, and `
 
 ## Package Overview
 
-The documentation follows the public package surface. Use the guide for task-oriented examples and the API reference for generated type and overload details.
+The package is implemented as TypeScript-first ESM and exposes its supported runtime surface through the public `@ollin/tui` entrypoint. The current implementation includes prompt helpers, form composition, output and status helpers, terminal controls, string and key utilities, OpenTUI text-frame rendering, and deterministic environments for tests or non-standard runtimes.
+
+The documentation follows that public package surface. Use the guide for task-oriented examples and the API reference for generated type and overload details. Runtime behavior and package consumption are covered by local tests, with the detailed reference parity map and completion audit tracked in `UPSTREAM.md`.
 
 ## Complete CLI Flow
 
