@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "src/.vitepress/dist/**", "src/api/**", "$TURBO_ROOT$/provision/.cache/bin/**"]
+      "outputs": ["dist/**", "src/.vitepress/dist/**", "src/api/**"]
     },
     "test": {
       "dependsOn": ["^test"],

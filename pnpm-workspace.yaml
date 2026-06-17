@@ -1,7 +1,6 @@
 packages:
   - "packages/*"
-  - "provision/go"
-  - "provision/ts"
+  - "infra"
 
 allowBuilds:
   esbuild: true

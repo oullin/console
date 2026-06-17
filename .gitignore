@@ -3,12 +3,11 @@ node_modules/
 **/.turbo/
 .cache/
 **/.cache/
-provision/.cache/
+infra/.cache/
 .DS_Store
+.idea/
 coverage/
 *.tsbuildinfo
-packages/artefacts/.logs/
-packages/artefacts/dist/
 packages/tui/dist/
 packages/docs/src/.vitepress/
 packages/docs/src/api/

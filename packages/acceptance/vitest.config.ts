@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const packagePath = dirname(fileURLToPath(import.meta.url));
 const packagesPath = dirname(packagePath);
 const workspacePath = dirname(packagesPath);
-const cachePath = join(workspacePath, 'provision', '.cache', 'vitest', 'acceptance');
+const cachePath = join(workspacePath, 'infra', '.cache', 'vitest', 'acceptance');
 const sourcePath = join(packagesPath, 'tui', 'src', 'index.ts');
 const internalSourcePath = join(packagesPath, 'tui', 'src', '$1');
 

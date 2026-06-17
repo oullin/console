@@ -8,7 +8,7 @@ const testPath = dirname(fileURLToPath(import.meta.url));
 const acceptancePath = dirname(testPath);
 const packagesPath = dirname(acceptancePath);
 const workspacePath = dirname(packagesPath);
-const acceptanceCachePath = join(workspacePath, 'provision', '.cache', 'vitest', 'acceptance');
+const acceptanceCachePath = join(workspacePath, 'infra', '.cache', 'vitest', 'acceptance');
 
 describe('package consumption', () => {
 	it('imports the built public entrypoint through ESM package resolution', () => {

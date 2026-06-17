@@ -1,5 +1,5 @@
 {
-  "extends": ["@ollin/tsconfig/base.json", "@ollin/artefacts/tsconfig/tui.json"],
+  "extends": ["@ollin/infra/tsconfig/base.json", "@ollin/infra/tsconfig/tui.json"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
