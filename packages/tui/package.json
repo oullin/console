@@ -91,6 +91,21 @@
       "import": "./dist/prompts/choices.js",
       "default": "./dist/prompts/choices.js"
     },
+    "./prompts/number": {
+      "types": "./dist/prompts/number.d.ts",
+      "import": "./dist/prompts/number.js",
+      "default": "./dist/prompts/number.js"
+    },
+    "./prompts/password": {
+      "types": "./dist/prompts/password.d.ts",
+      "import": "./dist/prompts/password.js",
+      "default": "./dist/prompts/password.js"
+    },
+    "./prompts/pause": {
+      "types": "./dist/prompts/pause.d.ts",
+      "import": "./dist/prompts/pause.js",
+      "default": "./dist/prompts/pause.js"
+    },
     "./prompts/search": {
       "types": "./dist/prompts/search/index.d.ts",
       "import": "./dist/prompts/search/index.js",
@@ -105,6 +120,16 @@
       "types": "./dist/prompts/suggest/index.d.ts",
       "import": "./dist/prompts/suggest/index.js",
       "default": "./dist/prompts/suggest/index.js"
+    },
+    "./prompts/text": {
+      "types": "./dist/prompts/text.d.ts",
+      "import": "./dist/prompts/text.js",
+      "default": "./dist/prompts/text.js"
+    },
+    "./prompts/textarea": {
+      "types": "./dist/prompts/textarea.d.ts",
+      "import": "./dist/prompts/textarea.js",
+      "default": "./dist/prompts/textarea.js"
     },
     "./status": {
       "types": "./dist/status.d.ts",
