@@ -10,6 +10,10 @@ the public package runtime:
   `@ollin/console-infra/tsconfig/*.json` exports.
 - `make` holds the modular Makefile. The repo-root `Makefile` is a transparent
   forwarder into `infra/make/Makefile`.
+- `scripts/run-turbo.mjs` is the single entry point for workspace turbo tasks
+  (`build`, `test`, `typecheck`). It points turbo's cache, logs, and XDG/Playwright
+  env at `infra/.cache`, then deletes the per-package `.turbo/turbo-<task>.log`
+  dirs turbo writes into each workspace (turbo offers no flag to relocate those).
 - `.cache` is the only mutable tool-cache root for workspace commands.
 
 Cache buckets are named by tool:

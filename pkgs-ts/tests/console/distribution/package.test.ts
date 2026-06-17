@@ -4,11 +4,13 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-const testPath = dirname(fileURLToPath(import.meta.url));
-const acceptancePath = dirname(dirname(testPath));
-const packagesPath = dirname(acceptancePath);
-const workspacePath = dirname(packagesPath);
-const acceptanceCachePath = join(workspacePath, 'infra', '.cache', 'vitest', 'tests');
+const testDirectoryPath = dirname(fileURLToPath(import.meta.url)); // .../tests/console/distribution
+const suitePath = dirname(testDirectoryPath); // .../tests/console
+const testsPackagePath = dirname(suitePath); // .../tests   (consumer package)
+const pkgsTsPath = dirname(testsPackagePath); // .../pkgs-ts
+const consolePackagePath = join(pkgsTsPath, 'console'); // .../pkgs-ts/console  (@ollin/console)
+const workspacePath = dirname(pkgsTsPath); // .../tui  (pnpm workspace root)
+const consumerCachePath = join(workspacePath, 'infra', '.cache', 'vitest', 'tests');
 
 describe('package consumption', () => {
 	it('imports the built public entrypoint through ESM package resolution', () => {
@@ -21,7 +23,7 @@ describe('package consumption', () => {
 			process.execPath,
 			['--input-type=module', '-e', "const module = await import('@ollin/console'); console.log([typeof module.text, typeof module.table, typeof module.stream].join(','));"],
 			{
-				cwd: acceptancePath,
+				cwd: testsPackagePath,
 				encoding: 'utf8',
 			},
 		);
@@ -123,7 +125,7 @@ describe('package consumption', () => {
 				`,
 			],
 			{
-				cwd: acceptancePath,
+				cwd: testsPackagePath,
 				encoding: 'utf8',
 			},
 		);
@@ -137,7 +139,7 @@ describe('package consumption', () => {
 			stdio: 'pipe',
 		});
 
-		const typecheckCachePath = join(acceptanceCachePath, 'types');
+		const typecheckCachePath = join(consumerCachePath, 'types');
 
 		mkdirSync(typecheckCachePath, { recursive: true });
 
@@ -147,7 +149,7 @@ describe('package consumption', () => {
 
 		try {
 			mkdirSync(packageScopeDirectory, { recursive: true });
-			symlinkSync(join(packagesPath, 'console'), join(packageScopeDirectory, 'console'), 'dir');
+			symlinkSync(consolePackagePath, join(packageScopeDirectory, 'console'), 'dir');
 			writeFileSync(
 				consumerPath,
 				`
@@ -214,7 +216,7 @@ describe('package consumption', () => {
 
 			try {
 				execFileSync('pnpm', ['exec', 'tsc', '--ignoreConfig', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--target', 'ES2022', '--strict', '--noEmit', consumerPath], {
-					cwd: acceptancePath,
+					cwd: testsPackagePath,
 					stdio: 'pipe',
 				});
 			} catch (error) {

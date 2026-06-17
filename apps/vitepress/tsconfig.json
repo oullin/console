@@ -8,7 +8,7 @@
 			"@docs-theme/*": ["theme/*"],
 			"@docs-ui/*": ["theme/components/ui/*"]
 		},
-		"tsBuildInfoFile": "../infra/.cache/tsbuild/vitepress.tsbuildinfo"
+		"tsBuildInfoFile": "../../infra/.cache/tsbuild/vitepress.tsbuildinfo"
 	},
 	"include": ["config.ts", "theme/**/*.ts", "vue.d.ts"]
 }

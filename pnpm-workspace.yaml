@@ -2,7 +2,6 @@ packages:
   - "pkgs-ts/*"
   - "apps/*"
   - "pkgs-go"
-  - "vitepress"
   - "infra"
 
 allowBuilds:

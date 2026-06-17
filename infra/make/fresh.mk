@@ -15,7 +15,8 @@ fresh: ## Clean generated state, reinstall dependencies, then build
 		"$(ROOT_PATH)/apps/docs/src/.vitepress/cache" \
 		"$(ROOT_PATH)/apps/docs/src/.vitepress/dist" \
 		"$(ROOT_PATH)/apps/docs/src/api" \
-		"$(ROOT_PATH)/pkgs-ts/console/dist"
+		"$(ROOT_PATH)/pkgs-ts/console/dist" \
+		"$(ROOT_PATH)/pkgs-ts/infra"
 	$(call step,Removing generated workspace caches)
 	find "$(ROOT_PATH)" -path "$(ROOT_PATH)/.git" -prune -o -type d -name '.turbo' -prune -exec rm -rf {} +
 	find "$(ROOT_PATH)" -path "$(ROOT_PATH)/.git" -prune -o -path "$(ROOT_PATH)/infra/.cache" -prune -o -type d -name '.cache' -prune -exec rm -rf {} +

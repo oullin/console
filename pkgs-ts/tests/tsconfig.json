@@ -8,5 +8,5 @@
 			"#console/prompts/*": ["console/src/prompts/*"]
 		}
 	},
-	"include": ["tests/**/*.ts", "vitest.config.ts", "../console/src/**/*.ts"]
+	"include": ["**/*.ts", "../console/src/**/*.ts"]
 }

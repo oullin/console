@@ -9,7 +9,7 @@ const docsSourcePath = join(packagePath, 'src');
 const cachePath = join(workspacePath, 'infra', '.cache', 'vitest', 'docs');
 const consoleSourcePath = join(workspacePath, 'pkgs-ts', 'console', 'src', 'index.ts');
 const internalSourcePath = join(workspacePath, 'pkgs-ts', 'console', 'src', '$1');
-const vitepressConfigPath = join(workspacePath, 'vitepress', 'config.ts');
+const vitepressConfigPath = join(packagesPath, 'vitepress', 'config.ts');
 const docsTestsPath = join(packagePath, 'tests');
 
 export default defineConfig({

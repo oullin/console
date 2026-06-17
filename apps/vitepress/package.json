@@ -7,7 +7,7 @@
 		".": "./config.ts"
 	},
 	"scripts": {
-		"typecheck": "XDG_CACHE_HOME=../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../infra/.cache/playwright tsc -p tsconfig.json --noEmit"
+		"typecheck": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright tsc -p tsconfig.json --noEmit"
 	},
 	"dependencies": {
 		"@fontsource/geist-mono": "^5.2.8",

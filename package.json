@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "XDG_CACHE_HOME=infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=infra/.cache/playwright turbo run build --cache-dir infra/.cache/turbo --log-file infra/.cache/turbo/logs/build.json --output-logs=none",
+    "build": "node infra/scripts/run-turbo.mjs build none",
     "dev": "make dev",
     "format": "make format",
     "format-all": "make format-all",
-    "test": "XDG_CACHE_HOME=infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=infra/.cache/playwright turbo run test --cache-dir infra/.cache/turbo --log-file infra/.cache/turbo/logs/test.json --output-logs=full",
-    "typecheck": "XDG_CACHE_HOME=infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=infra/.cache/playwright turbo run typecheck --cache-dir infra/.cache/turbo --log-file infra/.cache/turbo/logs/typecheck.json --output-logs=none"
+    "test": "node infra/scripts/run-turbo.mjs test full",
+    "typecheck": "node infra/scripts/run-turbo.mjs typecheck none"
   },
   "devDependencies": {
     "@ollin/console-infra": "workspace:*",
