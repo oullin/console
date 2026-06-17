@@ -15,13 +15,8 @@ export class Stream {
 		return this.append(content);
 	}
 
-	append(content: string, deferred = false): this {
-		if (this.#context.lifecycle.closed()) {
-			throw streamClosedError();
-		}
-
-		this.#context.buffer.append(parseStreamChunk(content));
-		this.render(deferred);
+	append(content: string): this {
+		this.appendChunk(content, false);
 
 		return this;
 	}
@@ -42,7 +37,7 @@ export class Stream {
 		return pipeStreamSource(
 			source,
 			(chunk) => {
-				this.append(chunk, true);
+				this.appendChunk(chunk, true);
 			},
 			() => {
 				this.close();
@@ -56,6 +51,15 @@ export class Stream {
 
 	value(): string {
 		return streamBufferValue(this.#context.buffer);
+	}
+
+	private appendChunk(content: string, deferred: boolean): void {
+		if (this.#context.lifecycle.closed()) {
+			throw streamClosedError();
+		}
+
+		this.#context.buffer.append(parseStreamChunk(content));
+		this.render(deferred);
 	}
 
 	private render(deferred: boolean): void {
