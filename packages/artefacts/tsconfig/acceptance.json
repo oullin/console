@@ -1,5 +1,0 @@
-{
-  "compilerOptions": {
-    "tsBuildInfoFile": "../../../provision/.cache/tsbuild/acceptance.tsbuildinfo"
-  }
-}

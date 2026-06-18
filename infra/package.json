@@ -1,0 +1,23 @@
+{
+  "name": "@ollin/console-infra",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./tsconfig/*.json": "./tsconfig/*.json"
+  },
+  "imports": {
+    "#infra/*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "XDG_CACHE_HOME=.cache/xdg PLAYWRIGHT_BROWSERS_PATH=.cache/playwright tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3"
+  }
+}

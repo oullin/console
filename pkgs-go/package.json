@@ -1,0 +1,10 @@
+{
+  "name": "@ollin/pkgs-go",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "if find . -name '*.go' -print -quit | grep -q .; then GOCACHE=\"$PWD/../infra/.cache/go-build\" GOMODCACHE=\"$PWD/../infra/.cache/go-mod\" go build ./...; else echo 'pkgs-go: no Go sources yet, skipping build'; fi",
+    "test": "if find . -name '*.go' -print -quit | grep -q .; then GOCACHE=\"$PWD/../infra/.cache/go-build\" GOMODCACHE=\"$PWD/../infra/.cache/go-mod\" go test ./...; else echo 'pkgs-go: no Go sources yet, skipping test'; fi",
+    "typecheck": "if find . -name '*.go' -print -quit | grep -q .; then GOCACHE=\"$PWD/../infra/.cache/go-build\" GOMODCACHE=\"$PWD/../infra/.cache/go-mod\" go vet ./...; else echo 'pkgs-go: no Go sources yet, skipping vet'; fi"
+  }
+}

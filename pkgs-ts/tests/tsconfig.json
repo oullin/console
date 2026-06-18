@@ -1,0 +1,12 @@
+{
+	"extends": ["@ollin/console-infra/tsconfig/base.json", "@ollin/console-infra/tsconfig/tests.json"],
+	"compilerOptions": {
+		"baseUrl": "..",
+		"paths": {
+			"@ollin/console": ["console/src/index.ts"],
+			"#console/*": ["console/src/*"],
+			"#console/prompts/*": ["console/src/prompts/*"]
+		}
+	},
+	"include": ["**/*.ts", "../console/src/**/*.ts"]
+}

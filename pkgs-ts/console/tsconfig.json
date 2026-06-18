@@ -1,0 +1,11 @@
+{
+  "extends": ["@ollin/console-infra/tsconfig/base.json", "@ollin/console-infra/tsconfig/console.json"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "#console/*": ["./src/*"],
+      "#console/prompts/*": ["./src/prompts/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "vitest.config.ts"]
+}

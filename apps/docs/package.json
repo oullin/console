@@ -1,0 +1,28 @@
+{
+	"name": "docs",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"api": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright typedoc --options typedoc.json && cp src/api/README.md src/api/index.md",
+		"build": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright pnpm api && XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright vitepress build src --config ../vitepress/config.ts",
+		"dev": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright pnpm api && XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright vitepress dev src --config ../vitepress/config.ts --host 127.0.0.1",
+		"preview": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright vitepress preview src --config ../vitepress/config.ts --host 127.0.0.1",
+		"test": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright vitest run --config vitest.config.ts",
+		"typecheck": "XDG_CACHE_HOME=../../infra/.cache/xdg PLAYWRIGHT_BROWSERS_PATH=../../infra/.cache/playwright tsc -p tsconfig.json --noEmit"
+	},
+	"dependencies": {
+		"@ollin/console": "workspace:*",
+		"@ollin/vitepress": "workspace:*"
+	},
+	"devDependencies": {
+		"@ollin/console-infra": "workspace:*",
+		"@types/node": "^25.6.2",
+		"typedoc": "^0.28.19",
+		"typedoc-plugin-markdown": "^4.12.0",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.16",
+		"vitepress": "^1.6.4",
+		"vitest": "^4.1.5"
+	}
+}

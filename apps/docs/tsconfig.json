@@ -1,0 +1,16 @@
+{
+	"extends": "@ollin/console-infra/tsconfig/base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@docs/*": ["src/*"],
+			"@docs-tests/*": ["tests/*"],
+			"@ollin/vitepress": ["../vitepress/config.ts"],
+			"@ollin/console": ["../../pkgs-ts/console/src/index.ts"],
+			"#console/*": ["../../pkgs-ts/console/src/*"],
+			"#console/prompts/*": ["../../pkgs-ts/console/src/prompts/*"]
+		},
+		"tsBuildInfoFile": "../../infra/.cache/tsbuild/docs.tsbuildinfo"
+	},
+	"include": ["examples/**/*.ts", "tests/**/*.ts", "vitest.config.ts", "../vitepress/config.ts", "../../pkgs-ts/console/src/**/*.ts"]
+}

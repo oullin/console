@@ -1,14 +1,27 @@
+# infra/.cache is the only mutable tool-cache root (see infra/README.md).
+# Every cache/build artifact below is generated and deliberately ignored;
+# nothing cache-related should ever live outside infra/.cache.
 node_modules/
+
+# Tool caches & build output (all redirected into infra/.cache)
 .turbo/
 **/.turbo/
 .cache/
 **/.cache/
-provision/.cache/
-.DS_Store
+infra/.cache/
 coverage/
 *.tsbuildinfo
-packages/artefacts/.logs/
-packages/artefacts/dist/
-packages/tui/dist/
-packages/docs/src/.vitepress/
-packages/docs/src/api/
+**/dist/
+**/.vitepress/cache/
+**/.vitepress/dist/
+apps/docs/src/.vitepress/
+apps/docs/src/api/
+
+# OS / editor
+.DS_Store
+.idea/
+
+# Go
+pkgs-go/bin/
+*.test
+*.out

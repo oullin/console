@@ -1,7 +1,8 @@
 packages:
-  - "packages/*"
-  - "provision/go"
-  - "provision/ts"
+  - "pkgs-ts/*"
+  - "apps/*"
+  - "pkgs-go"
+  - "infra"
 
 allowBuilds:
   esbuild: true
